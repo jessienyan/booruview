@@ -47,6 +47,8 @@ type Store = {
         searchOnLoad: boolean;
         highResImages: boolean;
 
+        blacklist: Tag[];
+
         save(): void;
         write<K extends SettingsKey, V = Store["settings"][K]>(
             key: K,
@@ -102,6 +104,8 @@ const store = reactive<Store>({
         ),
         highResImages: loadValue("highResImages", true, JSON.parse),
 
+        blacklist: loadValue("blacklist", [], JSON.parse),
+
         save() {
             this.write("consented", JSON.stringify);
             this.write("columnSizing", (v) => v);
@@ -111,6 +115,7 @@ const store = reactive<Store>({
             this.write("searchOnLoad", JSON.stringify);
             this.write("closeSidebarOnSearch", JSON.stringify);
             this.write("highResImages", JSON.stringify);
+            this.write("blacklist", JSON.stringify);
         },
 
         write<K extends keyof Store["settings"], V = Store["settings"][K]>(
