@@ -8,7 +8,7 @@ import store from "@/store";
         v-if="store.settings.blacklist.length > 0"
         :jiggle="false"
         :show-checkmark="false"
-        :tags="store.settings.blacklist"
+        :included-tags="store.settings.blacklist"
     />
     <template v-else>
         <p>
