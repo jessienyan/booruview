@@ -4,8 +4,9 @@ import AboutTab from "./AboutTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
+import BlacklistTab from "./BlacklistTab.vue";
 
-type Tab = "about" | "help" | "settings";
+type Tab = "about" | "help" | "settings" | "blacklist";
 const currentTab = ref<Tab>("about");
 
 // CBA writing the full setting each time
@@ -50,6 +51,13 @@ function toggleClose() {
             >
                 settings
             </button>
+            <button
+                class="tab-btn"
+                :class="{ active: currentTab === 'blacklist' && !closed }"
+                @click="switchTab('blacklist')"
+            >
+                blacklist
+            </button>
 
             <button
                 class="tab-btn close-btn"
@@ -71,6 +79,7 @@ function toggleClose() {
                 <HelpTab v-if="currentTab === 'help'" />
                 <AboutTab v-else-if="currentTab === 'about'" />
                 <SettingsTab v-else-if="currentTab === 'settings'" />
+                <BlacklistTab v-else-if="currentTab === 'blacklist'" />
             </KeepAlive>
         </div>
     </div>
