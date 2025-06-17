@@ -1,21 +1,31 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Chip from "./tag-chip/Chip.vue";
-import store from "@/store";
 
-type listCategories = {
-    artist: Tag[];
-    character: Tag[];
-    copyright: Tag[];
-    tag: Tag[];
-    metadata: Tag[];
-    unknown: Tag[];
+type statefulTag = {
+    state: TagState;
+    tag: Tag;
 };
 
-const { jiggle, tags, showCheckmark } = defineProps<{
-    jiggle: boolean;
-    tags: Tag[];
-    showCheckmark: boolean;
+type listCategories = {
+    artist: statefulTag[];
+    character: statefulTag[];
+    copyright: statefulTag[];
+    tag: statefulTag[];
+    metadata: statefulTag[];
+    unknown: statefulTag[];
+};
+
+const {
+    jiggle = false,
+    includedTags = [],
+    excludedTags = [],
+    showCheckmark = false,
+} = defineProps<{
+    jiggle?: boolean;
+    includedTags?: Tag[];
+    excludedTags?: Tag[];
+    showCheckmark?: boolean;
 }>();
 
 const categories = computed(() => {
@@ -28,110 +38,100 @@ const categories = computed(() => {
         unknown: [],
     };
 
-    function sortTag(tag: Tag) {
+    function sortTag(tag: Tag, state: TagState) {
         switch (tag.type) {
             case "artist":
-                ret.artist = ret.artist.concat(tag);
+                ret.artist = ret.artist.concat({ state, tag });
                 break;
             case "character":
-                ret.character = ret.character.concat(tag);
+                ret.character = ret.character.concat({ state, tag });
                 break;
             case "copyright":
-                ret.copyright = ret.copyright.concat(tag);
+                ret.copyright = ret.copyright.concat({ state, tag });
                 break;
             case "deprecated":
             case "tag":
-                ret.tag = ret.tag.concat(tag);
+                ret.tag = ret.tag.concat({ state, tag });
                 break;
             case "metadata":
-                ret.metadata = ret.metadata.concat(tag);
+                ret.metadata = ret.metadata.concat({ state, tag });
                 break;
             case "unknown":
-                ret.unknown = ret.unknown.concat(tag);
+                ret.unknown = ret.unknown.concat({ state, tag });
                 break;
         }
     }
 
-    tags.forEach(sortTag);
+    includedTags.forEach((v) => sortTag(v, showCheckmark ? "include" : "none"));
+    excludedTags.forEach((v) => sortTag(v, "exclude"));
 
-    ret.artist.sort((a, b) => a.name.localeCompare(b.name));
-    ret.character.sort((a, b) => a.name.localeCompare(b.name));
-    ret.copyright.sort((a, b) => a.name.localeCompare(b.name));
-    ret.tag.sort((a, b) => a.name.localeCompare(b.name));
-    ret.metadata.sort((a, b) => a.name.localeCompare(b.name));
-    ret.unknown.sort((a, b) => a.name.localeCompare(b.name));
+    ret.artist.sort(({ tag: a }, { tag: b }) => a.name.localeCompare(b.name));
+    ret.character.sort(({ tag: a }, { tag: b }) =>
+        a.name.localeCompare(b.name),
+    );
+    ret.copyright.sort(({ tag: a }, { tag: b }) =>
+        a.name.localeCompare(b.name),
+    );
+    ret.tag.sort(({ tag: a }, { tag: b }) => a.name.localeCompare(b.name));
+    ret.metadata.sort(({ tag: a }, { tag: b }) => a.name.localeCompare(b.name));
+    ret.unknown.sort(({ tag: a }, { tag: b }) => a.name.localeCompare(b.name));
 
     return ret;
 });
-
-const tagState = (tag: Tag) =>
-    computed<TagState>(() => {
-        const included = store.query.include.has(tag.name);
-        if (included) {
-            return showCheckmark ? "include" : "none";
-        }
-
-        const excluded = store.query.exclude.has(tag.name);
-        if (excluded) {
-            return "exclude";
-        }
-
-        return "none";
-    });
 </script>
 
 <template>
     <h3 v-if="categories.artist.length > 0">artist</h3>
     <Chip
-        v-for="t in categories.artist"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.artist"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 
     <h3 v-if="categories.character.length > 0">character</h3>
     <Chip
-        v-for="t in categories.character"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.character"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 
     <h3 v-if="categories.copyright.length > 0">copyright</h3>
     <Chip
-        v-for="t in categories.copyright"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.copyright"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 
     <h3 v-if="categories.tag.length > 0">tags</h3>
     <Chip
-        v-for="t in categories.tag"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.tag"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 
     <h3 v-if="categories.metadata.length > 0">metadata</h3>
     <Chip
-        v-for="t in categories.metadata"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.metadata"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 
     <h3 v-if="categories.unknown.length > 0">raw</h3>
     <Chip
-        v-for="t in categories.unknown"
-        :key="t.name"
-        :tag="t"
-        :state="tagState(t).value"
+        v-for="{ state, tag } in categories.unknown"
+        :key="tag.name"
+        :tag="tag"
+        :state="state"
         :jiggle="jiggle"
     />
 </template>
