@@ -92,12 +92,8 @@ function onRouteChange() {
 function onPageLoad() {
     loadQueryParams()
         .then(() => {
-            if (store.settings.searchOnLoad) {
-                store.searchPosts().then(() => {
-                    if (store.settings.closeSidebarOnSearch) {
-                        store.sidebarClosed = true;
-                    }
-                });
+            if (store.settings.searchOnLoad && !store.query.isEmpty()) {
+                store.searchPosts();
             }
         })
         .catch(() => {

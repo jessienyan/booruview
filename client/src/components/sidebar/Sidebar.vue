@@ -16,14 +16,7 @@ function doPostSearch() {
     store.currentPage = 1;
     store.posts.clear();
 
-    store
-        .searchPosts()
-        .then(() => {
-            if (store.settings.closeSidebarOnSearch) {
-                store.sidebarClosed = true;
-            }
-        })
-        .catch(() => store.posts.clear());
+    store.searchPosts().catch(() => store.posts.clear());
 }
 
 function onTagSelect(tag: Tag, negated: boolean) {

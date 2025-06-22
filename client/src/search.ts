@@ -18,6 +18,10 @@ class SearchQuery {
         this.exclude.clear();
     }
 
+    isEmpty() {
+        return this.include.size + this.exclude.size === 0;
+    }
+
     includeTag(t: Tag) {
         this.include.set(t.name, t);
         this.exclude.delete(t.name);
