@@ -15,7 +15,12 @@ type Tag = {
     type: TagType;
 };
 
-type TagState = "include" | "exclude" | "none";
+type ChipStyle = "checkmark" | "strikethrough" | "none";
+
+type TagChip = {
+    style: ChipStyle;
+    tag: Tag;
+};
 
 type Rating = "general" | "sensitive" | "questionable" | "explicit";
 

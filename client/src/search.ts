@@ -1,16 +1,18 @@
 class SearchQuery {
-    include: Map<string, Tag>;
-    exclude: Map<string, Tag>;
+    _include: Map<string, Tag>;
+    _exclude: Map<string, Tag>;
 
     constructor() {
-        this.include = new Map();
-        this.exclude = new Map();
+        this._include = new Map();
+        this._exclude = new Map();
     }
 
-    all(): Tag[] {
-        return Array.from(this.include.values()).concat(
-            Array.from(this.exclude.values()),
-        );
+    included(): Tag[] {
+        return Array.from(this._include.values());
+    }
+
+    excluded(): Tag[] {
+        return Array.from(this._exclude.values());
     }
 
     clear() {
@@ -23,42 +25,42 @@ class SearchQuery {
     }
 
     includeTag(t: Tag) {
-        this.include.set(t.name, t);
-        this.exclude.delete(t.name);
+        this._include.set(t.name, t);
+        this._exclude.delete(t.name);
     }
 
     excludeTag(t: Tag) {
-        this.exclude.set(t.name, t);
-        this.include.delete(t.name);
+        this._exclude.set(t.name, t);
+        this._include.delete(t.name);
     }
 
     removeTag(t: Tag) {
-        this.include.delete(t.name);
-        this.exclude.delete(t.name);
+        this._include.delete(t.name);
+        this._exclude.delete(t.name);
     }
 
     asList(): string[] {
-        const include = Array.from(this.include.values(), (t) => t.name);
-        const exclude = Array.from(this.exclude.values(), (t) => "-" + t.name);
+        const include = Array.from(this._include.values(), (t) => t.name);
+        const exclude = Array.from(this._exclude.values(), (t) => "-" + t.name);
         return include.concat(exclude);
     }
 
     equals(o: SearchQuery): boolean {
         if (
-            this.include.size !== o.include.size ||
-            this.exclude.size !== o.exclude.size
+            this._include.size !== o._include.size ||
+            this._exclude.size !== o._exclude.size
         ) {
             return false;
         }
 
-        for (const k of this.include.keys()) {
-            if (!o.include.has(k)) {
+        for (const k of this._include.keys()) {
+            if (!o._include.has(k)) {
                 return false;
             }
         }
 
-        for (const k of this.exclude.keys()) {
-            if (!o.exclude.has(k)) {
+        for (const k of this._exclude.keys()) {
+            if (!o._exclude.has(k)) {
                 return false;
             }
         }
@@ -68,8 +70,8 @@ class SearchQuery {
 
     copy(): SearchQuery {
         const clone = new SearchQuery();
-        clone.include = new Map(this.include);
-        clone.exclude = new Map(this.exclude);
+        clone._include = new Map(this._include);
+        clone._exclude = new Map(this._exclude);
         return clone;
     }
 }

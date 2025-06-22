@@ -2,11 +2,6 @@
 import { computed } from "vue";
 import Chip from "./tag-chip/Chip.vue";
 
-type statefulTag = {
-    state: TagState;
-    tag: Tag;
-};
-
 type listCategories = {
     artist: statefulTag[];
     character: statefulTag[];
