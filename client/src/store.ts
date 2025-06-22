@@ -205,6 +205,11 @@ const store = reactive<Store>({
                         this.posts.set(this.currentPage, json.results);
                         this.resultsPerPage = json.count_per_page;
                         this.totalPostCount = json.total_count;
+
+                        if (this.settings.closeSidebarOnSearch) {
+                            this.sidebarClosed = true;
+                        }
+
                         resolve();
                     });
                 })
