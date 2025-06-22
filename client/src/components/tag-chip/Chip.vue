@@ -4,9 +4,8 @@ import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 const {
     jiggle = false,
-    state,
-    tag,
-} = defineProps<{ jiggle?: boolean; state: TagState; tag: Tag }>();
+    tag
+} = defineProps<{ jiggle?: boolean; tag: TagChip }>();
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
 
