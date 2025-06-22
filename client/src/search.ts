@@ -13,6 +13,11 @@ class SearchQuery {
         );
     }
 
+    clear() {
+        this.include.clear();
+        this.exclude.clear();
+    }
+
     includeTag(t: Tag) {
         this.include.set(t.name, t);
         this.exclude.delete(t.name);
