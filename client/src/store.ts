@@ -172,8 +172,11 @@ const store = reactive<Store>({
         this.fetchingPosts = true;
 
         return new Promise((resolve, reject) => {
-            const query =
-                `q=${encodeURIComponent(this.query.asList().join(","))}` +
+            const query = this.query
+                .asList()
+                .concat(this.settings.blacklist.map((t) => `-${t.name}`));
+            const queryParams =
+                `q=${encodeURIComponent(query.join(","))}` +
                 `&page=${this.currentPage}`;
 
             this.setQueryParams();
@@ -185,7 +188,7 @@ const store = reactive<Store>({
                 return;
             }
 
-            fetch("/api/posts?" + query)
+            fetch("/api/posts?" + queryParams)
                 .then((resp) => {
                     if (resp.status >= 400) {
                         resp.json()
