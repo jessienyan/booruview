@@ -10,8 +10,8 @@ const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
 
 const cls = computed(() => ({
-    [`state-${state}`]: true,
-    [tag.type]: true,
+    [`style-${tag.style}`]: true,
+    [`excluded`]: tag.style === "strikethrough",
     jiggle: jiggle && !hasJiggled,
 }));
 
@@ -35,7 +35,7 @@ function onClick() {
     }
 
     store.tagMenu = {
-        tag,
+        tag: tag.tag,
         ref: chipRef.value,
     };
 }
@@ -43,9 +43,9 @@ function onClick() {
 
 <template>
     <div class="chip" :class="cls" ref="chip" @click="onClick">
-        <i class="bi bi-check-lg" v-if="state === 'include'"></i>
-        {{ tag.name
-        }}<span class="dep-warning" v-if="tag.type === 'deprecated'">
+        <i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i>
+        {{ tag.tag.name
+        }}<span class="dep-warning" v-if="tag.tag.type === 'deprecated'">
             (deprecated)</span
         >
     </div>
@@ -64,11 +64,6 @@ function onClick() {
     word-break: break-all;
     cursor: pointer;
 
-    &.state-exclude {
-        filter: brightness(0.8);
-        text-decoration: line-through;
-    }
-
     .dep-warning {
         color: #f44;
     }
@@ -80,6 +75,11 @@ function onClick() {
         background: $color-lightgray;
         color: white;
     }
+}
+
+.style-exclude {
+    filter: brightness(0.8);
+    text-decoration: line-through;
 }
 
 @keyframes jiggle-anim {
@@ -104,31 +104,31 @@ function onClick() {
     animation: 300ms linear 0s jiggle-anim;
 }
 
-.deprecated,
-.tag {
+.tag-deprecated,
+.tag-tag {
     background-color: #303030;
     color: hsl(208, 56%, 75%);
 }
 
-.artist {
+.tag-artist {
     background-color: #a00;
     color: #fff;
 }
 
-.copyright {
+.tag-copyright {
     background-color: #a0a;
     color: #fff;
 }
 
-.character {
+.tag-character {
     background-color: #0a0;
 }
 
-.metadata {
+.tag-metadata {
     background-color: #f80;
 }
 
-.unknown {
+.tag-unknown {
     background-color: #6275ae;
     color: #0b1227;
 }
