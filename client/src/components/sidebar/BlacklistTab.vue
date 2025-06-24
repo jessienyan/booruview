@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import TagList from "../TagList.vue";
 import store from "@/store";
+
+const styledTags = computed<TagChip[]>(() =>
+    store.settings.blacklist.map((tag) => ({ tag, style: "default" })),
+);
 </script>
 
 <template>
     <TagList
         v-if="store.settings.blacklist.length > 0"
         :jiggle="false"
-        :show-checkmark="false"
-        :included-tags="store.settings.blacklist"
+        :tags="styledTags"
     />
     <template v-else>
         <p>

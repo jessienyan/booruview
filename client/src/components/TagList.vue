@@ -4,14 +4,9 @@ import Chip from "./tag-chip/Chip.vue";
 
 type listCategories = Record<TagType, TagChip[]>;
 
-const {
-    jiggle = false,
-    tags = [],
-    showCheckmark = false,
-} = defineProps<{
+const { jiggle = false, tags = [] } = defineProps<{
     jiggle?: boolean;
     tags: TagChip[];
-    showCheckmark?: boolean;
 }>();
 
 const categories = computed(() => {
@@ -25,7 +20,8 @@ const categories = computed(() => {
         unknown: [],
     };
 
-    tags.forEach(t => ret[t.tag.type].concat(t));
+    tags.forEach((t) => (ret[t.tag.type] = ret[t.tag.type].concat(t)));
+
     // Move deprecated tags into the regular tag section
     ret.tag = ret.tag.concat(ret.deprecated);
     ret.deprecated = [];

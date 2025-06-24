@@ -7,21 +7,29 @@ class SearchQuery {
         this._exclude = new Map();
     }
 
-    included(): Tag[] {
+    includedList(): Tag[] {
         return Array.from(this._include.values());
     }
 
-    excluded(): Tag[] {
+    excludedList(): Tag[] {
         return Array.from(this._exclude.values());
     }
 
     clear() {
-        this.include.clear();
-        this.exclude.clear();
+        this._include.clear();
+        this._exclude.clear();
+    }
+
+    isExcluded(name: string) {
+        return this._exclude.has(name);
+    }
+
+    isIncluded(name: string) {
+        return this._include.has(name);
     }
 
     isEmpty() {
-        return this.include.size + this.exclude.size === 0;
+        return this._include.size + this._exclude.size === 0;
     }
 
     includeTag(t: Tag) {

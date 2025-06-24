@@ -2,16 +2,16 @@
 import store from "@/store";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
 
-const {
-    jiggle = false,
-    tag
-} = defineProps<{ jiggle?: boolean; tag: TagChip }>();
+const { jiggle = false, tag } = defineProps<{
+    jiggle?: boolean;
+    tag: TagChip;
+}>();
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
 
 const cls = computed(() => ({
-    [`style-${tag.style}`]: true,
-    [`excluded`]: tag.style === "strikethrough",
+    [`tag-${tag.tag.type}`]: true,
+    strikethrough: tag.style === "strikethrough",
     jiggle: jiggle && !hasJiggled,
 }));
 
@@ -77,7 +77,7 @@ function onClick() {
     }
 }
 
-.style-exclude {
+.strikethrough {
     filter: brightness(0.8);
     text-decoration: line-through;
 }

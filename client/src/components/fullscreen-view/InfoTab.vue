@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import store from "@/store";
-import { ref, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import TagList from "../TagList.vue";
 
 const tags = ref<Tag[]>([]);
@@ -13,11 +13,28 @@ watchEffect(() => {
 
     store.tagsForPost(post).then((val) => (tags.value = val));
 });
+
+const styledTags = computed(() =>
+    tags.value.map((t) => {
+        const ret: TagChip = {
+            tag: t,
+            style: "default",
+        };
+
+        if (store.query.isIncluded(t.name)) {
+            ret.style = "checkmark";
+        } else if (store.query.isExcluded(t.name)) {
+            ret.style = "strikethrough";
+        }
+
+        return ret;
+    }),
+);
 </script>
 
 <template>
     <div class="tag-list">
-        <TagList :jiggle="false" :tags="tags" :show-checkmark="true" />
+        <TagList :jiggle="false" :tags="styledTags" />
     </div>
 </template>
 
