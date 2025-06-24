@@ -34,10 +34,14 @@ function onClick() {
         return;
     }
 
-    store.tagMenu = {
-        tag: tag.tag,
-        ref: chipRef.value,
-    };
+    // HACK: clicking another chip will cause the menu to be closed by ChipMenu.
+    // Deferring this allows a new tag to be set after the close is triggered.
+    setTimeout(() => {
+        store.tagMenu = {
+            tag: tag.tag,
+            ref: chipRef.value,
+        };
+    }, 0);
 }
 </script>
 

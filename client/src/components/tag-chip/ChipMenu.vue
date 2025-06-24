@@ -10,7 +10,7 @@ const isIncluded = computed(() => {
         return false;
     }
 
-    return store.query._include.has(store.tagMenu.tag.name);
+    return store.query.isIncluded(store.tagMenu.tag.name);
 });
 
 const isExcluded = computed(() => {
@@ -18,7 +18,7 @@ const isExcluded = computed(() => {
         return false;
     }
 
-    return store.query._exclude.has(store.tagMenu.tag.name);
+    return store.query.isExcluded(store.tagMenu.tag.name);
 });
 
 function closeMenu() {
