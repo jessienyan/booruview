@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import store from "@/store";
-import { computed, useTemplateRef } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useDismiss } from "@/composable";
 
 const containerRef = useTemplateRef("container");
+const showBlacklistConfirm = ref(false);
+
+// Reset confirmation if tag changes
+watch([store.tagMenu], () => (showBlacklistConfirm.value = false));
+useDismiss([containerRef, store.tagMenu?.ref || null], closeMenu);
+
+const isBlacklisted = computed(() => {
+    if (store.tagMenu === null) {
+        return false;
+    }
+
+    const name = store.tagMenu.tag.name;
+    return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
+});
 
 const isIncluded = computed(() => {
     if (store.tagMenu === null) {
@@ -24,8 +38,6 @@ const isExcluded = computed(() => {
 function closeMenu() {
     store.tagMenu = null;
 }
-
-useDismiss([store.tagMenu?.ref || null], closeMenu);
 
 const menuPosition = computed(() => {
     const ref = store.tagMenu?.ref;
@@ -56,7 +68,7 @@ const menuPosition = computed(() => {
 });
 
 function onAdd() {
-    if (!store.tagMenu) {
+    if (store.tagMenu === null) {
         return;
     }
 
@@ -64,8 +76,28 @@ function onAdd() {
     closeMenu();
 }
 
+function onBlacklist() {
+    if (store.tagMenu === null) {
+        return;
+    }
+
+    showBlacklistConfirm.value = true;
+}
+
+function onConfirmBlacklist() {
+    if (store.tagMenu === null) {
+        return;
+    }
+
+    store.settings.blacklist = store.settings.blacklist.concat(
+        store.tagMenu.tag,
+    );
+    store.settings.save();
+    closeMenu();
+}
+
 function onExclude() {
-    if (!store.tagMenu) {
+    if (store.tagMenu === null) {
         return;
     }
 
@@ -74,11 +106,41 @@ function onExclude() {
 }
 
 function onRemove() {
-    if (!store.tagMenu) {
+    if (store.tagMenu === null) {
         return;
     }
 
+    const name = store.tagMenu.tag.name;
+    const i = store.settings.blacklist.findIndex((t) => t.name === name);
+
+    // Tag is blacklisted, remove from blacklist
+    if (i !== -1) {
+        store.settings.blacklist.splice(i, 1);
+        store.settings.save();
+        closeMenu();
+        return;
+    }
+
+    // Remove from query
     store.query.removeTag(store.tagMenu.tag);
+    closeMenu();
+}
+
+function onWhitelist() {
+    if (store.tagMenu === null) {
+        return;
+    }
+
+    const name = store.tagMenu.tag.name;
+    const i = store.settings.blacklist.findIndex((t) => t.name === name);
+
+    // shouldn't happen
+    if (i === -1) {
+        return;
+    }
+
+    store.settings.blacklist.splice(i, 1);
+    store.settings.save();
     closeMenu();
 }
 </script>
@@ -87,27 +149,38 @@ function onRemove() {
     <div class="options" ref="container" :style="menuPosition">
         <button
             class="btn-primary option-btn"
-            v-if="isExcluded || !isIncluded"
+            v-if="!isBlacklisted && (isExcluded || !isIncluded)"
             @click="onAdd"
         >
             <i class="bi bi-plus-lg"></i> include
         </button>
         <button
             class="btn-primary option-btn"
-            v-if="!isExcluded || isIncluded"
+            v-if="!isBlacklisted && (!isExcluded || isIncluded)"
             @click="onExclude"
         >
             <i class="bi bi-dash-lg"></i> exclude
         </button>
         <button
             class="btn-primary option-btn"
-            v-if="isExcluded || isIncluded"
+            v-if="isExcluded || isIncluded || isBlacklisted"
             @click="onRemove"
         >
             <i class="bi bi-x-lg"></i> remove
         </button>
-        <button class="btn-primary option-btn blacklist">
+        <button
+            class="btn-primary option-btn blacklist"
+            v-if="!isBlacklisted && !showBlacklistConfirm"
+            @click="onBlacklist"
+        >
             <i class="bi bi-ban"></i> blacklist
+        </button>
+        <button
+            class="btn-primary option-btn blacklist"
+            v-else-if="!isBlacklisted && showBlacklistConfirm"
+            @click="onConfirmBlacklist"
+        >
+            <i class="bi bi-ban"></i> confirm blacklist
         </button>
     </div>
 </template>
@@ -138,6 +211,10 @@ function onRemove() {
 
         &:last-of-type {
             border-radius: 0 0 4px 4px;
+        }
+
+        &:only-of-type {
+            border-radius: 4px 4px 4px 4px;
         }
 
         &:not(:last-of-type) {

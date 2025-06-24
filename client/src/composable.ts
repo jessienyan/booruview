@@ -4,21 +4,23 @@ import {
     onUnmounted,
     ref,
     toValue,
-    type ComponentPublicInstance,
     type ComputedRef,
     type MaybeRefOrGetter,
-    type ShallowRef,
 } from "vue";
 
-export function useDismiss(el: (HTMLElement | null)[], onDismiss: () => void) {
+export function useDismiss(
+    el: MaybeRefOrGetter<HTMLElement | null>[],
+    onDismiss: () => void,
+) {
     function handler(e: MouseEvent) {
         const clickedOutside =
             el.findIndex((v) => {
-                if (v === null) {
+                const real = toValue(v);
+                if (real === null) {
                     return false;
                 }
 
-                return v.contains(e.target as Node);
+                return real.contains(e.target as Node);
             }) === -1; // Clicked element was not found in any of `el`
 
         if (clickedOutside) {
