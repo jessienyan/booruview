@@ -11,7 +11,7 @@ const chipRef = useTemplateRef("chip");
 
 const cls = computed(() => ({
     [`tag-${tag.tag.type}`]: true,
-    strikethrough: tag.style === "strikethrough",
+    strikethrough: tag.style === "strikethrough" || tag.style === "blacklist",
     jiggle: jiggle && !hasJiggled,
 }));
 
@@ -48,8 +48,9 @@ function onClick() {
 <template>
     <div class="chip" :class="cls" ref="chip" @click="onClick">
         <i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i>
+        <i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i>
         {{ tag.tag.name
-        }}<span class="dep-warning" v-if="tag.tag.type === 'deprecated'">
+        }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
             (deprecated)</span
         >
     </div>
@@ -68,7 +69,7 @@ function onClick() {
     word-break: break-all;
     cursor: pointer;
 
-    .dep-warning {
+    .warning {
         color: #f44;
     }
 }
