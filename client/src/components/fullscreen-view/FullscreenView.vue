@@ -14,6 +14,8 @@ const currentTab = ref<Tab>("content");
 
 function close() {
     store.fullscreenPost = null;
+    // Explicitly close the tag menu since panzoom eats the click event
+    store.tagMenu = null;
 }
 
 function onKeyDown(e: KeyboardEvent) {
