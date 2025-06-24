@@ -3,6 +3,7 @@ import store from "@/store";
 import TagList from "../TagList.vue";
 import SearchForm from "../search/SearchForm.vue";
 import TabContainer from "./TabContainer.vue";
+import { computed } from "vue";
 
 defineEmits(["toggle"]);
 
@@ -45,6 +46,19 @@ function onTagSelect(tag: Tag, negated: boolean) {
         });
     }
 }
+
+const styledTags = computed(() => {
+    let ret: TagChip[];
+
+    ret = store.query.includedList().map((tag) => ({ tag, style: "default" }));
+    ret = ret.concat(
+        store.query
+            .excludedList()
+            .map((tag) => ({ tag, style: "strikethrough" })),
+    );
+
+    return ret;
+});
 </script>
 
 <template>
@@ -64,12 +78,7 @@ function onTagSelect(tag: Tag, negated: boolean) {
                 />
 
                 <div class="taglist-container">
-                    <TagList
-                        :jiggle="true"
-                        :included-tags="store.query.included()"
-                        :excluded-tags="store.query.excluded()"
-                        :show-checkmark="false"
-                    />
+                    <TagList :jiggle="true" :tags="styledTags" />
                 </div>
             </div>
 
