@@ -25,7 +25,7 @@ function closeMenu() {
     store.tagMenu = null;
 }
 
-useDismiss([containerRef.value, store.tagMenu?.ref || null], closeMenu);
+useDismiss([store.tagMenu?.ref || null], closeMenu);
 
 const menuPosition = computed(() => {
     const ref = store.tagMenu?.ref;
