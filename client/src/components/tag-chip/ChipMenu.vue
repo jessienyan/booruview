@@ -106,7 +106,7 @@ function onRemove() {
         >
             <i class="bi bi-x-lg"></i> remove
         </button>
-        <button class="btn-primary option-btn blacklist" disabled>
+        <button class="btn-primary option-btn blacklist">
             <i class="bi bi-ban"></i> blacklist
         </button>
     </div>
@@ -123,25 +123,26 @@ function onRemove() {
     z-index: 999;
     width: max-content;
     box-shadow: 0 0 10px black;
-}
 
-.option-btn {
-    text-align: left;
+    .option-btn {
+        padding: 12px;
+        text-align: left;
 
-    .bi {
-        margin-right: 5px;
-    }
+        .bi {
+            margin-right: 5px;
+        }
 
-    &:first-of-type {
-        border-radius: 4px 4px 0 0;
-    }
+        &:first-of-type {
+            border-radius: 4px 4px 0 0;
+        }
 
-    &:last-of-type {
-        border-radius: 0 0 4px 4px;
-    }
+        &:last-of-type {
+            border-radius: 0 0 4px 4px;
+        }
 
-    &:not(:last-of-type) {
-        border-bottom: none;
+        &:not(:last-of-type) {
+            border-bottom: none;
+        }
     }
 }
 
