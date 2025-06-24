@@ -93,6 +93,7 @@ function onConfirmBlacklist() {
         store.tagMenu.tag,
     );
     store.settings.save();
+    store.query.removeTag(store.tagMenu.tag);
     closeMenu();
 }
 
@@ -168,16 +169,22 @@ function onWhitelist() {
         >
             <i class="bi bi-x-lg"></i> remove
         </button>
+
+        <!--
+        NOTE: Important to use v-show here to avoid the menu being hidden.
+        If the button element is removed from the page the click event won't
+        appear to have come from within the container
+        -->
         <button
             class="btn-primary option-btn blacklist"
-            v-if="!isBlacklisted && !showBlacklistConfirm"
+            v-show="!isBlacklisted && !showBlacklistConfirm"
             @click="onBlacklist"
         >
             <i class="bi bi-ban"></i> blacklist
         </button>
         <button
             class="btn-primary option-btn blacklist"
-            v-else-if="!isBlacklisted && showBlacklistConfirm"
+            v-if="!isBlacklisted && showBlacklistConfirm"
             @click="onConfirmBlacklist"
         >
             <i class="bi bi-ban"></i> confirm blacklist
