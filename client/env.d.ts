@@ -15,7 +15,7 @@ type Tag = {
     type: TagType;
 };
 
-type ChipStyle = "checkmark" | "strikethrough" | "default";
+type ChipStyle = "blacklist" | "checkmark" | "strikethrough" | "default";
 
 type TagChip = {
     style: ChipStyle;

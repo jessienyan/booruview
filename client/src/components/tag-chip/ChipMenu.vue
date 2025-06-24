@@ -111,18 +111,6 @@ function onRemove() {
         return;
     }
 
-    const name = store.tagMenu.tag.name;
-    const i = store.settings.blacklist.findIndex((t) => t.name === name);
-
-    // Tag is blacklisted, remove from blacklist
-    if (i !== -1) {
-        store.settings.blacklist.splice(i, 1);
-        store.settings.save();
-        closeMenu();
-        return;
-    }
-
-    // Remove from query
     store.query.removeTag(store.tagMenu.tag);
     closeMenu();
 }
@@ -164,8 +152,7 @@ function onWhitelist() {
         </button>
         <button
             class="btn-primary option-btn"
-            :class="{ rounded: isBlacklisted }"
-            v-if="isExcluded || isIncluded || isBlacklisted"
+            v-if="isExcluded || isIncluded"
             @click="onRemove"
         >
             <i class="bi bi-x-lg"></i> remove
@@ -189,6 +176,13 @@ function onWhitelist() {
             @click="onConfirmBlacklist"
         >
             <i class="bi bi-ban"></i> confirm blacklist
+        </button>
+        <button
+            class="btn-primary option-btn rounded"
+            v-if="isBlacklisted"
+            @click="onWhitelist"
+        >
+            <i class="bi bi-x-lg"></i> remove from blacklist
         </button>
     </div>
 </template>

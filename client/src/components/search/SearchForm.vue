@@ -42,8 +42,11 @@ function doTagSearch(query: string) {
                 suggestions.value = json.results.filter(
                     // Don't suggest tags already added to the search
                     (t) =>
-                        !store.query._include.has(t.name) &&
-                        !store.query._exclude.has(t.name),
+                        !store.query.isIncluded(t.name) &&
+                        !store.query.isExcluded(t.name) &&
+                        store.settings.blacklist.findIndex(
+                            (bl) => t.name === bl.name,
+                        ) === -1,
                 );
             });
         })

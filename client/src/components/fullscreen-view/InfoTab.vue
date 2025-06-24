@@ -25,6 +25,11 @@ const styledTags = computed(() =>
             ret.style = "checkmark";
         } else if (store.query.isExcluded(t.name)) {
             ret.style = "strikethrough";
+        } else if (
+            store.settings.blacklist.findIndex((bl) => bl.name === t.name) !==
+            -1
+        ) {
+            ret.style = "blacklist";
         }
 
         return ret;
