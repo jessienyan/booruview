@@ -164,6 +164,7 @@ function onWhitelist() {
         </button>
         <button
             class="btn-primary option-btn"
+            :class="{ rounded: isBlacklisted }"
             v-if="isExcluded || isIncluded || isBlacklisted"
             @click="onRemove"
         >
@@ -220,12 +221,12 @@ function onWhitelist() {
             border-radius: 0 0 4px 4px;
         }
 
-        &:only-of-type {
-            border-radius: 4px 4px 4px 4px;
+        &:not(:last-of-type):not(.rounded) {
+            border-bottom: none;
         }
 
-        &:not(:last-of-type) {
-            border-bottom: none;
+        &.rounded {
+            border-radius: 4px;
         }
     }
 }
