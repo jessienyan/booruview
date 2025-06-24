@@ -78,7 +78,13 @@ export function useStationaryClick(
     return { mouseDown, mouseUp };
 }
 
-export function useNewFeatureIndicator(id: string) {
+export function useNewFeatureIndicator(id: string, until: Date) {
+    // Feature indicator is no longer needed and will never be shown for new visitors
+    if (new Date() > until) {
+        const show = ref(false);
+        return { show, onSeen: () => {} };
+    }
+
     const key = "feat-" + id;
     const flag = localStorage.getItem(key);
     const show = ref(flag === null);

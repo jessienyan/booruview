@@ -17,7 +17,10 @@ const closed = computed({
     set: (val: boolean) => (store.settings.sidebarTabsHidden = val),
 });
 
-const featBlacklist = useNewFeatureIndicator("blacklist");
+const featBlacklist = useNewFeatureIndicator(
+    "blacklist",
+    new Date("2025-07-01"),
+);
 
 function switchTab(tab: Tab) {
     currentTab.value = tab;
