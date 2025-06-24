@@ -5,6 +5,8 @@ import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
 import BlacklistTab from "./BlacklistTab.vue";
+import NewFeature from "../NewFeature.vue";
+import { useNewFeatureIndicator } from "@/composable";
 
 type Tab = "about" | "help" | "settings" | "blacklist";
 const currentTab = ref<Tab>("about");
@@ -14,6 +16,8 @@ const closed = computed({
     get: () => store.settings.sidebarTabsHidden,
     set: (val: boolean) => (store.settings.sidebarTabsHidden = val),
 });
+
+const featBlacklist = useNewFeatureIndicator("blacklist");
 
 function switchTab(tab: Tab) {
     currentTab.value = tab;
@@ -54,9 +58,13 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'blacklist' && !closed }"
-                @click="switchTab('blacklist')"
+                @click="
+                    switchTab('blacklist');
+                    featBlacklist.onSeen();
+                "
             >
                 blacklist
+                <NewFeature v-if="featBlacklist.show.value" />
             </button>
 
             <button
