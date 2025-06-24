@@ -77,3 +77,16 @@ export function useStationaryClick(
 
     return { mouseDown, mouseUp };
 }
+
+export function useNewFeatureIndicator(id: string) {
+    const key = "feat-" + id;
+    const flag = localStorage.getItem(key);
+    const show = ref(flag === null);
+
+    function onSeen() {
+        localStorage.setItem(key, "1");
+        show.value = false;
+    }
+
+    return { show, onSeen };
+}
