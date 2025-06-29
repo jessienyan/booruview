@@ -3,7 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
-	"strings"
+	"net/netip"
 
 	"github.com/rs/zerolog/log"
 
@@ -27,7 +27,16 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 
 func RateLimitMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := strings.Split(r.RemoteAddr, ":")[0]
+		var ip string
+		addr, err := netip.ParseAddrPort(r.RemoteAddr)
+
+		if err != nil {
+			log.Err(err).Str("remoteAddr", r.RemoteAddr).Msg("failed to parse remote address")
+			ip = r.RemoteAddr
+		} else {
+			ip = addr.Addr().String()
+		}
+
 		if api.IsRateLimited(ip) {
 			w.WriteHeader(http.StatusTooManyRequests)
 			return
