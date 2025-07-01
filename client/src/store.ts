@@ -63,6 +63,7 @@ type Store = {
     };
 
     query: SearchQuery;
+    lastQuery: SearchQuery;
 
     /** mapping of page number to posts */
     posts: Map<number, Post[]>;
@@ -125,8 +126,12 @@ const store = reactive<Store>({
                     query: new SearchQuery(),
                 };
 
-                data.query.include.forEach(entry.query.includeTag);
-                data.query.exclude.forEach(entry.query.excludeTag);
+                data.query.include.forEach((tag) =>
+                    entry.query.includeTag(tag),
+                );
+                data.query.exclude.forEach((tag) =>
+                    entry.query.excludeTag(tag),
+                );
 
                 ret = ret.concat(entry);
             }
@@ -156,6 +161,7 @@ const store = reactive<Store>({
     },
 
     query: new SearchQuery(),
+    lastQuery: new SearchQuery(),
     posts: new Map(),
     cachedTags: new Map(),
 
@@ -217,6 +223,17 @@ const store = reactive<Store>({
                 return;
             }
 
+            // Track query in history
+            const isNewQuery =
+                !this.query.isEmpty() && !this.query.equals(this.lastQuery);
+            if (isNewQuery) {
+                this.settings.queryHistory = this.settings.queryHistory.concat({
+                    date: new Date(),
+                    query: this.query.copy(),
+                });
+                this.settings.save();
+            }
+
             fetch("/api/posts?" + queryParams)
                 .then((resp) => {
                     if (resp.status >= 400) {
@@ -246,6 +263,8 @@ const store = reactive<Store>({
                         if (this.settings.closeSidebarOnSearch) {
                             this.sidebarClosed = true;
                         }
+
+                        this.lastQuery = this.query.copy();
 
                         resolve();
                     });
