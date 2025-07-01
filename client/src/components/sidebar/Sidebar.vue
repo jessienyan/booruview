@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useDontShowAgain } from "@/composable";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
 
 defineEmits(["toggle"]);
 const { closed } = defineProps<{ closed: boolean }>();
+const survey = useDontShowAgain("hide-survey");
 </script>
 
 <template>
@@ -15,6 +17,27 @@ const { closed } = defineProps<{ closed: boolean }>();
         </div>
 
         <div class="sidebar-content" v-show="!closed">
+            <div class="survey" v-if="survey.show.value">
+                <p>
+                    Do you like booruview or hate it? Let me know with this 3
+                    question survey. Anonymous, no signup.
+                </p>
+                <p>
+                    <a
+                        href="https://freesurveys.org/s/afOcVj9z-f"
+                        target="_blank"
+                        >https://freesurveys.org/s/afOcVj9z-f</a
+                    >
+                </p>
+                <p>
+                    <button
+                        class="btn-primary btn-rounded"
+                        @click="survey.onHide"
+                    >
+                        don't show again
+                    </button>
+                </p>
+            </div>
             <SidebarMain />
             <SidebarFooter />
         </div>
@@ -22,6 +45,7 @@ const { closed } = defineProps<{ closed: boolean }>();
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/buttons";
 @import "@/assets/breakpoints";
 @import "@/assets/colors";
 
@@ -65,5 +89,30 @@ const { closed } = defineProps<{ closed: boolean }>();
     cursor: pointer;
 
     color: $color-primary-lighter;
+}
+
+.survey {
+    background-color: $color-primary;
+    padding: 15px;
+    margin-bottom: 15px;
+
+    p {
+        color: $color-primary-light;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .hide-survey {
+        float: right;
+        border: none;
+        background: none;
+        color: $color-primary-light;
+    }
 }
 </style>
