@@ -1,7 +1,11 @@
-import { reactive, type ShallowRef } from "vue";
-import SearchQuery from "./search";
+import { reactive } from "vue";
+import { SearchQuery, type SerializedSearchQuery } from "./search";
 
 type SettingsKey = keyof Omit<Store["settings"], "save" | "write">;
+type SearchHistory = {
+    date: Date;
+    query: SearchQuery;
+};
 
 function loadValue<K extends SettingsKey, V = Store["settings"][K]>(
     key: K,
@@ -48,6 +52,8 @@ type Store = {
         highResImages: boolean;
 
         blacklist: Tag[];
+
+        queryHistory: SearchHistory[];
 
         save(): void;
         write<K extends SettingsKey, V = Store["settings"][K]>(
@@ -106,6 +112,28 @@ const store = reactive<Store>({
 
         blacklist: loadValue("blacklist", [], JSON.parse),
 
+        queryHistory: loadValue("queryHistory", [], (val) => {
+            let ret: SearchHistory[] = [];
+            const json = JSON.parse(val) as {
+                date: string;
+                query: SerializedSearchQuery;
+            }[];
+
+            for (const data of json) {
+                const entry = {
+                    date: new Date(data.date),
+                    query: new SearchQuery(),
+                };
+
+                data.query.include.forEach(entry.query.includeTag);
+                data.query.exclude.forEach(entry.query.excludeTag);
+
+                ret = ret.concat(entry);
+            }
+
+            return ret;
+        }),
+
         save() {
             this.write("consented", JSON.stringify);
             this.write("columnSizing", (v) => v);
@@ -116,6 +144,7 @@ const store = reactive<Store>({
             this.write("closeSidebarOnSearch", JSON.stringify);
             this.write("highResImages", JSON.stringify);
             this.write("blacklist", JSON.stringify);
+            this.write("queryHistory", JSON.stringify);
         },
 
         write<K extends keyof Store["settings"], V = Store["settings"][K]>(

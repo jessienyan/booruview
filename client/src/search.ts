@@ -1,4 +1,9 @@
-class SearchQuery {
+export type SerializedSearchQuery = {
+    include: Tag[];
+    exclude: Tag[];
+};
+
+export class SearchQuery {
     _include: Map<string, Tag>;
     _exclude: Map<string, Tag>;
 
@@ -82,6 +87,11 @@ class SearchQuery {
         clone._exclude = new Map(this._exclude);
         return clone;
     }
-}
 
-export default SearchQuery;
+    toJSON(): SerializedSearchQuery {
+        return {
+            include: this.includedList(),
+            exclude: this.excludedList(),
+        };
+    }
+}
