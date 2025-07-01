@@ -28,8 +28,15 @@ function onDelete(index: number) {
 }
 
 function onSearch(query: SearchQuery) {
+    if (store.fetchingPosts) {
+        return;
+    }
+
     store.query = query.copy();
-    store.searchPosts();
+    store.currentPage = 1;
+    store.posts.clear();
+
+    store.searchPosts().catch(() => store.posts.clear());
 }
 </script>
 
