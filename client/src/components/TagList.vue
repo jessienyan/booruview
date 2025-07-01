@@ -95,5 +95,9 @@ const categories = computed(() => {
 h3 {
     margin: 15px 0 10px;
     font-size: 18px;
+
+    &:first-child {
+        margin-top: 0;
+    }
 }
 </style>

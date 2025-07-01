@@ -50,7 +50,6 @@ function consent() {
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
-@import "@/assets/colors";
 
 .cw-container {
     position: absolute;

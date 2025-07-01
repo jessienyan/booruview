@@ -203,7 +203,6 @@ watch(inputVal, (query, _, onCleanup) => {
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
-@import "@/assets/colors";
 
 .input {
     background-color: #252525;

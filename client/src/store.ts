@@ -212,6 +212,15 @@ const store = reactive<Store>({
         this.fetchingPosts = true;
 
         return new Promise((resolve, reject) => {
+            const sameQuery = this.query.equals(this.lastQuery);
+
+            // Don't refetch posts we already have
+            if (sameQuery && this.posts.has(this.currentPage)) {
+                this.fetchingPosts = false;
+                resolve();
+                return;
+            }
+
             const query = this.query
                 .asList()
                 .concat(this.settings.blacklist.map((t) => `-${t.name}`));
@@ -220,13 +229,6 @@ const store = reactive<Store>({
                 `&page=${this.currentPage}`;
 
             this.setQueryParams();
-
-            // Don't refetch posts we already have
-            if (this.posts.has(this.currentPage)) {
-                this.fetchingPosts = false;
-                resolve();
-                return;
-            }
 
             fetch("/api/posts?" + queryParams)
                 .then((resp) => {

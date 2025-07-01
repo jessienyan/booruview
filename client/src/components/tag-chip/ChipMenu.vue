@@ -189,7 +189,6 @@ function onWhitelist() {
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
-@import "@/assets/colors";
 
 .options {
     position: absolute;
