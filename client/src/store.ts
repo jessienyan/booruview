@@ -7,6 +7,8 @@ type SearchHistory = {
     query: SearchQuery;
 };
 
+const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
+
 function loadValue<K extends SettingsKey, V = Store["settings"][K]>(
     key: K,
     defaultValue: V,
@@ -149,7 +151,9 @@ const store = reactive<Store>({
             this.write("closeSidebarOnSearch", JSON.stringify);
             this.write("highResImages", JSON.stringify);
             this.write("blacklist", JSON.stringify);
-            this.write("queryHistory", JSON.stringify);
+            this.write("queryHistory", (val) =>
+                JSON.stringify(val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT)),
+            );
         },
 
         write<K extends keyof Store["settings"], V = Store["settings"][K]>(
@@ -227,10 +231,13 @@ const store = reactive<Store>({
             const isNewQuery =
                 !this.query.isEmpty() && !this.query.equals(this.lastQuery);
             if (isNewQuery) {
-                this.settings.queryHistory = this.settings.queryHistory.concat({
-                    date: new Date(),
-                    query: this.query.copy(),
-                });
+                // Newest entries are added to the front of the list
+                this.settings.queryHistory = [
+                    {
+                        date: new Date(),
+                        query: this.query.copy(),
+                    },
+                ].concat(this.settings.queryHistory);
                 this.settings.save();
             }
 
