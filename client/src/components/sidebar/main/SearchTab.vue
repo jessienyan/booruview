@@ -79,6 +79,7 @@ const styledTags = computed(() => {
 }
 
 .taglist-container {
+    margin-top: 10px;
     overflow-y: scroll;
     flex: 1;
 }
