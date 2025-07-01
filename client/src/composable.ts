@@ -79,6 +79,18 @@ export function useStationaryClick(
     return { mouseDown, mouseUp };
 }
 
+export function useDontShowAgain(id: string) {
+    const flag = localStorage.getItem(id);
+    const show = ref(flag === null);
+
+    function onHide() {
+        localStorage.setItem(id, "1");
+        show.value = false;
+    }
+
+    return { show, onHide };
+}
+
 export function useNewFeatureIndicator(id: string, until: Date) {
     // Feature indicator is no longer needed and will never be shown for new visitors
     if (new Date() > until) {
@@ -86,15 +98,7 @@ export function useNewFeatureIndicator(id: string, until: Date) {
         return { show, onSeen: () => {} };
     }
 
-    const key = "feat-" + id;
-    const flag = localStorage.getItem(key);
-    const show = ref(flag === null);
-
-    function onSeen() {
-        localStorage.setItem(key, "1");
-        show.value = false;
-    }
-
+    const { show, onHide: onSeen } = useDontShowAgain("feat-" + id);
     return { show, onSeen };
 }
 
