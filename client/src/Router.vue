@@ -83,6 +83,8 @@ function onRouteChange() {
             }
 
             if (pageChanged || searchChanged) {
+                // Fix fullscreen not being dismissed when using browser navigation
+                store.fullscreenPost = null;
                 store.searchPosts();
             }
         })
