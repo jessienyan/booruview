@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import SearchTab from "./SearchTab.vue";
+import RecentTab from "./RecentTab.vue";
 
-type Tab = "search" | "recent_searches";
+type Tab = "search" | "recent";
 const currentTab = ref<Tab>("search");
 
 function switchTab(tab: Tab) {
@@ -22,8 +23,8 @@ function switchTab(tab: Tab) {
             </button>
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'recent_searches' }"
-                @click="switchTab('recent_searches')"
+                :class="{ active: currentTab === 'recent' }"
+                @click="switchTab('recent')"
             >
                 recent
             </button>
@@ -32,6 +33,7 @@ function switchTab(tab: Tab) {
         <div class="tab-content">
             <KeepAlive>
                 <SearchTab v-if="currentTab === 'search'" />
+                <RecentTab v-else-if="currentTab === 'recent'" />
             </KeepAlive>
         </div>
     </div>

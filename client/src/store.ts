@@ -231,13 +231,14 @@ const store = reactive<Store>({
             const isNewQuery =
                 !this.query.isEmpty() && !this.query.equals(this.lastQuery);
             if (isNewQuery) {
+                const newEntry = reactive({
+                    date: new Date(),
+                    query: this.query.copy(),
+                });
                 // Newest entries are added to the front of the list
-                this.settings.queryHistory = [
-                    {
-                        date: new Date(),
-                        query: this.query.copy(),
-                    },
-                ].concat(this.settings.queryHistory);
+                this.settings.queryHistory = [newEntry].concat(
+                    this.settings.queryHistory,
+                );
                 this.settings.save();
             }
 
