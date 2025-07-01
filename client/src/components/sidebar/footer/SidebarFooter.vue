@@ -5,7 +5,7 @@ import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
 import BlacklistTab from "./BlacklistTab.vue";
-import NewFeature from "../NewFeature.vue";
+import NewFeature from "@/components/NewFeature.vue";
 import { useNewFeatureIndicator } from "@/composable";
 
 type Tab = "about" | "help" | "settings" | "blacklist";

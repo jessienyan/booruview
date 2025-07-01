@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import SearchForm from "../search/SearchForm.vue";
-import TagList from "../TagList.vue";
+import SearchForm from "@/components/search/SearchForm.vue";
+import TagList from "@/components/TagList.vue";
 import store from "@/store";
 
 function doPostSearch() {
