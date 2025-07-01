@@ -359,23 +359,34 @@ const store = reactive<Store>({
             return;
         }
 
-        if (this.settings.queryHistory.length > 0) {
-            const mostRecent = this.settings.queryHistory[0];
+        let entry: SearchHistory | null = null;
 
-            // Don't track the same query twice in a row
-            if (this.query.equals(mostRecent.query)) {
-                return;
+        // To avoid cluttering the search history, reuse an existing entry
+        // if it exists with the same query
+        for (let i = 0; i < this.settings.queryHistory.length; i++) {
+            const ithEntry = this.settings.queryHistory[i];
+
+            if (!this.query.equals(ithEntry.query)) {
+                continue;
             }
+
+            entry = ithEntry;
+            entry.date = new Date();
+
+            // Remove the entry from the list, it will be re-added to the front
+            this.settings.queryHistory.splice(i, 1);
+            break;
         }
 
-        const newEntry = reactive({
-            date: new Date(),
-            query: this.query.copy(),
-        });
+        if (entry === null) {
+            entry = reactive({
+                date: new Date(),
+                query: this.query.copy(),
+            });
+        }
+
         // Newest entries are added to the front of the list
-        this.settings.queryHistory = [newEntry].concat(
-            this.settings.queryHistory,
-        );
+        this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
         this.settings.save();
     },
 });
