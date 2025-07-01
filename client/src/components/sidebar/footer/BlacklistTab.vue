@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import TagList from "../TagList.vue";
+import TagList from "@/components/TagList.vue";
 import store from "@/store";
 
 const styledTags = computed<TagChip[]>(() =>

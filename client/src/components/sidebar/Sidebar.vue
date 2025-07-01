@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import SidebarFooter from "./SidebarFooter.vue";
-import SidebarMain from "./SidebarMain.vue";
+import SidebarFooter from "./footer/SidebarFooter.vue";
+import SidebarMain from "./main/SidebarMain.vue";
 
 defineEmits(["toggle"]);
 const { closed } = defineProps<{ closed: boolean }>();
