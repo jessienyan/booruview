@@ -80,6 +80,7 @@ type Store = {
     prevPage(): Promise<void> | null;
     searchPosts(): Promise<void>;
     setQueryParams(): void;
+    addQueryToHistory(): void;
 };
 
 const store = reactive<Store>({
@@ -227,21 +228,6 @@ const store = reactive<Store>({
                 return;
             }
 
-            // Track query in history
-            const isNewQuery =
-                !this.query.isEmpty() && !this.query.equals(this.lastQuery);
-            if (isNewQuery) {
-                const newEntry = reactive({
-                    date: new Date(),
-                    query: this.query.copy(),
-                });
-                // Newest entries are added to the front of the list
-                this.settings.queryHistory = [newEntry].concat(
-                    this.settings.queryHistory,
-                );
-                this.settings.save();
-            }
-
             fetch("/api/posts?" + queryParams)
                 .then((resp) => {
                     if (resp.status >= 400) {
@@ -272,6 +258,7 @@ const store = reactive<Store>({
                             this.sidebarClosed = true;
                         }
 
+                        this.addQueryToHistory();
                         this.lastQuery = this.query.copy();
 
                         resolve();
@@ -363,6 +350,31 @@ const store = reactive<Store>({
 
         this.currentPage--;
         return this.searchPosts().catch(() => {});
+    },
+
+    addQueryToHistory() {
+        if (this.query.isEmpty() || this.query.equals(this.lastQuery)) {
+            return;
+        }
+
+        if (this.settings.queryHistory.length > 0) {
+            const mostRecent = this.settings.queryHistory[0];
+
+            // Don't track the same query twice in a row
+            if (this.query.equals(mostRecent.query)) {
+                return;
+            }
+        }
+
+        const newEntry = reactive({
+            date: new Date(),
+            query: this.query.copy(),
+        });
+        // Newest entries are added to the front of the list
+        this.settings.queryHistory = [newEntry].concat(
+            this.settings.queryHistory,
+        );
+        this.settings.save();
     },
 });
 
