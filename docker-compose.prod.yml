@@ -46,10 +46,53 @@ services:
   loki:
     image: grafana/loki:3.5.0
     restart: unless-stopped
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
     ports:
       - "3100:3100"
     volumes:
       - loki-data:/loki
+
+configs:
+  loki_config:
+    content: |
+      ###### Custom options ######
+      compactor:
+        retention_enabled: true
+        retention_delete_delay: 2h
+        delete_request_store: filesystem
+
+      limits_config:
+        max_query_series: 100000
+        retention_period: 365d
+
+      ###### Below are defaults from container /etc/loki/local-config.yaml ######
+      auth_enabled: false
+      server:
+        http_listen_port: 3100
+      common:
+        instance_addr: 127.0.0.1
+        path_prefix: /loki
+        storage:
+          filesystem:
+            chunks_directory: /loki/chunks
+            rules_directory: /loki/rules
+        replication_factor: 1
+        ring:
+          kvstore:
+            store: inmemory
+      schema_config:
+        configs:
+          - from: 2020-10-24
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: index_
+              period: 24h
+      ruler:
+        alertmanager_url: http://localhost:9093
 
 networks:
   default:
