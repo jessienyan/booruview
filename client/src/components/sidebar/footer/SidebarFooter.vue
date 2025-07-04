@@ -71,17 +71,11 @@ function toggleClose() {
             </button>
 
             <button
+                v-if="!closed"
                 class="tab-btn close-btn"
-                :class="{ active: closed }"
                 @click="toggleClose"
             >
-                <i
-                    class="bi"
-                    :class="{
-                        'bi-chevron-down': !closed,
-                        'bi-chevron-up': closed,
-                    }"
-                ></i>
+                <i class="bi bi-chevron-down"></i>
             </button>
         </header>
 
