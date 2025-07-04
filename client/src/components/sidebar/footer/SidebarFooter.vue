@@ -95,6 +95,7 @@ function toggleClose() {
 .tab-container {
     display: flex;
     flex-direction: column;
+    min-height: 0;
 
     &:not(.closed) {
         .tabs {
