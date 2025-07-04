@@ -9,15 +9,17 @@ const emit = defineEmits(["on-close"]);
         <li><code>blue_sky</code> → search for blue_sky</li>
         <li><code>-blue_sky</code> → exclude blue_sky</li>
         <li><code>blue*</code> → tags that start with blue</li>
+        <li><code>{blue_sky ~ sunset}</code> → blue_sky OR sunset</li>
         <li><code>sort:score</code> → sort by most popular</li>
         <li><code>rating:general</code> → SFW only</li>
     </ul>
     <p>
+        For a complete list of all the different search filters, check the
         <a
             href="https://gelbooru.com/index.php?page=wiki&s=&s=view&id=26263"
             target="_blank"
             >Gelbooru search cheatsheet</a
-        >
+        >.
     </p>
 </template>
 
