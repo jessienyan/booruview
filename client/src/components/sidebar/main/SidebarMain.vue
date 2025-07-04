@@ -51,7 +51,9 @@ function switchTab(tab: Tab) {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
+
+    // 140px is enough height to show the search box and search button
+    min-height: 140px;
 
     &:not(.closed) {
         .tabs {

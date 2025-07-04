@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import ChangeLog from "./ChangeLog.vue";
+import { changeLog } from "@/changelog";
 import { COMMIT_SHA, LAST_COMMIT_DATE } from "@/config";
+import { ref } from "vue";
+
+const showChangelog = ref(false);
 </script>
 
 <template>
@@ -18,10 +23,54 @@ import { COMMIT_SHA, LAST_COMMIT_DATE } from "@/config";
         <a href="mailto:216619670+jessienyan@users.noreply.github.com">email</a
         >.
     </p>
-    <p class="version">last commit {{ COMMIT_SHA }} @ {{ LAST_COMMIT_DATE }}</p>
+
+    <h4>
+        <button class="btn-changelog" @click="showChangelog = !showChangelog">
+            Changelog
+            <i
+                class="bi"
+                :class="{
+                    'bi-caret-down-fill': !showChangelog,
+                    'bi-caret-up-fill': showChangelog,
+                }"
+            ></i>
+        </button>
+    </h4>
+    <div v-if="showChangelog">
+        <ChangeLog
+            v-for="change in changeLog"
+            :date="change.date"
+            :changes="change.changes"
+        />
+
+        <p class="version">
+            latest commit
+            <a
+                :href="`https://github.com/jessienyan/booruview/commits/${COMMIT_SHA}/`"
+                target="_blank"
+                ><code>{{ COMMIT_SHA }}</code></a
+            >
+            @ {{ LAST_COMMIT_DATE }}
+        </p>
+    </div>
 </template>
 
 <style scoped>
+h4 {
+    margin: 1rem 0;
+    color: #ccc;
+}
+
+.btn-changelog {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+
 .version {
     font-family: "Courier New", Courier, monospace;
     font-size: 12px;
