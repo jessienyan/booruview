@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
@@ -30,8 +30,12 @@ const showSuggestions = ref(false);
 useDismiss([containerRef.value], () => (showSuggestions.value = false));
 
 function doTagSearch(query: string) {
+    if (smartSuggestionValue.value.length === 0) {
+        return;
+    }
+
     // Encoding the query prevents trailing whitespace from being stripped
-    fetch("/api/tagsearch?q=" + encodeURIComponent(query))
+    fetch("/api/tagsearch?q=" + encodeURIComponent(smartSuggestionValue.value))
         .then((resp) => {
             // Request took too long and results don't match the input, discard
             if (query !== inputVal.value) {
@@ -65,20 +69,63 @@ function changeSelection(direction: number) {
     selectedIndex.value = direction;
 }
 
+// Computes the current word(s) under the cursor in the search. This allows the
+// autocomplete to be more intelligent by only replacing the word(s) the user is entering.
+// For example if the query was `{blue sky ~ sunse`, then "sunse" would be the current word
+// boundary (assuming the cursor was at the end).
+const wordBoundary = computed(() => {
+    // Use the cursor position to find the word(s) that will be autocompleted
+    const end = inputRef.value?.selectionEnd ?? 0;
+    let start = end;
+
+    if (inputRef.value === null) {
+        return { start, end };
+    }
+
+    // Special operators that act as boundaries
+    const OPERATORS = ["-", "{", "~ " /* note the space */];
+
+    for (let i = start; i > 0; i--) {
+        let match = false;
+
+        for (const op of OPERATORS) {
+            if (inputVal.value.slice(i - op.length, i) === op) {
+                match = true;
+                start = i;
+                break;
+            }
+        }
+
+        if (match) {
+            break;
+        }
+
+        // If no match just decrement start
+        start--;
+    }
+
+    return { start, end };
+});
+
+const smartSuggestionValue = computed(() => {
+    const { start, end } = wordBoundary.value;
+    return inputVal.value.slice(start, end);
+});
+
 function autoComplete() {
-    if (suggestions.value.length === 0) {
+    if (suggestions.value.length === 0 || inputRef.value === null) {
         return;
     }
 
     const index = selectedIndex.value === -1 ? 0 : selectedIndex.value;
-    let val = suggestions.value[index].name;
+    let suggestionVal = suggestions.value[index].name;
 
-    // Preserve the NOT op
-    if (inputVal.value.startsWith("-")) {
-        val = "-" + val;
-    }
+    const bounds = wordBoundary.value;
+    const before = inputVal.value.substring(0, bounds.start);
+    const after = inputVal.value.substring(bounds.end);
+    const spliced = before + suggestionVal + after;
 
-    inputVal.value = val;
+    inputVal.value = spliced;
 }
 
 function onSuggestionClick(index: number) {
