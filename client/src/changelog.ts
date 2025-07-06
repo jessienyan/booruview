@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-07-06",
         changes: [
             "autocomplete no longer commits the search input if you're doing an OR search (you have to press 'search' or hit enter now to explicitly add the OR to your search)",
+            "added setting for video autoplay and mute",
         ],
     },
     {
