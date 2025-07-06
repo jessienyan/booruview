@@ -53,6 +53,9 @@ type Store = {
         searchOnLoad: boolean;
         highResImages: boolean;
 
+        autoplayVideo: boolean;
+        muteVideo: boolean;
+
         blacklist: Tag[];
 
         queryHistory: SearchHistory[];
@@ -114,6 +117,9 @@ const store = reactive<Store>({
         ),
         highResImages: loadValue("highResImages", true, JSON.parse),
 
+        autoplayVideo: loadValue("autoplayVideo", true, JSON.parse),
+        muteVideo: loadValue("muteVideo", true, JSON.parse),
+
         blacklist: loadValue("blacklist", [], JSON.parse),
 
         queryHistory: loadValue("queryHistory", [], (val) => {
@@ -151,6 +157,8 @@ const store = reactive<Store>({
             this.write("searchOnLoad", JSON.stringify);
             this.write("closeSidebarOnSearch", JSON.stringify);
             this.write("highResImages", JSON.stringify);
+            this.write("autoplayVideo", JSON.stringify);
+            this.write("muteVideo", JSON.stringify);
             this.write("blacklist", JSON.stringify);
             this.write("queryHistory", (val) =>
                 JSON.stringify(val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT)),
