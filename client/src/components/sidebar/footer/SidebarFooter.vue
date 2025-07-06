@@ -22,6 +22,11 @@ const featBlacklist = useNewFeatureIndicator(
     new Date("2025-07-01"),
 );
 
+const featAutoplayMuteSettings = useNewFeatureIndicator(
+    "autoplay-mute",
+    new Date("2025-07-09"),
+);
+
 function switchTab(tab: Tab) {
     currentTab.value = tab;
     closed.value = false;
@@ -54,9 +59,13 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'settings' && !closed }"
-                @click="switchTab('settings')"
+                @click="
+                    switchTab('settings');
+                    featAutoplayMuteSettings.onSeen();
+                "
             >
                 settings
+                <NewFeature v-if="featAutoplayMuteSettings.show.value" />
             </button>
             <button
                 class="tab-btn"
