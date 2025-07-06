@@ -131,7 +131,15 @@ function autoComplete() {
 function onSuggestionClick(index: number) {
     selectedIndex.value = index;
     autoComplete();
-    onSubmit();
+
+    const isOR = /^-?\{/.test(inputVal.value);
+
+    // Don't submit when building an OR query since the user may want to select more tags
+    if (!isOR) {
+        onSubmit();
+    }
+
+    inputRef.value?.focus();
 }
 
 function onInput(e: Event) {
@@ -165,9 +173,6 @@ function onSubmit() {
 
     if (selectedIndex.value !== -1) {
         tag = suggestions.value[selectedIndex.value];
-
-        // Refocus the search input if the user was selecting a suggestion
-        inputRef.value?.focus();
     } else {
         const value = negated ? inputVal.value.slice(1) : inputVal.value;
         const match = suggestions.value.find((t) => t.name === value);
