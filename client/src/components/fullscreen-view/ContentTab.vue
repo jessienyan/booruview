@@ -81,6 +81,8 @@ const content = computed(() => {
     <video
         v-if="isVideo"
         :poster="post.thumbnail_url || post.lowres_url"
+        :autoplay="store.settings.autoplayVideo"
+        :muted="store.settings.muteVideo"
         controls
         loop
     >

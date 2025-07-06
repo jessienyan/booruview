@@ -37,10 +37,22 @@ function onChangeHighResImages(e: Event) {
     store.settings.highResImages = (e.target as HTMLInputElement).checked;
     store.settings.save();
 }
+
+function onChangeAutoplayVideos(e: Event) {
+    store.settings.autoplayVideo = (e.target as HTMLInputElement).checked;
+    store.settings.save();
+}
+
+function onChangeMuteVideos(e: Event) {
+    store.settings.muteVideo = (e.target as HTMLInputElement).checked;
+    store.settings.save();
+}
 </script>
 
 <template>
     <div class="settings-container">
+        <h3>layout</h3>
+
         <div class="input-group">
             <label># of columns</label>
             <div class="input">
@@ -91,6 +103,8 @@ function onChangeHighResImages(e: Event) {
             </div>
         </div>
 
+        <h3>search</h3>
+
         <div class="input-group">
             <label>
                 <input
@@ -101,6 +115,19 @@ function onChangeHighResImages(e: Event) {
                 auto-search when page loads if search isn't empty</label
             >
         </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.closeSidebarOnSearch"
+                    @change="onChangeCloseSidebarOnSearch"
+                />
+                searching closes sidebar</label
+            >
+        </div>
+
+        <h3>content</h3>
 
         <div class="input-group">
             <label>
@@ -117,10 +144,21 @@ function onChangeHighResImages(e: Event) {
             <label>
                 <input
                     type="checkbox"
-                    :checked="store.settings.closeSidebarOnSearch"
-                    @change="onChangeCloseSidebarOnSearch"
+                    :checked="store.settings.autoplayVideo"
+                    @change="onChangeAutoplayVideos"
                 />
-                searching closes sidebar</label
+                autoplay videos</label
+            >
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.muteVideo"
+                    @change="onChangeMuteVideos"
+                />
+                mute videos</label
             >
         </div>
     </div>
