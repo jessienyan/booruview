@@ -1,5 +1,7 @@
 <script setup lang="ts">
-type ToastKind = "danger";
+import type store from "@/store";
+
+type ToastKind = typeof store.toast.type;
 const { kind } = defineProps<{ kind: ToastKind }>();
 defineEmits(["dismiss"]);
 </script>
@@ -15,9 +17,11 @@ defineEmits(["dismiss"]);
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/colors";
+
 .toast {
     position: absolute;
-    bottom: 20px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 999;
@@ -27,7 +31,11 @@ defineEmits(["dismiss"]);
     cursor: pointer;
 }
 
-.toast-danger {
+.toast-info {
+    background-color: $color-primary-lighter;
+}
+
+.toast-error {
     background-color: #700;
 }
 </style>

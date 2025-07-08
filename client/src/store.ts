@@ -30,7 +30,10 @@ type Store = {
     hasSearched: boolean;
     fetchingPosts: boolean;
 
-    toastError: string;
+    toast: {
+        msg: string;
+        type: "error" | "info";
+    };
 
     tagMenu: {
         tag: Tag;
@@ -93,7 +96,10 @@ const store = reactive<Store>({
     hasSearched: false,
     fetchingPosts: false,
 
-    toastError: "",
+    toast: {
+        msg: "",
+        type: "info",
+    },
 
     tagMenu: null,
 
@@ -243,16 +249,24 @@ const store = reactive<Store>({
                     if (resp.status >= 400) {
                         resp.json()
                             .then((val) => {
+                                let msg = "Something went wrong";
+
                                 if ("error" in val) {
-                                    store.toastError = val["error"];
-                                } else {
-                                    store.toastError = "Something went wrong";
+                                    msg = val["error"];
                                 }
+
+                                store.toast = {
+                                    msg,
+                                    type: "error",
+                                };
 
                                 reject();
                             })
                             .catch(() => {
-                                store.toastError = "Something went wrong";
+                                store.toast = {
+                                    msg: "Something went wrong",
+                                    type: "error",
+                                };
                                 reject();
                             })
                             .finally(() => (store.hasSearched = true));
@@ -276,7 +290,10 @@ const store = reactive<Store>({
                 })
                 .catch((err) => {
                     console.error(err);
-                    store.toastError = "Something went wrong";
+                    store.toast = {
+                        msg: "Something went wrong",
+                        type: "error",
+                    };
                     reject(err);
                 })
                 .finally(() => {
