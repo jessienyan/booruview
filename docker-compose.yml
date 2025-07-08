@@ -11,6 +11,7 @@ services:
       - "12345:12345"
     environment:
       - "VALKEY_ADDR=db:6379"
+      - "COMMIT_HASH=$VITE_COMMIT_SHA"
     env_file:
       - ".env"
     volumes:
