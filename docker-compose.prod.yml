@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       - "VALKEY_ADDR=db:6379"
+      - VITE_COMMIT_SHA
     env_file:
       - ".env"
     # Requires loki plugin:

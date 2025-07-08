@@ -12,7 +12,7 @@ CADDY_IMG=$PREFIX/booruview-caddy
 CLIENT_IMG=$PREFIX/booruview-client
 VALKEY_IMG=$PREFIX/booruview-valkey
 
-docker build -t $API_IMG -f api/Dockerfile.prod api/
+VITE_COMMIT_SHA=$COMMIT docker build -t $API_IMG -f api/Dockerfile.prod api/
 docker build -t $VALKEY_IMG valkey/
 docker build -t $CLIENT_IMG client/
 

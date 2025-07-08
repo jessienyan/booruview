@@ -1,5 +1,7 @@
 FROM golang:1.24-alpine AS build
 
+ENV VITE_COMMIT_SHA=$VITE_COMMIT_SHA
+
 WORKDIR /app
 
 # Restart on *.go change
@@ -13,9 +15,4 @@ RUN go mod download
 
 COPY . .
 
-
-# FROM scratch
-
-# COPY --from=build /dist/server /
-
-# CMD ["/server"]
+CMD gow run -ldflags="-X github.com/jessienyan/booruview.AppVersion=$VITE_COMMIT_SHA" cmd/main.go
