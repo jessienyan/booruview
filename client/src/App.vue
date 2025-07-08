@@ -52,10 +52,10 @@ const hasConsented = computed(() => {
         }"
     >
         <Toast
-            v-if="store.toastError.length > 0"
-            kind="danger"
-            @dismiss="store.toastError = ''"
-            >{{ store.toastError }}</Toast
+            v-if="store.toast.msg.length > 0"
+            :kind="store.toast.type"
+            @dismiss="store.toast.msg = ''"
+            >{{ store.toast.msg }}</Toast
         >
         <ChipMenu v-if="store.tagMenu !== null" />
         <ContentWarning v-if="!hasConsented" />
