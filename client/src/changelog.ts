@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-07-08",
         changes: [
             "added a notification when a new version is released",
+            "increased results per page from 50 to 100",
         ],
     },
     {
