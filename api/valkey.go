@@ -1,8 +1,6 @@
 package api
 
 import (
-	"os"
-
 	"github.com/valkey-io/valkey-go"
 )
 
@@ -22,7 +20,7 @@ func InitValkey() error {
 		return nil
 	}
 
-	vc, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{os.Getenv("VALKEY_ADDR")}})
+	vc, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{ValkeyAddr}})
 	if err != nil {
 		return err
 	}

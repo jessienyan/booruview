@@ -3,7 +3,6 @@ package gelbooru
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -25,12 +24,12 @@ type Client struct {
 var DefaultClient Client
 
 func init() {
-	uid := os.Getenv("GELBOORU_USERID")
+	uid := api.GelbooruUserId
 	if uid == "" {
 		log.Warn().Msg("GELBOORU_USERID is not set (may be subject to rate limiting)")
 	}
 
-	apiKey := os.Getenv("GELBOORU_APIKEY")
+	apiKey := api.GelbooruApiKey
 	if apiKey == "" {
 		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
 	}
