@@ -2,6 +2,8 @@ services:
   api:
     build:
       context: api
+      args:
+        - COMMIT_HASH=$VITE_COMMIT_SHA
     #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/main.go
     # security_opt: # IMPORTANT: only use when debugging
     #   - seccomp:unconfined
@@ -10,7 +12,6 @@ services:
       - "12345:12345"
     environment:
       - "VALKEY_ADDR=db:6379"
-      - VITE_COMMIT_SHA
     env_file:
       - ".env"
     volumes:

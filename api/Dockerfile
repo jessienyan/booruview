@@ -1,6 +1,7 @@
 FROM golang:1.24-alpine AS build
 
-ENV VITE_COMMIT_SHA=$VITE_COMMIT_SHA
+ARG COMMIT_HASH
+ENV COMMIT_HASH=$COMMIT_HASH
 
 WORKDIR /app
 
@@ -15,4 +16,4 @@ RUN go mod download
 
 COPY . .
 
-CMD gow run -ldflags="-X github.com/jessienyan/booruview.AppVersion=$VITE_COMMIT_SHA" cmd/main.go
+CMD gow run -ldflags="-X github.com/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/main.go

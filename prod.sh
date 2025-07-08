@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 cd ${0%/*}
 PREFIX=ghcr.io/jessienyan
 COMMIT=$(git rev-parse --short master)
@@ -12,7 +12,7 @@ CADDY_IMG=$PREFIX/booruview-caddy
 CLIENT_IMG=$PREFIX/booruview-client
 VALKEY_IMG=$PREFIX/booruview-valkey
 
-VITE_COMMIT_SHA=$COMMIT docker build -t $API_IMG -f api/Dockerfile.prod api/
+docker build -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
 docker build -t $VALKEY_IMG valkey/
 docker build -t $CLIENT_IMG client/
 
