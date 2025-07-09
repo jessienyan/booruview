@@ -90,13 +90,13 @@ function toggleClose() {
 
         <div class="tab-content-container" v-if="!closed">
             <div class="tab-content">
-            <KeepAlive>
-                <HelpTab v-if="currentTab === 'help'" />
-                <AboutTab v-else-if="currentTab === 'about'" />
-                <SettingsTab v-else-if="currentTab === 'settings'" />
-                <BlacklistTab v-else-if="currentTab === 'blacklist'" />
-            </KeepAlive>
-        </div>
+                <KeepAlive>
+                    <HelpTab v-if="currentTab === 'help'" />
+                    <AboutTab v-else-if="currentTab === 'about'" />
+                    <SettingsTab v-else-if="currentTab === 'settings'" />
+                    <BlacklistTab v-else-if="currentTab === 'blacklist'" />
+                </KeepAlive>
+            </div>
         </div>
     </div>
 </template>
