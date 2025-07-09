@@ -10,17 +10,27 @@ const showChangelog = ref(false);
 
 <template>
     <p>
-        Booruview is an open source <a href="https://gelbooru.com" target="_blank">Gelbooru</a> viewer. It's simple, fast, and works on desktop and mobile.
+        Booruview is an open source
+        <a href="https://gelbooru.com" target="_blank">Gelbooru</a> viewer. It's
+        simple, fast, and works on desktop and mobile.
     </p>
     <ul class="links">
         <li>
-            <a href="https://github.com/jessienyan/booruview" target="_blank">GitHub<i class="bi bi-github"></i></a>
+            <a href="https://github.com/jessienyan/booruview" target="_blank"
+                >GitHub<i class="bi bi-github"></i
+            ></a>
         </li>
         <li>
-            <a href="https://github.com/jessienyan/booruview/issues" target="_blank">Report a bug<i class="bi bi-bug-fill"></i></a>
+            <a
+                href="https://github.com/jessienyan/booruview/issues"
+                target="_blank"
+                >Report a bug<i class="bi bi-bug-fill"></i
+            ></a>
         </li>
         <li>
-            <a href="https://freesurveys.org/s/afOcVj9z-f" target="_blank">Give anonymous feedback<i class="bi bi-send-fill"></i></a>
+            <a href="https://freesurveys.org/s/afOcVj9z-f" target="_blank"
+                >Give anonymous feedback<i class="bi bi-send-fill"></i
+            ></a>
         </li>
     </ul>
 
