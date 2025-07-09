@@ -15,6 +15,15 @@
 		}
 	}
 
+	# Clients must always check if index.html changed
+	header / Cache-Control "public, no-cache"
+
+	# Assets are hashed and never change so are safe to cache
+	header /assets/* Cache-Control "max-age=31536000, immutable"
+
+	# API responses shouldn't be cached by clients, they are too volatile and cached by the API anyway
+	header /api/* Cache-Control "no-store"
+
 	# Bots running on workers.dev are scanning URLs
 	@botscan header "Cf-Worker" *
 	abort @botscan
