@@ -34,6 +34,10 @@ h5 {
     color: #ccc;
 }
 
+p, ul {
+    margin: 1rem 0;
+}
+
 .prevent-overscroll {
     overscroll-behavior: contain;
 }

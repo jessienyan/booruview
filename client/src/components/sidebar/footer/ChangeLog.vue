@@ -6,26 +6,9 @@ const { date, changes } = defineProps<ChangeLogEntry>();
 
 <template>
     <div class="entry">
-        <p>
-            <b>{{ date }}</b>
-        </p>
+        <h5>{{ date }}</h5>
         <ul>
             <li v-for="change in changes" v-html="change"></li>
         </ul>
     </div>
 </template>
-
-<style scoped>
-p {
-    color: #ccc;
-}
-
-p,
-ul {
-    margin: 10px 0;
-}
-
-.entry {
-    margin-bottom: 20px;
-}
-</style>
