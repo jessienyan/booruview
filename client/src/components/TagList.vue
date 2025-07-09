@@ -42,51 +42,82 @@ const categories = computed(() => {
 </script>
 
 <template>
-    <h3 v-if="categories.artist.length > 0">artist</h3>
-    <Chip
-        v-for="tag in categories.artist"
-        :key="tag.tag.name"
-        :tag="tag"
-        :jiggle="jiggle"
-    />
+    <template v-if="categories.artist.length > 0">
+    <h3>artist</h3>
+    <div class="tag-group">
+        <Chip
+            v-for="tag in categories.artist"
+            :key="tag.tag.name"
+            :tag="tag"
+            :jiggle="jiggle"
+        />
+    </div>
+</template>
 
-    <h3 v-if="categories.character.length > 0">character</h3>
-    <Chip
+    <template v-if="categories.character.length > 0">
+        <h3>character</h3>
+    <div class="tag-group">
+        <Chip
         v-for="tag in categories.character"
         :key="tag.tag.name"
         :tag="tag"
         :jiggle="jiggle"
-    />
+    />    </div>
+</template>
 
-    <h3 v-if="categories.copyright.length > 0">copyright</h3>
-    <Chip
+    <template v-if="categories.copyright.length > 0">
+        <h3>copyright</h3>
+    <div class="tag-group">
+        <Chip
         v-for="tag in categories.copyright"
         :key="tag.tag.name"
         :tag="tag"
         :jiggle="jiggle"
     />
+</div>
+</template>
 
-    <h3 v-if="categories.tag.length > 0">tags</h3>
-    <Chip
+    <template v-if="categories.tag.length > 0">
+        <h3>tags</h3>
+    <div class="tag-group">
+        <Chip
         v-for="tag in categories.tag"
         :key="tag.tag.name"
         :tag="tag"
         :jiggle="jiggle"
     />
+</div>
+</template>
 
-    <h3 v-if="categories.metadata.length > 0">metadata</h3>
-    <Chip
+    <template v-if="categories.metadata.length > 0">
+        <h3>metadata</h3>
+    <div class="tag-group">
+        <Chip
         v-for="tag in categories.metadata"
         :key="tag.tag.name"
         :tag="tag"
         :jiggle="jiggle"
     />
+</div>
+</template>
 
-    <h3 v-if="categories.unknown.length > 0">raw</h3>
-    <Chip
+    <template v-if="categories.unknown.length > 0">
+        <h3>raw</h3>
+    <div class="tag-group">
+        <Chip
         v-for="tag in categories.unknown"
         :key="tag.tag.name"
         :tag="tag"
         :jiggle="jiggle"
     />
+    </div>
 </template>
+</template>
+
+<style lang="scss" scoped>
+.tag-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+</style>

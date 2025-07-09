@@ -60,12 +60,10 @@ function onClick() {
 @import "@/assets/colors";
 
 .chip {
-    padding: 8px;
-    margin: 0 4px 4px 0;
+    padding: 0.5rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     display: inline-block;
-    font-size: 16px;
     word-break: break-all;
     cursor: pointer;
 
