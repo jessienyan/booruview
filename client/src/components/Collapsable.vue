@@ -2,17 +2,15 @@
 import { ref } from "vue";
 
 const {
-    el,
-    heading,
+    text,
     defaultOpen = false,
-} = defineProps<{ el: string; heading: string; defaultOpen?: boolean }>();
+} = defineProps<{ text: string; defaultOpen?: boolean }>();
 const show = ref(defaultOpen);
 </script>
 
 <template>
-    <component :is="el" @click="show = !show"
-        ><button class="btn-toggle">
-            {{ heading }}
+    <button class="btn-primary btn-rounded" @click="show = !show">
+            {{ text }}
             <i
                 class="bi"
                 :class="{
@@ -20,18 +18,10 @@ const show = ref(defaultOpen);
                     'bi-caret-up-fill': show,
                 }"
             ></i></button
-    ></component>
+    >
     <slot v-if="show"></slot>
 </template>
 
 <style lang="scss" scoped>
-.btn-toggle {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    cursor: pointer;
-    padding: 0;
-}
+@import "@/assets/buttons";
 </style>

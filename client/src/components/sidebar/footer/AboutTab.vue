@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ChangeLog from "./ChangeLog.vue";
 import { changeLog } from "@/changelog";
-import CollapsableHeading from "@/components/CollapsableHeading.vue";
+import Collapsable from "@/components/Collapsable.vue";
 import { COMMIT_SHA, LAST_COMMIT_DATE } from "@/config";
 import { ref } from "vue";
 
@@ -25,7 +25,7 @@ const showChangelog = ref(false);
         >.
     </p>
 
-    <CollapsableHeading el="h4" heading="changelog">
+    <Collapsable text="changelog">
         <ChangeLog
             v-for="change in changeLog"
             :date="change.date"
@@ -41,7 +41,7 @@ const showChangelog = ref(false);
             >
             @ {{ LAST_COMMIT_DATE }}
         </p>
-    </CollapsableHeading>
+    </Collapsable>
 </template>
 
 <style scoped>
