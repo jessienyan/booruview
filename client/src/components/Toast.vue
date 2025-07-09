@@ -27,8 +27,8 @@ defineEmits(["dismiss"]);
     z-index: 999;
     border-radius: 0.8rem;
     padding: 0.8rem 1rem;
-    font-size: 16px;
     cursor: pointer;
+    filter: drop-shadow(0 0 10px black);
 }
 
 .toast-info {
