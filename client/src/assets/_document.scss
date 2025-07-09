@@ -47,7 +47,9 @@ h5 {
 
 p,
 ul,
-label {
+label,
+input,
+select {
     color: #bbb;
 }
 
@@ -62,6 +64,13 @@ ul {
 
 li {
     margin-bottom: 0.2rem;
+}
+
+select {
+    background-color: #222;
+    border: 1px solid #555;
+    padding: 0.4rem;
+    border-radius: 0.4rem;
 }
 
 .prevent-overscroll {
