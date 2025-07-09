@@ -79,8 +79,8 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
 .crop-icon {
     font-size: 24px;
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 0.8rem;
+    top: 0.8rem;
     background-color: black;
     opacity: 0.25;
     border-radius: 50%;

@@ -46,11 +46,11 @@ const showChangelog = ref(false);
 <style scoped>
 .version {
     font-family: "Courier New", Courier, monospace;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: right;
 }
 
 .links .bi {
-    margin-left: 5px;
+    margin-left: 0.4rem;
 }
 </style>

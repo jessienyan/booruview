@@ -66,14 +66,14 @@ function switchTab(tab: Tab) {
 
 .tabs {
     display: flex;
-    padding: 0 10px;
-    gap: 5px;
+    padding: 0 0.8rem;
+    gap: 0.4rem;
 }
 
 .tab-btn {
     border: 1px solid #555;
     border-bottom: none;
-    padding: 5px 10px;
+    padding: 0.4rem 0.8rem;
     border-radius: 4px 4px 0 0;
     background-color: #1e1e1e;
     color: #999;
@@ -98,7 +98,7 @@ function switchTab(tab: Tab) {
 }
 
 .tab-content {
-    margin: 1rem;
+    margin: 0.8rem;
 }
 
 p,
@@ -116,7 +116,7 @@ select {
     background-color: #222;
     border: 1px solid #555;
     color: #999;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 0.4rem;
+    border-radius: 0.4rem;
 }
 </style>

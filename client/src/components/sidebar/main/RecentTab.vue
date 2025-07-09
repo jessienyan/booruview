@@ -77,7 +77,7 @@ function onSearch(query: SearchQuery) {
 @import "@/assets/colors";
 
 .history-entry {
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
 }
 
 .entry-footer {
@@ -94,11 +94,11 @@ function onSearch(query: SearchQuery) {
 }
 
 .btn-search {
-    margin: 10px 10px 10px auto;
+    margin: 0.8rem 0.8rem 0.8rem auto;
 }
 
 .tag-list {
-    padding: 10px;
+    padding: 0.8rem;
     background-color: $color-primary-darker;
 }
 
@@ -106,8 +106,8 @@ function onSearch(query: SearchQuery) {
     border: none;
     background: none;
     cursor: pointer;
-    padding: 10px;
-    margin: 0 5px;
+    padding: 0.6rem;
+    margin: 0.6rem;
     font-size: 20px;
     color: $color-primary-light;
 }

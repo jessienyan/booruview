@@ -21,8 +21,15 @@ body {
 }
 
 body,
+p,
+button,
 input {
-    font-size: 20px;
+    font-size: 16px;
+}
+
+a,
+a:visited {
+    color: $color-primary-light;
 }
 
 h1,
@@ -32,10 +39,22 @@ h4,
 h5 {
     margin: 1rem 0;
     color: #ccc;
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+p, ul, label {
+    color: #aaa;
 }
 
 p, ul {
     margin: 1rem 0;
+}
+
+ul {
+    margin-bottom: 1.2rem;
 }
 
 li {

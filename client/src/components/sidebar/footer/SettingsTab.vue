@@ -165,11 +165,6 @@ function onChangeMuteVideos(e: Event) {
 </template>
 
 <style lang="scss" scoped>
-.settings-container {
-    font-size: 16px;
-    color: #999;
-}
-
 .input {
     display: flex;
 
@@ -185,11 +180,11 @@ function onChangeMuteVideos(e: Event) {
 }
 
 .input-group {
-    margin: 16px 0;
+    margin: 1rem 0;
 }
 
 label + .input {
-    margin-top: 5px;
+    margin-top: 0.4rem;
 }
 
 label {

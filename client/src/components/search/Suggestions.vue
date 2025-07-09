@@ -54,10 +54,11 @@ watchPostEffect(() => {
     background-color: #252525;
     border: 1px solid #555;
     color: #000;
-    padding: 10px;
-    font-size: 18px;
+    padding: 0.5em;
+    font-size: 1.1rem;
     list-style: none;
     margin-top: -1px;
+    margin-bottom: 0;
     display: flex;
     justify-content: space-between;
     cursor: pointer;
