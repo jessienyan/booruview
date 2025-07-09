@@ -37,11 +37,13 @@ function switchTab(tab: Tab) {
             </button>
         </header>
 
-        <div class="tab-content">
-            <KeepAlive>
-                <SearchTab v-if="currentTab === 'search'" />
-                <RecentTab v-else-if="currentTab === 'recent'" />
-            </KeepAlive>
+        <div class="tab-content-container">
+            <div class="tab-content">
+                <KeepAlive>
+                    <SearchTab v-if="currentTab === 'search'" />
+                    <RecentTab v-else-if="currentTab === 'recent'" />
+                </KeepAlive>
+            </div>
         </div>
     </div>
 </template>
@@ -89,11 +91,14 @@ function switchTab(tab: Tab) {
     margin-left: auto;
 }
 
-.tab-content {
-    padding: 10px;
+.tab-content-container {
     flex: 1;
     min-height: 0;
     overflow-y: scroll;
+}
+
+.tab-content {
+    margin: 1rem;
 }
 
 p,
