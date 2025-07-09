@@ -83,11 +83,11 @@ watchPostEffect(() => {
 }
 
 .artist {
-    color: #a00;
+    color: #d51919;
 }
 
 .copyright {
-    color: #a0a;
+    color: #c928c9;
 }
 
 .character {
