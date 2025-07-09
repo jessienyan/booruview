@@ -38,7 +38,7 @@ h3,
 h4,
 h5 {
     margin: 1rem 0;
-    color: #ccc;
+    color: $color-primary-light;
 
     &:first-child {
         margin-top: 0;
@@ -48,7 +48,7 @@ h5 {
 p,
 ul,
 label {
-    color: #aaa;
+    color: #bbb;
 }
 
 p,
