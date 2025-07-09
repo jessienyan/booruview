@@ -180,7 +180,7 @@ function onChangeMuteVideos(e: Event) {
 }
 
 .input-group {
-    margin: 1rem 0;
+    margin: 1rem 0 1rem 1rem;
 }
 
 label + .input {
