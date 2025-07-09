@@ -25,8 +25,8 @@ defineEmits(["dismiss"]);
     left: 50%;
     transform: translateX(-50%);
     z-index: 999;
-    border-radius: 10px;
-    padding: 10px 15px;
+    border-radius: 0.8rem;
+    padding: 0.8rem 1rem;
     font-size: 16px;
     cursor: pointer;
 }

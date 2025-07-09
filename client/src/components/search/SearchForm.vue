@@ -262,19 +262,20 @@ watch(inputVal, (query, _, onCleanup) => {
     color: #ddd;
     display: block;
     width: 100%;
-    padding-left: 8px;
+    padding-left: 0.5rem;
     height: 40px;
 }
 
 .container {
     position: relative;
+    margin-bottom: 0.8rem;
 }
 
 .suggestions {
     position: absolute;
     width: 100%;
     z-index: 1;
-    padding-bottom: 10px;
+    padding-bottom: 1rem;
 }
 
 .submit-btn {
@@ -282,7 +283,6 @@ watch(inputVal, (query, _, onCleanup) => {
 
     display: block;
     width: 100%;
-    margin: 10px 0;
     line-height: $spinner-size;
 
     span {

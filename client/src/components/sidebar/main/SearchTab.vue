@@ -73,13 +73,12 @@ const styledTags = computed(() => {
 <style lang="css" scoped>
 .search {
     min-height: 0;
-    flex: 1;
     display: flex;
     flex-direction: column;
 }
 
 .taglist-container {
-    margin-top: 10px;
+    margin-top: 1rem;
     overflow-y: scroll;
     flex: 1;
 }

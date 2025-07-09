@@ -64,7 +64,7 @@ function consent() {
 }
 
 .content-warning {
-    padding: 10px;
+    padding: 0.8rem;
 }
 
 h3 {

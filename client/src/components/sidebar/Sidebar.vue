@@ -45,7 +45,7 @@ const { closed } = defineProps<{ closed: boolean }>();
 
 .sidebar-content {
     width: 450px;
-    margin-top: 10px;
+    margin-top: 0.8rem;
     position: relative;
     display: flex;
     flex-direction: column;

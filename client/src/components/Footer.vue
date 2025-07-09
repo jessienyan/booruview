@@ -35,7 +35,7 @@ import store from "@/store";
     text-align: center;
 
     .btn-primary:nth-of-type(2) {
-        margin-left: 10px;
+        margin-left: 0.8rem;
     }
 }
 </style>

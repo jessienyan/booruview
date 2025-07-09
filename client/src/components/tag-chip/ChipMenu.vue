@@ -196,14 +196,14 @@ function onWhitelist() {
     flex-direction: column;
     z-index: 999;
     width: max-content;
-    box-shadow: 0 0 10px black;
+    box-shadow: 0 0 0.8rem black;
 
     .option-btn {
         padding: 12px;
         text-align: left;
 
         .bi {
-            margin-right: 5px;
+            margin-right: 0.4rem;
         }
 
         &:first-of-type {

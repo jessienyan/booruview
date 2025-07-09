@@ -234,7 +234,7 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 0.8rem;
     padding-bottom: 100px;
 }
 
@@ -243,12 +243,12 @@ onUnmounted(() => {
     z-index: 2;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 500px;
-    padding: 0 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 10px black;
+    padding: 0 0.8rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 0 0.8rem black;
 
     position: absolute;
-    bottom: 10px;
+    bottom: 0.8rem;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -258,11 +258,11 @@ onUnmounted(() => {
     border: none;
     color: white;
     font-size: 30px;
-    text-shadow: 0 0 5px white;
+    text-shadow: 0 0 0.4rem white;
     opacity: 0.5;
     transition: opacity 150ms;
     cursor: pointer;
-    padding: 10px 15px;
+    padding: 0.8rem 1rem;
 
     &:not(:disabled) {
         &:hover,
@@ -279,7 +279,7 @@ onUnmounted(() => {
 
 .close-btn {
     color: #bb9fce;
-    text-shadow: 0 0 5px #bb9fce;
-    padding-right: 10px;
+    text-shadow: 0 0 0.4rem #bb9fce;
+    padding-right: 0.8rem;
 }
 </style>
