@@ -88,13 +88,15 @@ function toggleClose() {
             </button>
         </header>
 
-        <div class="tab-content" v-if="!closed">
+        <div class="tab-content-container" v-if="!closed">
+            <div class="tab-content">
             <KeepAlive>
                 <HelpTab v-if="currentTab === 'help'" />
                 <AboutTab v-else-if="currentTab === 'about'" />
                 <SettingsTab v-else-if="currentTab === 'settings'" />
                 <BlacklistTab v-else-if="currentTab === 'blacklist'" />
             </KeepAlive>
+        </div>
         </div>
     </div>
 </template>
@@ -140,11 +142,14 @@ function toggleClose() {
     margin-left: auto;
 }
 
-.tab-content {
-    padding: 0 10px;
+.tab-content-container {
     flex: 1;
     min-height: 0;
     overflow-y: scroll;
+}
+
+.tab-content {
+    margin: 1rem;
 }
 
 p,
