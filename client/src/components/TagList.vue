@@ -119,6 +119,6 @@ const categories = computed(() => {
 .tag-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.3rem;
 }
 </style>

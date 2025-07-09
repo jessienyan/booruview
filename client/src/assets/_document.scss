@@ -16,7 +16,6 @@ body {
 
 body {
     background-color: $color-bg;
-    color: #eee;
     margin: 0;
 }
 
@@ -38,7 +37,7 @@ h3,
 h4,
 h5 {
     margin: 1rem 0;
-    color: $color-primary-light;
+    color: #ccc;
 
     &:first-child {
         margin-top: 0;
@@ -50,7 +49,7 @@ ul,
 label,
 input,
 select {
-    color: #bbb;
+    color: #aaa;
 }
 
 p,
