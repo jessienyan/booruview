@@ -29,6 +29,7 @@ defineEmits(["dismiss"]);
     padding: 0.8rem 1rem;
     cursor: pointer;
     filter: drop-shadow(0 0 10px black);
+    color: #fff;
 }
 
 .toast-info {
