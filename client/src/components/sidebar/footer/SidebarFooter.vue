@@ -101,8 +101,7 @@ function toggleClose() {
     </div>
 </template>
 
-<!-- NOTE: no `scoped` here -->
-<style lang="scss">
+<style lang="scss" scoped>
 .tab-container {
     display: flex;
     flex-direction: column;
@@ -149,21 +148,5 @@ function toggleClose() {
 
 .tab-content {
     margin: 0.8rem;
-}
-
-p,
-li {
-    a,
-    a:visited {
-        color: #bb9fce;
-    }
-}
-
-select {
-    background-color: #222;
-    border: 1px solid #555;
-    color: #999;
-    padding: 0.4rem;
-    border-radius: 0.4rem;
 }
 </style>
