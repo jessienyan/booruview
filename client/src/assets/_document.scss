@@ -38,6 +38,10 @@ p, ul {
     margin: 1rem 0;
 }
 
+li {
+    margin-bottom: 0.2rem;
+}
+
 .prevent-overscroll {
     overscroll-behavior: contain;
 }

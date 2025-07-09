@@ -10,20 +10,19 @@ const showChangelog = ref(false);
 
 <template>
     <p>
-        Booruview makes it easy to search and browse
-        <a href="https://gelbooru.com" target="_blank">Gelbooru</a> posts. Check
-        the help tab for more info.
+        Booruview is an open source <a href="https://gelbooru.com" target="_blank">Gelbooru</a> viewer. It's simple, fast, and works on desktop and mobile.
     </p>
-    <p>
-        This project is open source and development is ongoing. Feedback and
-        suggestions are welcome. You can use the
-        <a href="https://github.com/jessienyan/booruview/issues" target="_blank"
-            >Github issue tracker</a
-        >
-        or send me an
-        <a href="mailto:216619670+jessienyan@users.noreply.github.com">email</a
-        >.
-    </p>
+    <ul class="links">
+        <li>
+            <a href="https://github.com/jessienyan/booruview" target="_blank">GitHub<i class="bi bi-github"></i></a>
+        </li>
+        <li>
+            <a href="https://github.com/jessienyan/booruview/issues" target="_blank">Report a bug<i class="bi bi-bug-fill"></i></a>
+        </li>
+        <li>
+            <a href="https://freesurveys.org/s/afOcVj9z-f" target="_blank">Give anonymous feedback<i class="bi bi-send-fill"></i></a>
+        </li>
+    </ul>
 
     <Collapsable text="changelog">
         <ChangeLog
@@ -49,5 +48,9 @@ const showChangelog = ref(false);
     font-family: "Courier New", Courier, monospace;
     font-size: 12px;
     text-align: right;
+}
+
+.links .bi {
+    margin-left: 5px;
 }
 </style>
