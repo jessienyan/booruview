@@ -66,6 +66,7 @@ function onClick() {
     display: inline-block;
     word-break: break-all;
     cursor: pointer;
+    color: #fff;
 
     .warning {
         color: #f44;
@@ -115,12 +116,10 @@ function onClick() {
 
 .tag-artist {
     background-color: #980000;
-    color: #fff;
 }
 
 .tag-copyright {
     background-color: #920092;
-    color: #fff;
 }
 
 .tag-character {
@@ -128,7 +127,7 @@ function onClick() {
 }
 
 .tag-metadata {
-    background-color: #c96b00;
+    background-color: #bc6808;
 }
 
 .tag-unknown {
