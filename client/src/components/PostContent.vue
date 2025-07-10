@@ -82,6 +82,7 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
     right: 0.8rem;
     top: 0.8rem;
     background-color: black;
+    color: white;
     opacity: 0.25;
     border-radius: 50%;
     padding: 0.6em;
@@ -102,6 +103,8 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
     left: 50%;
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
-    filter: drop-shadow(0 0 2px black) drop-shadow(0 0 6px black);
+    filter: drop-shadow(0 0 3px black);
+    color: #fff;
+    opacity: 0.6;
 }
 </style>
