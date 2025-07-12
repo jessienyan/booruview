@@ -13,8 +13,8 @@ const (
 	perSecondLimit = 3
 	burstLimit     = 20
 
-	evictInterval = 5 * time.Minute
-	banTime       = 10 * time.Minute
+	evictInterval = 10 * time.Minute
+	banTime       = 3 * time.Minute
 )
 
 var (

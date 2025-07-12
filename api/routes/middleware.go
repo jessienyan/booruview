@@ -38,7 +38,7 @@ func RateLimitMiddleware(next http.Handler) http.Handler {
 		}
 
 		if api.IsRateLimited(ip) {
-			w.WriteHeader(http.StatusTooManyRequests)
+			handle429Error(w)
 			return
 		}
 

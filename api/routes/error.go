@@ -8,13 +8,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type badRequestResponse struct {
+type errResponse struct {
 	Error string `json:"error"`
 }
 
 func handle400Error(w http.ResponseWriter, msg string) {
-	resp, _ := json.Marshal(badRequestResponse{Error: msg})
+	resp, _ := json.Marshal(errResponse{Error: msg})
 	w.WriteHeader(http.StatusBadRequest)
+	w.Write(resp)
+}
+
+func handle429Error(w http.ResponseWriter) {
+	resp, _ := json.Marshal(errResponse{Error: "Rate limited, wait a few minutes and try again"})
+	w.WriteHeader(http.StatusTooManyRequests)
 	w.Write(resp)
 }
 
