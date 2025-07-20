@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-07-20",
         changes: [
             "added consent option to only view SFW content (blacklists sensitive, questionable, and explicit ratings)",
+            'added an "always" option to auto search on page load (default)',
         ],
     },
     {
