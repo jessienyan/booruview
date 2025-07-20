@@ -17,6 +17,10 @@ onMounted(() => {
 function consent() {
     store.settings.consented = true;
     store.settings.save();
+
+    if (store.settings.searchOnLoad && !store.query.isEmpty()) {
+        store.searchPosts();
+    }
 }
 
 function consentSFW() {
