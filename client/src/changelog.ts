@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-07-20",
+        changes: [
+            "added consent option to only view SFW content (blacklists sensitive, questionable, and explicit ratings)",
+        ],
+    },
+    {
         date: "2025-07-11",
         changes: [
             "added a notification when making too many requests and triggering the rate limit",

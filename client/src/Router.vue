@@ -94,11 +94,7 @@ function onRouteChange() {
 function onPageLoad() {
     loadQueryParams()
         .then(() => {
-            if (
-                store.settings.consented &&
-                store.settings.searchOnLoad &&
-                !store.query.isEmpty()
-            ) {
+            if (store.settings.consented && store.shouldSearchOnPageLoad()) {
                 store.searchPosts();
             }
         })
