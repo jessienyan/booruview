@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import store, { type ColumnSizing } from "@/store";
+import store, { type ColumnSizing, type PageLoadAutoSearch } from "@/store";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
     fixed: "fixed",
+};
+
+const searchOnPageLoadOptions: Record<PageLoadAutoSearch, string> = {
+    always: "always",
+    "if-query": "if search isn't empty",
+    never: "never",
 };
 
 function onChangeColCount(e: Event) {
@@ -28,8 +34,9 @@ function onChangeCloseSidebarOnSearch(e: Event) {
     store.settings.save();
 }
 
-function onChangeSearchOnLoad(e: Event) {
-    store.settings.searchOnLoad = (e.target as HTMLInputElement).checked;
+function onChangeSearchOnPageLoad(e: Event) {
+    store.settings.searchOnPageLoad = (e.target as HTMLInputElement)
+        .value as any;
     store.settings.save();
 }
 
@@ -106,14 +113,20 @@ function onChangeMuteVideos(e: Event) {
         <h3>search</h3>
 
         <div class="input-group">
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="store.settings.searchOnLoad"
-                    @change="onChangeSearchOnLoad"
-                />
-                auto-search when page loads if search isn't empty</label
-            >
+            <label>auto-search when page loads</label>
+            <div class="input">
+                <select
+                    :value="store.settings.searchOnPageLoad"
+                    @change="onChangeSearchOnPageLoad"
+                >
+                    <option
+                        v-for="(label, val) in searchOnPageLoadOptions"
+                        :value="val"
+                    >
+                        {{ label }}
+                    </option>
+                </select>
+            </div>
         </div>
 
         <div class="input-group">

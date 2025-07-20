@@ -22,6 +22,23 @@ function loadValue<K extends SettingsKey, V = Store["settings"][K]>(
 }
 
 export type ColumnSizing = "fixed" | "dynamic";
+export type PageLoadAutoSearch = "always" | "if-query" | "never";
+
+// Page load setting was changed from a checkbox to a dropdown. Convert the
+// existing bool to the new dropdown selection
+function onPageLoadDefaultValue(): PageLoadAutoSearch {
+    const oldKey = "searchOnLoad";
+    const val = localStorage.getItem(oldKey);
+
+    switch (val) {
+        case "true":
+            return "if-query";
+        case "false":
+            return "never";
+        default:
+            return "always";
+    }
+}
 
 type Store = {
     currentPage: number;
@@ -53,7 +70,7 @@ type Store = {
 
         sidebarTabsHidden: boolean;
         closeSidebarOnSearch: boolean;
-        searchOnLoad: boolean;
+        searchOnPageLoad: PageLoadAutoSearch;
         highResImages: boolean;
 
         autoplayVideo: boolean;
@@ -87,6 +104,7 @@ type Store = {
     searchPosts(): Promise<void>;
     setQueryParams(): void;
     addQueryToHistory(): void;
+    shouldSearchOnPageLoad(): boolean;
 };
 
 const store = reactive<Store>({
@@ -115,7 +133,11 @@ const store = reactive<Store>({
         columnWidth: loadValue("columnWidth", 400, parseInt),
 
         sidebarTabsHidden: loadValue("sidebarTabsHidden", false, JSON.parse),
-        searchOnLoad: loadValue("searchOnLoad", true, JSON.parse),
+        searchOnPageLoad: loadValue(
+            "searchOnPageLoad",
+            onPageLoadDefaultValue(),
+            JSON.parse,
+        ),
         closeSidebarOnSearch: loadValue(
             "closeSidebarOnSearch",
             true,
@@ -160,7 +182,7 @@ const store = reactive<Store>({
             this.write("columnCount", (v) => v.toString());
             this.write("columnWidth", (v) => v.toString());
             this.write("sidebarTabsHidden", JSON.stringify);
-            this.write("searchOnLoad", JSON.stringify);
+            this.write("searchOnPageLoad", JSON.stringify);
             this.write("closeSidebarOnSearch", JSON.stringify);
             this.write("highResImages", JSON.stringify);
             this.write("autoplayVideo", JSON.stringify);
@@ -413,6 +435,19 @@ const store = reactive<Store>({
         // Newest entries are added to the front of the list
         this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
         this.settings.save();
+    },
+
+    shouldSearchOnPageLoad(): boolean {
+        switch (store.settings.searchOnPageLoad) {
+            case "always":
+                return true;
+            case "if-query":
+                return !store.query.isEmpty();
+            case "never":
+                return false;
+            default:
+                return false;
+        }
     },
 });
 
