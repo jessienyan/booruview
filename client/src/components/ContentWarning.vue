@@ -18,30 +18,60 @@ function consent() {
     store.settings.consented = true;
     store.settings.save();
 }
+
+function consentSFW() {
+    store.settings.blacklist = store.settings.blacklist.concat([
+        {
+            name: "rating:explicit",
+            type: "unknown",
+            count: 0,
+        },
+        {
+            name: "rating:questionable",
+            type: "unknown",
+            count: 0,
+        },
+        {
+            name: "rating:sensitive",
+            type: "unknown",
+            count: 0,
+        },
+    ]);
+    consent();
+}
+
+function consentNSFW() {
+    consent();
+}
 </script>
 
 <template>
     <ScreenCover blackout />
     <div class="cw-container">
         <div class="content-warning">
-            <h3>CONTENT WARNING</h3>
             <p>
-                This site is an image browser for Gelbooru, a
-                <span class="nsfw-warning">NSFW image board.</span>
+                Booruview is an image browser for Gelbooru, an image board that
+                hosts
+                <span class="nsfw-warning">Not Safe For Work</span> content.
             </p>
             <p>
-                Do NOT continue unless you consent to viewing potentially adult
-                content.
+                Do you wish to only view
+                <span class="sfw">Safe For Work</span> content?
             </p>
-            <p>
+            <p class="btn-container">
                 <button
-                    class="btn-primary btn-rounded consent"
+                    class="btn-consent btn-sfw"
                     :disabled="timeRemaining > 0"
-                    @click="consent"
+                    @click="consentSFW"
                 >
-                    continue<span v-if="timeRemaining > 0">
-                        ({{ timeRemaining }})</span
-                    >
+                    only view SFW content
+                </button>
+                <button
+                    class="btn-consent btn-nsfw"
+                    :disabled="timeRemaining > 0"
+                    @click="consentNSFW"
+                >
+                    view all content (18+)
                 </button>
             </p>
         </div>
@@ -50,6 +80,15 @@ function consent() {
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
+
+.btn-sfw {
+    background-color: #70e570;
+}
+
+.btn-nsfw {
+    background-color: #830b0b;
+    color: white;
+}
 
 .cw-container {
     position: absolute;
@@ -65,19 +104,42 @@ function consent() {
 
 .content-warning {
     padding: 0.8rem;
-}
-
-h3 {
-    text-align: center;
+    max-width: 500px;
 }
 
 .nsfw-warning {
     font-weight: bold;
-    color: #a00;
+    color: #c00;
 }
 
-.consent {
-    display: block;
-    margin: 40px auto 0;
+.sfw {
+    font-weight: bold;
+    color: #0c0;
+}
+
+.btn-consent {
+    border-radius: 10px;
+    border: none;
+    padding: 1rem;
+    cursor: pointer;
+
+    &:disabled {
+        filter: grayscale(0.5) brightness(0.8);
+        cursor: not-allowed;
+    }
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    max-width: 300px;
+    margin: auto;
+    margin-top: 3rem;
+}
+
+p {
+    text-align: center;
 }
 </style>
