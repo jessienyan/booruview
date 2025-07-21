@@ -61,7 +61,7 @@ function loadQueryParams(): Promise<void> {
             window.location.hash.replace(/^#/, ""),
         );
         const page = params.get("page") || "1";
-        const query = params.get("q") || "";
+        const query = (params.get("q") || "").toLowerCase();
         store.currentPage = parsePage(page);
         parseQuery(query).then(resolve).catch(reject);
     });
