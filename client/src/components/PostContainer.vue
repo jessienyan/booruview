@@ -14,7 +14,10 @@ type ColumnDimensions = {
     width: number;
 };
 
-const { posts } = defineProps<{ posts: Post[] }>();
+const { scrollContainer, posts } = defineProps<{
+    scrollContainer: HTMLElement;
+    posts: Post[];
+}>();
 const container = useTemplateRef("container");
 const containerWidth = ref(0);
 
@@ -130,6 +133,7 @@ onMounted(() => {
                 :renderHeight="post.renderHeight"
                 :maxHeight="maxPostHeight"
                 :cropped="post.cropped"
+                :scrollContainer="scrollContainer"
             />
         </div>
     </div>

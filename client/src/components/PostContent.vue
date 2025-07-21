@@ -3,12 +3,14 @@ import { useIsVideo } from "@/composable";
 import store from "@/store";
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
 
-const { cropped, maxHeight, renderHeight, post } = defineProps<{
-    cropped: boolean;
-    maxHeight: number;
-    renderHeight: number;
-    post: Post;
-}>();
+const { cropped, maxHeight, renderHeight, post, scrollContainer } =
+    defineProps<{
+        cropped: boolean;
+        maxHeight: number;
+        renderHeight: number;
+        post: Post;
+        scrollContainer: HTMLElement;
+    }>();
 
 const isVideo = useIsVideo(() => post);
 
@@ -37,15 +39,22 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
 });
 
 const showImage = ref(false);
-const containerRef = useTemplateRef("content");
+const containerRef = useTemplateRef("container");
 const scrollObserver = new IntersectionObserver(onIntersectionChange, {
+    root: scrollContainer,
+
     // Preload images when they are within this distance from the bottom of the viewport
-    rootMargin: "600px",
+    rootMargin: "600px 0px 600px 0px",
 });
 
 function onIntersectionChange(entries: IntersectionObserverEntry[]) {
     const e = entries[0];
-    showImage.value = e.isIntersecting;
+
+    // Once: render the image when it comes into view and cleanup the observer
+    if (e.isIntersecting) {
+        showImage.value = true;
+        scrollObserver.disconnect();
+    }
 }
 
 onMounted(() => scrollObserver.observe(containerRef.value!));
@@ -57,14 +66,14 @@ onUnmounted(() => scrollObserver.disconnect());
         class="post"
         :style="{ maxHeight: maxHeight + 'px', height: renderHeight + 'px' }"
         @click="store.fullscreenPost = post"
-        ref="content"
+        ref="container"
     >
         <img
             class="content"
             :src="content.url"
             :width="content.width"
             :height="content.height"
-            v-show="showImage"
+            v-if="showImage"
         />
 
         <span
