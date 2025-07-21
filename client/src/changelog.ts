@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-07-21",
+        changes: ['"rating:" filter now appears as a metadata tag'],
+    },
+    {
         date: "2025-07-20",
         changes: [
             "added consent option to only view SFW content (blacklists sensitive, questionable, and explicit ratings)",
