@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
         changes: [
             '"rating:" filter now appears as a metadata tag',
             "fixed uppercase tags not being registered correctly. the search input now only accepts lowercase letters",
+            "changed images to start loading before they are visible (should improve how the site feels on slower connections)",
         ],
     },
     {
