@@ -133,11 +133,17 @@ func (client *Client) SearchTags(query string) ([]api.TagResponse, error) {
 	}
 
 	tags := make([]api.TagResponse, 0, len(suggestions))
+	tagType := api.Unknown
+
+	// Fake rating:* as metadata tag
+	if strings.Contains(query, "rating:") {
+		tagType = api.Metadata
+	}
 
 	for _, v := range suggestions {
 		data := api.TagResponse{
 			Name: v,
-			Type: api.Unknown,
+			Type: tagType,
 		}
 		tags = append(tags, data)
 	}
@@ -226,6 +232,9 @@ func (client *Client) ListPosts(tags string, page int) (*PostList, error) {
 			Width:           p.Width,
 			Height:          p.Height,
 		}
+
+		// Fake rating:* as metadata tag
+		data.Tags = append(data.Tags, fmt.Sprintf("rating:%s", data.Rating))
 
 		if createdAt, err := time.Parse(time.RubyDate, p.CreatedAt); err == nil {
 			data.CreatedAtTimestamp = createdAt.Unix()

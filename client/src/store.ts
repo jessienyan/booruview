@@ -203,8 +203,26 @@ const store = reactive<Store>({
 
     query: new SearchQuery(),
     lastQuery: new SearchQuery(),
-    posts: new Map(),
-    cachedTags: new Map(),
+    posts: new Map<number, Post[]>(),
+    cachedTags: new Map<string, Tag>([
+        // Fake rating:* as metadata tags
+        [
+            "rating:general",
+            { name: "rating:general", count: 0, type: "metadata" },
+        ],
+        [
+            "rating:sensitive",
+            { name: "rating:sensitive", count: 0, type: "metadata" },
+        ],
+        [
+            "rating:questionable",
+            { name: "rating:questionable", count: 0, type: "metadata" },
+        ],
+        [
+            "rating:explicit",
+            { name: "rating:explicit", count: 0, type: "metadata" },
+        ],
+    ]),
 
     tagsForPost(post: Post): Promise<Tag[]> {
         return new Promise<Tag[]>((resolve, reject) => {
