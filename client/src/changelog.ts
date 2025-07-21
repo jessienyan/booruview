@@ -6,7 +6,10 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-07-21",
-        changes: ['"rating:" filter now appears as a metadata tag'],
+        changes: [
+            '"rating:" filter now appears as a metadata tag',
+            "fixed uppercase tags not being registered correctly. the search input now only accepts lowercase letters",
+        ],
     },
     {
         date: "2025-07-20",
