@@ -73,7 +73,10 @@ const hasConsented = computed(() => {
             <template v-if="store.hasSearched">
                 <NoResults v-if="store.totalPostCount === 0" />
                 <template v-else>
-                    <PostContainer :posts="store.postsForCurrentPage() || []" />
+                    <PostContainer
+                        :posts="store.postsForCurrentPage() || []"
+                        :scroll-container="mainContainer!"
+                    />
                     <Footer v-if="!store.fetchingPosts" />
                 </template>
             </template>
