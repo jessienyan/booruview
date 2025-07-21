@@ -148,7 +148,9 @@ function onInput(e: Event) {
     }
 
     // Prevent the user from entering any leading whitespace
-    const newVal = (e.target as HTMLInputElement).value.trimStart();
+    const newVal = (e.target as HTMLInputElement).value
+        .trimStart()
+        .toLowerCase();
     const changed = inputVal.value !== newVal;
 
     if (changed) {
