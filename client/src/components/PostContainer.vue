@@ -127,6 +127,7 @@ onMounted(() => {
                 v-for="post in col"
                 :post="post.post"
                 :key="post.post.id"
+                :renderHeight="post.renderHeight"
                 :maxHeight="maxPostHeight"
                 :cropped="post.cropped"
             />
