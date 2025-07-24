@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-07-24",
+        changes: [
+            "added settings to customize the menu position when viewing a post in fullscreen",
+        ],
+    },
+    {
         date: "2025-07-21",
         changes: [
             '"rating:" filter now appears as a metadata tag',
