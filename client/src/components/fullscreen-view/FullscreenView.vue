@@ -27,13 +27,37 @@ const currentTab = ref<Tab>("content");
 
 const menuAnchorPoints: Record<FullscreenViewMenuAnchorPoint, CSSProperties> = {
     topleft: { top: "0px", left: "0px" },
-    topcenter: { top: "0px", left: "50%", transform: "translateX(-50%)" },
+    topcenter: {
+        top: "0px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        marginLeft: "0px",
+        marginRight: "0px",
+    },
     topright: { top: "0px", right: "0px" },
-    right: { top: "50%", right: "0px" },
+    right: {
+        top: "50%",
+        right: "0px",
+        transform: "translateY(-50%)",
+        marginTop: "0px",
+        marginBottom: "0px",
+    },
     bottomright: { bottom: "0px", right: "0px" },
-    bottomcenter: { bottom: "0px", left: "50%", transform: "translateX(-50%)" },
+    bottomcenter: {
+        bottom: "0px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        marginLeft: "0px",
+        marginRight: "0px",
+    },
     bottomleft: { bottom: "0px", left: "0px" },
-    left: { top: "50%", left: "0px" },
+    left: {
+        top: "50%",
+        left: "0px",
+        transform: "translateY(-50%)",
+        marginTop: "0px",
+        marginBottom: "0px",
+    },
 };
 
 const featMenuAnchor = useNewFeatureIndicator(
