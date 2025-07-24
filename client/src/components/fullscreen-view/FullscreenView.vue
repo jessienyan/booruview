@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import store from "@/store";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
 import ScreenCover from "../ScreenCover.vue";
@@ -8,9 +8,31 @@ import { useIsVideo, useStationaryClick } from "@/composable";
 
 type Tab = "content" | "info";
 type PostNavInfo = { page: number; index: number } | null;
+type MenuAnchorPoint =
+    | "topleft"
+    | "topcenter"
+    | "topright"
+    | "right"
+    | "bottomright"
+    | "bottomcenter"
+    | "bottomleft"
+    | "left";
 
 const { post } = defineProps<{ post: Post }>();
 const currentTab = ref<Tab>("content");
+
+const menuAnchorPoints: Record<MenuAnchorPoint, CSSProperties> = {
+    topleft: { top: "0px", left: "0px" },
+    topcenter: { top: "0px", left: "50%", transform: "translateX(-50%)" },
+    topright: { top: "0px", right: "0px" },
+    right: { top: "50%", right: "0px" },
+    bottomright: { bottom: "0px", right: "0px" },
+    bottomcenter: { bottom: "0px", left: "50%", transform: "translateX(-50%)" },
+    bottomleft: { bottom: "0px", left: "0px" },
+    left: { top: "50%", left: "0px" },
+};
+const menuAnchor: MenuAnchorPoint = "bottomright";
+const rotateMenu = true;
 
 function close() {
     store.fullscreenPost = null;
@@ -161,7 +183,11 @@ onUnmounted(() => {
                     <InfoTab v-else-if="currentTab == 'info'" :post="post" />
                 </KeepAlive>
             </div>
-            <footer class="tab-menu">
+            <footer
+                class="tab-menu"
+                :class="{ flipped: rotateMenu }"
+                :style="menuAnchorPoints[menuAnchor]"
+            >
                 <button
                     class="menu-btn"
                     :class="{ active: currentTab == 'content' }"
@@ -240,17 +266,18 @@ onUnmounted(() => {
 
 .tab-menu {
     display: flex;
+    position: absolute;
     z-index: 2;
     background-color: rgba(0, 0, 0, 0.8);
     border-radius: 500px;
-    padding: 0 0.8rem;
-    margin-bottom: 0.8rem;
+    padding: 0 0.6rem;
+    margin: 1rem;
     box-shadow: 0 0 0.8rem black;
 
-    position: absolute;
-    bottom: 0.8rem;
-    left: 50%;
-    transform: translateX(-50%);
+    &.flipped {
+        padding: 0.6rem 0;
+        flex-direction: column-reverse;
+    }
 }
 
 .menu-btn {
@@ -262,7 +289,7 @@ onUnmounted(() => {
     opacity: 0.5;
     transition: opacity 150ms;
     cursor: pointer;
-    padding: 0.8rem 1rem;
+    padding: 0.6rem;
 
     &:not(:disabled) {
         &:hover,
