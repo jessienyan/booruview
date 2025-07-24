@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import store from "@/store";
+import store, { type FullscreenViewMenuAnchorPoint } from "@/store";
 import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
@@ -8,20 +8,11 @@ import { useIsVideo, useStationaryClick } from "@/composable";
 
 type Tab = "content" | "info";
 type PostNavInfo = { page: number; index: number } | null;
-type MenuAnchorPoint =
-    | "topleft"
-    | "topcenter"
-    | "topright"
-    | "right"
-    | "bottomright"
-    | "bottomcenter"
-    | "bottomleft"
-    | "left";
 
 const { post } = defineProps<{ post: Post }>();
 const currentTab = ref<Tab>("content");
 
-const menuAnchorPoints: Record<MenuAnchorPoint, CSSProperties> = {
+const menuAnchorPoints: Record<FullscreenViewMenuAnchorPoint, CSSProperties> = {
     topleft: { top: "0px", left: "0px" },
     topcenter: { top: "0px", left: "50%", transform: "translateX(-50%)" },
     topright: { top: "0px", right: "0px" },
@@ -31,8 +22,6 @@ const menuAnchorPoints: Record<MenuAnchorPoint, CSSProperties> = {
     bottomleft: { bottom: "0px", left: "0px" },
     left: { top: "50%", left: "0px" },
 };
-const menuAnchor: MenuAnchorPoint = "bottomright";
-const rotateMenu = true;
 
 function close() {
     store.fullscreenPost = null;
@@ -185,8 +174,10 @@ onUnmounted(() => {
             </div>
             <footer
                 class="tab-menu"
-                :class="{ flipped: rotateMenu }"
-                :style="menuAnchorPoints[menuAnchor]"
+                :class="{ flipped: store.settings.fullscreenViewMenuRotate }"
+                :style="
+                    menuAnchorPoints[store.settings.fullscreenViewMenuAnchor]
+                "
             >
                 <button
                     class="menu-btn"
@@ -268,7 +259,7 @@ onUnmounted(() => {
     display: flex;
     position: absolute;
     z-index: 2;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
     border-radius: 500px;
     padding: 0 0.6rem;
     margin: 1rem;
@@ -289,7 +280,7 @@ onUnmounted(() => {
     opacity: 0.5;
     transition: opacity 150ms;
     cursor: pointer;
-    padding: 0.6rem;
+    padding: 0.6rem 0.8rem;
 
     &:not(:disabled) {
         &:hover,

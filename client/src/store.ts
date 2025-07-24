@@ -7,13 +7,23 @@ type SearchHistory = {
     query: SearchQuery;
 };
 
+export type FullscreenViewMenuAnchorPoint =
+    | "topleft"
+    | "topcenter"
+    | "topright"
+    | "right"
+    | "bottomright"
+    | "bottomcenter"
+    | "bottomleft"
+    | "left";
+
 const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
 
-function loadValue<K extends SettingsKey, V = Store["settings"][K]>(
+function loadValue<K extends SettingsKey>(
     key: K,
-    defaultValue: V,
-    transform: (val: string) => V,
-): V {
+    defaultValue: Store["settings"][K],
+    transform: (val: string) => Store["settings"][K],
+): Store["settings"][K] {
     const val = localStorage?.getItem(key);
     if (val === null) {
         return defaultValue;
@@ -76,14 +86,17 @@ type Store = {
         autoplayVideo: boolean;
         muteVideo: boolean;
 
+        fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
+        fullscreenViewMenuRotate: boolean;
+
         blacklist: Tag[];
 
         queryHistory: SearchHistory[];
 
         save(): void;
-        write<K extends SettingsKey, V = Store["settings"][K]>(
+        write<K extends SettingsKey>(
             key: K,
-            transform: (val: V) => string,
+            transform: (val: Store["settings"][K]) => string,
         ): void;
     };
 
@@ -148,6 +161,17 @@ const store = reactive<Store>({
         autoplayVideo: loadValue("autoplayVideo", true, JSON.parse),
         muteVideo: loadValue("muteVideo", true, JSON.parse),
 
+        fullscreenViewMenuAnchor: loadValue(
+            "fullscreenViewMenuAnchor",
+            "bottomcenter",
+            JSON.parse,
+        ),
+        fullscreenViewMenuRotate: loadValue(
+            "fullscreenViewMenuRotate",
+            false,
+            JSON.parse,
+        ),
+
         blacklist: loadValue("blacklist", [], JSON.parse),
 
         queryHistory: loadValue("queryHistory", [], (val) => {
@@ -187,6 +211,8 @@ const store = reactive<Store>({
             this.write("highResImages", JSON.stringify);
             this.write("autoplayVideo", JSON.stringify);
             this.write("muteVideo", JSON.stringify);
+            this.write("fullscreenViewMenuAnchor", JSON.stringify);
+            this.write("fullscreenViewMenuRotate", JSON.stringify);
             this.write("blacklist", JSON.stringify);
             this.write("queryHistory", (val) =>
                 JSON.stringify(val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT)),
