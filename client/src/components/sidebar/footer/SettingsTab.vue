@@ -1,9 +1,27 @@
 <script setup lang="ts">
-import store, { type ColumnSizing, type PageLoadAutoSearch } from "@/store";
+import store, {
+    type ColumnSizing,
+    type FullscreenViewMenuAnchorPoint,
+    type PageLoadAutoSearch,
+} from "@/store";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
     fixed: "fixed",
+};
+
+const fullscreenViewMenuAnchorOptions: Record<
+    FullscreenViewMenuAnchorPoint,
+    string
+> = {
+    topleft: "top left",
+    topcenter: "top center",
+    topright: "top right",
+    right: "right",
+    bottomright: "bottom right",
+    bottomcenter: "bottom center",
+    bottomleft: "bottom left",
+    left: "left",
 };
 
 const searchOnPageLoadOptions: Record<PageLoadAutoSearch, string> = {
@@ -18,12 +36,26 @@ function onChangeColCount(e: Event) {
 }
 
 function onChangeColSizing(e: Event) {
-    store.settings.columnSizing = (e.target as HTMLInputElement).value as any;
+    store.settings.columnSizing = (e.target as HTMLInputElement)
+        .value as ColumnSizing;
     store.settings.save();
 }
 
 function onChangeColWidth(e: Event) {
     store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value);
+    store.settings.save();
+}
+
+function onChangeFullscreenViewMenuAnchor(e: Event) {
+    store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement)
+        .value as FullscreenViewMenuAnchorPoint;
+    store.settings.save();
+}
+
+function onChangeFullscreenViewMenuRotate(e: Event) {
+    store.settings.fullscreenViewMenuRotate = (
+        e.target as HTMLInputElement
+    ).checked;
     store.settings.save();
 }
 
@@ -108,6 +140,34 @@ function onChangeMuteVideos(e: Event) {
                 />
                 <span class="value">{{ store.settings.columnWidth }}px</span>
             </div>
+        </div>
+
+        <div class="input-group">
+            <label>fullscreen view menu position</label>
+            <div class="input">
+                <select
+                    :value="store.settings.fullscreenViewMenuAnchor"
+                    @change="onChangeFullscreenViewMenuAnchor"
+                >
+                    <option
+                        v-for="(label, val) in fullscreenViewMenuAnchorOptions"
+                        :value="val"
+                    >
+                        {{ label }}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.fullscreenViewMenuRotate"
+                    @change="onChangeFullscreenViewMenuRotate"
+                />
+                rotate menu 90 degrees</label
+            >
         </div>
 
         <h3>search</h3>
