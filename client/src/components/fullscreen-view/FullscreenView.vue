@@ -201,6 +201,21 @@ function showPrevPost() {
     }
 }
 
+function toggleFavorite() {
+    if (isFavorited.value) {
+        store.settings.favorites.splice(favoriteIndex.value, 1);
+    } else {
+        store.settings.favorites = [post].concat(store.settings.favorites);
+    }
+
+    store.settings.save();
+}
+
+const favoriteIndex = computed(() =>
+    store.settings.favorites.findIndex((p) => p.id === post.id),
+);
+const isFavorited = computed(() => favoriteIndex.value !== -1);
+
 onMounted(() => {
     document.addEventListener("keydown", onKeyDown, { capture: true });
 });
@@ -290,6 +305,17 @@ onUnmounted(() => {
                     title="view tags"
                 >
                     <i class="bi bi-info-circle"></i>
+                </button>
+                <button
+                    class="menu-btn fav-btn"
+                    :class="{ favorited: isFavorited }"
+                    @click="toggleFavorite"
+                    title="favorite"
+                >
+                    <i
+                        class="bi"
+                        :class="[`bi-${isFavorited ? 'heart-fill' : 'heart'}`]"
+                    ></i>
                 </button>
                 <button
                     class="menu-btn"
@@ -417,6 +443,17 @@ onUnmounted(() => {
     &:disabled {
         opacity: 0.2;
         cursor: default;
+    }
+}
+
+.fav-btn {
+    .bi {
+        position: relative;
+        top: 2px;
+    }
+
+    &.favorited {
+        color: pink;
     }
 }
 
