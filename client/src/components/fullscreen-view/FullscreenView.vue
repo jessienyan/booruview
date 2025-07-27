@@ -92,6 +92,9 @@ function onKeyDown(e: KeyboardEvent) {
     } else if (e.key === "ArrowRight" || e.key.toUpperCase() === "D") {
         e.preventDefault();
         showNextPost();
+    } else if (e.key.toUpperCase() === "F") {
+        e.preventDefault();
+        toggleFavorite();
     }
 }
 
