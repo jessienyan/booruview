@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed, useTemplateRef, watch } from "vue";
+import {
+    computed,
+    onMounted,
+    onUnmounted,
+    ref,
+    useTemplateRef,
+    watch,
+    watchEffect,
+} from "vue";
 import store from "@/store";
 import PostContainer from "./components/PostContainer.vue";
 import Sidebar from "./components/sidebar/Sidebar.vue";
@@ -12,21 +20,54 @@ import ChipMenu from "./components/tag-chip/ChipMenu.vue";
 import Toast from "./components/Toast.vue";
 
 const mainContainer = useTemplateRef("main");
+const scrollPositionHistory = ref<{ [page: number]: number }>({});
 
+function onPostsCleared() {
+    // Reset any scroll position history when a new search is triggered
+    scrollPositionHistory.value = {};
+}
+
+onMounted(() => {
+    store.onPostsCleared.addEventListener("postsCleared", onPostsCleared);
+});
+
+onUnmounted(() => {
+    store.onPostsCleared.removeEventListener("postsCleared", onPostsCleared);
+});
+
+// Pre-DOM update on page change
 watch(
-    () => [mainContainer, store.posts],
+    () => store.currentPage,
+    (_, prevPage) => {
+        // Remember where the scroll position was when the page changes. This watcher
+        // runs before the DOM has updated
+        scrollPositionHistory.value[prevPage] =
+            mainContainer.value?.scrollTop ?? 0;
+    },
+);
+
+// Post-DOM update on page change
+watch(
+    () => store.currentPage,
     () => {
         // Scroll needs to be deferred in order to work on mobile
         setTimeout(() => {
             if (mainContainer.value === null) {
                 return;
             }
-            mainContainer.value.scrollTop = 0;
+
+            // If this is a new page scroll to the top
+            if (!(store.currentPage in scrollPositionHistory.value)) {
+                scrollPositionHistory.value[store.currentPage] = 0;
+            }
+
+            // Restore scroll position
+            mainContainer.value.scrollTop =
+                scrollPositionHistory.value[store.currentPage];
         }, 0);
     },
     {
         flush: "post",
-        deep: true,
     },
 );
 
