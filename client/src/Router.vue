@@ -79,7 +79,7 @@ function onRouteChange() {
             const searchChanged = !lastSearch.equals(store.query);
 
             if (searchChanged) {
-                store.posts.clear();
+                store.clearPosts();
             }
 
             if (pageChanged || searchChanged) {
