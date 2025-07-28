@@ -48,8 +48,13 @@ watch(
 
 // Post-DOM update on page change
 watch(
-    () => store.currentPage,
+    () => [store.currentPage, store.posts.size],
     () => {
+        // Prevent firing on page load if there are no posts yet
+        if (store.posts.size === 0) {
+            return;
+        }
+
         // Scroll needs to be deferred in order to work on mobile
         setTimeout(() => {
             if (mainContainer.value === null) {
@@ -65,6 +70,8 @@ watch(
             mainContainer.value.scrollTop =
                 scrollPositionHistory.value[store.currentPage];
         }, 0);
+
+        mainContainer.value!.focus();
     },
     {
         flush: "post",
@@ -110,7 +117,7 @@ const hasConsented = computed(() => {
             :closed="store.sidebarClosed"
             @toggle="store.sidebarClosed = !store.sidebarClosed"
         />
-        <main ref="main">
+        <main ref="main" tabindex="-1">
             <template v-if="store.hasSearched">
                 <NoResults v-if="store.totalPostCount === 0" />
                 <template v-else>
@@ -151,6 +158,10 @@ main {
         .sidebar-open & {
             display: none;
         }
+    }
+
+    &:focus {
+        outline: none;
     }
 }
 </style>
