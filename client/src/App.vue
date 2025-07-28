@@ -78,6 +78,16 @@ watch(
     },
 );
 
+// Focus main container when exiting fullscreen view
+watch(
+    () => store.fullscreenPost,
+    () => {
+        if (store.fullscreenPost === null) {
+            mainContainer.value!.focus();
+        }
+    },
+);
+
 const hasConsented = computed(() => {
     if (store.settings.consented) {
         return true;
