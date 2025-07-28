@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-07-28",
+        changes: [
+            "fixed scroll position not being remembered when using back/forward browser navigation",
+            "fixed keyboard nav (pageup/pagedown) not working",
+        ],
+    },
+    {
         date: "2025-07-24",
         changes: [
             "added settings to customize the menu position when viewing a post in fullscreen",
