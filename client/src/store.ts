@@ -107,8 +107,9 @@ type Store = {
     posts: Map<number, Post[]>;
     cachedTags: Map<string, Tag>;
 
-    tagsForPost(post: Post): Promise<Tag[]>;
+    onPostsCleared: EventTarget;
 
+    tagsForPost(post: Post): Promise<Tag[]>;
     loadTags(tags: string[]): Promise<void>;
     maxPage(): number;
     nextPage(): Promise<void> | null;
@@ -118,6 +119,7 @@ type Store = {
     setQueryParams(): void;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
+    clearPosts(): void;
 };
 
 const store = reactive<Store>({
@@ -249,6 +251,8 @@ const store = reactive<Store>({
             { name: "rating:explicit", count: 0, type: "metadata" },
         ],
     ]),
+
+    onPostsCleared: new EventTarget(),
 
     tagsForPost(post: Post): Promise<Tag[]> {
         return new Promise<Tag[]>((resolve, reject) => {
@@ -492,6 +496,11 @@ const store = reactive<Store>({
             default:
                 return false;
         }
+    },
+
+    clearPosts() {
+        this.posts.clear();
+        this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
     },
 });
 

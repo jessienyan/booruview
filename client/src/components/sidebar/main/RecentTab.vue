@@ -34,9 +34,9 @@ function onSearch(query: SearchQuery) {
 
     store.query = query.copy();
     store.currentPage = 1;
-    store.posts.clear();
+    store.clearPosts();
 
-    store.searchPosts().catch(() => store.posts.clear());
+    store.searchPosts().catch(() => store.clearPosts());
 }
 </script>
 

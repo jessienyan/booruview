@@ -10,9 +10,9 @@ function doPostSearch() {
     }
 
     store.currentPage = 1;
-    store.posts.clear();
+    store.clearPosts();
 
-    store.searchPosts().catch(() => store.posts.clear());
+    store.searchPosts().catch(() => store.clearPosts());
 }
 
 function onTagSelect(tag: Tag, negated: boolean) {
