@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import VanillaSwipe, { type EventData } from "vanilla-swipe";
 import { onMounted, onUnmounted, ref } from "vue";
+import store from "./store";
 
 const props = defineProps<{ scrollContainer: HTMLElement }>();
 const swipeDirection = ref<"LEFT" | "RIGHT" | null>(null);
@@ -23,15 +24,31 @@ onMounted(() => {
         // Swap the swipe direction (flick left means right)
         rotationAngle: 180,
 
-        onSwipeStart(event, data) {
-            if (isHorizontalSwipe(data)) {
-                swipeDirection.value = data.directionX as any;
-            } else {
-                swipeDirection.value = null;
+        onSwipeStart(_, data) {
+            if (store.fullscreenPost !== null || !isHorizontalSwipe(data)) {
+                return;
+            }
+
+            switch (data.directionX) {
+                case "LEFT":
+                    if (store.currentPage === 1) {
+                        return;
+                    }
+
+                    swipeDirection.value = "LEFT";
+                    break;
+
+                case "RIGHT":
+                    if (store.currentPage === store.maxPage()) {
+                        return;
+                    }
+
+                    swipeDirection.value = "RIGHT";
+                    break;
             }
         },
 
-        onSwiping(event, data) {
+        onSwiping(_, data) {
             if (swipeDirection.value === null) {
                 return;
             }
@@ -42,10 +59,17 @@ onMounted(() => {
             }
         },
 
-        onSwiped(event, data) {
-            if (swipeDirection.value === null) {
-                return;
+        onSwiped() {
+            switch (swipeDirection.value) {
+                case "LEFT":
+                    store.prevPage();
+                    break;
+                case "RIGHT":
+                    store.nextPage();
+                    break;
             }
+
+            swipeDirection.value = null;
         },
     });
     swipe.init();
@@ -81,12 +105,14 @@ onUnmounted(() => swipe.destroy());
     border-radius: 100%;
     filter: drop-shadow(0 0 10px black);
     opacity: 0.8;
+
+    user-select: none;
+    pointer-events: none;
 }
 
 @keyframes slide-from-left {
     0% {
         left: -100px;
-        opacity: 0;
     }
 
     100% {
@@ -97,7 +123,6 @@ onUnmounted(() => swipe.destroy());
 @keyframes slide-from-right {
     0% {
         right: -100px;
-        opacity: 0;
     }
 
     100% {
