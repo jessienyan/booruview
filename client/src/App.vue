@@ -145,7 +145,7 @@ const hasConsented = computed(() => {
                         :posts="store.postsForCurrentPage() || []"
                         :scroll-container="mainContainer!"
                     />
-                    <Footer v-if="!store.fetchingPosts" />
+                    <Footer />
                 </template>
             </template>
         </main>
