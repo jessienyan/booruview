@@ -167,6 +167,7 @@ main {
     flex: 1;
     min-height: 0;
     overflow-y: scroll;
+    overscroll-behavior-x: contain;
 
     @media (max-width: $mobile-width) {
         .sidebar-open & {
