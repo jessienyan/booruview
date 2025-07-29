@@ -6,6 +6,7 @@ import store from "@/store";
     <footer class="page-nav">
         <button
             class="btn-primary btn-rounded"
+            :disabled="store.fetchingPosts"
             @click="store.prevPage()"
             v-if="store.currentPage > 1"
         >
@@ -13,6 +14,7 @@ import store from "@/store";
         </button>
         <button
             class="btn-primary btn-rounded"
+            :disabled="store.fetchingPosts"
             @click="store.nextPage()"
             v-if="store.currentPage < store.maxPage()"
         >
