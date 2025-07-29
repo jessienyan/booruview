@@ -21,12 +21,14 @@ defineEmits(["dismiss"]);
 
 .toast {
     position: absolute;
-    bottom: 40px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
+    max-width: 90vw;
+    width: max-content;
     z-index: 999;
     border-radius: 0.8rem;
-    padding: 0.8rem 1rem;
+    padding: 1rem 1.2rem;
     cursor: pointer;
     filter: drop-shadow(0 0 10px black);
     color: #fff;
