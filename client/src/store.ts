@@ -115,7 +115,7 @@ type Store = {
     nextPage(): Promise<void> | null;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void> | null;
-    searchPosts(): Promise<void>;
+    searchPosts(page?: number): Promise<void>;
     setQueryParams(): void;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
@@ -286,21 +286,21 @@ const store = reactive<Store>({
         }
     },
 
-    searchPosts(): Promise<void> {
+    searchPosts(page?: number): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
             total_count: number;
             results: Post[];
         };
 
-        this.fetchingPosts = true;
-
         return new Promise((resolve, reject) => {
+            page = page ?? this.currentPage;
             const sameQuery = this.query.equals(this.lastQuery);
 
             // Don't refetch posts we already have
-            if (sameQuery && this.posts.has(this.currentPage)) {
+            if (sameQuery && this.posts.has(page)) {
                 this.fetchingPosts = false;
+                this.currentPage = page;
                 this.setQueryParams();
                 resolve();
                 return;
@@ -310,8 +310,9 @@ const store = reactive<Store>({
                 .asList()
                 .concat(this.settings.blacklist.map((t) => `-${t.name}`));
             const queryParams =
-                `q=${encodeURIComponent(query.join(","))}` +
-                `&page=${this.currentPage}`;
+                `q=${encodeURIComponent(query.join(","))}` + `&page=${page}`;
+
+            this.fetchingPosts = true;
 
             fetch("/api/posts?" + queryParams)
                 .then((resp) => {
@@ -343,9 +344,10 @@ const store = reactive<Store>({
                     }
 
                     resp.json().then((json: PostListResponse) => {
-                        this.posts.set(this.currentPage, json.results);
+                        this.posts.set(page!, json.results);
                         this.resultsPerPage = json.count_per_page;
                         this.totalPostCount = json.total_count;
+                        this.currentPage = page!;
 
                         if (this.settings.closeSidebarOnSearch) {
                             this.sidebarClosed = true;
@@ -436,8 +438,7 @@ const store = reactive<Store>({
             return null;
         }
 
-        this.currentPage++;
-        return this.searchPosts().catch(() => {});
+        return this.searchPosts(this.currentPage + 1).catch(() => {});
     },
 
     prevPage(): Promise<void> | null {
@@ -445,8 +446,7 @@ const store = reactive<Store>({
             return null;
         }
 
-        this.currentPage--;
-        return this.searchPosts().catch(() => {});
+        return this.searchPosts(this.currentPage - 1).catch(() => {});
     },
 
     addQueryToHistory() {
