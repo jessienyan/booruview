@@ -131,7 +131,13 @@ const hasConsented = computed(() => {
             :closed="store.sidebarClosed"
             @toggle="store.sidebarClosed = !store.sidebarClosed"
         />
-        <main ref="main" tabindex="-1">
+        <main
+            ref="main"
+            tabindex="-1"
+            :class="{
+                'prevent-pull-to-refresh': store.userIsSwipingToChangePage,
+            }"
+        >
             <template v-if="store.hasSearched">
                 <NoResults v-if="store.totalPostCount === 0" />
                 <template v-else>
@@ -178,5 +184,9 @@ main {
     &:focus {
         outline: none;
     }
+}
+
+.prevent-pull-to-refresh {
+    overscroll-behavior-y: contain;
 }
 </style>

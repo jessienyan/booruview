@@ -66,10 +66,10 @@ type Store = {
         tag: Tag;
         ref: HTMLElement | null;
     } | null;
-
     fullscreenPost: Post | null;
-
     sidebarClosed: boolean;
+
+    userIsSwipingToChangePage: boolean;
 
     settings: {
         consented: boolean;
@@ -135,10 +135,10 @@ const store = reactive<Store>({
     },
 
     tagMenu: null,
-
     fullscreenPost: null,
-
     sidebarClosed: false,
+
+    userIsSwipingToChangePage: false,
 
     settings: {
         consented: loadValue("consented", false, JSON.parse),
