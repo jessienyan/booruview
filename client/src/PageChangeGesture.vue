@@ -19,13 +19,14 @@ onMounted(() => {
     swipe = new VanillaSwipe({
         element: props.scrollContainer,
         delta: minDistanceForSwipe,
-        directionDelta: 30,
+        directionDelta: 10,
 
         // Swap the swipe direction (flick left means right)
         rotationAngle: 180,
 
         onSwipeStart(_, data) {
             if (store.fullscreenPost !== null || !isHorizontalSwipe(data)) {
+                swipeDirection.value = null;
                 return;
             }
 
@@ -56,6 +57,7 @@ onMounted(() => {
             // Cancel the swipe if the user changed direction
             if (swipeDirection.value !== data.directionX) {
                 swipeDirection.value = null;
+                return;
             }
         },
 
@@ -97,7 +99,7 @@ onUnmounted(() => swipe.destroy());
     z-index: 1;
 
     padding: 20px;
-    margin: 10px;
+    margin: 20px;
 
     background-color: $color-primary;
     color: $color-primary-light;
@@ -131,12 +133,12 @@ onUnmounted(() => swipe.destroy());
 }
 
 .swipe-left {
-    animation: slide-from-left 400ms cubic-bezier(0, 1, 0.25, 1) 1;
+    animation: slide-from-left 300ms cubic-bezier(0, 1, 0.25, 1) 1;
     left: 0;
 }
 
 .swipe-right {
-    animation: slide-from-right 400ms cubic-bezier(0, 1, 0.25, 1) 1;
+    animation: slide-from-right 300ms cubic-bezier(0, 1, 0.25, 1) 1;
     right: 0;
 }
 </style>
