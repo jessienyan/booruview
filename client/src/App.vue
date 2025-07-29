@@ -6,7 +6,6 @@ import {
     ref,
     useTemplateRef,
     watch,
-    watchEffect,
 } from "vue";
 import store from "@/store";
 import PostContainer from "./components/PostContainer.vue";
@@ -18,6 +17,7 @@ import Footer from "./components/Footer.vue";
 import NoResults from "./components/NoResults.vue";
 import ChipMenu from "./components/tag-chip/ChipMenu.vue";
 import Toast from "./components/Toast.vue";
+import PageChangeGesture from "./PageChangeGesture.vue";
 
 const mainContainer = useTemplateRef("main");
 const scrollPositionHistory = ref<{ [page: number]: number }>({});
@@ -102,6 +102,10 @@ const hasConsented = computed(() => {
 
 <template>
     <Router />
+    <PageChangeGesture
+        v-if="mainContainer != null"
+        :scroll-container="mainContainer!"
+    />
     <div
         class="app"
         :class="{
