@@ -301,6 +301,7 @@ const store = reactive<Store>({
             // Don't refetch posts we already have
             if (sameQuery && this.posts.has(this.currentPage)) {
                 this.fetchingPosts = false;
+                this.setQueryParams();
                 resolve();
                 return;
             }
@@ -311,8 +312,6 @@ const store = reactive<Store>({
             const queryParams =
                 `q=${encodeURIComponent(query.join(","))}` +
                 `&page=${this.currentPage}`;
-
-            this.setQueryParams();
 
             fetch("/api/posts?" + queryParams)
                 .then((resp) => {
@@ -354,6 +353,7 @@ const store = reactive<Store>({
 
                         this.addQueryToHistory();
                         this.lastQuery = this.query.copy();
+                        this.setQueryParams();
 
                         resolve();
                     });
