@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import VanillaSwipe, { type EventData } from "vanilla-swipe";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import store from "./store";
 
 const props = defineProps<{ scrollContainer: HTMLElement }>();
@@ -14,6 +14,10 @@ function isHorizontalSwipe({ absY, absX }: EventData): boolean {
     const angle = Math.atan2(absY, absX) * (180 / Math.PI);
     return angle < maxAngleForSwipe;
 }
+
+watch(swipeDirection, () => {
+    store.userIsSwipingToChangePage = swipeDirection.value !== null;
+});
 
 onMounted(() => {
     swipe = new VanillaSwipe({
