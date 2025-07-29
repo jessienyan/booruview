@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-07-29",
+        changes: [
+            "added swipe gesture to change the page",
+            "reduced flashing when changing pages",
+        ],
+    },
+    {
         date: "2025-07-28",
         changes: [
             "fixed scroll position not being remembered when using back/forward browser navigation",
