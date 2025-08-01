@@ -31,8 +31,8 @@ function setupPanZoom() {
         autocenter: true,
         bounds: true,
         boundsPadding: 0.1,
-        maxZoom: 3,
-        minZoom: 0.1,
+        maxZoom: 4,
+        minZoom: 0.05,
         onTouch() {
             // Don't block the touch event so the user can right click
             return false;
