@@ -19,14 +19,16 @@ import SidebarMain from "./main/SidebarMain.vue";
 
             <button
                 class="btn-sidebar btn-small"
-                @click="$emit('toggle')"
+                :class="{ active: store.postsBeingViewed === 'search-results' }"
+                @click="store.postsBeingViewed = 'search-results'"
                 title="view search results"
             >
                 <i class="bi bi-search"></i>
             </button>
             <button
                 class="btn-sidebar btn-small"
-                @click="$emit('toggle')"
+                :class="{ active: store.postsBeingViewed === 'favorites' }"
+                @click="store.postsBeingViewed = 'favorites'"
                 title="view favorites"
             >
                 <i class="bi bi-heart"></i>
@@ -104,7 +106,7 @@ $sidebar-width: 60px;
     width: $sidebar-width - 10px;
 
     &:hover,
-    .active {
+    &.active {
         color: $color-primary-light;
     }
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="nr-container">
-        <p>no results :(</p>
+        <p><slot></slot></p>
     </div>
 </template>
 
