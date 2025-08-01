@@ -109,6 +109,10 @@ $sidebar-width: 60px;
     &.active {
         color: $color-primary-light;
     }
+
+    &.active {
+        text-shadow: 0 0 5px $color-primary-light;
+    }
 }
 
 .closed {
