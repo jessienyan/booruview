@@ -111,12 +111,29 @@ const tabClasses = computed(() => {
 
 const tabHandler = useStationaryClick(close);
 
-const currentPostIndex = computed(() =>
-    store.posts.get(store.currentPage)?.findIndex((p) => p.id === post.id),
-);
+const currentPostIndex = computed(() => {
+    if (store.postsBeingViewed === "search-results") {
+        return store.posts
+            .get(store.currentPage)
+            ?.findIndex((p) => p.id === post.id);
+    } else if (store.postsBeingViewed === "favorites") {
+        return store.settings.favorites.findIndex((p) => p.id === post.id);
+    }
+});
 const nextPost = computed<PostNavInfo>(() => {
     if (currentPostIndex.value == null) {
         return null;
+    }
+
+    if (store.postsBeingViewed === "favorites") {
+        if (currentPostIndex.value === store.settings.favorites.length - 1) {
+            return null;
+        }
+
+        return {
+            page: 1,
+            index: currentPostIndex.value + 1,
+        };
     }
 
     const isLastPage = store.currentPage === store.maxPage();
@@ -144,6 +161,17 @@ const prevPost = computed<PostNavInfo>(() => {
         return null;
     }
 
+    if (store.postsBeingViewed === "favorites") {
+        if (currentPostIndex.value === 0) {
+            return null;
+        }
+
+        return {
+            page: 1,
+            index: currentPostIndex.value - 1,
+        };
+    }
+
     const isFirstPage = store.currentPage === 1;
     const isFirstResult = currentPostIndex.value === 0;
 
@@ -169,6 +197,9 @@ function showNextPost() {
 
     if (nav === null) {
         return;
+    } else if (store.postsBeingViewed === "favorites") {
+        store.fullscreenPost = store.settings.favorites[nav.index];
+        return;
     }
 
     if (store.currentPage === nav.page) {
@@ -188,6 +219,9 @@ function showPrevPost() {
     const nav = prevPost.value;
 
     if (nav === null) {
+        return;
+    } else if (store.postsBeingViewed === "favorites") {
+        store.fullscreenPost = store.settings.favorites[nav.index];
         return;
     }
 
