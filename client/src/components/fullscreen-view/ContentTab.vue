@@ -30,6 +30,7 @@ function setupPanZoom() {
     pz = createPanZoom(imgRef.value!, {
         autocenter: true,
         bounds: true,
+        boundsPadding: 0.1,
         maxZoom: 3,
         minZoom: 0.1,
         onTouch() {
