@@ -115,19 +115,19 @@ function onClick() {
 }
 
 .tag-artist {
-    background-color: #980000;
+    background-color: #892020;
 }
 
 .tag-copyright {
-    background-color: #920092;
+    background-color: #872d87;
 }
 
 .tag-character {
-    background-color: #008100;
+    background-color: #1d701d;
 }
 
 .tag-metadata {
-    background-color: #bc6808;
+    background-color: #9d6803;
 }
 
 .tag-unknown {
