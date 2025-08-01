@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-01",
+        changes: [
+            "added favorites",
+            "fixed tags being obscured when using a vertical menu in fullscreen view",
+            "tweaked tag colors to be a bit easier on the eyes",
+        ],
+    },
+    {
         date: "2025-07-29",
         changes: [
             "added swipe gesture to change the page",
