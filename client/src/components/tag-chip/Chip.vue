@@ -127,7 +127,8 @@ function onClick() {
 }
 
 .tag-metadata {
-    background-color: #9d6803;
+    background-color: #c98606;
+    color: black;
 }
 
 .tag-unknown {
