@@ -2,6 +2,31 @@
 import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
+import { useNewFeatureIndicator } from "@/composable";
+import { useTemplateRef } from "vue";
+import { arrow, flip, offset, shift, useFloating } from "@floating-ui/vue";
+import NewFeature from "../NewFeature.vue";
+
+const favoritesButtonRef = useTemplateRef("favorites-btn");
+const tooltipRef = useTemplateRef("tooltip");
+const tooltipArrowRef = useTemplateRef("tooltip-arrow");
+const { floatingStyles, middlewareData } = useFloating(
+    favoritesButtonRef,
+    tooltipRef,
+    {
+        placement: "right",
+        middleware: [
+            flip(),
+            shift(),
+            offset(10),
+            arrow({ element: tooltipArrowRef }),
+        ],
+    },
+);
+const featFavorites = useNewFeatureIndicator(
+    "favorites",
+    new Date("2025-08-03"),
+);
 </script>
 
 <template>
@@ -30,9 +55,41 @@ import SidebarMain from "./main/SidebarMain.vue";
                 :class="{ active: store.postsBeingViewed === 'favorites' }"
                 @click="store.postsBeingViewed = 'favorites'"
                 title="view favorites"
+                ref="favorites-btn"
             >
                 <i class="bi bi-heart"></i>
             </button>
+
+            <div
+                class="tooltip"
+                v-if="featFavorites.show.value && store.sidebarClosed"
+                ref="tooltip"
+                :style="floatingStyles"
+            >
+                <p><NewFeature /></p>
+                <p>you can find your favorites here</p>
+                <p>
+                    <button
+                        class="btn-primary btn-rounded"
+                        @click="featFavorites.onSeen()"
+                    >
+                        ok
+                    </button>
+                </p>
+
+                <div
+                    class="tooltip-arrow"
+                    ref="tooltip-arrow"
+                    :style="{
+                        position: 'absolute',
+                        left: '-30px',
+                        top:
+                            middlewareData.arrow?.y != null
+                                ? `${middlewareData.arrow.y}px`
+                                : '',
+                    }"
+                ></div>
+            </div>
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
@@ -131,5 +188,32 @@ $sidebar-width: 60px;
 
 .spacing {
     margin: auto;
+}
+
+.tooltip {
+    background-color: $color-primary;
+    border: 1px solid $color-primary-lighter;
+    border-radius: 5px;
+    width: fit-content;
+    padding: 0 1rem;
+    filter: drop-shadow(0 0 10px black);
+    z-index: 2;
+
+    p {
+        color: $color-primary-light;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+.tooltip-arrow {
+    $arrowSize: 15px;
+
+    width: $arrowSize * 2;
+    height: $arrowSize * 2;
+    border: $arrowSize solid transparent;
+    border-right: $arrowSize solid $color-primary;
 }
 </style>
