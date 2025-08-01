@@ -125,11 +125,12 @@ onMounted(() => {
 
 <template>
     <div class="post-container" ref="container">
-        <div class="post-column" v-for="(col, i) in orderedPosts" :key="i">
+        <div class="post-column" v-for="(col, i) in orderedPosts">
+            <!-- NOTE: intentionally not using keys here to reuse the component instances
+                       when the post list changes. Saves about 50ms on garbage collection -->
             <PostContent
                 v-for="post in col"
                 :post="post.post"
-                :key="post.post.id"
                 :renderHeight="post.renderHeight"
                 :maxHeight="maxPostHeight"
                 :cropped="post.cropped"
