@@ -457,8 +457,7 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.8rem;
-    padding-bottom: 100px;
+    padding: 3rem 0.8rem;
 }
 
 .tab-menu {
