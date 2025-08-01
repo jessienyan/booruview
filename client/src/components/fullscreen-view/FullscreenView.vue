@@ -126,13 +126,17 @@ const tabClasses = computed(() => {
 const tabHandler = useStationaryClick(close);
 
 const currentPostIndex = computed(() => {
+    let index = -1;
+
     if (store.postsBeingViewed === "search-results") {
-        return store.posts
-            .get(store.currentPage)
-            ?.findIndex((p) => p.id === post.id);
+        index = store.posts
+            .get(store.currentPage)!
+            .findIndex((p) => p.id === post.id);
     } else if (store.postsBeingViewed === "favorites") {
-        return store.settings.favorites.findIndex((p) => p.id === post.id);
+        index = store.settings.favorites.findIndex((p) => p.id === post.id);
     }
+
+    return index === -1 ? null : index;
 });
 const nextPost = computed<PostNavInfo>(() => {
     if (currentPostIndex.value == null) {
