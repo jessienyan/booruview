@@ -135,8 +135,15 @@ const hasConsented = computed(() => {
                 'prevent-pull-to-refresh': store.userIsSwipingToChangePage,
             }"
         >
-            <template v-if="store.hasSearched">
-                <NoResults v-if="store.totalPostCount === 0" />
+            <template
+                v-if="
+                    store.hasSearched &&
+                    store.postsBeingViewed === 'search-results'
+                "
+            >
+                <NoResults v-if="store.totalPostCount === 0">
+                    no results :(
+                </NoResults>
                 <template v-else>
                     <PostContainer
                         :posts="store.postsForCurrentPage() || []"
@@ -144,6 +151,17 @@ const hasConsented = computed(() => {
                     />
                     <Footer />
                 </template>
+            </template>
+
+            <template v-else-if="store.postsBeingViewed === 'favorites'">
+                <NoResults v-if="store.settings.favorites.length === 0">
+                    you don't have any favorites yet
+                </NoResults>
+                <PostContainer
+                    v-else
+                    :posts="store.settings.favorites"
+                    :scroll-container="mainContainer!"
+                />
             </template>
         </main>
     </div>

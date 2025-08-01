@@ -56,7 +56,7 @@ type Store = {
     resultsPerPage: number;
     hasSearched: boolean;
     fetchingPosts: boolean;
-    postsBeingRendered: "search-results" | "favorites";
+    postsBeingViewed: "search-results" | "favorites";
 
     toast: {
         msg: string;
@@ -130,7 +130,7 @@ const store = reactive<Store>({
     resultsPerPage: 0,
     hasSearched: false,
     fetchingPosts: false,
-    postsBeingRendered: "search-results",
+    postsBeingViewed: "search-results",
 
     toast: {
         msg: "",
