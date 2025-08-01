@@ -1,17 +1,15 @@
 <script setup lang="ts">
+import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
-
-defineEmits(["toggle"]);
-const { closed } = defineProps<{ closed: boolean }>();
 </script>
 
 <template>
-    <header class="sidebar-container" :class="{ closed }">
+    <header class="sidebar-container" :class="{ closed: store.sidebarClosed }">
         <div class="buttons">
             <button
                 class="btn-sidebar btn-toggle"
-                @click="$emit('toggle')"
+                @click="store.sidebarClosed = !store.sidebarClosed"
                 title="toggle sidebar"
             >
                 <i class="bi bi-list"></i>
@@ -35,7 +33,7 @@ const { closed } = defineProps<{ closed: boolean }>();
             </button>
         </div>
 
-        <div class="content" v-show="!closed">
+        <div class="content" v-show="!store.sidebarClosed">
             <SidebarMain />
             <SidebarFooter />
         </div>
