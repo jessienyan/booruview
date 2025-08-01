@@ -7,14 +7,35 @@ const { closed } = defineProps<{ closed: boolean }>();
 </script>
 
 <template>
-    <header class="sidebar-container">
-        <div class="sidebar-header">
-            <button class="toggle-btn" @click="$emit('toggle')">
+    <header class="sidebar-container" :class="{ closed }">
+        <div class="buttons">
+            <button
+                class="btn-sidebar btn-toggle"
+                @click="$emit('toggle')"
+                title="toggle sidebar"
+            >
                 <i class="bi bi-list"></i>
+            </button>
+
+            <div class="spacing"></div>
+
+            <button
+                class="btn-sidebar btn-small"
+                @click="$emit('toggle')"
+                title="view search results"
+            >
+                <i class="bi bi-search"></i>
+            </button>
+            <button
+                class="btn-sidebar btn-small"
+                @click="$emit('toggle')"
+                title="view favorites"
+            >
+                <i class="bi bi-heart"></i>
             </button>
         </div>
 
-        <div class="sidebar-content" v-show="!closed">
+        <div class="content" v-show="!closed">
             <SidebarMain />
             <SidebarFooter />
         </div>
@@ -43,7 +64,7 @@ const { closed } = defineProps<{ closed: boolean }>();
     }
 }
 
-.sidebar-content {
+.content {
     width: 450px;
     margin-top: 0.8rem;
     position: relative;
@@ -59,12 +80,50 @@ const { closed } = defineProps<{ closed: boolean }>();
     }
 }
 
-.toggle-btn {
+$sidebar-width: 60px;
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    font-size: 48px;
+    padding-right: 10px;
+}
+
+.btn-sidebar {
     background: none;
     border: none;
-    font-size: 40px;
     cursor: pointer;
-
+    font-size: 48px;
+    padding: 0;
+    width: $sidebar-width;
+    height: $sidebar-width;
     color: $color-primary-lighter;
+}
+
+.btn-small {
+    font-size: 30px;
+    width: $sidebar-width - 10px;
+
+    &:hover,
+    .active {
+        color: $color-primary-light;
+    }
+}
+
+.closed {
+    .buttons {
+        flex-direction: column;
+        height: 100%;
+        width: $sidebar-width;
+    }
+
+    .btn-small {
+        width: $sidebar-width;
+    }
+}
+
+.spacing {
+    margin: auto;
 }
 </style>
