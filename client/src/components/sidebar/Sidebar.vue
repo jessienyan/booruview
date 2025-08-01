@@ -4,25 +4,14 @@ import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
 import { useNewFeatureIndicator } from "@/composable";
 import { useTemplateRef } from "vue";
-import { arrow, flip, offset, shift, useFloating } from "@floating-ui/vue";
+import { flip, offset, shift, useFloating } from "@floating-ui/vue";
 import NewFeature from "../NewFeature.vue";
 
 const favoritesButtonRef = useTemplateRef("favorites-btn");
 const tooltipRef = useTemplateRef("tooltip");
-const tooltipArrowRef = useTemplateRef("tooltip-arrow");
-const { floatingStyles, middlewareData } = useFloating(
-    favoritesButtonRef,
-    tooltipRef,
-    {
-        placement: "right",
-        middleware: [
-            flip(),
-            shift(),
-            offset(10),
-            arrow({ element: tooltipArrowRef }),
-        ],
-    },
-);
+const { floatingStyles } = useFloating(favoritesButtonRef, tooltipRef, {
+    middleware: [flip(), shift(), offset(10)],
+});
 const featFavorites = useNewFeatureIndicator(
     "favorites",
     new Date("2025-08-03"),
@@ -76,19 +65,6 @@ const featFavorites = useNewFeatureIndicator(
                         ok
                     </button>
                 </p>
-
-                <div
-                    class="tooltip-arrow"
-                    ref="tooltip-arrow"
-                    :style="{
-                        position: 'absolute',
-                        left: '-30px',
-                        top:
-                            middlewareData.arrow?.y != null
-                                ? `${middlewareData.arrow.y}px`
-                                : '',
-                    }"
-                ></div>
             </div>
         </div>
 
@@ -206,14 +182,5 @@ $sidebar-width: 60px;
     button {
         width: 100%;
     }
-}
-
-.tooltip-arrow {
-    $arrowSize: 15px;
-
-    width: $arrowSize * 2;
-    height: $arrowSize * 2;
-    border: $arrowSize solid transparent;
-    border-right: $arrowSize solid $color-primary;
 }
 </style>
