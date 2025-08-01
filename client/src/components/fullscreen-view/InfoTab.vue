@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import store from "@/store";
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect, type CSSProperties } from "vue";
 import TagList from "../TagList.vue";
 
 const tags = ref<Tag[]>([]);
@@ -12,6 +12,31 @@ watchEffect(() => {
     }
 
     store.tagsForPost(post).then((val) => (tags.value = val));
+});
+
+// Add padding if the menu would cover part of the container
+const containerStyle = computed<CSSProperties>(() => {
+    if (!store.settings.fullscreenViewMenuRotate) {
+        return {};
+    }
+
+    switch (store.settings.fullscreenViewMenuAnchor) {
+        case "bottomleft":
+        case "left":
+        case "topleft":
+            return {
+                paddingLeft: "3.5rem",
+            };
+
+        case "bottomright":
+        case "right":
+        case "topright":
+            return {
+                paddingRight: "3.5rem",
+            };
+    }
+
+    return {};
 });
 
 const styledTags = computed(() =>
@@ -38,7 +63,7 @@ const styledTags = computed(() =>
 </script>
 
 <template>
-    <div class="tag-list">
+    <div class="tag-list" :style="containerStyle">
         <TagList :jiggle="false" :tags="styledTags" />
     </div>
 </template>
