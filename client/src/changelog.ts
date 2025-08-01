@@ -11,6 +11,7 @@ export const changeLog: ChangeLogEntry[] = [
             "fixed tags being obscured when using a vertical menu in fullscreen view",
             "tweaked tag colors to be a bit easier on the eyes",
             "fixed some lag when changing pages",
+            "tweaked min/max zoom level",
         ],
     },
     {
