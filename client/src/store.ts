@@ -353,6 +353,7 @@ const store = reactive<Store>({
                         this.resultsPerPage = json.count_per_page;
                         this.totalPostCount = json.total_count;
                         this.currentPage = page!;
+                        this.postsBeingViewed = "search-results";
 
                         if (this.settings.closeSidebarOnSearch) {
                             this.sidebarClosed = true;
