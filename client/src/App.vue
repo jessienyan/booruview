@@ -127,10 +127,7 @@ const hasConsented = computed(() => {
             :post="store.fullscreenPost"
         />
 
-        <Sidebar
-            :closed="store.sidebarClosed"
-            @toggle="store.sidebarClosed = !store.sidebarClosed"
-        />
+        <Sidebar />
         <main
             ref="main"
             tabindex="-1"
