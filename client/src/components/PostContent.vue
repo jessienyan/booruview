@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useIsVideo } from "@/composable";
 import store from "@/store";
-import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
+import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 
 const { cropped, maxHeight, renderHeight, post, scrollContainer } =
     defineProps<{
@@ -57,8 +57,22 @@ function onIntersectionChange(entries: IntersectionObserverEntry[]) {
     }
 }
 
-onMounted(() => scrollObserver.observe(containerRef.value!));
-onUnmounted(() => scrollObserver.disconnect());
+// Reset showImage state if post changes. Allows component to be reused
+watch(
+    () => [post.id, containerRef.value],
+    () => {
+        if (containerRef.value === null) {
+            return;
+        }
+
+        showImage.value = false;
+        scrollObserver.observe(containerRef.value!);
+    },
+);
+
+onUnmounted(() => {
+    scrollObserver.disconnect();
+});
 </script>
 
 <template>
