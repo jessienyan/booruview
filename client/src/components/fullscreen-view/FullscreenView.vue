@@ -25,38 +25,52 @@ type PostNavInfo = { page: number; index: number } | null;
 const { post } = defineProps<{ post: Post }>();
 const currentTab = ref<Tab>("content");
 
+const borderRadius = "15px";
+
 const menuAnchorPoints: Record<FullscreenViewMenuAnchorPoint, CSSProperties> = {
-    topleft: { top: "0px", left: "0px" },
+    topleft: { top: "0px", left: "0px", borderBottomRightRadius: borderRadius },
     topcenter: {
         top: "0px",
         left: "50%",
         transform: "translateX(-50%)",
-        marginLeft: "0px",
-        marginRight: "0px",
+        borderBottomLeftRadius: borderRadius,
+        borderBottomRightRadius: borderRadius,
     },
-    topright: { top: "0px", right: "0px" },
+    topright: {
+        top: "0px",
+        right: "0px",
+        borderBottomLeftRadius: borderRadius,
+    },
     right: {
         top: "50%",
         right: "0px",
         transform: "translateY(-50%)",
-        marginTop: "0px",
-        marginBottom: "0px",
+        borderTopLeftRadius: borderRadius,
+        borderBottomLeftRadius: borderRadius,
     },
-    bottomright: { bottom: "0px", right: "0px" },
+    bottomright: {
+        bottom: "0px",
+        right: "0px",
+        borderTopLeftRadius: borderRadius,
+    },
     bottomcenter: {
         bottom: "0px",
         left: "50%",
         transform: "translateX(-50%)",
-        marginLeft: "0px",
-        marginRight: "0px",
+        borderTopLeftRadius: borderRadius,
+        borderTopRightRadius: borderRadius,
     },
-    bottomleft: { bottom: "0px", left: "0px" },
+    bottomleft: {
+        bottom: "0px",
+        left: "0px",
+        borderTopRightRadius: borderRadius,
+    },
     left: {
         top: "50%",
         left: "0px",
         transform: "translateY(-50%)",
-        marginTop: "0px",
-        marginBottom: "0px",
+        borderTopRightRadius: borderRadius,
+        borderBottomRightRadius: borderRadius,
     },
 };
 
@@ -448,13 +462,9 @@ onUnmounted(() => {
     position: absolute;
     z-index: 2;
     background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 500px;
-    padding: 0 0.6rem;
-    margin: 1rem;
     box-shadow: 0 0 0.8rem black;
 
     &.flipped {
-        padding: 0.6rem 0;
         flex-direction: column-reverse;
     }
 }
