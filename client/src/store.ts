@@ -56,6 +56,7 @@ type Store = {
     resultsPerPage: number;
     hasSearched: boolean;
     fetchingPosts: boolean;
+    postsBeingRendered: "search-results" | "favorites";
 
     toast: {
         msg: string;
@@ -90,6 +91,7 @@ type Store = {
         fullscreenViewMenuRotate: boolean;
 
         blacklist: Tag[];
+        favorites: Post[];
 
         queryHistory: SearchHistory[];
 
@@ -128,6 +130,7 @@ const store = reactive<Store>({
     resultsPerPage: 0,
     hasSearched: false,
     fetchingPosts: false,
+    postsBeingRendered: "search-results",
 
     toast: {
         msg: "",
@@ -175,6 +178,7 @@ const store = reactive<Store>({
         ),
 
         blacklist: loadValue("blacklist", [], JSON.parse),
+        favorites: loadValue("favorites", [], JSON.parse),
 
         queryHistory: loadValue("queryHistory", [], (val) => {
             let ret: SearchHistory[] = [];
@@ -216,16 +220,17 @@ const store = reactive<Store>({
             this.write("fullscreenViewMenuAnchor", JSON.stringify);
             this.write("fullscreenViewMenuRotate", JSON.stringify);
             this.write("blacklist", JSON.stringify);
+            this.write("favorites", JSON.stringify);
             this.write("queryHistory", (val) =>
                 JSON.stringify(val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT)),
             );
         },
 
-        write<K extends keyof Store["settings"], V = Store["settings"][K]>(
+        write<K extends keyof Store["settings"]>(
             key: K,
-            transform: (val: V) => string,
+            transform: (val: Store["settings"][K]) => string,
         ) {
-            localStorage?.setItem(key, transform(this[key] as V));
+            localStorage?.setItem(key, transform(this[key]));
         },
     },
 
