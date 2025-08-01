@@ -115,15 +115,17 @@ $sidebar-width: 60px;
     }
 }
 
-.closed {
-    .buttons {
-        flex-direction: column;
-        height: 100%;
-        width: $sidebar-width;
-    }
+@media (min-width: $mobile-width) {
+    .closed {
+        .buttons {
+            flex-direction: column;
+            height: 100%;
+            width: $sidebar-width;
+        }
 
-    .btn-small {
-        width: $sidebar-width;
+        .btn-small {
+            width: $sidebar-width;
+        }
     }
 }
 
