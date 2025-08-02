@@ -73,34 +73,25 @@ type Store = {
     userIsSwipingToChangePage: boolean;
 
     settings: {
-        consented: boolean;
-
-        columnSizing: ColumnSizing;
-        columnCount: number;
-        columnWidth: number;
-
-        sidebarTabsHidden: boolean;
-        closeSidebarOnSearch: boolean;
-        searchOnPageLoad: PageLoadAutoSearch;
-        highResImages: boolean;
-
         autoplayVideo: boolean;
-        muteVideo: boolean;
-
+        blacklist: Tag[];
+        closeSidebarOnSearch: boolean;
+        columnCount: number;
+        columnSizing: ColumnSizing;
+        columnWidth: number;
+        consented: boolean;
+        favorites: Post[];
         fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
         fullscreenViewMenuRotate: boolean;
-
-        blacklist: Tag[];
-        favorites: Post[];
-
+        highResImages: boolean;
+        muteVideo: boolean;
         queryHistory: SearchHistory[];
-
-        save(): void;
-        write<K extends SettingsKey>(
-            key: K,
-            transform: (val: Store["settings"][K]) => string,
-        ): void;
+        searchOnPageLoad: PageLoadAutoSearch;
+        sidebarTabsHidden: boolean;
     };
+
+    loadSettings(): void;
+    saveSettings(): void;
 
     query: SearchQuery;
     lastQuery: SearchQuery;
@@ -144,94 +135,62 @@ const store = reactive<Store>({
     userIsSwipingToChangePage: false,
 
     settings: {
-        consented: loadValue("consented", false, JSON.parse),
+        autoplayVideo: true,
+        blacklist: [],
+        closeSidebarOnSearch: true,
+        columnCount: 3,
+        columnSizing: "dynamic",
+        columnWidth: 400,
+        consented: false,
+        favorites: [],
+        fullscreenViewMenuAnchor: "bottomcenter",
+        fullscreenViewMenuRotate: false,
+        highResImages: true,
+        muteVideo: true,
+        queryHistory: [],
+        searchOnPageLoad: onPageLoadDefaultValue(),
+        sidebarTabsHidden: false,
+    },
 
-        columnSizing: loadValue("columnSizing", "dynamic", (v) => v as any),
-        columnCount: loadValue("columnCount", 3, parseInt),
-        columnWidth: loadValue("columnWidth", 400, parseInt),
+    loadSettings() {
+        for (const _k in this.settings) {
+            const k = _k as keyof typeof store.settings;
 
-        sidebarTabsHidden: loadValue("sidebarTabsHidden", false, JSON.parse),
-        searchOnPageLoad: loadValue(
-            "searchOnPageLoad",
-            onPageLoadDefaultValue(),
-            JSON.parse,
-        ),
-        closeSidebarOnSearch: loadValue(
-            "closeSidebarOnSearch",
-            true,
-            JSON.parse,
-        ),
-        highResImages: loadValue("highResImages", true, JSON.parse),
-
-        autoplayVideo: loadValue("autoplayVideo", true, JSON.parse),
-        muteVideo: loadValue("muteVideo", true, JSON.parse),
-
-        fullscreenViewMenuAnchor: loadValue(
-            "fullscreenViewMenuAnchor",
-            "bottomcenter",
-            JSON.parse,
-        ),
-        fullscreenViewMenuRotate: loadValue(
-            "fullscreenViewMenuRotate",
-            false,
-            JSON.parse,
-        ),
-
-        blacklist: loadValue("blacklist", [], JSON.parse),
-        favorites: loadValue("favorites", [], JSON.parse),
-
-        queryHistory: loadValue("queryHistory", [], (val) => {
-            let ret: SearchHistory[] = [];
-            const json = JSON.parse(val) as {
-                date: string;
-                query: SerializedSearchQuery;
-            }[];
-
-            for (const data of json) {
-                const entry = {
-                    date: new Date(data.date),
-                    query: new SearchQuery(),
-                };
-
-                data.query.include.forEach((tag) =>
-                    entry.query.includeTag(tag),
-                );
-                data.query.exclude.forEach((tag) =>
-                    entry.query.excludeTag(tag),
-                );
-
-                ret = ret.concat(entry);
+            let val = JSON.parse(localStorage.getItem(k) ?? "null");
+            if (val == null) {
+                continue;
             }
 
-            return ret;
-        }),
+            if (k === "queryHistory") {
+                type serializedHistory = {
+                    date: string;
+                    query: SerializedSearchQuery;
+                };
 
-        save() {
-            this.write("consented", JSON.stringify);
-            this.write("columnSizing", (v) => v);
-            this.write("columnCount", (v) => v.toString());
-            this.write("columnWidth", (v) => v.toString());
-            this.write("sidebarTabsHidden", JSON.stringify);
-            this.write("searchOnPageLoad", JSON.stringify);
-            this.write("closeSidebarOnSearch", JSON.stringify);
-            this.write("highResImages", JSON.stringify);
-            this.write("autoplayVideo", JSON.stringify);
-            this.write("muteVideo", JSON.stringify);
-            this.write("fullscreenViewMenuAnchor", JSON.stringify);
-            this.write("fullscreenViewMenuRotate", JSON.stringify);
-            this.write("blacklist", JSON.stringify);
-            this.write("favorites", JSON.stringify);
-            this.write("queryHistory", (val) =>
-                JSON.stringify(val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT)),
-            );
-        },
+                // Transform query history JSON
+                val = (val as serializedHistory[]).map(({ date, query }) => {
+                    const entry = {
+                        date: new Date(date),
+                        query: new SearchQuery(),
+                    };
 
-        write<K extends keyof Store["settings"]>(
-            key: K,
-            transform: (val: Store["settings"][K]) => string,
-        ) {
-            localStorage?.setItem(key, transform(this[key]));
-        },
+                    query.include.forEach((tag) => entry.query.includeTag(tag));
+                    query.exclude.forEach((tag) => entry.query.excludeTag(tag));
+
+                    return entry;
+                });
+
+                val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+            }
+
+            (this.settings as any)[k] = val;
+        }
+    },
+
+    saveSettings() {
+        Object.entries(this.settings).forEach(([k, v]) => {
+            localStorage.setItem(k, JSON.stringify(v));
+        });
     },
 
     query: new SearchQuery(),
@@ -488,7 +447,7 @@ const store = reactive<Store>({
 
         // Newest entries are added to the front of the list
         this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
-        this.settings.save();
+        this.saveSettings();
     },
 
     shouldSearchOnPageLoad(): boolean {
