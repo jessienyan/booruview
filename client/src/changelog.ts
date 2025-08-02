@@ -7,6 +7,7 @@ export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-08-02",
         changes: [
+            "added import/export to settings",
             "fixed search tag being flagged as 'raw' if it contained a space",
         ],
     },
