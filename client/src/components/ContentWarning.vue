@@ -16,7 +16,7 @@ onMounted(() => {
 
 function consent() {
     store.settings.consented = true;
-    store.settings.save();
+    store.saveSettings();
 
     // Auto search doesn't trigger on page load if the user hasn't consented.
     // Trigger it once they consent

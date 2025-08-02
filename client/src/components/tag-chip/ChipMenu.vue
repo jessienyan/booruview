@@ -92,7 +92,7 @@ function onConfirmBlacklist() {
     store.settings.blacklist = store.settings.blacklist.concat(
         store.tagMenu.tag,
     );
-    store.settings.save();
+    store.saveSettings();
     store.query.removeTag(store.tagMenu.tag);
     closeMenu();
 }
@@ -129,7 +129,7 @@ function onWhitelist() {
     }
 
     store.settings.blacklist.splice(i, 1);
-    store.settings.save();
+    store.saveSettings();
     closeMenu();
 }
 </script>
