@@ -1,23 +1,10 @@
 <script setup lang="ts">
 import store, { type FullscreenViewMenuAnchorPoint } from "@/store";
-import {
-    computed,
-    onMounted,
-    onUnmounted,
-    ref,
-    useTemplateRef,
-    type CSSProperties,
-} from "vue";
+import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
 import ScreenCover from "../ScreenCover.vue";
-import {
-    useIsVideo,
-    useNewFeatureIndicator,
-    useStationaryClick,
-} from "@/composable";
-import { arrow, flip, offset, shift, useFloating } from "@floating-ui/vue";
-import NewFeature from "../NewFeature.vue";
+import { useIsVideo, useStationaryClick } from "@/composable";
 
 type Tab = "content" | "info";
 type PostNavInfo = { page: number; index: number } | null;
@@ -73,22 +60,6 @@ const menuAnchorPoints: Record<FullscreenViewMenuAnchorPoint, CSSProperties> = {
         borderBottomRightRadius: borderRadius,
     },
 };
-
-const featMenuAnchor = useNewFeatureIndicator(
-    "menu-anchor",
-    new Date("2025-07-27"),
-);
-const menuRef = useTemplateRef("menu");
-const tooltipRef = useTemplateRef("tooltip");
-const tooltipArrowRef = useTemplateRef("tooltip-arrow");
-const { floatingStyles, middlewareData } = useFloating(menuRef, tooltipRef, {
-    middleware: [
-        flip(),
-        shift(),
-        offset(20),
-        arrow({ element: tooltipArrowRef }),
-    ],
-});
 
 function close() {
     store.fullscreenPost = null;
@@ -296,47 +267,6 @@ onUnmounted(() => {
                 </KeepAlive>
             </div>
 
-            <div
-                class="tooltip"
-                v-if="featMenuAnchor.show.value"
-                ref="tooltip"
-                :style="floatingStyles"
-            >
-                <p><NewFeature /></p>
-                <p>
-                    this menu can now be moved and rotated. check the settings
-                    tab in the sidebar
-                </p>
-                <p>
-                    <button
-                        class="btn-primary btn-rounded"
-                        @click="featMenuAnchor.onSeen()"
-                    >
-                        ok
-                    </button>
-                </p>
-
-                <div
-                    class="tooltip-arrow"
-                    ref="tooltip-arrow"
-                    :style="{
-                        position: 'absolute',
-                        left:
-                            middlewareData.arrow?.x != null
-                                ? `${middlewareData.arrow.x}px`
-                                : '',
-                        top:
-                            middlewareData.arrow?.y != null
-                                ? `${middlewareData.arrow.y}px`
-                                : '',
-                        transform:
-                            middlewareData.arrow?.y == null
-                                ? 'rotate(180deg)'
-                                : '',
-                    }"
-                ></div>
-            </div>
-
             <footer
                 ref="menu"
                 class="tab-menu"
@@ -419,33 +349,6 @@ onUnmounted(() => {
     position: relative;
     z-index: 2;
     width: 100%;
-}
-
-.tooltip {
-    background-color: $color-primary;
-    border: 1px solid $color-primary-lighter;
-    border-radius: 5px;
-    width: 300px;
-    padding: 0 1rem;
-    filter: drop-shadow(0 0 10px black);
-
-    p {
-        color: $color-primary-light;
-    }
-
-    button {
-        width: 100%;
-    }
-}
-
-.tooltip-arrow {
-    $arrowSize: 15px;
-
-    width: $arrowSize * 2;
-    height: $arrowSize;
-    border-left: $arrowSize solid transparent;
-    border-right: $arrowSize solid transparent;
-    border-bottom: $arrowSize solid $color-primary;
 }
 
 .tab {

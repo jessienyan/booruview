@@ -2,12 +2,9 @@
 import { ref } from "vue";
 import SearchTab from "./SearchTab.vue";
 import RecentTab from "./RecentTab.vue";
-import NewFeature from "@/components/NewFeature.vue";
-import { useNewFeatureIndicator } from "@/composable";
 
 type Tab = "search" | "recent";
 const currentTab = ref<Tab>("search");
-const featRecent = useNewFeatureIndicator("recent_tab", new Date("2025-07-08"));
 
 function switchTab(tab: Tab) {
     currentTab.value = tab;
@@ -27,13 +24,9 @@ function switchTab(tab: Tab) {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'recent' }"
-                @click="
-                    switchTab('recent');
-                    featRecent.onSeen();
-                "
+                @click="switchTab('recent')"
             >
                 recent
-                <NewFeature v-if="featRecent.show.value" />
             </button>
         </header>
 

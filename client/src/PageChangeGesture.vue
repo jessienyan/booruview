@@ -2,17 +2,11 @@
 import VanillaSwipe, { type EventData } from "vanilla-swipe";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import store from "./store";
-import { useNewFeatureIndicator } from "./composable";
 
 const props = defineProps<{ scrollContainer: HTMLElement }>();
 const swipeDirection = ref<"LEFT" | "RIGHT" | null>(null);
 const minDistanceForSwipe = 50; // pixels
 const maxAngleForSwipe = 30; // degrees
-
-const featGesture = useNewFeatureIndicator(
-    "swipe-page-change",
-    new Date("2025-08-01"),
-);
 
 let swipe: VanillaSwipe;
 
@@ -26,15 +20,6 @@ watch(swipeDirection, () => {
 });
 
 onMounted(() => {
-    if (featGesture.show.value && VanillaSwipe.isTouchEventsSupported()) {
-        store.toast = {
-            msg: "NEW: swipe left/right to change pages",
-            type: "info",
-        };
-
-        featGesture.onSeen();
-    }
-
     swipe = new VanillaSwipe({
         element: props.scrollContainer,
         delta: minDistanceForSwipe,
