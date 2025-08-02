@@ -1,7 +1,6 @@
 import { reactive } from "vue";
 import { SearchQuery, type SerializedSearchQuery } from "./search";
 
-type SettingsKey = keyof Omit<Store["settings"], "save" | "write">;
 type SearchHistory = {
     date: Date;
     query: SearchQuery;
@@ -18,18 +17,6 @@ export type FullscreenViewMenuAnchorPoint =
     | "left";
 
 const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
-
-function loadValue<K extends SettingsKey>(
-    key: K,
-    defaultValue: Store["settings"][K],
-    transform: (val: string) => Store["settings"][K],
-): Store["settings"][K] {
-    const val = localStorage?.getItem(key);
-    if (val === null) {
-        return defaultValue;
-    }
-    return transform(val);
-}
 
 export type ColumnSizing = "fixed" | "dynamic";
 export type PageLoadAutoSearch = "always" | "if-query" | "never";
