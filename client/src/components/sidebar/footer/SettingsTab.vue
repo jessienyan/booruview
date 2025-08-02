@@ -4,7 +4,7 @@ import store, {
     type FullscreenViewMenuAnchorPoint,
     type PageLoadAutoSearch,
 } from "@/store";
-import { ref, useTemplateRef } from "vue";
+import { ref, useTemplateRef, watch } from "vue";
 
 const exportCodeRef = useTemplateRef("export-code");
 
@@ -91,7 +91,14 @@ function onChangeMuteVideos(e: Event) {
 }
 
 const exportCode = ref("");
+const canGenerate = ref(true);
 const generatingCode = ref(false);
+
+// Re-enable code generation once a change is made
+watch(
+    () => store.settings,
+    () => (canGenerate.value = true),
+);
 
 function generateExportCode() {
     generatingCode.value = true;
@@ -106,9 +113,10 @@ function generateExportCode() {
         method: "POST",
         body: JSON.stringify(data),
     })
-        .then((resp) =>
-            resp.json().then(({ code }) => (exportCode.value = code)),
-        )
+        .then((resp) => {
+            resp.json().then(({ code }) => (exportCode.value = code));
+            canGenerate.value = false;
+        })
         .catch((e) => console.error(e))
         .finally(() => (generatingCode.value = false));
 }
@@ -307,8 +315,8 @@ function importData() {
 
         <div class="input-group">
             <label
-                >1. Export data and generate a code. The export code is good for
-                24 hours.</label
+                >1. Export data and generate a code. The code will expire after
+                15 minutes.</label
             >
             <div class="input text-btn-combo">
                 <input
@@ -322,7 +330,7 @@ function importData() {
                 <button
                     class="btn-primary"
                     @click="generateExportCode"
-                    :disabled="generatingCode"
+                    :disabled="generatingCode || !canGenerate"
                 >
                     export
                 </button>
