@@ -32,59 +32,59 @@ const searchOnPageLoadOptions: Record<PageLoadAutoSearch, string> = {
 
 function onChangeColCount(e: Event) {
     store.settings.columnCount = parseInt((e.target as HTMLInputElement).value);
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeColSizing(e: Event) {
     store.settings.columnSizing = (e.target as HTMLInputElement)
         .value as ColumnSizing;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeColWidth(e: Event) {
     store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value);
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeFullscreenViewMenuAnchor(e: Event) {
     store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement)
         .value as FullscreenViewMenuAnchorPoint;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeFullscreenViewMenuRotate(e: Event) {
     store.settings.fullscreenViewMenuRotate = (
         e.target as HTMLInputElement
     ).checked;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeCloseSidebarOnSearch(e: Event) {
     store.settings.closeSidebarOnSearch = (
         e.target as HTMLInputElement
     ).checked;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeSearchOnPageLoad(e: Event) {
     store.settings.searchOnPageLoad = (e.target as HTMLInputElement)
         .value as any;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeHighResImages(e: Event) {
     store.settings.highResImages = (e.target as HTMLInputElement).checked;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeAutoplayVideos(e: Event) {
     store.settings.autoplayVideo = (e.target as HTMLInputElement).checked;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onChangeMuteVideos(e: Event) {
     store.settings.muteVideo = (e.target as HTMLInputElement).checked;
-    store.settings.save();
+    store.saveSettings();
 }
 </script>
 

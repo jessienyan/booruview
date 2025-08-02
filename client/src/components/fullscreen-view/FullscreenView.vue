@@ -263,7 +263,7 @@ function toggleFavorite() {
         store.settings.favorites = [post].concat(store.settings.favorites);
     }
 
-    store.settings.save();
+    store.saveSettings();
 }
 
 const favoriteIndex = computed(() =>

@@ -24,7 +24,7 @@ function styledTags(query: SearchQuery) {
 
 function onDelete(index: number) {
     store.settings.queryHistory.splice(index, 1);
-    store.settings.save();
+    store.saveSettings();
 }
 
 function onSearch(query: SearchQuery) {

@@ -30,12 +30,12 @@ const featAutoplayMuteSettings = useNewFeatureIndicator(
 function switchTab(tab: Tab) {
     currentTab.value = tab;
     closed.value = false;
-    store.settings.save();
+    store.saveSettings();
 }
 
 function toggleClose() {
     closed.value = !closed.value;
-    store.settings.save();
+    store.saveSettings();
 }
 </script>
 
