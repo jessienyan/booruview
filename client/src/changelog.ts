@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-02",
+        changes: [
+            "fixed search tag being flagged as 'raw' if it contained a space",
+        ],
+    },
+    {
         date: "2025-08-01",
         changes: [
             "added favorites",
