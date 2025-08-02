@@ -20,8 +20,8 @@ func cacheShareKey(code string) string {
 }
 
 // Generates a 12 digit code based on the hash of the data
-func generateShareCode(data SettingExportRequest) string {
-	hash := sha1.Sum([]byte(data.Data))
+func generateShareCode(data []byte) string {
+	hash := sha1.Sum(data)
 
 	var num int64
 	for i := 0; i < len(hash) && num < 100_000_000_000; i++ {
@@ -33,10 +33,6 @@ func generateShareCode(data SettingExportRequest) string {
 	return code
 }
 
-type SettingExportRequest struct {
-	Data string `json:"data"`
-}
-
 func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -44,23 +40,16 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var data SettingExportRequest
-	if err := json.Unmarshal(body, &data); err != nil {
-		handleError(w, err)
-		return
+	if !json.Valid(body) {
+		handle400Error(w, "must be valid json")
 	}
 
-	if len(data.Data) == 0 {
-		handle400Error(w, "`data` is required")
-		return
-	}
-
-	if len(data.Data) > settingShareMaxLen {
+	if len(body) > settingShareMaxLen {
 		handle400Error(w, fmt.Sprintf("settings data is too large (max %d bytes)", settingShareMaxLen))
 		return
 	}
 
-	code := generateShareCode(data)
+	code := generateShareCode(body)
 	vc := api.Valkey()
 
 	// Write to redis
@@ -69,7 +58,7 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		vc.B().Setex().
 			Key(cacheShareKey(code)).
 			Seconds(api.SettingShareTtl).
-			Value(data.Data).
+			Value(string(body)).
 			Build()).Error()
 
 	if err != nil {
@@ -77,6 +66,7 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(fmt.Sprintf(`{"code":"%s"}`, code)))
 }
 
@@ -114,5 +104,6 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf(`{"data":"%s"}`, stored)))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(stored))
 }
