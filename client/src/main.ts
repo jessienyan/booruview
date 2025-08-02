@@ -19,5 +19,7 @@ setInterval(() => {
     );
 }, 60 * 1000);
 
+store.loadSettings();
+
 const app = createApp(App);
 app.mount(document.body);
