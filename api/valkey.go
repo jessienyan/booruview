@@ -10,9 +10,10 @@ var (
 )
 
 const (
-	PostTtl      = 5 * 60       // seconds
-	TagTtl       = 24 * 60 * 60 // seconds
-	TagSearchTtl = 60 * 60      // seconds
+	PostTtl         = 5 * 60       // seconds
+	TagTtl          = 24 * 60 * 60 // seconds
+	TagSearchTtl    = 60 * 60      // seconds
+	SettingShareTtl = 24 * 60 * 60 // seconds
 )
 
 func InitValkey() error {
