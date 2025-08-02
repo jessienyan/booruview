@@ -177,12 +177,14 @@ function onSubmit() {
         tag = suggestions.value[selectedIndex.value];
     } else {
         const value = negated ? inputVal.value.slice(1) : inputVal.value;
-        const match = suggestions.value.find((t) => t.name === value);
+        const match = suggestions.value.find(
+            (t) => t.name === value || t.name.replace("_", " ") === value,
+        );
 
-        // User is submitting a raw tag that wasn't in the search suggestions
         if (match) {
             tag = match;
         } else {
+            // User is submitting a raw tag that wasn't in the search suggestions
             tag = {
                 count: 0,
                 name: value,
