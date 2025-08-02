@@ -124,9 +124,11 @@ function mergeSettings(data: Record<string, any>) {
         if (k === "blacklist") {
             // prettier-ignore
             v = (v as Tag[]).filter((a) => store.settings.blacklist.findIndex((b) => a.name === b.name) === -1);
+            v = v.concat(store.settings.blacklist);
         } else if (k === "favorites") {
             // prettier-ignore
             v = (v as Post[]).filter((a) => store.settings.favorites.findIndex((b) => a.id === b.id) === -1);
+            v = v.concat(store.settings.favorites);
         }
 
         (store.settings as any)[k] = v;
