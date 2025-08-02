@@ -4,6 +4,9 @@ import store, {
     type FullscreenViewMenuAnchorPoint,
     type PageLoadAutoSearch,
 } from "@/store";
+import { ref, useTemplateRef } from "vue";
+
+const exportCodeRef = useTemplateRef("export-code");
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
@@ -85,6 +88,63 @@ function onChangeAutoplayVideos(e: Event) {
 function onChangeMuteVideos(e: Event) {
     store.settings.muteVideo = (e.target as HTMLInputElement).checked;
     store.saveSettings();
+}
+
+const exportCode = ref("");
+const generatingCode = ref(false);
+
+function generateExportCode() {
+    generatingCode.value = true;
+
+    const data: Partial<typeof store.settings> = Object.assign(
+        {},
+        store.settings,
+    );
+    delete data["queryHistory"];
+
+    fetch("/api/settings/export", {
+        method: "POST",
+        body: JSON.stringify(data),
+    })
+        .then((resp) =>
+            resp.json().then(({ code }) => (exportCode.value = code)),
+        )
+        .catch((e) => console.error(e))
+        .finally(() => (generatingCode.value = false));
+}
+
+const importCode = ref("");
+const importingData = ref(false);
+
+function mergeSettings(data: Record<string, any>) {
+    Object.entries(data).forEach(([_k, v]) => {
+        const k = _k as Exclude<keyof typeof store.settings, "queryHistory">;
+
+        // Remove any duplicates
+        if (k === "blacklist") {
+            // prettier-ignore
+            v = (v as Tag[]).filter((a) => store.settings.blacklist.findIndex((b) => a.name === b.name) === -1);
+        } else if (k === "favorites") {
+            // prettier-ignore
+            v = (v as Post[]).filter((a) => store.settings.favorites.findIndex((b) => a.id === b.id) === -1);
+        }
+
+        (store.settings as any)[k] = v;
+    });
+
+    store.saveSettings();
+}
+
+function importData() {
+    importingData.value = true;
+
+    fetch("/api/settings/import", {
+        method: "POST",
+        body: JSON.stringify({ code: importCode.value }),
+    })
+        .then((resp) => resp.json().then((data) => mergeSettings(data)))
+        .catch((e) => console.error(e))
+        .finally(() => (importingData.value = false));
 }
 </script>
 
@@ -234,10 +294,64 @@ function onChangeMuteVideos(e: Event) {
                 mute videos</label
             >
         </div>
+
+        <h3>import/export</h3>
+
+        <p>
+            <i class="bi bi-info-circle"></i> Copy your data to another device
+            (settings, blacklist, favorites). Importing will combine/merge your
+            blacklist and favorites.
+        </p>
+
+        <div class="input-group">
+            <label
+                >1. Export data and generate a code. The export code is good for
+                24 hours.</label
+            >
+            <div class="input text-btn-combo">
+                <input
+                    ref="export-code"
+                    type="text"
+                    placeholder="export to generate code"
+                    readonly
+                    :value="exportCode"
+                    @focus="exportCodeRef?.setSelectionRange(0, 999)"
+                />
+                <button
+                    class="btn-primary"
+                    @click="generateExportCode"
+                    :disabled="generatingCode"
+                >
+                    export
+                </button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>2. Import using the generated code.</label>
+            <div class="input text-btn-combo">
+                <input
+                    type="text"
+                    placeholder="xxxx-xxxx-xxxx"
+                    v-model="importCode"
+                />
+                <button
+                    class="btn-primary"
+                    @click="importData"
+                    :disabled="
+                        importingData || !/^\d{4}-\d{4}-\d{4}$/.test(importCode)
+                    "
+                >
+                    import
+                </button>
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/buttons";
+
 .input {
     display: flex;
 
@@ -246,12 +360,18 @@ function onChangeMuteVideos(e: Event) {
         flex: 1;
     }
 
+    input[type="text"] {
+        background-color: #252525;
+        border: 1px solid #555;
+    }
+
     .value {
         min-width: 60px;
         text-align: center;
     }
 }
 
+p,
 .input-group {
     margin: 1rem 0 1rem 1rem;
 }
@@ -262,5 +382,22 @@ label + .input {
 
 label {
     display: block;
+}
+
+.text-btn-combo {
+    input[type="text"] {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-right: 0;
+        text-align: center;
+        color: #aaa;
+    }
+
+    button {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }
 </style>
