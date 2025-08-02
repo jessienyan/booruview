@@ -15,12 +15,12 @@ const (
 	settingShareMaxLen = 150_000 // KiB
 )
 
-func cacheShareKey(key string) string {
-	return "share:" + key
+func cacheShareKey(code string) string {
+	return "share:" + code
 }
 
-// Generates a 12 digit key based on the hash of the data
-func generateShareKey(data SettingExportRequest) string {
+// Generates a 12 digit code based on the hash of the data
+func generateShareCode(data SettingExportRequest) string {
 	hash := sha1.Sum([]byte(data.Data))
 
 	var num int64
@@ -28,9 +28,9 @@ func generateShareKey(data SettingExportRequest) string {
 		num = (num << 8) | int64(hash[i])
 	}
 
-	key := fmt.Sprintf("%12d", num)
-	key = key[:4] + "-" + key[4:8] + "-" + key[8:12]
-	return key
+	code := fmt.Sprintf("%12d", num)
+	code = code[:4] + "-" + code[4:8] + "-" + code[8:12]
+	return code
 }
 
 type SettingExportRequest struct {
@@ -60,14 +60,14 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	key := generateShareKey(data)
+	code := generateShareCode(data)
 	vc := api.Valkey()
 
 	// Write to redis
 	err = vc.Do(
 		req.Context(),
 		vc.B().Setex().
-			Key(cacheShareKey(key)).
+			Key(cacheShareKey(code)).
 			Seconds(api.SettingShareTtl).
 			Value(data.Data).
 			Build()).Error()
@@ -77,11 +77,11 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Write([]byte(fmt.Sprintf(`{"key":"%s"}`, key)))
+	w.Write([]byte(fmt.Sprintf(`{"code":"%s"}`, code)))
 }
 
 type SettingImportRequest struct {
-	Key string `json:"key"`
+	Code string `json:"code"`
 }
 
 func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
@@ -97,16 +97,16 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if len(data.Key) == 0 {
-		handle400Error(w, "`key` is required")
+	if len(data.Code) == 0 {
+		handle400Error(w, "`code` is required")
 		return
 	}
 
 	vc := api.Valkey()
-	stored, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Key)).Build()).ToString()
+	stored, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).ToString()
 	if err != nil {
 		if valkey.IsValkeyNil(err) {
-			handle4xxError(w, 404, "key is invalid or may have expired")
+			handle4xxError(w, 404, "code is invalid or may have expired")
 			return
 		}
 
