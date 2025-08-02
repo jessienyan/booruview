@@ -20,7 +20,7 @@ func cacheShareKey(key string) string {
 }
 
 // Generates a 12 digit key based on the hash of the data
-func generateShareKey(data SettingImportRequest) string {
+func generateShareKey(data SettingExportRequest) string {
 	hash := sha1.Sum([]byte(data.Data))
 
 	var num int64
@@ -33,18 +33,18 @@ func generateShareKey(data SettingImportRequest) string {
 	return key
 }
 
-type SettingImportRequest struct {
+type SettingExportRequest struct {
 	Data string `json:"data"`
 }
 
-func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
+func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	var data SettingImportRequest
+	var data SettingExportRequest
 	if err := json.Unmarshal(body, &data); err != nil {
 		handleError(w, err)
 		return
@@ -80,18 +80,18 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte(fmt.Sprintf(`{"key":"%s"}`, key)))
 }
 
-type SettingExportRequest struct {
+type SettingImportRequest struct {
 	Key string `json:"key"`
 }
 
-func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
+func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	var data SettingExportRequest
+	var data SettingImportRequest
 	if err := json.Unmarshal(body, &data); err != nil {
 		handleError(w, err)
 		return
