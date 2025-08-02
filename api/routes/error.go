@@ -13,8 +13,12 @@ type errResponse struct {
 }
 
 func handle400Error(w http.ResponseWriter, msg string) {
+	handle4xxError(w, 400, msg)
+}
+
+func handle4xxError(w http.ResponseWriter, code int, msg string) {
 	resp, _ := json.Marshal(errResponse{Error: msg})
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(code)
 	w.Write(resp)
 }
 

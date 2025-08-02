@@ -10,10 +10,12 @@ import (
 
 func NewRouter() *mux.Router {
 	r := mux.NewRouter()
-	r.Path("/posts").HandlerFunc(PostsHandler)
-	r.Path("/tags").HandlerFunc(TagsHandler)
-	r.Path("/tagsearch").HandlerFunc(TagSearchHandler)
-	r.Path("/version").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/posts", PostsHandler)
+	r.HandleFunc("/tags", TagsHandler)
+	r.HandleFunc("/tagsearch", TagSearchHandler)
+	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
+	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
+	r.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(fmt.Sprintf("{\"version\": \"%s\"}", api.AppVersion)))
 	})
 	r.Use(RecoverMiddleware, RateLimitMiddleware)
