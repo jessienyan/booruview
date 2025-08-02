@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	settingShareMaxLen = 50_000 // KiB
+	settingShareMaxLen = 150_000 // KiB
 )
 
 func cacheShareKey(key string) string {
