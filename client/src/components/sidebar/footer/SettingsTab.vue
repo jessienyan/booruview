@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import { useNewFeatureIndicator } from "@/composable";
 import store, {
     type ColumnSizing,
     type FullscreenViewMenuAnchorPoint,
     type PageLoadAutoSearch,
 } from "@/store";
 import { ref, useTemplateRef, watch } from "vue";
-
-const exportCodeRef = useTemplateRef("export-code");
+import NewFeature from "@/components/NewFeature.vue";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
@@ -90,7 +90,13 @@ function onChangeMuteVideos(e: Event) {
     store.saveSettings();
 }
 
+const featExport = useNewFeatureIndicator(
+    "export-settings-heading",
+    new Date("2025-08-05"),
+);
+
 const exportCode = ref("");
+const exportCodeRef = useTemplateRef("export-code");
 const canGenerate = ref(true);
 const generatingCode = ref(false);
 
@@ -305,7 +311,7 @@ function importData() {
             >
         </div>
 
-        <h3>import/export</h3>
+        <h3>import/export <NewFeature v-if="featExport.show" /></h3>
 
         <p>
             <i class="bi bi-info-circle"></i> Copy your data to another device

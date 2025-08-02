@@ -17,14 +17,9 @@ const closed = computed({
     set: (val: boolean) => (store.settings.sidebarTabsHidden = val),
 });
 
-const featBlacklist = useNewFeatureIndicator(
-    "blacklist",
-    new Date("2025-07-01"),
-);
-
-const featAutoplayMuteSettings = useNewFeatureIndicator(
-    "autoplay-mute",
-    new Date("2025-07-09"),
+const featExport = useNewFeatureIndicator(
+    "export-settings",
+    new Date("2025-08-05"),
 );
 
 function switchTab(tab: Tab) {
@@ -61,22 +56,18 @@ function toggleClose() {
                 :class="{ active: currentTab === 'settings' && !closed }"
                 @click="
                     switchTab('settings');
-                    featAutoplayMuteSettings.onSeen();
+                    featExport.onSeen();
                 "
             >
                 settings
-                <NewFeature v-if="featAutoplayMuteSettings.show.value" />
+                <NewFeature v-if="featExport.show.value" />
             </button>
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'blacklist' && !closed }"
-                @click="
-                    switchTab('blacklist');
-                    featBlacklist.onSeen();
-                "
+                @click="switchTab('blacklist')"
             >
                 blacklist
-                <NewFeature v-if="featBlacklist.show.value" />
             </button>
 
             <button
