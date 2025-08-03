@@ -28,5 +28,6 @@ const randomString = strings[Math.round(Math.random() * (strings.length - 1))];
 .new-feature {
     font-weight: bold;
     color: #ff9ff0;
+    text-wrap: nowrap;
 }
 </style>
