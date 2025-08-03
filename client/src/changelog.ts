@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
         changes: [
             "added import/export to settings",
             "fixed search tag being flagged as 'raw' if it contained a space",
+            "fixed search input losing focus when using arrow keys + enter to choose a suggestion",
         ],
     },
     {
