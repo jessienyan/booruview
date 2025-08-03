@@ -72,6 +72,7 @@ function switchTab(tab: Tab) {
     color: #999;
     cursor: pointer;
     font-size: 16px;
+    width: min-content;
 
     &.active {
         border-color: #695675;

@@ -119,6 +119,7 @@ function toggleClose() {
     background-color: #1e1e1e;
     color: #999;
     cursor: pointer;
+    width: min-content;
 
     &.active {
         border-color: #695675;
