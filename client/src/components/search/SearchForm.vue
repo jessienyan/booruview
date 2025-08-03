@@ -195,6 +195,7 @@ function onSubmit() {
 
     inputVal.value = "";
     selectedIndex.value = -1;
+    inputRef.value?.focus();
     emit("onTagSelect", tag, negated);
 }
 
