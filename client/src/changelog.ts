@@ -11,6 +11,7 @@ export const changeLog: ChangeLogEntry[] = [
             "added tag editing",
             "fixed search tag being flagged as 'raw' if it contained a space",
             "fixed search input losing focus when using arrow keys + enter to choose a suggestion",
+            "tweaked help tab and search button to make entering one tag at a time more clear",
         ],
     },
     {
