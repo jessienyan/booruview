@@ -4,9 +4,14 @@ import Chip from "./tag-chip/Chip.vue";
 
 type listCategories = Record<TagType, TagChip[]>;
 
-const { jiggle = false, tags = [] } = defineProps<{
+const {
+    jiggle = false,
+    tags = [],
+    forSearchTags,
+} = defineProps<{
     jiggle?: boolean;
     tags: TagChip[];
+    forSearchTags: boolean;
 }>();
 
 const categories = computed(() => {
@@ -50,6 +55,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>
@@ -62,6 +68,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>
@@ -74,6 +81,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>
@@ -86,6 +94,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>
@@ -98,6 +107,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>
@@ -110,6 +120,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
+                :from-search="forSearchTags"
             />
         </div>
     </template>

@@ -53,6 +53,7 @@ type Store = {
     tagMenu: {
         tag: Tag;
         ref: HTMLElement | null;
+        fromSearch: boolean;
     } | null;
     fullscreenPost: Post | null;
     sidebarClosed: boolean;
@@ -87,8 +88,10 @@ type Store = {
     posts: Map<number, Post[]>;
     cachedTags: Map<string, Tag>;
 
+    onEditTag: EventTarget;
     onPostsCleared: EventTarget;
 
+    editTag(tag: Tag): void;
     tagsForPost(post: Post): Promise<Tag[]>;
     loadTags(tags: string[]): Promise<void>;
     maxPage(): number;
@@ -219,7 +222,14 @@ const store = reactive<Store>({
         ],
     ]),
 
+    onEditTag: new EventTarget(),
     onPostsCleared: new EventTarget(),
+
+    editTag(tag: Tag) {
+        this.onEditTag.dispatchEvent(
+            new CustomEvent("edit_tag", { detail: tag }),
+        );
+    },
 
     tagsForPost(post: Post): Promise<Tag[]> {
         return new Promise<Tag[]>((resolve, reject) => {

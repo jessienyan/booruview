@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import {
+    computed,
+    onMounted,
+    onUnmounted,
+    ref,
+    useTemplateRef,
+    watch,
+} from "vue";
 import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
@@ -211,6 +218,22 @@ watch(inputVal, (query, _, onCleanup) => {
         suggestions.value = [];
     }
 });
+
+function editTag(e: Event) {
+    const tag = (e as CustomEvent).detail as Tag;
+
+    if (store.query.isExcluded(tag.name)) {
+        inputVal.value = "-" + tag.name;
+    } else {
+        inputVal.value = tag.name;
+    }
+
+    store.query.removeTag(tag);
+    inputRef.value?.focus();
+}
+
+onMounted(() => store.onEditTag.addEventListener("edit_tag", editTag));
+onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 </script>
 
 <template>
