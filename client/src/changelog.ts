@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-08-02",
         changes: [
             "added import/export to settings",
+            "added tag editing",
             "fixed search tag being flagged as 'raw' if it contained a space",
             "fixed search input losing focus when using arrow keys + enter to choose a suggestion",
         ],
