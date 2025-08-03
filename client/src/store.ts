@@ -143,8 +143,24 @@ const store = reactive<Store>({
         for (const _k in this.settings) {
             const k = _k as keyof typeof store.settings;
 
-            let val = JSON.parse(localStorage.getItem(k) ?? "null");
-            if (val == null) {
+            let raw = localStorage.getItem(k);
+            if (raw == null) {
+                continue;
+            }
+
+            // The old settings code didn't stringify columnSizing, fix it
+            if (k === "columnSizing" && raw.length > 0 && raw[0] != '"') {
+                raw = JSON.stringify(raw);
+                localStorage.setItem(k, raw);
+            }
+
+            let val;
+
+            // Ignore bad values and just use the default
+            try {
+                val = JSON.parse(raw);
+            } catch (e) {
+                console.warn("bad setting value", { k, val, e });
                 continue;
             }
 
