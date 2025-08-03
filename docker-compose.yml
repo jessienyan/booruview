@@ -28,6 +28,7 @@ services:
     volumes:
       - ./client/dist:/srv:ro   # Live client updates
       - caddy-data:/data
+      - ./logs/:/var/log/caddy/
 
   client:
     build:

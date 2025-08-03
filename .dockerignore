@@ -2,4 +2,5 @@
 .vscode
 .env
 client/node_modules
+logs
 api/__debug_bin*
