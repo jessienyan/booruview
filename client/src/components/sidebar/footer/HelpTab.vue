@@ -5,6 +5,7 @@ const emit = defineEmits(["on-close"]);
 <template>
     <p>Quick reference:</p>
     <ul>
+        <li>Enter one tag at a time</li>
         <li>Searching without tags shows the most recent posts</li>
         <li><code>blue_sky</code> → search for blue_sky</li>
         <li><code>-blue_sky</code> → exclude blue_sky</li>
