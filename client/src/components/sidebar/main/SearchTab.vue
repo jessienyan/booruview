@@ -65,7 +65,11 @@ const styledTags = computed(() => {
         />
 
         <div class="taglist-container">
-            <TagList :jiggle="true" :tags="styledTags" />
+            <TagList
+                :jiggle="true"
+                :tags="styledTags"
+                :for-search-tags="true"
+            />
         </div>
     </div>
 </template>

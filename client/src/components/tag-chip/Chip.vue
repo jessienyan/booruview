@@ -2,9 +2,14 @@
 import store from "@/store";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
 
-const { jiggle = false, tag } = defineProps<{
+const {
+    jiggle = false,
+    tag,
+    fromSearch,
+} = defineProps<{
     jiggle?: boolean;
     tag: TagChip;
+    fromSearch: boolean;
 }>();
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
@@ -40,6 +45,7 @@ function onClick() {
         store.tagMenu = {
             tag: tag.tag,
             ref: chipRef.value,
+            fromSearch,
         };
     }, 0);
 }

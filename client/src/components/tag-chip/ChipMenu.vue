@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import store from "@/store";
-import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 import { useDismiss } from "@/composable";
 
 const containerRef = useTemplateRef("container");
@@ -138,6 +138,16 @@ function onWhitelist() {
     <div class="options" ref="container" :style="menuPosition">
         <button
             class="btn-primary option-btn"
+            v-if="store.tagMenu?.fromSearch && (isExcluded || isIncluded)"
+            @click="
+                store.editTag(store.tagMenu.tag);
+                closeMenu();
+            "
+        >
+            <i class="bi bi-pencil"></i> edit
+        </button>
+        <button
+            class="btn-primary option-btn"
             v-if="!isBlacklisted && (isExcluded || !isIncluded)"
             @click="onAdd"
         >
@@ -152,7 +162,7 @@ function onWhitelist() {
         </button>
         <button
             class="btn-primary option-btn"
-            v-if="isExcluded || isIncluded"
+            v-if="(!isBlacklisted && isExcluded) || isIncluded"
             @click="onRemove"
         >
             <i class="bi bi-x-lg"></i> remove
