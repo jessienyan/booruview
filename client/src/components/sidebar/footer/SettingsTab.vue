@@ -158,7 +158,37 @@ function importData() {
         method: "POST",
         body: JSON.stringify({ code: importCode.value }),
     })
-        .then((resp) => resp.json().then((data) => mergeSettings(data)))
+        .then((resp) => {
+            if (resp.status >= 400) {
+                resp.json()
+                    .then((val) => {
+                        let msg = "Something went wrong";
+
+                        if ("error" in val) {
+                            msg = val["error"];
+                        }
+
+                        store.toast = {
+                            msg,
+                            type: "error",
+                        };
+                    })
+                    .catch(() => {
+                        store.toast = {
+                            msg: "Something went wrong",
+                            type: "error",
+                        };
+                    });
+                return;
+            }
+
+            resp.json().then((data) => mergeSettings(data));
+            store.toast = {
+                msg: "data imported successfully",
+                type: "info",
+            };
+            importCode.value = "";
+        })
         .catch((e) => console.error(e))
         .finally(() => (importingData.value = false));
 }
