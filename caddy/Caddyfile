@@ -10,8 +10,8 @@
 	# Used to expose a file log for fail2ban
 	log file-log {
 		level INFO
-		output file /var/log/caddy.log {
-			roll_keep 1
+		output file /var/log/caddy/caddy.log {
+			mode 644
 		}
 	}
 
