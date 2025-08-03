@@ -276,8 +276,11 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         @click="onSubmit"
         :disabled="showSpinner"
     >
-        <span v-if="!showSpinner">search</span>
-        <span v-else class="spinner"></span>
+        <span v-if="showSpinner" class="spinner"></span>
+        <span v-else-if="inputVal.length > 0"
+            ><i class="bi bi-plus"></i> add to search</span
+        >
+        <span v-else>search</span>
     </button>
 </template>
 
