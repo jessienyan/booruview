@@ -16,7 +16,7 @@ import (
 
 const (
 	postApiCostIfCacheHit  = 1
-	postApiCostIfCacheMiss = 3
+	postApiCostIfCacheMiss = 5
 )
 
 type PostsResponse struct {

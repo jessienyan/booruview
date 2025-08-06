@@ -35,7 +35,7 @@ type clientBan struct {
 }
 
 func (cb clientBan) banned() bool {
-	return cb.bannedUntil.Before(time.Now())
+	return cb.bannedUntil.After(time.Now())
 }
 
 func (cb clientBan) banTime() time.Duration {
@@ -47,17 +47,14 @@ func getClientBan(ip string) (*clientBan, error) {
 	vc := Valkey()
 	resp, err := vc.Do(context.Background(),
 		vc.B().
-			Hmget().
+			Hgetall().
 			Key(clientBanKey(ip)).
-			Field().
 			Build()).ToMap()
 
 	if err != nil {
-		if valkey.IsValkeyNil(err) {
-			return nil, nil
-		}
-
 		return nil, err
+	} else if len(resp) == 0 {
+		return &clientBan{}, nil
 	}
 
 	var m valkey.ValkeyMessage
