@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"github.com/valkey-io/valkey-go"
 
 	"golang.org/x/time/rate"
@@ -38,7 +39,7 @@ func (cb clientBan) banned() bool {
 }
 
 func (cb clientBan) banTime() time.Duration {
-	exp := int(math.Pow(2, float64(cb.banCount)))
+	exp := int(math.Pow(2, float64(cb.banCount-1)))
 	return initialBanDuration * time.Duration(exp)
 }
 
@@ -125,8 +126,17 @@ func ban(ip string, cb *clientBan) error {
 			Timestamp(expires).
 			Build(),
 	).Error()
+	if err != nil {
+		return err
+	}
 
-	return err
+	log.Warn().
+		Str("ip", ip).
+		Int("banCount", cb.banCount).
+		Time("bannedUntil", cb.bannedUntil).
+		Msg("client banned (rate limited)")
+
+	return nil
 }
 
 func getLimiter(ip string) *rate.Limiter {
@@ -155,6 +165,11 @@ func IsRateLimited(ip string, cost int) (banned bool, err error) {
 	}
 
 	if banned = cb.banned(); banned {
+		log.Info().
+			Str("ip", ip).
+			Int("banCount", cb.banCount).
+			Time("bannedUntil", cb.bannedUntil).
+			Msg("request blocked (rate limited)")
 		return
 	}
 
