@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/netip"
@@ -10,9 +11,25 @@ import (
 	api "github.com/jessienyan/booruview"
 )
 
+type contextKey string
+
+var (
+	ipKey = contextKey("ip")
+)
+
+func clientIP(req *http.Request) string {
+	val, ok := req.Context().Value(ipKey).(string)
+	if !ok {
+		log.Warn().Msg("request context is missing IP")
+		return ""
+	}
+
+	return val
+}
+
 // Gracefully recover from a panic
 func RecoverMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
 				log.Err(fmt.Errorf("%v", err)).Msg("recovered from panic")
@@ -21,27 +38,24 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 			}
 		}()
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, req)
 	})
 }
 
-func RateLimitMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func IPMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var ip string
-		addr, err := netip.ParseAddrPort(r.RemoteAddr)
+		addr, err := netip.ParseAddrPort(req.RemoteAddr)
 
 		if err != nil {
-			log.Err(err).Str("remoteAddr", r.RemoteAddr).Msg("failed to parse remote address")
-			ip = r.RemoteAddr
+			log.Err(err).Str("remoteAddr", req.RemoteAddr).Msg("failed to parse remote address")
+			ip = req.RemoteAddr
 		} else {
 			ip = addr.Addr().String()
 		}
 
-		if api.IsRateLimited(ip) {
-			handle429Error(w)
-			return
-		}
+		req = req.WithContext(context.WithValue(req.Context(), ipKey, ip))
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, req)
 	})
 }
