@@ -17,16 +17,21 @@ import (
 )
 
 const (
-	tagLimit = 100
+	tagLimit   = 100
+	tagApiCost = 1
 )
 
 type TagsResponse struct {
 	Results []api.TagResponse `json:"results"`
 }
 
-func TagsHandler(w http.ResponseWriter, r *http.Request) {
+func TagsHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, tagApiCost) {
+		return
+	}
+
 	// Clean up the query so we're left with a sorted list of unique tags
-	query := strings.Split(r.FormValue("q"), " ")
+	query := strings.Split(req.FormValue("q"), " ")
 	query = slices.DeleteFunc(
 		query,
 		func(s string) bool {

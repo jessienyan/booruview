@@ -107,6 +107,7 @@ func ban(ip string, cb *clientBan) error {
 			FieldValue("banCount", strconv.Itoa(cb.banCount)).
 			FieldValue("bannedUntil", cb.bannedUntil.Format(time.RFC3339)).
 			Build()).Error()
+	// TODO: set expiration
 
 	return err
 }
