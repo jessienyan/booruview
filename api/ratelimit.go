@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	tokenRefillRate = 3 // per second
-	maxTokens       = 20
-	baseBanTime     = 5 * time.Minute
+	tokenRefillRate    = 3 // per second
+	maxTokens          = 20
+	initialBanDuration = 5 * time.Minute
+	banResetsAfter     = 24 * time.Hour
 )
 
 var (
@@ -38,7 +39,7 @@ func (cb clientBan) banned() bool {
 
 func (cb clientBan) banTime() time.Duration {
 	exp := int(math.Pow(2, float64(cb.banCount)))
-	return baseBanTime * time.Duration(exp)
+	return initialBanDuration * time.Duration(exp)
 }
 
 func getClientBan(ip string) (*clientBan, error) {
@@ -99,15 +100,31 @@ func ban(ip string, cb *clientBan) error {
 	cb.bannedUntil = time.Now().Add(cb.banTime())
 
 	vc := Valkey()
-	err := vc.Do(context.Background(),
+	key := clientBanKey(ip)
+	err := vc.Do(
+		context.Background(),
 		vc.B().
 			Hmset().
-			Key(clientBanKey(ip)).
+			Key(key).
 			FieldValue().
 			FieldValue("banCount", strconv.Itoa(cb.banCount)).
 			FieldValue("bannedUntil", cb.bannedUntil.Format(time.RFC3339)).
-			Build()).Error()
-	// TODO: set expiration
+			Build(),
+	).Error()
+	if err != nil {
+		return err
+	}
+
+	// Reset the ban count after a waiting period (w.p. is relative to unban time)
+	expires := cb.bannedUntil.Add(banResetsAfter).Unix()
+	err = vc.Do(
+		context.Background(),
+		vc.B().
+			Expireat().
+			Key(key).
+			Timestamp(expires).
+			Build(),
+	).Error()
 
 	return err
 }
