@@ -18,7 +18,7 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(fmt.Sprintf("{\"version\": \"%s\"}", api.AppVersion)))
 	})
-	r.Use(RecoverMiddleware, IPMiddleware)
+	r.Use(RecoverMiddleware)
 
 	return r
 }
