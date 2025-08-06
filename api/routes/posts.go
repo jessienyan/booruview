@@ -15,7 +15,11 @@ import (
 )
 
 const (
-	postApiCostIfCacheHit  = 1
+	postApiCostIfCacheHit = 1
+
+	// 5 seems a bit aggressive but the token refill is also very generous.
+	// Swiping page after page on my phone I was able to do 20 pages before
+	// hitting the limit (with Gelbooru latency around 700ms)
 	postApiCostIfCacheMiss = 5
 )
 

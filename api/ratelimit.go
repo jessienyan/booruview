@@ -14,8 +14,11 @@ import (
 )
 
 const (
-	tokenRefillRate    = 3 // per second
-	maxTokens          = 20
+	// These limits are nearly impossible for a human to hit even when trying to
+	// do it intentionally. However it should block most scripts (just scrape gelbooru directly??)
+	tokenRefillRate = 3 // per second
+	maxTokens       = 20
+
 	initialBanDuration = 5 * time.Minute
 	banResetsAfter     = 24 * time.Hour
 )
@@ -39,6 +42,8 @@ func (cb clientBan) banned() bool {
 }
 
 func (cb clientBan) banTime() time.Duration {
+	// Ban times are exponential
+	// t = t0 * 2^(n-1)
 	exp := int(math.Pow(2, float64(cb.banCount-1)))
 	return initialBanDuration * time.Duration(exp)
 }
