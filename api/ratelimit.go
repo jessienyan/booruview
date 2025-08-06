@@ -1,116 +1,151 @@
 package api
 
 import (
+	"context"
+	"math"
+	"strconv"
 	"sync"
 	"time"
 
-	"github.com/rs/zerolog/log"
+	"github.com/valkey-io/valkey-go"
 
 	"golang.org/x/time/rate"
 )
 
 const (
-	perSecondLimit = 3
-	burstLimit     = 20
-
-	evictInterval = 10 * time.Minute
-	banTime       = 3 * time.Minute
+	tokenRefillRate = 3 // per second
+	maxTokens       = 20
+	baseBanTime     = 5 * time.Minute
 )
 
 var (
-	bannedIps         map[string]time.Time = make(map[string]time.Time)
-	banMutex          sync.Mutex
-	clientLimits      map[string]*limiter = make(map[string]*limiter)
+	clientLimits      = make(map[string]*rate.Limiter)
 	clientLimitsMutex sync.Mutex
 )
 
-type limiter struct {
-	limiter   *rate.Limiter
-	touchedAt time.Time
+func clientBanKey(ip string) string {
+	return "clientban:" + ip
 }
 
-func init() {
-	// Cleanup rate limits to avoid leaking
-	go func() {
-		ticker := time.NewTicker(evictInterval)
-		defer ticker.Stop()
+type clientBan struct {
+	banCount    int
+	bannedUntil time.Time
+}
 
-		for range ticker.C {
-			evictKeys()
+func (cb clientBan) banned() bool {
+	return cb.bannedUntil.Before(time.Now())
+}
+
+func (cb clientBan) banTime() time.Duration {
+	exp := int(math.Pow(2, float64(cb.banCount)))
+	return baseBanTime * time.Duration(exp)
+}
+
+func getClientBan(ip string) (*clientBan, error) {
+	vc := Valkey()
+	resp, err := vc.Do(context.Background(),
+		vc.B().
+			Hmget().
+			Key(clientBanKey(ip)).
+			Field().
+			Build()).ToMap()
+
+	if err != nil {
+		if valkey.IsValkeyNil(err) {
+			return nil, nil
 		}
-	}()
-}
 
-func evictKeys() {
-	clientLimitsMutex.Lock()
-	defer clientLimitsMutex.Unlock()
+		return nil, err
+	}
 
-	evictCount := 0
-	evictIfOlder := time.Now().Add(-evictInterval)
-	for k, v := range clientLimits {
-		if v.touchedAt.Before(evictIfOlder) {
-			delete(clientLimits, k)
-			evictCount++
+	var m valkey.ValkeyMessage
+	var banCount int
+	var bannedUntil time.Time
+
+	m = resp["banCount"]
+	if val, err := m.AsInt64(); err != nil {
+		return nil, err
+	} else {
+		banCount = int(val)
+	}
+
+	m = resp["bannedUntil"]
+	if val, err := m.ToString(); err != nil {
+		return nil, err
+	} else {
+		bannedUntil, err = time.Parse(time.RFC3339, val)
+		if err != nil {
+			return nil, err
 		}
 	}
 
-	if evictCount > 0 {
-		log.Info().Int("evicted", evictCount).Msg("evict old rate limit keys")
+	cb := &clientBan{
+		banCount:    banCount,
+		bannedUntil: bannedUntil,
 	}
+
+	return cb, nil
 }
 
-func getLimiter(ip string) *limiter {
+func ban(ip string, cb *clientBan) error {
+	if cb == nil {
+		cb = &clientBan{
+			banCount: 1,
+		}
+	} else {
+		cb.banCount++
+	}
+
+	cb.bannedUntil = time.Now().Add(cb.banTime())
+
+	vc := Valkey()
+	err := vc.Do(context.Background(),
+		vc.B().
+			Hmset().
+			Key(clientBanKey(ip)).
+			FieldValue().
+			FieldValue("banCount", strconv.Itoa(cb.banCount)).
+			FieldValue("bannedUntil", cb.bannedUntil.Format(time.RFC3339)).
+			Build()).Error()
+
+	return err
+}
+
+func getLimiter(ip string) *rate.Limiter {
 	clientLimitsMutex.Lock()
 	defer clientLimitsMutex.Unlock()
 
-	lim, ok := clientLimits[ip]
-	if !ok {
-		lim = &limiter{limiter: rate.NewLimiter(perSecondLimit, burstLimit)}
+	lim, exists := clientLimits[ip]
+	if !exists {
+		lim = rate.NewLimiter(tokenRefillRate, maxTokens)
 		clientLimits[ip] = lim
 	}
 
 	return lim
 }
 
-func isBanned(ip string) (banned bool, unbannedAt *time.Time) {
-	banMutex.Lock()
-	defer banMutex.Unlock()
-
-	unbanTime, banned := bannedIps[ip]
-	if !banned {
-		return false, nil
+// IsRateLimited checks if a client is currently banned, and if not, whether
+// they are able to make a request worth `cost` tokens.
+//
+// Rate limiting is handled using the token bucket algorithm. Clients have a bucket
+// of tokens that slowly refill. Requests remove tokens from the bucket equal to their cost.
+// If a request costs more than what's available, the client is rate limited.
+func IsRateLimited(ip string, cost int) (banned bool, err error) {
+	cb, err := getClientBan(ip)
+	if err != nil {
+		return
 	}
 
-	// Unban if it expired
-	if time.Now().After(unbanTime) {
-		delete(bannedIps, ip)
-		return false, nil
-	}
-
-	return true, &unbanTime
-}
-
-func ban(ip string) {
-	banMutex.Lock()
-	defer banMutex.Unlock()
-	bannedIps[ip] = time.Now().Add(banTime)
-
-	log.Warn().Str("ip", ip).Dur("until", banTime).Msg("client banned (too many requests)")
-}
-
-func IsRateLimited(ip string) bool {
-	if banned, unbanAt := isBanned(ip); banned {
-		log.Warn().Str("ip", ip).Dur("banRemaining", time.Until(*unbanAt)).Msg("blocked client request (banned)")
-		return true
+	if banned = cb.banned(); banned {
+		return
 	}
 
 	lim := getLimiter(ip)
-	lim.touchedAt = time.Now()
-
-	if !lim.limiter.Allow() {
-		ban(ip)
-		return true
+	if !lim.AllowN(time.Now(), cost) {
+		banned = true
+		err = ban(ip, cb)
+		return
 	}
 
-	return false
+	return
 }
