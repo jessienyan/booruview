@@ -17,7 +17,6 @@ import (
 
 func main() {
 	zerolog.DurationFieldUnit = time.Second
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMicro
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.StampMicro}).With().Caller().Logger()
 	timeout := 1 * time.Second
 
