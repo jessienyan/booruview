@@ -1,57 +1,57 @@
 {$CADDY_HOST} {
-	encode
-	file_server
+    encode
+    file_server
 
-	log stderr-log {
-		level INFO
-		output stderr
-	}
+    log stderr-log {
+        level INFO
+        output stderr
+    }
 
-	# Used to expose a file log for fail2ban
-	log file-log {
-		level INFO
-		output file /var/log/caddy/caddy.log {
-			mode 644
-		}
-	}
+    # Used to expose a file log for fail2ban
+    log file-log {
+        level INFO
+        output file /var/log/caddy/caddy.log {
+            mode 644
+        }
+    }
 
-	# Clients must always check if index.html changed
-	header / Cache-Control "public, no-cache"
+    # Clients must always check if index.html changed
+    header / Cache-Control "public, no-cache"
 
-	# Assets are hashed and never change so are safe to cache
-	header /assets/* Cache-Control "max-age=31536000, immutable"
+    # Assets are hashed and never change so are safe to cache
+    header /assets/* Cache-Control "max-age=31536000, immutable"
 
-	# API responses shouldn't be cached by clients, they are too volatile and cached by the API anyway
-	header /api/* Cache-Control "no-store"
+    # API responses shouldn't be cached by clients, they are too volatile and cached by the API anyway
+    header /api/* Cache-Control "no-store"
 
-	# Global headers
-	# https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
-	header {
-		Referrer-Policy					"no-referrer"
-		X-Frame-Options 				"DENY"
-		X-Content-Type-Options			"nosniff"
-		Strict-Transport-Security		"max-age=2592000; includeSubDomains"
-		Cross-Origin-Opener-Policy		"same-origin"
-		Cross-Origin-Resource-Policy	"same-site"
-		Content-Security-Policy			"default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' *.gelbooru.com; media-src 'self' *.gelbooru.com; object-src 'none'; frame-src 'none'; base-uri 'none'"
-	}
+    # Global headers
+    # https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+    header {
+        Referrer-Policy                 "no-referrer"
+        X-Frame-Options                 "DENY"
+        X-Content-Type-Options          "nosniff"
+        Strict-Transport-Security       "max-age=2592000; includeSubDomains"
+        Cross-Origin-Opener-Policy      "same-origin"
+        Cross-Origin-Resource-Policy    "same-site"
+        Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' *.gelbooru.com; media-src 'self' *.gelbooru.com; object-src 'none'; frame-src 'none'; base-uri 'none'"
+    }
 
-	# Bots running on workers.dev are scanning URLs
-	@botscan header "Cf-Worker" *
-	abort @botscan
+    # Bots running on workers.dev are scanning URLs
+    @botscan header "Cf-Worker" *
+    abort @botscan
 
-	@longUrl expression {path}.size() > 2000
-	error @longUrl "URI Too Long" 414
+    @longUrl expression {path}.size() > 2000
+    error @longUrl "URI Too Long" 414
 
-	handle_errors {
-		respond "{err.status_code} {err.status_text}"
-	}
+    handle_errors {
+        respond "{err.status_code} {err.status_text}"
+    }
 
-	handle_path /api/* {
-		reverse_proxy http://api:8000
-	}
+    handle_path /api/* {
+        reverse_proxy http://api:8000
+    }
 }
 
 {$GRAFANA_HOST:grafana.localhost} {
-	reverse_proxy http://grafana:3000
+    reverse_proxy http://grafana:3000
 }
