@@ -13,16 +13,24 @@ import (
 	"github.com/valkey-io/valkey-go"
 )
 
+const (
+	tagSearchApiCost = 1
+)
+
 type TagSearchResponse struct {
 	Results []api.TagResponse `json:"results"`
 }
 
-func TagSearchHandler(w http.ResponseWriter, r *http.Request) {
+func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, tagSearchApiCost) {
+		return
+	}
+
 	resp := TagSearchResponse{
 		Results: []api.TagResponse{},
 	}
 
-	query := strings.TrimLeftFunc(r.FormValue("q"), unicode.IsSpace)
+	query := strings.TrimLeftFunc(req.FormValue("q"), unicode.IsSpace)
 	// Words are separated by underscores even though they are rendered using whitespace
 	query = strings.ReplaceAll(query, " ", "_")
 	query = strings.ToLower(query)

@@ -13,6 +13,9 @@ import (
 
 const (
 	settingShareMaxLen = 150_000 // KiB
+
+	settingExportApiCost = 3
+	settingImportApiCost = 1
 )
 
 func cacheShareKey(code string) string {
@@ -34,6 +37,10 @@ func generateShareCode(data []byte) string {
 }
 
 func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, settingExportApiCost) {
+		return
+	}
+
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)
@@ -75,6 +82,10 @@ type SettingImportRequest struct {
 }
 
 func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, settingImportApiCost) {
+		return
+	}
+
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		handleError(w, err)

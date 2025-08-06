@@ -14,18 +14,26 @@ import (
 	"github.com/valkey-io/valkey-go"
 )
 
+const (
+	postApiCostIfCacheHit  = 1
+	postApiCostIfCacheMiss = 3
+)
+
 type PostsResponse struct {
 	CountPerPage int                `json:"count_per_page"`
 	TotalCount   int                `json:"total_count"`
 	Results      []api.PostResponse `json:"results"`
 }
 
-func PostsHandler(w http.ResponseWriter, r *http.Request) {
+func PostsHandler(w http.ResponseWriter, req *http.Request) {
+	// NOTE: post rate limiting happens after checking the cache. The cost increases
+	// if there's a cache miss
+
 	resp := PostsResponse{
 		Results: []api.PostResponse{},
 	}
 
-	pageVal := r.FormValue("page")
+	pageVal := req.FormValue("page")
 	if pageVal == "" {
 		pageVal = "1"
 	}
@@ -38,7 +46,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Clean up the query so we're left with a sorted list of unique tags
 	normalized := slices.DeleteFunc(
-		strings.Split(r.FormValue("q"), ","),
+		strings.Split(req.FormValue("q"), ","),
 		func(s string) bool {
 			return len(s) == 0
 		},
@@ -54,7 +62,15 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Cache hit
 	if cached != nil {
+		if isRateLimited(w, req, postApiCostIfCacheHit) {
+			return
+		}
+
 		api.DecompressData(w, cached)
+		return
+	}
+
+	if isRateLimited(w, req, postApiCostIfCacheMiss) {
 		return
 	}
 
