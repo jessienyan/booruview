@@ -24,6 +24,17 @@
 	# API responses shouldn't be cached by clients, they are too volatile and cached by the API anyway
 	header /api/* Cache-Control "no-store"
 
+	# Global headers
+	# https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+	header {
+		X-Frame-Options 				"DENY"
+		X-Content-Type-Options			"nosniff"
+		Strict-Transport-Security		"max-age=2592000; includeSubDomains"
+		Cross-Origin-Opener-Policy		"same-origin"
+		Cross-Origin-Resource-Policy	"same-site"
+		Content-Security-Policy			"default-src 'self'; img-src 'self' *.gelbooru.com"
+	}
+
 	# Bots running on workers.dev are scanning URLs
 	@botscan header "Cf-Worker" *
 	abort @botscan
