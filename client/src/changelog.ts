@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-06",
+        changes: [
+            "added search hints for commonly misused filters, e.g. order:favcount instead of sort:score",
+        ],
+    },
+    {
         date: "2025-08-05",
         changes: [
             "fixed rate limit sometimes being triggered when it shouldn't",
