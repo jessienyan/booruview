@@ -11,6 +11,17 @@ import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
 
+type MistakeSuggestion = {
+    pattern: RegExp;
+    suggestion: string;
+};
+
+const mistakeSuggestions: MistakeSuggestion[] = [
+    { pattern: /^sort:favcount$/, suggestion: "sort:score" },
+    { pattern: /^order:\w+$/, suggestion: "sort:" },
+    { pattern: /^favcount:.+$/, suggestion: "score:" },
+];
+
 type SearchResponse = {
     results: Tag[];
 };
@@ -197,6 +208,16 @@ function onSubmit() {
                 name: value,
                 type: "unknown",
             };
+
+            for (const mistake of mistakeSuggestions) {
+                if (mistake.pattern.test(value)) {
+                    store.toast = {
+                        msg: `"${value}" is probably a mistake. try "${mistake.suggestion}"`,
+                        type: "info",
+                    };
+                    break;
+                }
+            }
         }
     }
 
