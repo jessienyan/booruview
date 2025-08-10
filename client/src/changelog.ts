@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-10",
+        changes: ["added a loading spinner to the prev/next footer buttons"],
+    },
+    {
         date: "2025-08-06",
         changes: [
             "added search hints for commonly misused filters, e.g. order:favcount instead of sort:score",
