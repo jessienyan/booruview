@@ -47,9 +47,7 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'settings' && !closed }"
-                @click="
-                    switchTab('settings')
-                "
+                @click="switchTab('settings')"
             >
                 settings
             </button>
