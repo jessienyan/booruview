@@ -2,20 +2,6 @@
 import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
-import { useNewFeatureIndicator } from "@/composable";
-import { useTemplateRef } from "vue";
-import { flip, offset, shift, useFloating } from "@floating-ui/vue";
-import NewFeature from "../NewFeature.vue";
-
-const favoritesButtonRef = useTemplateRef("favorites-btn");
-const tooltipRef = useTemplateRef("tooltip");
-const { floatingStyles } = useFloating(favoritesButtonRef, tooltipRef, {
-    middleware: [flip(), shift(), offset(10)],
-});
-const featFavorites = useNewFeatureIndicator(
-    "favorites",
-    new Date("2025-08-03"),
-);
 </script>
 
 <template>
@@ -48,24 +34,6 @@ const featFavorites = useNewFeatureIndicator(
             >
                 <i class="bi bi-heart"></i>
             </button>
-
-            <div
-                class="tooltip"
-                v-if="featFavorites.show.value && store.sidebarClosed"
-                ref="tooltip"
-                :style="floatingStyles"
-            >
-                <p><NewFeature /></p>
-                <p>you can find your favorites here</p>
-                <p>
-                    <button
-                        class="btn-primary btn-rounded"
-                        @click="featFavorites.onSeen()"
-                    >
-                        ok
-                    </button>
-                </p>
-            </div>
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
@@ -164,23 +132,5 @@ $sidebar-width: 60px;
 
 .spacing {
     margin: auto;
-}
-
-.tooltip {
-    background-color: $color-primary;
-    border: 1px solid $color-primary-lighter;
-    border-radius: 5px;
-    width: fit-content;
-    padding: 0 1rem;
-    filter: drop-shadow(0 0 10px black);
-    z-index: 2;
-
-    p {
-        color: $color-primary-light;
-    }
-
-    button {
-        width: 100%;
-    }
 }
 </style>
