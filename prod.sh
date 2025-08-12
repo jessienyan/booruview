@@ -2,15 +2,15 @@
 
 set -ex
 cd ${0%/*}
-PREFIX=codeberg.org/jessienyan
+PREFIX=codeberg.org/jessienyan/booruview
 COMMIT=$(git rev-parse --short master)
 DATE=$(git show -s --format=%cs master)
 TAG=$COMMIT-$DATE
 
-API_IMG=$PREFIX/booruview-api
-CADDY_IMG=$PREFIX/booruview-caddy
-CLIENT_IMG=$PREFIX/booruview-client
-VALKEY_IMG=$PREFIX/booruview-valkey
+API_IMG=$PREFIX/api
+CADDY_IMG=$PREFIX/caddy
+CLIENT_IMG=$PREFIX/client
+VALKEY_IMG=$PREFIX/valkey
 
 docker build -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
 docker build -t $VALKEY_IMG valkey/
