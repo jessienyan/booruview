@@ -16,6 +16,7 @@ docker build -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod 
 docker build -t $VALKEY_IMG valkey/
 docker build -t $CLIENT_IMG client/
 
+mkdir -p client/dist
 docker run --rm \
     -e VITE_COMMIT_SHA=$COMMIT \
     -e VITE_LAST_COMMIT_DATE=$DATE \
