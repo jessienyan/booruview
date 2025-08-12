@@ -2,7 +2,7 @@
 
 set -ex
 cd ${0%/*}
-PREFIX=ghcr.io/jessienyan
+PREFIX=codeberg.org/jessienyan
 COMMIT=$(git rev-parse --short master)
 DATE=$(git show -s --format=%cs master)
 TAG=$COMMIT-$DATE
