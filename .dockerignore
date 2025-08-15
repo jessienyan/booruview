@@ -1,6 +1,6 @@
 .git
 .vscode
 .env
-client/node_modules
-logs
-api/__debug_bin*
+**/node_modules
+**/logs
+**/__debug_bin*
