@@ -1,3 +1,9 @@
+{
+    # Ensure the `ja4h_header` directive gets handled first before
+    # other directives (like reverse_proxy)
+    order ja4h_header first
+}
+
 {$CADDY_HOST} {
     encode
     file_server
@@ -48,6 +54,7 @@
     }
 
     handle_path /api/* {
+        ja4h_header
         reverse_proxy http://api:8000
     }
 }
