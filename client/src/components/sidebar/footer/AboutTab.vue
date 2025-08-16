@@ -3,9 +3,7 @@ import ChangeLog from "./ChangeLog.vue";
 import { changeLog } from "@/changelog";
 import Collapsable from "@/components/Collapsable.vue";
 import { COMMIT_SHA, LAST_COMMIT_DATE } from "@/config";
-import { ref } from "vue";
-
-const showChangelog = ref(false);
+import CodebergLogo from "@/assets/codeberg.svg";
 </script>
 
 <template>
@@ -16,21 +14,21 @@ const showChangelog = ref(false);
     </p>
     <ul class="links">
         <li>
-            <a href="https://github.com/jessienyan/booruview" target="_blank"
-                >GitHub<i class="bi bi-github"></i
-            ></a>
+            <a href="https://codeberg.org/jessienyan/booruview" target="_blank"
+                ><img class="codeberg" :src="CodebergLogo" />Source code</a
+            >
         </li>
         <li>
             <a
                 href="https://github.com/jessienyan/booruview/issues"
                 target="_blank"
-                >Report a bug<i class="bi bi-bug-fill"></i
-            ></a>
+                ><i class="bi bi-bug-fill"></i>Report a bug</a
+            >
         </li>
         <li>
             <a href="https://freesurveys.org/s/afOcVj9z-f" target="_blank"
-                >Give anonymous feedback<i class="bi bi-send-fill"></i
-            ></a>
+                ><i class="bi bi-send-fill"></i>Give anonymous feedback</a
+            >
         </li>
     </ul>
 
@@ -53,14 +51,18 @@ const showChangelog = ref(false);
     </Collapsable>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/assets/colors";
+
 .version {
     font-family: "Courier New", Courier, monospace;
     font-size: 0.75rem;
     text-align: right;
 }
 
-.links .bi {
-    margin-left: 0.4rem;
+.links .bi,
+.codeberg {
+    margin-right: 0.4rem;
+    vertical-align: middle;
 }
 </style>
