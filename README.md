@@ -1,3 +1,5 @@
+# NEW REPO: https://codeberg.org/jessienyan/booruview
+
 # booruview
 
 [booruview.com](https://booruview.com) is a web app for browsing gelbooru posts. It's very fast, has a simple interface, and anonymous with no signups or search limits.
