@@ -55,6 +55,7 @@
 
     handle_path /api/* {
         ja4h_header
+        log_append ja4h {http.request.header.Ja4h}
         reverse_proxy http://api:8000
     }
 }
