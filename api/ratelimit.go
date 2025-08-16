@@ -16,8 +16,10 @@ import (
 const (
 	// These limits are nearly impossible for a human to hit even when trying to
 	// do it intentionally. However it should block most scripts (just scrape gelbooru directly??)
-	tokenRefillRate = 3 // per second
-	maxTokens       = 20
+	tokenRefillRate       = 3 // per second
+	strictTokenRefillRate = 1 // per second
+	maxTokens             = 20
+	strictMaxTokens       = 12
 
 	initialBanDuration = 5 * time.Minute
 	banResetsAfter     = 24 * time.Hour
@@ -141,15 +143,23 @@ func ban(ip string, cb *clientBan) error {
 	return nil
 }
 
-func getLimiter(ip string) *rate.Limiter {
+func getLimiter(ip string, ja4h string) *rate.Limiter {
 	clientLimitsMutex.Lock()
 	defer clientLimitsMutex.Unlock()
 
 	lim, exists := clientLimits[ip]
-	if !exists {
-		lim = rate.NewLimiter(tokenRefillRate, maxTokens)
-		clientLimits[ip] = lim
+	if exists {
+		return lim
 	}
+
+	if NaughtyFingerprints[ja4h] {
+		// Naughty clients have significantly lower rate limits
+		lim = rate.NewLimiter(strictTokenRefillRate, strictMaxTokens)
+		log.Info().Str("ja4h", ja4h).Msg("new session for naughty client")
+	} else {
+		lim = rate.NewLimiter(tokenRefillRate, maxTokens)
+	}
+	clientLimits[ip] = lim
 
 	return lim
 }
@@ -160,7 +170,7 @@ func getLimiter(ip string) *rate.Limiter {
 // Rate limiting is handled using the token bucket algorithm. Clients have a bucket
 // of tokens that slowly refill. Requests remove tokens from the bucket equal to their cost.
 // If a request costs more than what's available, the client is rate limited.
-func IsRateLimited(ip string, cost int) (banned bool, err error) {
+func IsRateLimited(ip string, cost int, ja4h string) (banned bool, err error) {
 	cb, err := getClientBan(ip)
 	if err != nil {
 		return
@@ -175,7 +185,7 @@ func IsRateLimited(ip string, cost int) (banned bool, err error) {
 		return
 	}
 
-	lim := getLimiter(ip)
+	lim := getLimiter(ip, ja4h)
 	if !lim.AllowN(time.Now(), cost) {
 		banned = true
 		err = ban(ip, cb)

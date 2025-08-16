@@ -7,7 +7,7 @@ import (
 )
 
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) (abort bool) {
-	banned, err := api.IsRateLimited(clientIP(req), cost)
+	banned, err := api.IsRateLimited(clientIP(req), cost, req.Header.Get("Ja4h"))
 	if err != nil {
 		handleError(w, err)
 		abort = true
