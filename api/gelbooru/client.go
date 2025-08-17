@@ -16,12 +16,22 @@ var (
 	ApiUrl = "https://gelbooru.com/index.php"
 )
 
-type Client struct {
+type authClient struct {
 	UserId string
 	ApiKey string
 }
 
-var DefaultClient Client
+type Client interface {
+	ListPosts(tags string, page int) (*PostList, error)
+	ListTags(tags string) ([]api.TagResponse, error)
+	SearchTags(query string) ([]api.TagResponse, error)
+}
+
+func NewClient() Client {
+	return DefaultClient
+}
+
+var DefaultClient authClient
 
 func init() {
 	uid := api.GelbooruUserId
@@ -34,19 +44,19 @@ func init() {
 		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
 	}
 
-	DefaultClient = Client{
+	DefaultClient = authClient{
 		UserId: uid,
 		ApiKey: apiKey,
 	}
 }
 
-func (client *Client) withAuth(params url.Values) {
-	if client.UserId == "" || client.ApiKey == "" {
+func (c authClient) withAuth(params url.Values) {
+	if c.UserId == "" || c.ApiKey == "" {
 		return
 	}
 
-	params.Add("user_id", client.UserId)
-	params.Add("api_key", client.ApiKey)
+	params.Add("user_id", c.UserId)
+	params.Add("api_key", c.ApiKey)
 }
 
 type TagSearchResponse struct {
@@ -91,12 +101,12 @@ func ParseTagNumericType(raw int) api.TagType {
 	return api.Unknown
 }
 
-func (client *Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
+func (c authClient) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	var resp []TagSearchResponse
 	params := url.Values{}
 	params.Add("page", "autocomplete2")
 	params.Add("term", query)
-	client.withAuth(params)
+	c.withAuth(params)
 
 	if err := httpGetJson(params, &resp); err != nil {
 		return nil, err
@@ -125,11 +135,11 @@ func (client *Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	return tags, nil
 }
 
-func (client *Client) SearchTags(query string) ([]api.TagResponse, error) {
+func (c authClient) SearchTags(query string) ([]api.TagResponse, error) {
 	isFilter, suggestions := SuggestedSearchFilters(query)
 
 	if !isFilter {
-		return client.doApiTagSearch(query)
+		return c.doApiTagSearch(query)
 	}
 
 	tags := make([]api.TagResponse, 0, len(suggestions))
@@ -195,7 +205,7 @@ var (
 	postLimitStr = strconv.Itoa(PostsPerPage)
 )
 
-func (client *Client) ListPosts(tags string, page int) (*PostList, error) {
+func (c authClient) ListPosts(tags string, page int) (*PostList, error) {
 	var resp FullPostResponse
 	params := url.Values{}
 	params.Add("page", "dapi")
@@ -205,7 +215,7 @@ func (client *Client) ListPosts(tags string, page int) (*PostList, error) {
 	params.Add("limit", postLimitStr)
 	params.Add("tags", tags)
 	params.Add("pid", strconv.Itoa(page-1)) // Pages are 0-indexed
-	client.withAuth(params)
+	c.withAuth(params)
 
 	if err := httpGetJson(params, &resp); err != nil {
 		return nil, err
@@ -271,7 +281,7 @@ type FullTagInfoResponse struct {
 
 // ListTags returns a list of info found on the given tags (e.g. count, type).
 // tags should be one or more tags separated by a space.
-func (client *Client) ListTags(tags string) ([]api.TagResponse, error) {
+func (c authClient) ListTags(tags string) ([]api.TagResponse, error) {
 	var resp FullTagInfoResponse
 	params := url.Values{}
 	params.Add("page", "dapi")
@@ -279,7 +289,7 @@ func (client *Client) ListTags(tags string) ([]api.TagResponse, error) {
 	params.Add("q", "index")
 	params.Add("json", "1")
 	params.Add("names", tags)
-	client.withAuth(params)
+	c.withAuth(params)
 
 	if err := httpGetJson(params, &resp); err != nil {
 		return nil, err
