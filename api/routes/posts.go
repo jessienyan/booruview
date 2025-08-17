@@ -4,13 +4,16 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	api "github.com/jessienyan/booruview"
 	"github.com/jessienyan/booruview/gelbooru"
+	"github.com/rs/zerolog/log"
 	"github.com/valkey-io/valkey-go"
 )
 
@@ -33,6 +36,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	// NOTE: post rate limiting happens after checking the cache. The cost increases
 	// if there's a cache miss
 
+	isNaughty := api.NaughtyFingerprints[req.Header.Get("Ja4h")]
 	resp := PostsResponse{
 		Results: []api.PostResponse{},
 	}
@@ -64,8 +68,8 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Cache hit
-	if cached != nil {
+	// Nice users get a cache :)
+	if !isNaughty && cached != nil {
 		if isRateLimited(w, req, postApiCostIfCacheHit) {
 			return
 		}
@@ -78,7 +82,19 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	results, err := gelbooru.NewClient().ListPosts(query, page)
+	var client gelbooru.Client
+
+	if isNaughty {
+		// Naughty users get fake data and latency :)
+		client = gelbooru.NewFakeClient()
+		fakeLatency := time.Duration(rand.Int()%2_000+500) * time.Millisecond
+		log.Info().Float64("latency", fakeLatency.Seconds()).Str("ja4h", req.Header.Get("Ja4h")).Msg("sending client coal :)")
+		time.Sleep(fakeLatency)
+	} else {
+		client = gelbooru.NewClient()
+	}
+
+	results, err := client.ListPosts(query, page)
 	if err != nil {
 		if _, ok := err.(gelbooru.GelbooruError); ok {
 			handle400Error(w, "Gelbooru is not available right now")
@@ -98,7 +114,10 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	writePostsToCache(query, page, respBody)
+	if !isNaughty {
+		writePostsToCache(query, page, respBody)
+	}
+
 	w.Write(respBody)
 }
 

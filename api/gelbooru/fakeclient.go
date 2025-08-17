@@ -43,12 +43,10 @@ func (f fakeClient) ListPosts(tags string, page int) (*PostList, error) {
 
 func (f fakeClient) ListTags(tags string) ([]api.TagResponse, error) {
 	panic("not impl")
-	// seed := hash(tags)
 }
 
 func (f fakeClient) SearchTags(query string) ([]api.TagResponse, error) {
 	panic("not impl")
-	// seed := hash(query)
 }
 
 // hash uses the djb2 algorithm
