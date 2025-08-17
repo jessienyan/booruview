@@ -91,6 +91,18 @@ func randString(r *rand.Rand, src string, len int) string {
 	return result.String()
 }
 
+func randDigest(r *rand.Rand) string {
+	if api.FakePostHashes != nil {
+		return randChoice(r, api.FakePostHashes)
+	}
+
+	var hashInput [8]byte
+	r.Read(hashInput[:])
+	hashData := md5.Sum(hashInput[:])
+
+	return hex.EncodeToString(hashData[:])
+}
+
 var (
 	postRatings = []string{
 		"explicit",
@@ -210,11 +222,6 @@ const (
 )
 
 func newFakePost(r *rand.Rand) api.PostResponse {
-	var hashInput [8]byte
-	r.Read(hashInput[:])
-	hashData := md5.Sum(hashInput[:])
-	digest := hex.EncodeToString(hashData[:])
-
 	var thumbW, thumbH, lowresW, lowresH int
 	width := randRange(r, 800, 3000)
 	height := randRange(r, 800, 3000)
@@ -232,6 +239,7 @@ func newFakePost(r *rand.Rand) api.PostResponse {
 		lowresH = int(float64(maxLowresSize) / aspect)
 	}
 
+	digest := randDigest(r)
 	resp := api.PostResponse{
 		Id:                 randRange(r, 5_000_000, 13_000_000),
 		CreatedAtTimestamp: time.Now().Unix() - int64(randRange(r, 0, 1_000_000)),
@@ -256,6 +264,14 @@ func newFakePost(r *rand.Rand) api.PostResponse {
 		Height:          height,
 	}
 
+	// Small images don't have a low res version
+	if width < maxLowresSize || height < maxLowresSize {
+		resp.LowResUrl = ""
+		resp.LowResHeight = 0
+		resp.LowResWidth = 0
+	}
+
+	// Tags are sorted and the booruview API adds the rating as a fake metadata tag
 	slices.Sort(resp.Tags)
 	resp.Tags = append(resp.Tags, fmt.Sprintf("rating:%s", resp.Rating))
 

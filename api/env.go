@@ -15,15 +15,21 @@ var (
 	GelbooruUserId      = os.Getenv("GELBOORU_USERID")
 	GelbooruApiKey      = os.Getenv("GELBOORU_APIKEY")
 	NaughtyFingerprints = make(map[string]bool)
+	FakePostHashes      = []string(nil)
 )
 
 func init() {
-	fingerprints := os.Getenv("NAUGHTY_RATELIMIT_FINGERPRINTS")
+	fingerprints := os.Getenv("NAUGHTY_JA4H_FINGERPRINTS")
 	if fingerprints != "" {
 		for fp := range strings.SplitSeq(fingerprints, ",") {
 			NaughtyFingerprints[fp] = true
 		}
 
 		log.Info().Msgf("loaded %d ja4h fingerprints", len(NaughtyFingerprints))
+	}
+
+	hashes := os.Getenv("FAKEDATA_POST_HASHES")
+	if hashes != "" {
+		FakePostHashes = strings.Split(hashes, ",")
 	}
 }
