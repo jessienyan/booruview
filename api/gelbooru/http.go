@@ -1,10 +1,14 @@
 package gelbooru
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"syscall"
 
 	api "github.com/jessienyan/booruview"
 	"github.com/rs/zerolog/log"
@@ -21,6 +25,11 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 
 	resp, err := api.DoRequest(req)
 	if err != nil {
+		resetByPeer := errors.Is(err, syscall.ECONNRESET)
+		if resetByPeer || os.IsTimeout(err) {
+			err = errors.Join(GelbooruError{Code: -1}, err)
+		}
+
 		return nil, err
 	}
 
@@ -37,9 +46,18 @@ func httpGetJson[T any](params url.Values, dst T) error {
 		return err
 	}
 
+	if resp.StatusCode >= 400 {
+		return GelbooruError{Code: resp.StatusCode}
+	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
+	}
+
+	// This gets received sometimes with status=200, very cool
+	if bytes.HasPrefix(body, []byte("Too deep!")) {
+		return GelbooruError{Code: 429}
 	}
 
 	if err := json.Unmarshal(body, &dst); err != nil {

@@ -28,10 +28,10 @@ type Client interface {
 }
 
 func NewClient() Client {
-	return DefaultClient
+	return defaultClient
 }
 
-var DefaultClient authClient
+var defaultClient authClient
 
 func init() {
 	uid := api.GelbooruUserId
@@ -44,7 +44,7 @@ func init() {
 		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
 	}
 
-	DefaultClient = authClient{
+	defaultClient = authClient{
 		UserId: uid,
 		ApiKey: apiKey,
 	}
