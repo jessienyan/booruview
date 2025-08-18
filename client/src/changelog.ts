@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-18",
+        changes: [
+            "improved gelbooru error handling to avoid vague 'something went wrong' error",
+        ],
+    },
+    {
         date: "2025-08-15",
         changes: [
             "moved source code to codeberg",
