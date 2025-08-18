@@ -8,11 +8,42 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"syscall"
+	"time"
 
-	api "github.com/jessienyan/booruview"
 	"github.com/rs/zerolog/log"
 )
+
+var (
+	httpClient   = &http.Client{Timeout: 4 * time.Second}
+	reMaskApiKey = regexp.MustCompile(`(api_key=\w{7})(\w+)`)
+)
+
+func doRequest(req *http.Request) (*http.Response, error) {
+	earlier := time.Now()
+	resp, err := httpClient.Do(req)
+
+	method := req.Method
+	if method == "" {
+		method = "GET"
+	}
+
+	cleanUrl := reMaskApiKey.ReplaceAllString(req.URL.String(), "$1******")
+
+	if err != nil {
+		log.Err(err).Str("method", method).Str("url", cleanUrl).Msg("http request failed")
+	} else {
+		log.Info().
+			Dur("duration", time.Since(earlier)).
+			Int("status", resp.StatusCode).
+			Str("method", method).
+			Str("url", cleanUrl).
+			Send()
+	}
+
+	return resp, err
+}
 
 func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	_url, err := url.Parse(theUrl + "?" + params.Encode())
@@ -23,7 +54,7 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	req := &http.Request{URL: _url, Header: http.Header{}}
 	req.Header.Set("Cookie", "fringeBenefits=yup") // Enable all content
 
-	resp, err := api.DoRequest(req)
+	resp, err := doRequest(req)
 	if err != nil {
 		resetByPeer := errors.Is(err, syscall.ECONNRESET)
 		if resetByPeer || os.IsTimeout(err) {
