@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
 	"syscall"
 	"time"
 
@@ -16,29 +15,21 @@ import (
 )
 
 var (
-	httpClient   = &http.Client{Timeout: 4 * time.Second}
-	reMaskApiKey = regexp.MustCompile(`(api_key=\w{7})(\w+)`)
+	httpClient = &http.Client{Timeout: 4 * time.Second}
 )
 
 func doRequest(req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
 	resp, err := httpClient.Do(req)
 
-	method := req.Method
-	if method == "" {
-		method = "GET"
-	}
-
-	cleanUrl := reMaskApiKey.ReplaceAllString(req.URL.String(), "$1******")
-
 	if err != nil {
-		log.Err(err).Str("method", method).Str("url", cleanUrl).Msg("http request failed")
+		log.Err(err).Str("method", req.Method).Str("url", req.URL.String()).Msg("http request failed")
 	} else {
 		log.Info().
 			Dur("duration", time.Since(earlier)).
 			Int("status", resp.StatusCode).
-			Str("method", method).
-			Str("url", cleanUrl).
+			Str("method", req.Method).
+			Str("url", req.URL.String()).
 			Send()
 	}
 
