@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"syscall"
@@ -56,6 +57,8 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	}
 
 	if resp.StatusCode != 200 {
+		body, _ := httputil.DumpResponse(resp, true)
+		log.Error().Msgf("non-200 response: %s", string(body))
 		return nil, GelbooruError{Code: resp.StatusCode}
 	}
 
