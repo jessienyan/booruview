@@ -12,15 +12,30 @@ var (
 	ValkeyAddr = os.Getenv("VALKEY_ADDR")
 
 	// Optional
-	GelbooruUserId      = os.Getenv("GELBOORU_USERID")
-	GelbooruApiKey      = os.Getenv("GELBOORU_APIKEY")
+	GelbooruUserIds     = []string(nil)
+	GelbooruApiKeys     = []string(nil)
 	NaughtyFingerprints = make(map[string]bool)
 	FakePostHashes      = []string(nil)
 )
 
 func init() {
-	fingerprints := os.Getenv("NAUGHTY_JA4H_FINGERPRINTS")
-	if fingerprints != "" {
+	if userIds := os.Getenv("GELBOORU_USERID"); userIds != "" {
+		GelbooruUserIds = strings.Split(userIds, ",")
+	} else {
+		log.Warn().Msg("GELBOORU_USERID is not set (may be subject to rate limiting)")
+	}
+
+	if apiKeys := os.Getenv("GELBOORU_APIKEY"); apiKeys != "" {
+		GelbooruApiKeys = strings.Split(apiKeys, ",")
+	} else {
+		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
+	}
+
+	if len(GelbooruUserIds) != len(GelbooruApiKeys) {
+		log.Fatal().Msg("number of gelbooru userids and apikeys does not match")
+	}
+
+	if fingerprints := os.Getenv("NAUGHTY_JA4H_FINGERPRINTS"); fingerprints != "" {
 		for fp := range strings.SplitSeq(fingerprints, ",") {
 			NaughtyFingerprints[fp] = true
 		}
@@ -28,8 +43,7 @@ func init() {
 		log.Info().Msgf("loaded %d ja4h fingerprints", len(NaughtyFingerprints))
 	}
 
-	hashes := os.Getenv("FAKEDATA_POST_HASHES")
-	if hashes != "" {
+	if hashes := os.Getenv("FAKEDATA_POST_HASHES"); hashes != "" {
 		FakePostHashes = strings.Split(hashes, ",")
 	}
 }

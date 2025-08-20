@@ -23,13 +23,18 @@ func doRequest(req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
 	resp, err := httpClient.Do(req)
 
+	method := req.Method
+	if method == "" {
+		method = "GET"
+	}
+
 	if err != nil {
-		log.Err(err).Str("method", req.Method).Str("url", req.URL.String()).Msg("http request failed")
+		log.Err(err).Str("method", method).Str("url", req.URL.String()).Msg("http request failed")
 	} else {
 		log.Info().
 			Dur("duration", time.Since(earlier)).
 			Int("status", resp.StatusCode).
-			Str("method", req.Method).
+			Str("method", method).
 			Str("url", req.URL.String()).
 			Send()
 	}

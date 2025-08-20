@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -14,6 +15,10 @@ import (
 
 var (
 	ApiUrl = "https://gelbooru.com/index.php"
+
+	// Selects which userid/apikey pair to use
+	authPairIndex      = 0
+	authPairIndexMutex sync.Mutex
 )
 
 type authClient struct {
@@ -28,26 +33,18 @@ type Client interface {
 }
 
 func NewClient() Client {
-	return defaultClient
-}
-
-var defaultClient authClient
-
-func init() {
-	uid := api.GelbooruUserId
-	if uid == "" {
-		log.Warn().Msg("GELBOORU_USERID is not set (may be subject to rate limiting)")
+	if api.GelbooruApiKeys == nil {
+		return authClient{}
 	}
 
-	apiKey := api.GelbooruApiKey
-	if apiKey == "" {
-		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
-	}
+	authPairIndexMutex.Lock()
+	defer authPairIndexMutex.Unlock()
 
-	defaultClient = authClient{
-		UserId: uid,
-		ApiKey: apiKey,
-	}
+	// Rotate which pair is used to authenticate with the API
+	uid, apiKey := api.GelbooruUserIds[authPairIndex], api.GelbooruApiKeys[authPairIndex]
+	authPairIndex = (authPairIndex + 1) % len(api.GelbooruApiKeys)
+
+	return authClient{UserId: uid, ApiKey: apiKey}
 }
 
 func (c authClient) withAuth(params url.Values) {
