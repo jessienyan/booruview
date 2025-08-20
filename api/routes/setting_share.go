@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	api "github.com/jessienyan/booruview"
+	api "codeberg.org/jessienyan/booruview"
 	"github.com/valkey-io/valkey-go"
 )
 

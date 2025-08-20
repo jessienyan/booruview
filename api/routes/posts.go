@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/jessienyan/booruview"
-	"github.com/jessienyan/booruview/gelbooru"
+	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/gelbooru"
 	"github.com/rs/zerolog/log"
 	"github.com/valkey-io/valkey-go"
 )

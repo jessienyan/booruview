@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 ARG COMMIT_HASH
-RUN go build -ldflags "-X github.com/jessienyan/booruview.AppVersion=$COMMIT_HASH" -o /dist/server ./cmd/main.go
+RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" -o /dist/server ./cmd/main.go
 
 FROM scratch
 

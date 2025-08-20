@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	api "github.com/jessienyan/booruview"
-	"github.com/jessienyan/booruview/routes"
+	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/routes"
 )
 
 var (

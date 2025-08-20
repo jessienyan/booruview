@@ -16,4 +16,4 @@ COPY . .
 ARG COMMIT_HASH
 ENV COMMIT_HASH=$COMMIT_HASH
 
-CMD gow run -ldflags="-X github.com/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/main.go
+CMD gow run -ldflags="-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/main.go

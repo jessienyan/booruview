@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unicode"
 
-	api "github.com/jessienyan/booruview"
-	"github.com/jessienyan/booruview/gelbooru"
+	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/gelbooru"
 	"github.com/valkey-io/valkey-go"
 )
 

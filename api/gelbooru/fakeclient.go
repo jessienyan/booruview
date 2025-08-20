@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/jessienyan/booruview"
+	api "codeberg.org/jessienyan/booruview"
 )
 
 type fakeClient struct{}

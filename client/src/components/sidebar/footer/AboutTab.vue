@@ -20,7 +20,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
         </li>
         <li>
             <a
-                href="https://github.com/jessienyan/booruview/issues"
+                href="https://codeberg.org/jessienyan/booruview/issues"
                 target="_blank"
                 ><i class="bi bi-bug-fill"></i>Report a bug</a
             >
@@ -42,7 +42,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
         <p class="version">
             latest commit
             <a
-                :href="`https://github.com/jessienyan/booruview/commits/${COMMIT_SHA}/`"
+                :href="`https://codeberg.org/jessienyan/booruview/commits/${COMMIT_SHA}/`"
                 target="_blank"
                 ><code>{{ COMMIT_SHA }}</code></a
             >

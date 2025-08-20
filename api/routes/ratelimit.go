@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	api "github.com/jessienyan/booruview"
+	api "codeberg.org/jessienyan/booruview"
 )
 
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) (abort bool) {

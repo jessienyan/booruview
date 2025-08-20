@@ -1,4 +1,4 @@
-module github.com/jessienyan/booruview
+module codeberg.org/jessienyan/booruview
 
 go 1.24.0
 

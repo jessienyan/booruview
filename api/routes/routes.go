@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	api "codeberg.org/jessienyan/booruview"
 	"github.com/gorilla/mux"
-	api "github.com/jessienyan/booruview"
 )
 
 func NewRouter() *mux.Router {
