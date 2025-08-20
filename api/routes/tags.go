@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"slices"
@@ -82,6 +83,11 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	if len(missing) > 0 {
 		tags, err = gelbooru.NewClient().ListTags(strings.Join(missing, " "))
 		if err != nil {
+			if errors.As(err, &gelbooru.GelbooruError{}) {
+				handleGelbooruUnavailable(w)
+				return
+			}
+
 			handleError(w, err)
 			return
 		}

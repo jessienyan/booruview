@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strings"
 	"unicode"
@@ -54,6 +55,11 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 
 	results, err := gelbooru.NewClient().SearchTags(query)
 	if err != nil {
+		if errors.As(err, &gelbooru.GelbooruError{}) {
+			handleGelbooruUnavailable(w)
+			return
+		}
+
 		handleError(w, err)
 		return
 	}

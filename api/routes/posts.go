@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"math/rand"
 	"net/http"
 	"slices"
@@ -96,8 +97,8 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 
 	results, err := client.ListPosts(query, page)
 	if err != nil {
-		if _, ok := err.(gelbooru.GelbooruError); ok {
-			handle400Error(w, "Gelbooru is down, wait a minute and try again")
+		if errors.As(err, &gelbooru.GelbooruError{}) {
+			handleGelbooruUnavailable(w)
 			return
 		}
 
