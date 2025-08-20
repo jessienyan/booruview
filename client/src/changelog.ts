@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-08-20",
         changes: [
             "added support for multiple gelbooru API keys to avoid rate limiting",
+            "fixed search suggestions breaking if a tag contains a hyphen",
         ],
     },
     {
