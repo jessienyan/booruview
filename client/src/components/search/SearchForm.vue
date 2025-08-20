@@ -101,7 +101,7 @@ const wordBoundary = computed(() => {
     }
 
     // Special operators that act as boundaries
-    const OPERATORS = ["-", "{", "~ " /* note the space */];
+    const OPERATORS = ["{", "~ " /* note the space */];
 
     for (let i = start; i > 0; i--) {
         let match = false;
@@ -120,6 +120,12 @@ const wordBoundary = computed(() => {
 
         // If no match just decrement start
         start--;
+    }
+
+    // Handle negated tags. This can't be used as a boundary because it breaks on tags
+    // that also contain a hyphen
+    if (start === 0 && inputVal.value[0] === "-") {
+        start = 1;
     }
 
     return { start, end };
