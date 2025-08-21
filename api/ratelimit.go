@@ -17,7 +17,7 @@ const (
 	// These limits are nearly impossible for a human to hit even when trying to
 	// do it intentionally. However it should block most scripts (just scrape gelbooru directly??)
 	tokenRefillRate = 3 // per second
-	maxTokens       = 20
+	maxTokens       = 25
 
 	initialBanDuration = 5 * time.Minute
 	banResetsAfter     = 24 * time.Hour
