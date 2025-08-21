@@ -22,10 +22,6 @@ func handle4xxError(w http.ResponseWriter, code int, msg string) {
 	w.Write(resp)
 }
 
-func handle429Error(w http.ResponseWriter) {
-	handle4xxError(w, 429, "Rate limited, wait a few minutes and try again")
-}
-
 func handleGelbooruUnavailable(w http.ResponseWriter) {
 	handle4xxError(w, 503, "Gelbooru is currently unavailable")
 }

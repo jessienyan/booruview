@@ -38,20 +38,20 @@ func clientBanKey(ip string) string {
 	return "clientban:" + ip
 }
 
-type clientBan struct {
-	banCount    int
-	bannedUntil time.Time
+type ClientBan struct {
+	BanCount    int
+	BannedUntil time.Time
 }
 
-func (cb clientBan) banned() bool {
-	return cb.bannedUntil.After(time.Now())
+func (cb ClientBan) Banned() bool {
+	return cb.BannedUntil.After(time.Now())
 }
 
-func (cb clientBan) banTime() time.Duration {
-	return banTimes[min(cb.banCount, len(banTimes)-1)]
+func (cb ClientBan) BanTime() time.Duration {
+	return banTimes[min(cb.BanCount-1, len(banTimes)-1)]
 }
 
-func getClientBan(ip string) (*clientBan, error) {
+func getClientBan(ip string) (*ClientBan, error) {
 	vc := Valkey()
 	resp, err := vc.Do(context.Background(),
 		vc.B().
@@ -62,7 +62,7 @@ func getClientBan(ip string) (*clientBan, error) {
 	if err != nil {
 		return nil, err
 	} else if len(resp) == 0 {
-		return &clientBan{}, nil
+		return &ClientBan{}, nil
 	}
 
 	var m valkey.ValkeyMessage
@@ -86,24 +86,24 @@ func getClientBan(ip string) (*clientBan, error) {
 		}
 	}
 
-	cb := &clientBan{
-		banCount:    banCount,
-		bannedUntil: bannedUntil,
+	cb := &ClientBan{
+		BanCount:    banCount,
+		BannedUntil: bannedUntil,
 	}
 
 	return cb, nil
 }
 
-func ban(ip string, cb *clientBan) error {
+func ban(ip string, cb *ClientBan) (*ClientBan, error) {
 	if cb == nil {
-		cb = &clientBan{
-			banCount: 1,
+		cb = &ClientBan{
+			BanCount: 1,
 		}
 	} else {
-		cb.banCount++
+		cb.BanCount++
 	}
 
-	cb.bannedUntil = time.Now().Add(cb.banTime())
+	cb.BannedUntil = time.Now().Add(cb.BanTime())
 
 	vc := Valkey()
 	key := clientBanKey(ip)
@@ -113,16 +113,16 @@ func ban(ip string, cb *clientBan) error {
 			Hmset().
 			Key(key).
 			FieldValue().
-			FieldValue("banCount", strconv.Itoa(cb.banCount)).
-			FieldValue("bannedUntil", cb.bannedUntil.Format(time.RFC3339)).
+			FieldValue("banCount", strconv.Itoa(cb.BanCount)).
+			FieldValue("bannedUntil", cb.BannedUntil.Format(time.RFC3339)).
 			Build(),
 	).Error()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Reset the ban count after a waiting period (w.p. is relative to unban time)
-	expires := cb.bannedUntil.Add(banResetsAfter).Unix()
+	expires := cb.BannedUntil.Add(banResetsAfter).Unix()
 	err = vc.Do(
 		context.Background(),
 		vc.B().
@@ -132,16 +132,16 @@ func ban(ip string, cb *clientBan) error {
 			Build(),
 	).Error()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.Warn().
 		Str("ip", ip).
-		Int("banCount", cb.banCount).
-		Time("bannedUntil", cb.bannedUntil).
+		Int("banCount", cb.BanCount).
+		Time("bannedUntil", cb.BannedUntil).
 		Msg("client banned (rate limited)")
 
-	return nil
+	return cb, nil
 }
 
 func getLimiter(ip string) *rate.Limiter {
@@ -163,26 +163,24 @@ func getLimiter(ip string) *rate.Limiter {
 // Rate limiting is handled using the token bucket algorithm. Clients have a bucket
 // of tokens that slowly refill. Requests remove tokens from the bucket equal to their cost.
 // If a request costs more than what's available, the client is rate limited.
-func IsRateLimited(ip string, cost int) (banned bool, err error) {
-	cb, err := getClientBan(ip)
+func IsRateLimited(ip string, cost int) (cb *ClientBan, err error) {
+	cb, err = getClientBan(ip)
 	if err != nil {
 		return
 	}
 
-	if banned = cb.banned(); banned {
+	if banned := cb.Banned(); banned {
 		log.Info().
 			Str("ip", ip).
-			Int("banCount", cb.banCount).
-			Time("bannedUntil", cb.bannedUntil).
+			Int("banCount", cb.BanCount).
+			Time("bannedUntil", cb.BannedUntil).
 			Msg("request blocked (rate limited)")
 		return
 	}
 
 	lim := getLimiter(ip)
 	if !lim.AllowN(time.Now(), cost) {
-		banned = true
-		err = ban(ip, cb)
-		return
+		cb, err = ban(ip, cb)
 	}
 
 	return
