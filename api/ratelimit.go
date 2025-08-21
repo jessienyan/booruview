@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -18,12 +17,19 @@ const (
 	// do it intentionally. However it should block most scripts (just scrape gelbooru directly??)
 	tokenRefillRate = 3 // per second
 	maxTokens       = 25
-
-	initialBanDuration = 5 * time.Minute
-	banResetsAfter     = 24 * time.Hour
+	banResetsAfter  = 24 * time.Hour
 )
 
 var (
+	banTimes = []time.Duration{
+		// Very short initially to prevent punishing legit users
+		30 * time.Second,
+		60 * time.Second,
+		30 * time.Minute,
+		4 * time.Hour,
+		24 * time.Hour,
+	}
+
 	clientLimits      = make(map[string]*rate.Limiter)
 	clientLimitsMutex sync.Mutex
 )
@@ -42,10 +48,7 @@ func (cb clientBan) banned() bool {
 }
 
 func (cb clientBan) banTime() time.Duration {
-	// Ban times are exponential
-	// t = t0 * 2^(n-1)
-	exp := int(math.Pow(2, float64(cb.banCount-1)))
-	return initialBanDuration * time.Duration(exp)
+	return banTimes[min(cb.banCount, len(banTimes)-1)]
 }
 
 func getClientBan(ip string) (*clientBan, error) {
