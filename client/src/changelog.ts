@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-21",
+        changes: [
+            "tweaked rate limit to be more forgiving initially",
+            "changed rate limit error message to include time until unbanned",
+        ],
+    },
+    {
         date: "2025-08-20",
         changes: [
             "added support for multiple gelbooru API keys to avoid rate limiting",
