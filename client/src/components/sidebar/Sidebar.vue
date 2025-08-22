@@ -2,6 +2,10 @@
 import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
+import { useDontShowAgain } from "@/composable";
+import { SURVEY_LINK } from "@/config";
+
+const survey = useDontShowAgain("hide-survey");
 </script>
 
 <template>
@@ -37,6 +41,24 @@ import SidebarMain from "./main/SidebarMain.vue";
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
+            <div class="survey" v-if="survey.show.value">
+                <p>Have any suggestions? Two questions, 100% anonymous:</p>
+                <p>
+                    <a :href="SURVEY_LINK" target="_blank">{{ SURVEY_LINK }}</a>
+                </p>
+                <p>
+                    <i class="bi bi-info-circle"></i> The survey can also be
+                    found in the "about" tab.
+                </p>
+                <p>
+                    <button
+                        class="btn-primary btn-rounded"
+                        @click="survey.onHide"
+                    >
+                        don't show again
+                    </button>
+                </p>
+            </div>
             <SidebarMain />
             <SidebarFooter />
         </div>
@@ -132,5 +154,30 @@ $sidebar-width: 60px;
 
 .spacing {
     margin: auto;
+}
+
+.survey {
+    background-color: $color-primary;
+    padding: 15px;
+    margin-bottom: 15px;
+
+    p {
+        color: $color-primary-light;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .hide-survey {
+        float: right;
+        border: none;
+        background: none;
+        color: $color-primary-light;
+    }
 }
 </style>

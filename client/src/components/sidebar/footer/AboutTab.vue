@@ -2,7 +2,7 @@
 import ChangeLog from "./ChangeLog.vue";
 import { changeLog } from "@/changelog";
 import Collapsable from "@/components/Collapsable.vue";
-import { COMMIT_SHA, LAST_COMMIT_DATE } from "@/config";
+import { COMMIT_SHA, LAST_COMMIT_DATE, SURVEY_LINK } from "@/config";
 import CodebergLogo from "@/assets/codeberg.svg";
 </script>
 
@@ -26,7 +26,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
             >
         </li>
         <li>
-            <a href="https://freesurveys.org/s/N8udWoFRTr" target="_blank"
+            <a :href="SURVEY_LINK" target="_blank"
                 ><i class="bi bi-send-fill"></i>Give anonymous feedback</a
             >
         </li>
