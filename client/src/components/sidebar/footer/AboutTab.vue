@@ -26,7 +26,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
             >
         </li>
         <li>
-            <a href="https://freesurveys.org/s/afOcVj9z-f" target="_blank"
+            <a href="https://freesurveys.org/s/N8udWoFRTr" target="_blank"
                 ><i class="bi bi-send-fill"></i>Give anonymous feedback</a
             >
         </li>
