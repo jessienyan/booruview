@@ -194,6 +194,54 @@ function importData() {
 
 <template>
     <div class="settings-container">
+        <h3>app</h3>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.checkForUpdates"
+                    @change="onChangeCheckForUpdates"
+                />
+                periodically check for updates</label
+            >
+        </div>
+
+        <h3>content</h3>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.highResImages"
+                    @change="onChangeHighResImages"
+                />
+                high resolution images (uncheck if slow connection)</label
+            >
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.autoplayVideo"
+                    @change="onChangeAutoplayVideos"
+                />
+                autoplay videos</label
+            >
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.muteVideo"
+                    @change="onChangeMuteVideos"
+                />
+                mute videos</label
+            >
+        </div>
+
         <h3>layout</h3>
 
         <div class="input-group">
@@ -270,7 +318,7 @@ function importData() {
                     :checked="store.settings.fullscreenViewMenuRotate"
                     @change="onChangeFullscreenViewMenuRotate"
                 />
-                rotate menu 90 degrees</label
+                vertical controls/menu</label
             >
         </div>
 
@@ -301,54 +349,6 @@ function importData() {
                     @change="onChangeCloseSidebarOnSearch"
                 />
                 searching closes sidebar</label
-            >
-        </div>
-
-        <h3>content</h3>
-
-        <div class="input-group">
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="store.settings.highResImages"
-                    @change="onChangeHighResImages"
-                />
-                high resolution images (uncheck if slow connection)</label
-            >
-        </div>
-
-        <div class="input-group">
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="store.settings.autoplayVideo"
-                    @change="onChangeAutoplayVideos"
-                />
-                autoplay videos</label
-            >
-        </div>
-
-        <div class="input-group">
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="store.settings.muteVideo"
-                    @change="onChangeMuteVideos"
-                />
-                mute videos</label
-            >
-        </div>
-
-        <h3>app</h3>
-
-        <div class="input-group">
-            <label>
-                <input
-                    type="checkbox"
-                    :checked="store.settings.checkForUpdates"
-                    @change="onChangeCheckForUpdates"
-                />
-                periodically check for updates</label
             >
         </div>
 
