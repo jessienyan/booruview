@@ -109,7 +109,7 @@ $sidebar-width: 60px;
     display: flex;
     flex-direction: row;
     width: 100%;
-    font-size: 48px;
+    font-size: 0;
     padding-right: 10px;
 }
 
@@ -117,15 +117,18 @@ $sidebar-width: 60px;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 48px;
+    font-size: 0;
     padding: 0;
     width: $sidebar-width;
     height: $sidebar-width;
     color: $color-primary-lighter;
+
+    .bi {
+        font-size: 48px;
+    }
 }
 
 .btn-small {
-    font-size: 30px;
     width: $sidebar-width - 10px;
 
     &:hover,
@@ -135,6 +138,10 @@ $sidebar-width: 60px;
 
     &.active {
         text-shadow: 0 0 5px $color-primary-light;
+    }
+
+    .bi {
+        font-size: 30px;
     }
 }
 
