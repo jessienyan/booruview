@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
         changes: [
             "tweaked rate limit to be more forgiving initially",
             "changed rate limit error message to include time until unbanned",
+            "added setting to disable checking for updates",
         ],
     },
     {
