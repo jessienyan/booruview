@@ -6,6 +6,10 @@ import { COMMIT_SHA } from "./config";
 // Periodically check the API and notify the user if the version updated
 let currentVersion = COMMIT_SHA;
 setInterval(() => {
+    if (!store.settings.checkForUpdates) {
+        return;
+    }
+
     fetch("/api/version").then((resp) =>
         resp.json().then(({ version }: { version: string }) => {
             if (version !== currentVersion) {

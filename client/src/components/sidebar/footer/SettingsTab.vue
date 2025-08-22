@@ -88,6 +88,11 @@ function onChangeMuteVideos(e: Event) {
     store.saveSettings();
 }
 
+function onChangeCheckForUpdates(e: Event) {
+    store.settings.checkForUpdates = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
+}
+
 const exportCode = ref("");
 const exportCodeRef = useTemplateRef("export-code");
 const canGenerate = ref(true);
@@ -331,6 +336,19 @@ function importData() {
                     @change="onChangeMuteVideos"
                 />
                 mute videos</label
+            >
+        </div>
+
+        <h3>app</h3>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.checkForUpdates"
+                    @change="onChangeCheckForUpdates"
+                />
+                periodically check for updates</label
             >
         </div>
 

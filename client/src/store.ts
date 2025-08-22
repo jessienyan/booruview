@@ -63,6 +63,7 @@ type Store = {
     settings: {
         autoplayVideo: boolean;
         blacklist: Tag[];
+        checkForUpdates: boolean;
         closeSidebarOnSearch: boolean;
         columnCount: number;
         columnSizing: ColumnSizing;
@@ -127,6 +128,7 @@ const store = reactive<Store>({
     settings: {
         autoplayVideo: true,
         blacklist: [],
+        checkForUpdates: true,
         closeSidebarOnSearch: true,
         columnCount: 3,
         columnSizing: "dynamic",
