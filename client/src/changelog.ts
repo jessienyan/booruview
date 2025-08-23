@@ -6,7 +6,10 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-08-23",
-        changes: ["cache search suggestions on frontend"],
+        changes: [
+            "added icon to show which posts are favorited",
+            "cache search suggestions on frontend",
+        ],
     },
     {
         date: "2025-08-22",
