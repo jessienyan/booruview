@@ -47,8 +47,25 @@ const showSuggestions = ref(false);
 
 useDismiss([containerRef.value], () => (showSuggestions.value = false));
 
+function setSuggestions(tags: Tag[]) {
+    // Filter out blacklist/already in search
+    suggestions.value = tags.filter(
+        (t) =>
+            !store.query.isIncluded(t.name) &&
+            !store.query.isExcluded(t.name) &&
+            store.settings.blacklist.findIndex((bl) => t.name === bl.name) ===
+                -1,
+    );
+}
+
 function doTagSearch(query: string) {
     if (smartSuggestionValue.value.length === 0) {
+        return;
+    }
+
+    const cached = store.cachedTagSearch.get(query);
+    if (cached != null) {
+        setSuggestions(cached);
         return;
     }
 
@@ -61,15 +78,8 @@ function doTagSearch(query: string) {
             }
 
             resp.json().then((json: SearchResponse) => {
-                suggestions.value = json.results.filter(
-                    // Don't suggest tags already added to the search
-                    (t) =>
-                        !store.query.isIncluded(t.name) &&
-                        !store.query.isExcluded(t.name) &&
-                        store.settings.blacklist.findIndex(
-                            (bl) => t.name === bl.name,
-                        ) === -1,
-                );
+                store.cachedTagSearch.set(query, json.results);
+                setSuggestions(json.results);
             });
         })
         .catch((err) => console.error(err));

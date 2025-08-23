@@ -88,6 +88,7 @@ type Store = {
     /** mapping of page number to posts */
     posts: Map<number, Post[]>;
     cachedTags: Map<string, Tag>;
+    cachedTagSearch: Map<string, Tag[]>;
 
     onEditTag: EventTarget;
     onPostsCleared: EventTarget;
@@ -223,6 +224,7 @@ const store = reactive<Store>({
             { name: "rating:explicit", count: 0, type: "metadata" },
         ],
     ]),
+    cachedTagSearch: new Map<string, Tag[]>(),
 
     onEditTag: new EventTarget(),
     onPostsCleared: new EventTarget(),
