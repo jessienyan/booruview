@@ -122,10 +122,14 @@ const wordBoundary = computed(() => {
         start--;
     }
 
-    // Handle negated tags. This can't be used as a boundary because it breaks on tags
-    // that also contain a hyphen
-    if (start === 0 && inputVal.value[0] === "-") {
-        start = 1;
+    // Trim leading spaces/hyphens
+    while (start < end) {
+        const c = inputVal.value[start];
+        if (c === "-" || c === " ") {
+            start++;
+        } else {
+            break;
+        }
     }
 
     return { start, end };
