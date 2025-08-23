@@ -42,7 +42,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
         <p class="version">
             latest commit
             <a
-                :href="`https://codeberg.org/jessienyan/booruview/commits/${COMMIT_SHA}/`"
+                :href="`https://codeberg.org/jessienyan/booruview/commit/${COMMIT_SHA}`"
                 target="_blank"
                 ><code>{{ COMMIT_SHA }}</code></a
             >
