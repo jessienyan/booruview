@@ -13,6 +13,9 @@ const { cropped, maxHeight, renderHeight, post, scrollContainer } =
     }>();
 
 const isVideo = useIsVideo(() => post);
+const favorited = computed(
+    () => store.settings.favorites.findIndex((p) => p.id === post.id) !== -1,
+);
 
 const content = computed<{ url: string; width: number; height: number }>(() => {
     if (isVideo.value) {
@@ -90,12 +93,18 @@ onUnmounted(() => {
             v-if="showImage"
         />
 
-        <span
-            v-if="cropped"
-            class="crop-icon"
-            title="post is cropped (too tall)"
-            ><i class="bi bi-crop"></i
-        ></span>
+        <div class="icons" v-if="favorited || cropped">
+            <i
+                v-if="favorited"
+                class="bi bi-heart-fill fav-icon"
+                title="favorited"
+            ></i>
+            <i
+                v-if="cropped"
+                class="bi bi-crop crop-icon"
+                title="post is cropped (too tall)"
+            ></i>
+        </div>
         <i v-if="isVideo" class="bi bi-play-circle play-icon"></i>
     </div>
 </template>
@@ -109,31 +118,40 @@ onUnmounted(() => {
 }
 
 .content {
-    /* placeholder color */
-    background-color: #444;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.crop-icon {
-    font-size: 24px;
+.icons {
     position: absolute;
     right: 0.8rem;
     top: 0.8rem;
-    background-color: black;
     color: white;
-    opacity: 0.25;
-    border-radius: 50%;
-    padding: 0.6em;
-    line-height: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    opacity: 0.5;
+    border-radius: 9999px;
+    padding: 0.5em;
+    font-size: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
 
     .bi {
-        display: block;
-        line-height: 0;
+        width: 26px;
+        height: 26px;
+        text-shadow: 0 0 3px black;
+    }
+
+    .crop-icon {
         position: relative;
+        scale: 0.9;
+        top: -0.12em;
         left: -0.06em;
-        top: -0.06em;
+    }
+
+    .fav-icon {
+        color: pink;
     }
 }
 
