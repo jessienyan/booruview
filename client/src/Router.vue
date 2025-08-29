@@ -94,13 +94,12 @@ function onRouteChange() {
 function onPageLoad() {
     loadQueryParams()
         .then(() => {
+            store.setQueryParams();
             if (store.settings.consented && store.shouldSearchOnPageLoad()) {
                 store.searchPosts();
             }
         })
-        .catch(() => {
-            store.setQueryParams();
-        });
+        .catch(() => store.setQueryParams());
 }
 
 window.addEventListener("hashchange", onRouteChange);
