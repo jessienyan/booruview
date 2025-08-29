@@ -209,6 +209,11 @@ function importData() {
 
         <h3>content</h3>
 
+        <p class="text-pink">
+            Gelbooru's CDN has been slow lately. If fullscreen images are taking
+            a while to load, uncheck this <i class="bi bi-arrow-down"></i>
+        </p>
+
         <div class="input-group">
             <label>
                 <input

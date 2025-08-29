@@ -5,6 +5,8 @@ import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
 import BlacklistTab from "./BlacklistTab.vue";
+import { useNewFeatureIndicator } from "@/composable";
+import NewFeature from "@/components/NewFeature.vue";
 
 type Tab = "about" | "help" | "settings" | "blacklist";
 const currentTab = ref<Tab>("about");
@@ -24,6 +26,16 @@ function switchTab(tab: Tab) {
 function toggleClose() {
     closed.value = !closed.value;
     store.saveSettings();
+}
+
+const reminderDisableHD = useNewFeatureIndicator(
+    "remind-disable-hd",
+    new Date("2025-09-03"),
+);
+
+// Don't remind users who already have HD images disabled
+if (!store.settings.highResImages) {
+    reminderDisableHD.onSeen();
 }
 </script>
 
@@ -47,9 +59,13 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'settings' && !closed }"
-                @click="switchTab('settings')"
+                @click="
+                    switchTab('settings');
+                    reminderDisableHD.onSeen();
+                "
             >
                 settings
+                <NewFeature v-if="reminderDisableHD.show.value" />
             </button>
             <button
                 class="tab-btn"
