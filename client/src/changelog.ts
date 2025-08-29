@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-08-29",
+        changes: [
+            "fixed duplicate history entry when searching for the first time",
+        ],
+    },
+    {
         date: "2025-08-23",
         changes: [
             "added icon to show which posts are favorited",
