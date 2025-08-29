@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-08-29",
         changes: [
             "fixed duplicate history entry when searching for the first time",
+            "added reminder to disable hd images if loading is slow",
         ],
     },
     {
