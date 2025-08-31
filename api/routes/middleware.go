@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog/log"
-
-	api "codeberg.org/jessienyan/booruview"
 )
 
 func clientIP(req *http.Request) string {
@@ -22,10 +20,14 @@ func clientIP(req *http.Request) string {
 func RecoverMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		defer func() {
-			if err := recover(); err != nil {
-				log.Err(fmt.Errorf("%v", err)).Msg("recovered from panic")
-				api.LogStackTrace()
-				w.WriteHeader(http.StatusInternalServerError)
+			if recoverErr := recover(); recoverErr != nil {
+				var err error
+				if asErr, ok := recoverErr.(error); ok {
+					err = asErr
+				} else {
+					err = fmt.Errorf("%v", recoverErr)
+				}
+				respondWithInternalError(w, fmt.Errorf("recovered from panic: %w", err))
 			}
 		}()
 
