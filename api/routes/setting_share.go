@@ -109,7 +109,7 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	vc := api.Valkey()
-	settings, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).ToString()
+	settings, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).AsBytes()
 	if err != nil {
 		if valkey.IsValkeyNil(err) {
 			respondWithNotFound(w, "code is invalid or may have expired")
