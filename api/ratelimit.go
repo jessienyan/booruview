@@ -23,7 +23,7 @@ const (
 var (
 	banTimes = []time.Duration{
 		// Very short initially to prevent punishing legit users
-		30 * time.Second,
+		15 * time.Second,
 		60 * time.Second,
 		30 * time.Minute,
 		4 * time.Hour,
