@@ -9,6 +9,15 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 )
 
+const (
+	postApiCostIfCacheHit  = 1
+	postApiCostIfCacheMiss = 7
+	settingExportApiCost   = 3
+	settingImportApiCost   = 1
+	tagSearchApiCost       = 1
+	tagApiCost             = 1
+)
+
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) (abort bool) {
 	cb, err := api.IsRateLimited(clientIP(req), cost)
 	if err != nil {

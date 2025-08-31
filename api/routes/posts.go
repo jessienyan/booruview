@@ -18,11 +18,6 @@ import (
 	"github.com/valkey-io/valkey-go"
 )
 
-const (
-	postApiCostIfCacheHit  = 1
-	postApiCostIfCacheMiss = 7
-)
-
 type PostsResponse struct {
 	CountPerPage int                `json:"count_per_page"`
 	TotalCount   int                `json:"total_count"`

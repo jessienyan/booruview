@@ -13,9 +13,6 @@ import (
 
 const (
 	settingShareMaxLen = 150_000 // KiB
-
-	settingExportApiCost = 3
-	settingImportApiCost = 1
 )
 
 func cacheShareKey(code string) string {

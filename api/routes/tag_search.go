@@ -14,10 +14,6 @@ import (
 	"github.com/valkey-io/valkey-go"
 )
 
-const (
-	tagSearchApiCost = 1
-)
-
 type TagSearchResponse struct {
 	Results []api.TagResponse `json:"results"`
 }

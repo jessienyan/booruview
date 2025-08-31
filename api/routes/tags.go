@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	tagLimit   = 100
-	tagApiCost = 1
+	tagLimit = 100
 )
 
 type TagsResponse struct {
