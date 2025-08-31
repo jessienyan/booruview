@@ -2,7 +2,9 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 	"github.com/rs/zerolog/log"
@@ -10,23 +12,42 @@ import (
 
 type errResponse struct {
 	Error string `json:"error"`
+	Extra string `json:"extra,omitempty"`
 }
 
-func handle400Error(w http.ResponseWriter, msg string) {
-	handle4xxError(w, 400, msg)
-}
-
-func handle4xxError(w http.ResponseWriter, code int, msg string) {
-	resp, _ := json.Marshal(errResponse{Error: msg})
+func respondJson(w http.ResponseWriter, code int, data any) {
+	resp, _ := json.Marshal(data)
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(resp)
 }
 
-func handleGelbooruUnavailable(w http.ResponseWriter) {
-	handle4xxError(w, 503, "Gelbooru is currently unavailable")
+func respondWithError(w http.ResponseWriter, code int, msg string, extra string) {
+	respondJson(w, code, errResponse{Error: msg, Extra: extra})
 }
 
-func handleError(w http.ResponseWriter, err error) {
+func respondWithBadRequest(w http.ResponseWriter, msg string) {
+	respondWithError(w, http.StatusBadRequest, msg, "")
+}
+
+func respondWithNotFound(w http.ResponseWriter, msg string) {
+	respondWithError(w, http.StatusNotFound, msg, "")
+}
+
+func respondWithRateLimited(w http.ResponseWriter, banDuration time.Duration) {
+	respondWithError(
+		w,
+		http.StatusTooManyRequests,
+		fmt.Sprintf("Rate limited, wait %s and try again", banDuration),
+		"Please do not use booruview's API for scraping. Use Gelbooru's API directly. Any form of abuse will result in a permanent IP ban.",
+	)
+}
+
+func respondWithGelbooruUnavailable(w http.ResponseWriter) {
+	respondWithError(w, http.StatusServiceUnavailable, "Gelbooru is currently unavailable", "")
+}
+
+func respondWithInternalError(w http.ResponseWriter, err error) {
 	log.Err(err).Stack().Msg("api error")
 	api.LogStackTrace()
 	w.WriteHeader(http.StatusInternalServerError)

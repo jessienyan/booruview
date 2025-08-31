@@ -33,13 +33,13 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 	query = strings.ToLower(query)
 
 	if query == "" {
-		handle400Error(w, "required GET param `q` is missing or blank")
+		respondWithBadRequest(w, "required GET param `q` is missing or blank")
 		return
 	}
 
 	cached, err := getCachedTagSearch(query)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
@@ -52,18 +52,18 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 	results, err := gelbooru.NewClient().SearchTags(query)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
-			handleGelbooruUnavailable(w)
+			respondWithGelbooruUnavailable(w)
 			return
 		}
 
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
 	resp.Results = results
 	respBody, err := json.Marshal(resp)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 

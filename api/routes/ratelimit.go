@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -21,12 +20,12 @@ const (
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) (abort bool) {
 	cb, err := api.IsRateLimited(clientIP(req), cost)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		abort = true
 	} else if cb.Banned() {
 		banDuration := time.Until(cb.BannedUntil).Round(time.Second)
 		w.Header().Add("Retry-After", strconv.Itoa(int(banDuration.Seconds())))
-		handle4xxError(w, 429, fmt.Sprintf("Rate limited, wait %s and try again", banDuration))
+		respondWithRateLimited(w, banDuration)
 		abort = true
 	}
 

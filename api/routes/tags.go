@@ -53,7 +53,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		resp := TagsResponse{Results: []api.TagResponse{}}
 		data, err := json.Marshal(resp)
 		if err != nil {
-			handleError(w, err)
+			respondWithInternalError(w, err)
 			return
 		}
 		w.Write(data)
@@ -61,13 +61,13 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if len(query) > tagLimit {
-		handle400Error(w, fmt.Sprintf("limit of %d tags", tagLimit))
+		respondWithBadRequest(w, fmt.Sprintf("limit of %d tags", tagLimit))
 		return
 	}
 
 	cached, cachedMap, err := getCachedTags(query)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
@@ -83,11 +83,11 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		tags, err = gelbooru.NewClient().ListTags(strings.Join(missing, " "))
 		if err != nil {
 			if errors.As(err, &gelbooru.GelbooruError{}) {
-				handleGelbooruUnavailable(w)
+				respondWithGelbooruUnavailable(w)
 				return
 			}
 
-			handleError(w, err)
+			respondWithInternalError(w, err)
 			return
 		}
 	}
@@ -95,7 +95,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	resp := TagsResponse{Results: append(cached, tags...)}
 	data, err := json.Marshal(resp)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 

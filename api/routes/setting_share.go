@@ -40,16 +40,16 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
 	if !json.Valid(body) {
-		handle400Error(w, "must be valid json")
+		respondWithBadRequest(w, "must be valid json")
 	}
 
 	if len(body) > settingShareMaxLen {
-		handle400Error(w, fmt.Sprintf("settings data is too large (max %d bytes)", settingShareMaxLen))
+		respondWithBadRequest(w, fmt.Sprintf("settings data is too large (max %d bytes)", settingShareMaxLen))
 		return
 	}
 
@@ -66,7 +66,7 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 			Build()).Error()
 
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
@@ -85,18 +85,18 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
 	var data SettingImportRequest
 	if err := json.Unmarshal(body, &data); err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
 	if len(data.Code) == 0 {
-		handle400Error(w, "`code` is required")
+		respondWithBadRequest(w, "`code` is required")
 		return
 	}
 
@@ -104,11 +104,11 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 	stored, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).ToString()
 	if err != nil {
 		if valkey.IsValkeyNil(err) {
-			handle4xxError(w, 404, "code is invalid or may have expired")
+			respondWithNotFound(w, "code is invalid or may have expired")
 			return
 		}
 
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 

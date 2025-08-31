@@ -40,7 +40,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 
 	page, err := strconv.Atoi(pageVal)
 	if err != nil || page < 1 {
-		handle400Error(w, "invalid page number")
+		respondWithBadRequest(w, "invalid page number")
 		return
 	}
 
@@ -56,7 +56,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	query := strings.Join(normalized, " ")
 	cached, err := getCachedPosts(query, page)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
@@ -89,11 +89,11 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	results, err := client.ListPosts(query, page)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
-			handleGelbooruUnavailable(w)
+			respondWithGelbooruUnavailable(w)
 			return
 		}
 
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
@@ -102,7 +102,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	resp.Results = results.Posts
 	respBody, err := json.Marshal(resp)
 	if err != nil {
-		handleError(w, err)
+		respondWithInternalError(w, err)
 		return
 	}
 
