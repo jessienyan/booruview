@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	settingShareMaxLen = 150_000 // KiB
+	settingShareMaxLen = 300_000 // KiB
 )
 
 func cacheShareKey(code string) string {
@@ -21,13 +21,18 @@ func cacheShareKey(code string) string {
 
 // Generates a 12 digit code based on the hash of the data
 func generateShareCode(data []byte) string {
+	var num int64
+
+	// using a hash gives us a random source for generating the code while also
+	// ensuring we don't store the same data twice under two different codes
 	hash := sha1.Sum(data)
 
-	var num int64
+	// convert the hash to a number with at least 12 digits
 	for i := 0; i < len(hash) && num < 100_000_000_000; i++ {
 		num = (num << 8) | int64(hash[i])
 	}
 
+	// format code as 0000-0000-0000
 	code := fmt.Sprintf("%12d", num)
 	code = code[:4] + "-" + code[4:8] + "-" + code[8:12]
 	return code
