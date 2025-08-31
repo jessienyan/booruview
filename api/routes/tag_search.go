@@ -3,7 +3,6 @@ package routes
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -61,14 +60,8 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp.Results = results
-	respBody, err := json.Marshal(resp)
-	if err != nil {
-		respondWithInternalError(w, err)
-		return
-	}
-
-	writeTagSearchToCache(query, respBody)
-	w.Write(respBody)
+	respData := respondJson(w, http.StatusOK, resp)
+	writeTagSearchToCache(query, respData)
 }
 
 func getCachedTagSearch(query string) ([]byte, error) {

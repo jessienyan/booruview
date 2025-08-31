@@ -3,7 +3,6 @@ package routes
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"math/rand"
 	"net/http"
@@ -100,17 +99,12 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	resp.CountPerPage = gelbooru.PostsPerPage
 	resp.TotalCount = results.TotalCount
 	resp.Results = results.Posts
-	respBody, err := json.Marshal(resp)
-	if err != nil {
-		respondWithInternalError(w, err)
-		return
-	}
+
+	respData := respondJson(w, http.StatusOK, resp)
 
 	if !isNaughty {
-		writePostsToCache(query, page, respBody)
+		writePostsToCache(query, page, respData)
 	}
-
-	w.Write(respBody)
 }
 
 func getCachedPosts(tags string, page int) ([]byte, error) {

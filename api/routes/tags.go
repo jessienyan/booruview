@@ -2,7 +2,6 @@ package routes
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -51,12 +50,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	// write empty response
 	if len(query) == 0 {
 		resp := TagsResponse{Results: []api.TagResponse{}}
-		data, err := json.Marshal(resp)
-		if err != nil {
-			respondWithInternalError(w, err)
-			return
-		}
-		w.Write(data)
+		respondJson(w, http.StatusOK, resp)
 		return
 	}
 
@@ -93,16 +87,11 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := TagsResponse{Results: append(cached, tags...)}
-	data, err := json.Marshal(resp)
-	if err != nil {
-		respondWithInternalError(w, err)
-		return
-	}
+	respondJson(w, http.StatusOK, resp)
 
 	if len(tags) > 0 {
 		writeCachedTags(tags)
 	}
-	w.Write(data)
 }
 
 func writeCachedTags(tags []api.TagResponse) {

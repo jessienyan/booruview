@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
 	api "codeberg.org/jessienyan/booruview"
@@ -16,7 +15,10 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
 	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
 	r.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(fmt.Sprintf("{\"version\": \"%s\"}", api.AppVersion)))
+		type versionResponse struct {
+			Version string `json:"version"`
+		}
+		respondJson(w, http.StatusOK, versionResponse{Version: api.AppVersion})
 	})
 	r.Use(RecoverMiddleware)
 

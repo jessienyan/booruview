@@ -33,6 +33,10 @@ func generateShareCode(data []byte) string {
 	return code
 }
 
+type settingExportResponse struct {
+	Code string `json:"code"`
+}
+
 func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, settingExportApiCost) {
 		return
@@ -70,8 +74,7 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(fmt.Sprintf(`{"code":"%s"}`, code)))
+	respondJson(w, http.StatusOK, settingExportResponse{Code: code})
 }
 
 type SettingImportRequest struct {
@@ -101,7 +104,7 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	vc := api.Valkey()
-	stored, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).ToString()
+	settings, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).ToString()
 	if err != nil {
 		if valkey.IsValkeyNil(err) {
 			respondWithNotFound(w, "code is invalid or may have expired")
@@ -112,6 +115,5 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(stored))
+	respondJson(w, http.StatusOK, settings)
 }
