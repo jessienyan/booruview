@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-03",
+        changes: [
+            "fixed searches/tag lookups breaking if a tag has a quote in it because apparently gelbooru html escapes them? very cool",
+        ],
+    },
+    {
         date: "2025-08-31",
         changes: [
             "tweaked rate limit",
