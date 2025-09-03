@@ -32,6 +32,11 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		Results: []api.PostResponse{},
 	}
 
+	if err := req.ParseForm(); err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
+
 	pageVal := req.FormValue("page")
 	if pageVal == "" {
 		pageVal = "1"
@@ -43,9 +48,11 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	tags := req.Form["q"]
+
 	// Clean up the query so we're left with a sorted list of unique tags
 	normalized := slices.DeleteFunc(
-		strings.Split(req.FormValue("q"), ","),
+		tags,
 		func(s string) bool {
 			return len(s) == 0
 		},

@@ -2,6 +2,7 @@ package gelbooru
 
 import (
 	"fmt"
+	"html"
 	"net/url"
 	"strconv"
 	"strings"
@@ -210,8 +211,8 @@ func (c authClient) ListPosts(tags string, page int) (*PostList, error) {
 	params.Add("q", "index")
 	params.Add("json", "1")
 	params.Add("limit", postLimitStr)
-	params.Add("tags", tags)
-	params.Add("pid", strconv.Itoa(page-1)) // Pages are 0-indexed
+	params.Add("tags", html.EscapeString(tags)) // search query needs to be html escaped?? HUH
+	params.Add("pid", strconv.Itoa(page-1))     // Pages are 0-indexed
 	c.withAuth(params)
 
 	if err := httpGetJson(params, &resp); err != nil {
@@ -238,6 +239,11 @@ func (c authClient) ListPosts(tags string, page int) (*PostList, error) {
 			ImageUrl:        p.ImageUrl,
 			Width:           p.Width,
 			Height:          p.Height,
+		}
+
+		// Tags are HTML escaped??
+		for i, t := range data.Tags {
+			data.Tags[i] = html.UnescapeString(t)
 		}
 
 		// Fake rating:* as metadata tag
@@ -299,7 +305,8 @@ func (c authClient) ListTags(tags string) ([]api.TagResponse, error) {
 		}
 
 		tagInfo[i] = api.TagResponse{
-			Name:  t.Name,
+			// Tag names are HTML escaped for some reason
+			Name:  html.UnescapeString(t.Name),
 			Type:  ParseTagNumericType(t.Type),
 			Count: t.Count,
 		}

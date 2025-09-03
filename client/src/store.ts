@@ -287,15 +287,20 @@ const store = reactive<Store>({
                 return;
             }
 
-            const query = this.query
+            const searchTags = this.query
                 .asList()
                 .concat(this.settings.blacklist.map((t) => `-${t.name}`));
-            const queryParams =
-                `q=${encodeURIComponent(query.join(","))}` + `&page=${page}`;
+
+            const queryParams = new URLSearchParams();
+            queryParams.append("page", page.toString());
+
+            for (const t of searchTags) {
+                queryParams.append("q", t);
+            }
 
             this.fetchingPosts = true;
 
-            fetch("/api/posts?" + queryParams)
+            fetch("/api/posts?" + queryParams.toString())
                 .then((resp) => {
                     if (resp.status >= 400) {
                         resp.json()
@@ -395,7 +400,13 @@ const store = reactive<Store>({
                 return;
             }
 
-            fetch("/api/tags?q=" + encodeURIComponent(missing.join(" ")))
+            const queryParams = new URLSearchParams();
+
+            for (const t of missing) {
+                queryParams.append("t", t);
+            }
+
+            fetch("/api/tags?" + queryParams.toString())
                 .then((resp) => {
                     resp.json().then((json: TagResponse) => {
                         json.results.forEach((t) =>

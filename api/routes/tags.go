@@ -29,8 +29,13 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if err := req.ParseForm(); err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
+
 	// Clean up the query so we're left with a sorted list of unique tags
-	query := strings.Split(req.FormValue("q"), " ")
+	query := req.Form["t"]
 	query = slices.DeleteFunc(
 		query,
 		func(s string) bool {
