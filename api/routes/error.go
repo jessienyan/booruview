@@ -15,19 +15,27 @@ type errResponse struct {
 	Extra string `json:"extra,omitempty"`
 }
 
-// respondJson writes a JSON response and returns the response body as []byte
+// respondJson writes a JSON response and returns the response body as []byte.
+// Panics if there is an error
 func respondJson(w http.ResponseWriter, code int, data any) []byte {
 	var resp []byte
 
 	if dataAsBytes, ok := data.([]byte); ok {
 		resp = dataAsBytes
 	} else {
-		resp, _ = json.Marshal(data)
+		var err error
+		resp, err = json.Marshal(data)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(resp)
+
+	if _, err := w.Write(resp); err != nil {
+		panic(err)
+	}
 
 	return resp
 }
