@@ -61,7 +61,11 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
+	// Gelbooru is down (cloudflare error)
+	if resp.StatusCode == 521 {
+		err = GelbooruError{Code: -1}
+		return nil, err
+	} else if resp.StatusCode != 200 {
 		body, _ := httputil.DumpResponse(resp, true)
 		log.Error().Msgf("non-200 response: %s", string(body))
 		return nil, GelbooruError{Code: resp.StatusCode}
