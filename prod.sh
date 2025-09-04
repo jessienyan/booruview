@@ -3,9 +3,9 @@
 set -ex
 cd ${0%/*}
 PREFIX=codeberg.org/jessienyan/booruview
-COMMIT=$(git rev-parse --short master)
-DATE=$(git show -s --format=%cs master)
-TAG=$COMMIT-$DATE
+
+# tag images as {unixts}-{commit}
+TAG=$(git show -s --format=%ct-%h master)
 
 API_IMG=$PREFIX/api
 CADDY_IMG=$PREFIX/caddy
@@ -26,13 +26,15 @@ docker build -t $CADDY_IMG -f caddy/Dockerfile .
 
 docker tag $API_IMG $API_IMG:$TAG
 docker tag $API_IMG $API_IMG:latest
+docker push $API_IMG:$TAG
+docker push $API_IMG:latest
 
 docker tag $CADDY_IMG $CADDY_IMG:$TAG
 docker tag $CADDY_IMG $CADDY_IMG:latest
+docker push $CADDY_IMG:$TAG
+docker push $CADDY_IMG:latest
 
 docker tag $VALKEY_IMG $VALKEY_IMG:$TAG
 docker tag $VALKEY_IMG $VALKEY_IMG:latest
-
-docker push $API_IMG
-docker push $CADDY_IMG
-docker push $VALKEY_IMG
+docker push $VALKEY_IMG:$TAG
+docker push $VALKEY_IMG:latest
