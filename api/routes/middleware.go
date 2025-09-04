@@ -34,3 +34,25 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, req)
 	})
 }
+
+type wrappedResponseWriter struct {
+	http.ResponseWriter
+	bodyLen int
+}
+
+func (w *wrappedResponseWriter) Write(data []byte) (int, error) {
+	w.bodyLen = len(data)
+	return w.ResponseWriter.Write(data)
+}
+
+// Checks for an empty response body and logs it
+func EmptyResponseMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		wrapped := &wrappedResponseWriter{ResponseWriter: w}
+		next.ServeHTTP(wrapped, req)
+
+		if wrapped.bodyLen == 0 {
+			log.Warn().Str("url", req.URL.String()).Msg("empty response body")
+		}
+	})
+}
