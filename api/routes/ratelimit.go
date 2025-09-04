@@ -17,17 +17,18 @@ const (
 	tagApiCost             = 2
 )
 
-func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) (abort bool) {
+func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) bool {
 	cb, err := api.IsRateLimited(clientIP(req), cost)
+
 	if err != nil {
 		respondWithInternalError(w, err)
-		abort = true
+		return true
 	} else if cb.Banned() {
 		banDuration := time.Until(cb.BannedUntil).Round(time.Second)
 		w.Header().Add("Retry-After", strconv.Itoa(int(banDuration.Seconds())))
 		respondWithRateLimited(w, banDuration)
-		abort = true
+		return true
 	}
 
-	return
+	return false
 }

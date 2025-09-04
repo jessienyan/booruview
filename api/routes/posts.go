@@ -72,7 +72,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		api.DecompressData(w, cached)
+		respondJson(w, 200, api.DecompressData(cached))
 		return
 	}
 

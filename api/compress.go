@@ -17,8 +17,10 @@ func CompressData(dst io.Writer, data []byte) error {
 	return err
 }
 
-func DecompressData(dst io.Writer, data []byte) {
+func DecompressData(data []byte) []byte {
 	r := flate.NewReader(bytes.NewReader(data))
 	defer r.Close()
-	io.Copy(dst, r)
+	buf := bytes.Buffer{}
+	io.Copy(&buf, r)
+	return buf.Bytes()
 }

@@ -44,7 +44,7 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 
 	// Cache hit
 	if cached != nil {
-		api.DecompressData(w, cached)
+		respondJson(w, 200, api.DecompressData(cached))
 		return
 	}
 
