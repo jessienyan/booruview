@@ -60,5 +60,5 @@ func respondWithGelbooruUnavailable(w http.ResponseWriter) {
 func respondWithInternalError(w http.ResponseWriter, err error) {
 	log.Err(err).Stack().Msg("api error")
 	api.LogStackTrace()
-	w.WriteHeader(http.StatusInternalServerError)
+	respondWithError(w, http.StatusInternalServerError, "An unexpected error occurred :(", "")
 }
