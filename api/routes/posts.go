@@ -84,7 +84,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 
 	if isNaughty {
 		// Naughty users get fake data and latency :)
-		client = gelbooru.NewFakeClient()
+		client = gelbooru.NewFakeClientv2()
 		fakeLatency := time.Duration(rand.Int()%2_000+500) * time.Millisecond
 		log.Info().Float64("latency", fakeLatency.Seconds()).Str("ja4h", req.Header.Get("Ja4h")).Msg("sending client coal :)")
 		time.Sleep(fakeLatency)
@@ -102,6 +102,9 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		respondWithInternalError(w, err)
 		return
 	}
+
+	// Used by the fake client for sending random posts
+	gelbooru.CollectRecentPosts(results.Posts)
 
 	resp.CountPerPage = gelbooru.PostsPerPage
 	resp.TotalCount = results.TotalCount
