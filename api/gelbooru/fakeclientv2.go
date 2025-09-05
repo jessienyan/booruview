@@ -10,16 +10,27 @@ import (
 )
 
 var (
-	recentPosts     = make([]api.PostResponse, 1000)
+	recentPosts     = make([]api.PostResponse, 0, 1000)
 	recentPostIndex = 0
 )
 
 func CollectRecentPosts(posts []api.PostResponse) {
+	if len(posts) == 0 {
+		return
+	}
+
 	// Just sample half
 	half := posts[:len(posts)/2]
 	for _, p := range half {
-		recentPosts[recentPostIndex] = p
-		recentPostIndex = (recentPostIndex + 1) % len(recentPosts)
+		// Append to recentPosts until it's full. Once it's full, switch to using an index
+		// to treat it like a circular array
+		if len(recentPosts) < cap(recentPosts) {
+			recentPosts = append(recentPosts, p)
+		} else {
+			recentPosts[recentPostIndex] = p
+			recentPostIndex = (recentPostIndex + 1) % len(recentPosts)
+		}
+
 	}
 }
 
