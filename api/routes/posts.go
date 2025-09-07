@@ -48,6 +48,11 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if page > 200 {
+		respondWithBadRequest(w, "results past page 200 are blocked by gelbooru")
+		return
+	}
+
 	tags := req.Form["q"]
 
 	// Clean up the query so we're left with a sorted list of unique tags

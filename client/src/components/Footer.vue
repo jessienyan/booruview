@@ -21,6 +21,14 @@ function prevPage() {
 
 <template>
     <footer class="page-nav">
+        <p
+            v-if="store.maxPage() > 200 && store.currentPage >= 200"
+            class="end-notice"
+        >
+            Unfortunately, results past page 200 aren't viewable<br />because
+            they are blocked by Gelbooru. :(
+        </p>
+
         <div class="nav-btns">
             <button
                 class="btn-primary btn-rounded"
@@ -40,7 +48,7 @@ function prevPage() {
             </button>
             <button
                 class="btn-primary btn-rounded"
-                :disabled="store.fetchingPosts"
+                :disabled="store.fetchingPosts || store.currentPage >= 200"
                 @click="nextPage"
                 v-if="store.currentPage < store.maxPage()"
             >
@@ -82,6 +90,10 @@ function prevPage() {
         width: 80px;
         height: 40px;
     }
+}
+
+.end-notice {
+    color: orange;
 }
 
 .spinner {

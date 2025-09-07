@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
         changes: [
             "added some subtle animations",
             "adjusted tag chip text to be easier to read",
+            "added error message when trying to view posts past page 200 (gelbooru blocks the request)",
         ],
     },
     {
