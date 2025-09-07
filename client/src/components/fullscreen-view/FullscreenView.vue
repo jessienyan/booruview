@@ -11,6 +11,7 @@ type PostNavInfo = { page: number; index: number } | null;
 
 const { post } = defineProps<{ post: Post }>();
 const currentTab = ref<Tab>("content");
+const favAnimation = ref(false);
 
 const borderRadius = "15px";
 
@@ -232,6 +233,8 @@ function toggleFavorite() {
         store.settings.favorites.splice(favoriteIndex.value, 1);
     } else {
         store.settings.favorites = [post].concat(store.settings.favorites);
+        favAnimation.value = true;
+        setTimeout(() => (favAnimation.value = false), 300);
     }
 
     store.saveSettings();
@@ -293,7 +296,10 @@ onUnmounted(() => {
                 </button>
                 <button
                     class="menu-btn fav-btn"
-                    :class="{ favorited: isFavorited }"
+                    :class="{
+                        favorited: isFavorited,
+                        'fav-animation': favAnimation,
+                    }"
                     @click="toggleFavorite"
                     title="favorite"
                 >
@@ -408,6 +414,19 @@ onUnmounted(() => {
     &.favorited {
         color: pink;
     }
+}
+
+@keyframes fav-thump {
+    0% {
+        scale: 1.2;
+    }
+    100% {
+        scale: 1;
+    }
+}
+
+.fav-animation {
+    animation: 300ms ease-out fav-thump;
 }
 
 .close-btn {
