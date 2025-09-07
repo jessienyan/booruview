@@ -113,12 +113,14 @@ const hasConsented = computed(() => {
             'sidebar-open': !store.sidebarClosed,
         }"
     >
-        <Toast
-            v-if="store.toast.msg.length > 0"
-            :kind="store.toast.type"
-            @dismiss="store.toast.msg = ''"
-            >{{ store.toast.msg }}</Toast
-        >
+        <Transition>
+            <Toast
+                v-if="store.toast.msg.length > 0"
+                :kind="store.toast.type"
+                @dismiss="store.toast.msg = ''"
+                >{{ store.toast.msg }}</Toast
+            >
+        </Transition>
         <ChipMenu v-if="store.tagMenu !== null" />
         <ContentWarning v-if="!hasConsented" />
 

@@ -1,28 +1,16 @@
 <script setup lang="ts">
 import type store from "@/store";
-import { onMounted, ref } from "vue";
 
 type ToastKind = typeof store.toast.type;
 const { kind } = defineProps<{ kind: ToastKind }>();
-const emit = defineEmits(["dismiss"]);
-const dismissing = ref(false);
-const appearing = ref(true);
-
-function onDismiss() {
-    setTimeout(() => emit("dismiss"), 400);
-    dismissing.value = true;
-}
-
-onMounted(() => {
-    setTimeout(() => (appearing.value = false), 400);
-});
+defineEmits(["dismiss"]);
 </script>
 
 <template>
     <div
         class="toast"
-        :class="{ [`toast-${kind}`]: true, appearing, dismissing }"
-        @click="onDismiss"
+        :class="{ [`toast-${kind}`]: true }"
+        @click="$emit('dismiss')"
     >
         <slot></slot>
     </div>
@@ -42,6 +30,15 @@ onMounted(() => {
     }
 }
 
+.v-enter-active {
+    animation: 300ms ease-out slide-up;
+}
+
+.v-leave-active {
+    animation: 200ms linear reverse slide-up;
+    opacity: 0;
+}
+
 .toast {
     position: absolute;
     bottom: 80px;
@@ -57,15 +54,6 @@ onMounted(() => {
     filter: drop-shadow(0 0 10px black);
     color: #fff;
     text-shadow: 0 0 3px #000a;
-}
-
-.appearing {
-    animation: 300ms ease-out slide-up;
-}
-
-.dismissing {
-    animation: 180ms ease-out reverse slide-up;
-    opacity: 0;
 }
 
 .toast-info {
