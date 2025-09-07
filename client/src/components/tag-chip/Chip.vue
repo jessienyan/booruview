@@ -66,13 +66,14 @@ function onClick() {
 @import "@/assets/colors";
 
 .chip {
-    padding: 0.5rem;
+    padding: 0.5rem 0.6rem;
     border: none;
     border-radius: 0.5rem;
     display: inline-block;
     word-break: break-all;
     cursor: pointer;
     color: #fff;
+    text-shadow: 0 0 2px black;
 
     .warning {
         color: #f44;
@@ -135,6 +136,7 @@ function onClick() {
 .tag-metadata {
     background-color: #c98606;
     color: black;
+    text-shadow: none;
 }
 
 .tag-unknown {
