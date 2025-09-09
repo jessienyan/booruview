@@ -21,8 +21,7 @@ const survey = useDontShowAgain("hide-survey");
 
             <div class="spacing"></div>
 
-            <!-- TODO: link back to previous search if exists -->
-            <RouterLink :to="{ name: 'landing' }">
+            <RouterLink :to="store.lastSearchRoute || { name: 'landing' }">
                 <button
                     class="btn-sidebar btn-small"
                     title="view search results"
