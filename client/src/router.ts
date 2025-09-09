@@ -6,10 +6,10 @@ import SearchResultsView from "./views/SearchResultsView.vue";
 export const router = createRouter({
     history: createWebHashHistory(),
     routes: [
-        { path: "/", component: LandingView },
-        { path: "/search/:page", component: SearchResultsView, props: true },
+        { path: "/", name: "landing", component: LandingView },
         {
-            path: "/search/:page/:query",
+            path: "/search/:page(\\d+)/:query?",
+            name: "search",
             component: SearchResultsView,
             props: true,
         },

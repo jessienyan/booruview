@@ -7,22 +7,14 @@ import { onMounted, watch } from "vue";
 import { tagsToSearchQuery } from "@/search";
 
 const props = defineProps<{
-    page: number | string;
+    page: string;
     query?: string | string[];
 }>();
 
 function loadPosts() {
-    let page: number;
-
-    if (typeof props.page === "string") {
-        page = parseInt(props.page);
-    } else {
-        page = props.page;
-    }
-
     tagsToSearchQuery(props.query || []).then((q) => {
         store.query = q;
-        store.searchPosts(page);
+        store.searchPosts(parseInt(props.page));
     });
 }
 

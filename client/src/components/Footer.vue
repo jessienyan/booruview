@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import store from "@/store";
 import { computed, ref } from "vue";
+import { RouterLink } from "vue-router";
 
 const clickedWhich = ref<"prev" | "next" | null>(null);
 const fmt = new Intl.NumberFormat();
 const currentPageText = computed(() => fmt.format(store.currentPage));
 const maxPageText = computed(() => fmt.format(store.maxPage()));
 const totalPostCountText = computed(() => fmt.format(store.totalPostCount));
-
-function nextPage() {
-    clickedWhich.value = "next";
-    store.nextPage()?.finally(() => (clickedWhich.value = null));
-}
-
-function prevPage() {
-    clickedWhich.value = "prev";
-    store.prevPage()?.finally(() => (clickedWhich.value = null));
-}
 </script>
 
 <template>
@@ -30,38 +21,57 @@ function prevPage() {
         </p>
 
         <div class="nav-btns">
-            <button
-                class="btn-primary btn-rounded"
-                :disabled="store.fetchingPosts"
-                @click="prevPage"
+            <RouterLink
                 v-if="store.currentPage > 1"
+                :to="{
+                    name: 'search',
+                    params: {
+                        page: store.currentPage - 1,
+                        query: $route.params.query,
+                    },
+                }"
             >
-                <div
-                    class="spinner"
-                    v-if="store.fetchingPosts && clickedWhich === 'prev'"
+                <button
+                    class="btn-primary btn-rounded"
+                    :disabled="store.fetchingPosts"
+                    v-if="store.currentPage > 1"
                 >
-                    <span class="spinner-inner"></span>
-                </div>
-                <template v-else>
-                    <i class="bi bi-arrow-left"></i> prev
-                </template>
-            </button>
-            <button
-                class="btn-primary btn-rounded"
-                :disabled="store.fetchingPosts || store.currentPage >= 200"
-                @click="nextPage"
+                    <div
+                        class="spinner"
+                        v-if="store.fetchingPosts && clickedWhich === 'prev'"
+                    >
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        <i class="bi bi-arrow-left"></i> prev
+                    </template>
+                </button>
+            </RouterLink>
+            <RouterLink
                 v-if="store.currentPage < store.maxPage()"
+                :to="{
+                    name: 'search',
+                    params: {
+                        page: store.currentPage + 1,
+                        query: $route.params.query,
+                    },
+                }"
             >
-                <div
-                    class="spinner"
-                    v-if="store.fetchingPosts && clickedWhich === 'next'"
+                <button
+                    class="btn-primary btn-rounded"
+                    :disabled="store.fetchingPosts || store.currentPage >= 200"
                 >
-                    <span class="spinner-inner"></span>
-                </div>
-                <template v-else>
-                    next <i class="bi bi-arrow-right"></i>
-                </template>
-            </button>
+                    <div
+                        class="spinner"
+                        v-if="store.fetchingPosts && clickedWhich === 'next'"
+                    >
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        next <i class="bi bi-arrow-right"></i>
+                    </template>
+                </button>
+            </RouterLink>
         </div>
         <p>
             page {{ currentPageText }} of {{ maxPageText }} ({{
