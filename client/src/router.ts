@@ -22,26 +22,30 @@ export const router = createRouter({
 let justLoaded = true;
 
 router.beforeEach((to, from) => {
-    let shouldSearch = true;
+    const alwaysSearchOnLoad =
+        justLoaded && store.settings.searchOnPageLoad === "always";
+    const searchIfNonEmptyQuery =
+        justLoaded &&
+        to.name === "search" &&
+        store.settings.searchOnPageLoad === "if-query" &&
+        !!to.params.query;
+    const navigatingToSearchPage = !justLoaded && to.name === "search";
 
-    if (justLoaded) {
-        shouldSearch = store.shouldSearchOnPageLoad();
-        justLoaded = false;
+    justLoaded = false;
 
-        if (shouldSearch && to.name === "landing") {
-            return router.push({
-                name: "search",
-                params: { page: 1 },
-            });
-        }
+    // Redirect to search page if we always search on load
+    if (alwaysSearchOnLoad && to.name === "landing") {
+        return router.push({
+            name: "search",
+            params: { page: 1 },
+        });
     }
 
-    if (shouldSearch && to.name === "search") {
-        const page = parseInt((to.params.page as string) || "1");
-        const query = to.params.query || "";
+    if (alwaysSearchOnLoad || searchIfNonEmptyQuery || navigatingToSearchPage) {
+        const page = parseInt(to.params.page as string);
 
         return new Promise<void>((resolve, reject) => {
-            tagsToSearchQuery(query || []).then((q) => {
+            tagsToSearchQuery(to.params.query || []).then((q) => {
                 store.query = q;
                 store
                     .searchPosts(page, true)
