@@ -25,8 +25,10 @@ onMounted(loadPosts);
 
 <template>
     <PageChangeGesture :scroll-container="$root?.$parent?.$el" />
-    <NoResults v-if="store.totalPostCount === 0"> no results :( </NoResults>
-    <template v-else>
+    <NoResults v-if="store.totalPostCount === 0 && !store.fetchingPosts">
+        no results :(
+    </NoResults>
+    <template v-else-if="!store.fetchingPosts">
         <PostContainer
             :posts="store.postsForCurrentPage() || []"
             :scroll-container="$root?.$parent?.$el"
