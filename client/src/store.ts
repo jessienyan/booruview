@@ -101,10 +101,10 @@ type Store = {
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void> | null;
     searchPosts(page?: number): Promise<void>;
-    setQueryParams(): void;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
     clearPosts(): void;
+    getTag(name: string): Tag | undefined;
 };
 
 const store = reactive<Store>({
@@ -250,23 +250,6 @@ const store = reactive<Store>({
         });
     },
 
-    setQueryParams() {
-        const params = new URLSearchParams();
-        params.set("page", this.currentPage.toString());
-        params.set("q", this.query.asList().join(","));
-
-        const newUrl = new URL(window.location.href);
-        newUrl.hash = params.toString();
-
-        if (window.location.href !== newUrl.toString()) {
-            // Slight hack: pushState() does not trigger the window hashchange event.
-            // This made it easier to add routing without having to redo a lot of logic.
-            // This means searchPosts() is called both by the UI (i.e. clicking search)
-            // and by the router (page load/forward/back)
-            window.history.pushState(null, "", newUrl);
-        }
-    },
-
     searchPosts(page?: number): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
@@ -282,7 +265,6 @@ const store = reactive<Store>({
             if (sameQuery && this.posts.has(page)) {
                 this.fetchingPosts = false;
                 this.currentPage = page;
-                this.setQueryParams();
                 resolve();
                 return;
             }
@@ -342,7 +324,6 @@ const store = reactive<Store>({
 
                         this.addQueryToHistory();
                         this.lastQuery = this.query.copy();
-                        this.setQueryParams();
 
                         resolve();
                     });
@@ -494,6 +475,13 @@ const store = reactive<Store>({
     clearPosts() {
         this.posts.clear();
         this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
+    },
+
+    getTag(name: string): Tag | undefined {
+        if (name.startsWith("-")) {
+            name = name.slice(1);
+        }
+        return this.cachedTags.get(name);
     },
 });
 

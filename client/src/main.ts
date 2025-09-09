@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import store from "./store";
 import { COMMIT_SHA } from "./config";
+import { router } from "./router";
 
 // Periodically check the API and notify the user if the version updated
 let currentVersion = COMMIT_SHA;
@@ -26,4 +27,5 @@ setInterval(() => {
 store.loadSettings();
 
 const app = createApp(App);
+app.use(router);
 app.mount(document.body);

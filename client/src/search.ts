@@ -1,3 +1,5 @@
+import store from "./store";
+
 export type SerializedSearchQuery = {
     include: Tag[];
     exclude: Tag[];
@@ -94,4 +96,37 @@ export class SearchQuery {
             exclude: this.excludedList(),
         };
     }
+}
+
+export function tagsToSearchQuery(
+    tagNames: string | string[],
+): Promise<SearchQuery> {
+    if (typeof tagNames === "string") {
+        tagNames = tagNames.split(",");
+    }
+
+    return new Promise<SearchQuery>((resolve, reject) => {
+        store
+            .loadTags(tagNames)
+            .then(() => {
+                const query = new SearchQuery();
+
+                for (const name of tagNames) {
+                    const tag = store.getTag(name);
+
+                    if (tag == null) {
+                        continue;
+                    }
+
+                    if (name.startsWith("-")) {
+                        query.excludeTag(tag);
+                    } else {
+                        query.includeTag(tag);
+                    }
+                }
+
+                resolve(query);
+            })
+            .catch(reject);
+    });
 }
