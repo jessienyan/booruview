@@ -4,7 +4,8 @@ import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
 import ScreenCover from "../ScreenCover.vue";
-import { useIsVideo, useStationaryClick } from "@/composable";
+import { useIsVideo, useMainContainer, useStationaryClick } from "@/composable";
+import { useRoute } from "vue-router";
 
 type Tab = "content" | "info";
 type PostNavInfo = { page: number; index: number } | null;
@@ -96,15 +97,16 @@ const tabClasses = computed(() => {
 });
 
 const tabHandler = useStationaryClick(close);
+const route = useRoute(); // TODO: refactor
 
 const currentPostIndex = computed(() => {
     let index = -1;
 
-    if (store.postsBeingViewed === "search-results") {
+    if (route.name === "search") {
         index = store.posts
             .get(store.currentPage)!
             .findIndex((p) => p.id === post.id);
-    } else if (store.postsBeingViewed === "favorites") {
+    } else if (route.name === "favorites") {
         index = store.settings.favorites.findIndex((p) => p.id === post.id);
     }
 
@@ -115,7 +117,7 @@ const nextPost = computed<PostNavInfo>(() => {
         return null;
     }
 
-    if (store.postsBeingViewed === "favorites") {
+    if (route.name === "favorites") {
         if (currentPostIndex.value === store.settings.favorites.length - 1) {
             return null;
         }
@@ -151,7 +153,7 @@ const prevPost = computed<PostNavInfo>(() => {
         return null;
     }
 
-    if (store.postsBeingViewed === "favorites") {
+    if (route.name === "favorites") {
         if (currentPostIndex.value === 0) {
             return null;
         }
@@ -187,7 +189,7 @@ function showNextPost() {
 
     if (nav === null) {
         return;
-    } else if (store.postsBeingViewed === "favorites") {
+    } else if (route.name === "favorites") {
         store.fullscreenPost = store.settings.favorites[nav.index];
         return;
     }
@@ -210,7 +212,7 @@ function showPrevPost() {
 
     if (nav === null) {
         return;
-    } else if (store.postsBeingViewed === "favorites") {
+    } else if (route.name === "favorites") {
         store.fullscreenPost = store.settings.favorites[nav.index];
         return;
     }
@@ -251,6 +253,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener("keydown", onKeyDown, { capture: true });
+    useMainContainer().value.focus();
 });
 </script>
 

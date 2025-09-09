@@ -44,7 +44,6 @@ type Store = {
     resultsPerPage: number;
     hasSearched: boolean;
     fetchingPosts: boolean;
-    postsBeingViewed: "search-results" | "favorites";
 
     toast: {
         msg: string;
@@ -116,7 +115,6 @@ const store = reactive<Store>({
     resultsPerPage: 0,
     hasSearched: false,
     fetchingPosts: false,
-    postsBeingViewed: "search-results",
 
     toast: {
         msg: "",
@@ -320,7 +318,6 @@ const store = reactive<Store>({
                         this.resultsPerPage = json.count_per_page;
                         this.totalPostCount = json.total_count;
                         this.currentPage = page!;
-                        this.postsBeingViewed = "search-results";
 
                         if (this.settings.closeSidebarOnSearch) {
                             this.sidebarClosed = true;

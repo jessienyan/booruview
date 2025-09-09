@@ -1,5 +1,6 @@
 import {
     computed,
+    inject,
     onMounted,
     onUnmounted,
     readonly,
@@ -7,6 +8,7 @@ import {
     toValue,
     type ComputedRef,
     type MaybeRefOrGetter,
+    type ShallowRef,
 } from "vue";
 
 export function useDismiss(
@@ -141,4 +143,10 @@ export function useRelativeTime() {
     }
 
     return timeString;
+}
+
+export function useMainContainer() {
+    const mainContainer: Readonly<ShallowRef<HTMLElement>> =
+        inject("mainContainer")!;
+    return mainContainer;
 }

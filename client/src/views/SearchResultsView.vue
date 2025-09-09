@@ -4,26 +4,43 @@ import NoResults from "@/components/NoResults.vue";
 import Footer from "@/components/Footer.vue";
 import PageChangeGesture from "@/PageChangeGesture.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { inject, onMounted, watch, type ShallowRef } from "vue";
+import { onMounted } from "vue";
 import { tagsToSearchQuery } from "@/search";
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from "vue-router";
+import { useMainContainer } from "@/composable";
 
-const mainContainer: Readonly<ShallowRef<HTMLElement>> =
-    inject("mainContainer")!;
+const mainContainer = useMainContainer();
+const route = useRoute();
 
-const props = defineProps<{
-    page: string;
-    query?: string | string[];
-}>();
-
-function loadPosts() {
-    tagsToSearchQuery(props.query || []).then((q) => {
-        store.query = q;
-        store.searchPosts(parseInt(props.page));
+function loadPosts(page: number, query: string | string[]) {
+    return new Promise<void>((resolve, reject) => {
+        tagsToSearchQuery(query || []).then((q) => {
+            store.query = q;
+            store
+                .searchPosts(page)
+                .then(() => {
+                    mainContainer.value.focus();
+                    resolve();
+                })
+                .catch(reject);
+        });
     });
 }
 
-watch(() => [props.page, props.query], loadPosts);
-onMounted(loadPosts);
+onBeforeRouteUpdate((to) => {
+    const { page, query } = to.params;
+    return loadPosts(parseInt(page as string), query);
+});
+
+onBeforeRouteLeave((to, from) => {
+    store.lastSearchRoute = from;
+});
+
+onMounted(() => {
+    const { page, query } = route.params;
+    store.lastSearchRoute = route;
+    loadPosts(parseInt(page as string), query);
+});
 </script>
 
 <template>

@@ -1,1 +1,1 @@
-<template>landing</template>
+<template></template>

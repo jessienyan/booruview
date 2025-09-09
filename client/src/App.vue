@@ -3,7 +3,7 @@ import store from "@/store";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import { RouterView } from "vue-router";
 
-import { computed, provide, readonly, useTemplateRef, watch } from "vue";
+import { computed, provide, readonly, useTemplateRef } from "vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import ContentWarning from "./components/ContentWarning.vue";
 import ChipMenu from "./components/tag-chip/ChipMenu.vue";
@@ -11,16 +11,6 @@ import Toast from "./components/Toast.vue";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
-
-// Focus main container when exiting fullscreen view
-watch(
-    () => store.fullscreenPost,
-    () => {
-        if (store.fullscreenPost === null) {
-            mainContainer.value!.focus();
-        }
-    },
-);
 
 const hasConsented = computed(() => {
     if (store.settings.consented) {
