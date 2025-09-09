@@ -4,7 +4,7 @@ USER node
 WORKDIR /app
 
 COPY --chown=node package.json yarn.lock ./
-RUN yarn
+RUN yarn --frozen-lockfile
 
 COPY --chown=node . .
 
