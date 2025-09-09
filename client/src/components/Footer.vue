@@ -3,11 +3,14 @@ import store from "@/store";
 import { computed, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 
-watch(() => store.fetchingPosts, () => {
-    if(!store.fetchingPosts) {
-        clickedWhich.value = null;
-    }
-})
+watch(
+    () => store.fetchingPosts,
+    () => {
+        if (!store.fetchingPosts) {
+            clickedWhich.value = null;
+        }
+    },
+);
 
 const clickedWhich = ref<"prev" | "next" | null>(null);
 const fmt = new Intl.NumberFormat();

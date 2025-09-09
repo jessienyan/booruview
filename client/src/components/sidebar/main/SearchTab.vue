@@ -12,10 +12,17 @@ function doPostSearch() {
         return;
     }
 
-    // FIXME: search doesn't trigger if the params didn't change
+    const searchDidntChange =
+        router.currentRoute.value.name === "search" &&
+        store.currentPage === 1 &&
+        store.lastQuery.equals(store.query);
+
     router.push({
         name: "search",
         params: { page: 1, query: store.query.asQueryParams() },
+        force: true,
+        // Searching while nothing has changed is the same as refreshing; don't store a new entry
+        replace: searchDidntChange,
     });
 }
 

@@ -4,51 +4,20 @@ import NoResults from "@/components/NoResults.vue";
 import Footer from "@/components/Footer.vue";
 import PageChangeGesture from "@/PageChangeGesture.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { onMounted } from "vue";
-import { tagsToSearchQuery } from "@/search";
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute } from "vue-router";
 import { useMainContainer } from "@/composable";
+import { onMounted } from "vue";
 
 const mainContainer = useMainContainer();
-const route = useRoute();
 
-function loadPosts(page: number, query: string | string[]) {
-    return new Promise<void>((resolve, reject) => {
-        tagsToSearchQuery(query || []).then((q) => {
-            store.query = q;
-            store
-                .searchPosts(page)
-                .then(() => {
-                    mainContainer.value.focus();
-                    resolve();
-                })
-                .catch(reject);
-        });
-    });
-}
-
-onBeforeRouteUpdate((to) => {
-    const { page, query } = to.params;
-    return loadPosts(parseInt(page as string), query);
-});
-
-onBeforeRouteLeave((to, from) => {
-    store.lastSearchRoute = from;
-});
-
-onMounted(() => {
-    const { page, query } = route.params;
-    store.lastSearchRoute = route;
-    loadPosts(parseInt(page as string), query);
-});
+onMounted(() => mainContainer.value.focus());
 </script>
 
 <template>
     <PageChangeGesture :scroll-container="mainContainer" />
-    <NoResults v-if="store.totalPostCount === 0 && !store.fetchingPosts">
+    <NoResults v-if="store.totalPostCount === 0 && store.hasSearched">
         no results :(
     </NoResults>
-    <template v-else-if="!store.fetchingPosts">
+    <template v-else-if="store.totalPostCount > 0">
         <PostContainer
             :posts="store.postsForCurrentPage() || []"
             :scroll-container="mainContainer"

@@ -3,6 +3,9 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import FavoritesView from "./views/FavoritesView.vue";
 import LandingView from "./views/LandingView.vue";
 import SearchResultsView from "./views/SearchResultsView.vue";
+import { tagsToSearchQuery } from "./search";
+import store from "./store";
+import { useMainContainer } from "./composable";
 
 export const router = createRouter({
     history: createWebHashHistory(),
@@ -15,4 +18,26 @@ export const router = createRouter({
         },
         { path: "/favs", name: "favorites", component: FavoritesView },
     ],
+});
+
+router.beforeEach((to, from) => {
+    if (to.name === "search") {
+        const page = parseInt(to.params.page as string);
+        const query = to.params.query;
+
+        return new Promise<void>((resolve, reject) => {
+            tagsToSearchQuery(query || []).then((q) => {
+                store.query = q;
+                store
+                    .searchPosts(page, true)
+                    .then(() => {
+                        // TODO
+                        // useMainContainer().value.focus();
+                        store.lastSearchRoute = to;
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        });
+    }
 });

@@ -102,7 +102,7 @@ type Store = {
     nextPage(): Promise<void> | null;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void> | null;
-    searchPosts(page?: number): Promise<void>;
+    searchPosts(page?: number, force?: boolean): Promise<void>;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
     clearPosts(): void;
@@ -252,7 +252,7 @@ const store = reactive<Store>({
         });
     },
 
-    searchPosts(page?: number): Promise<void> {
+    searchPosts(page?: number, force?: boolean): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
             total_count: number;
@@ -264,7 +264,7 @@ const store = reactive<Store>({
             const sameQuery = this.query.equals(this.lastQuery);
 
             // Don't refetch posts we already have
-            if (sameQuery && this.posts.has(page)) {
+            if (!force && sameQuery && this.posts.has(page)) {
                 this.fetchingPosts = false;
                 this.currentPage = page;
                 resolve();
