@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import store from "@/store";
+import NoResults from "@/components/NoResults.vue";
+import PostContainer from "@/components/PostContainer.vue";
 </script>
 
 <template>

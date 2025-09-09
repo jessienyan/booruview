@@ -21,23 +21,24 @@ const survey = useDontShowAgain("hide-survey");
 
             <div class="spacing"></div>
 
-            <button
-                class="btn-sidebar btn-small"
-                :class="{ active: store.postsBeingViewed === 'search-results' }"
-                @click="store.postsBeingViewed = 'search-results'"
-                title="view search results"
-            >
-                <i class="bi bi-search"></i>
-            </button>
-            <button
-                class="btn-sidebar btn-small"
-                :class="{ active: store.postsBeingViewed === 'favorites' }"
-                @click="store.postsBeingViewed = 'favorites'"
-                title="view favorites"
-                ref="favorites-btn"
-            >
-                <i class="bi bi-heart"></i>
-            </button>
+            <!-- TODO: link back to previous search if exists -->
+            <RouterLink :to="{ name: 'landing' }">
+                <button
+                    class="btn-sidebar btn-small"
+                    title="view search results"
+                >
+                    <i class="bi bi-search"></i>
+                </button>
+            </RouterLink>
+            <RouterLink :to="{ name: 'favorites' }">
+                <button
+                    class="btn-sidebar btn-small"
+                    title="view favorites"
+                    ref="favorites-btn"
+                >
+                    <i class="bi bi-heart"></i>
+                </button>
+            </RouterLink>
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
@@ -111,6 +112,16 @@ $sidebar-width: 60px;
     width: 100%;
     font-size: 0;
     padding-right: 10px;
+
+    .router-link-active {
+        .btn-sidebar {
+            color: $color-primary-light;
+        }
+
+        .btn-sidebar {
+            text-shadow: 0 0 5px $color-primary-light;
+        }
+    }
 }
 
 .btn-sidebar {
@@ -131,13 +142,8 @@ $sidebar-width: 60px;
 .btn-small {
     width: $sidebar-width - 10px;
 
-    &:hover,
-    &.active {
+    &:hover {
         color: $color-primary-light;
-    }
-
-    &.active {
-        text-shadow: 0 0 5px $color-primary-light;
     }
 
     .bi {

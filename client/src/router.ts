@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import FavoritesView from "./views/FavoritesView.vue";
 import LandingView from "./views/LandingView.vue";
 import SearchResultsView from "./views/SearchResultsView.vue";
 
@@ -13,5 +14,6 @@ export const router = createRouter({
             component: SearchResultsView,
             props: true,
         },
+        { path: "/favs", name: "favorites", component: FavoritesView },
     ],
 });
