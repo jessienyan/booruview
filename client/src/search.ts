@@ -60,6 +60,10 @@ export class SearchQuery {
         return include.concat(exclude);
     }
 
+    asQueryParams(): string {
+        return this.asList().join(",");
+    }
+
     equals(o: SearchQuery): boolean {
         if (
             this._include.size !== o._include.size ||

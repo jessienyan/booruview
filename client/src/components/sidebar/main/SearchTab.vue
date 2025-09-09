@@ -3,16 +3,19 @@ import { computed } from "vue";
 import SearchForm from "@/components/search/SearchForm.vue";
 import TagList from "@/components/TagList.vue";
 import store from "@/store";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 function doPostSearch() {
     if (store.fetchingPosts) {
         return;
     }
 
-    store.currentPage = 1;
-    store.clearPosts();
-
-    store.searchPosts().catch(() => store.clearPosts());
+    router.push({
+        name: "search",
+        params: { page: 1, query: store.query.asQueryParams() },
+    });
 }
 
 function onTagSelect(tag: Tag, negated: boolean) {

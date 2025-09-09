@@ -2,6 +2,7 @@
 import store from "@/store";
 import NoResults from "@/components/NoResults.vue";
 import Footer from "@/components/Footer.vue";
+import PageChangeGesture from "@/PageChangeGesture.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { onMounted, watch } from "vue";
 import { tagsToSearchQuery } from "@/search";
