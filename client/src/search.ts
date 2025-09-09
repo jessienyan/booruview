@@ -116,10 +116,15 @@ export function tagsToSearchQuery(
                 const query = new SearchQuery();
 
                 for (const name of tagNames) {
-                    const tag = store.getTag(name);
+                    let tag = store.getTag(name);
 
-                    if (tag == null) {
-                        continue;
+                    // Handle raw tags
+                    if (tag === undefined) {
+                        tag = {
+                            count: 0,
+                            name: name,
+                            type: "unknown",
+                        };
                     }
 
                     if (name.startsWith("-")) {
