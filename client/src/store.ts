@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 import { SearchQuery, type SerializedSearchQuery } from "./search";
 import { type RouteLocation } from "vue-router";
+import { router } from "./router";
 
 type SearchHistory = {
     date: Date;
@@ -99,9 +100,9 @@ type Store = {
     tagsForPost(post: Post): Promise<Tag[]>;
     loadTags(tags: string[]): Promise<void>;
     maxPage(): number;
-    nextPage(): Promise<void> | null;
+    nextPage(): Promise<void>;
     postsForCurrentPage(): Post[] | undefined;
-    prevPage(): Promise<void> | null;
+    prevPage(): Promise<void>;
     searchPosts(page?: number, force?: boolean): Promise<void>;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
@@ -408,20 +409,42 @@ const store = reactive<Store>({
         return this.posts.get(this.currentPage);
     },
 
-    nextPage(): Promise<void> | null {
-        if (this.currentPage >= this.maxPage()) {
-            return null;
-        }
+    nextPage(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this.currentPage >= this.maxPage()) {
+                return reject();
+            }
 
-        return this.searchPosts(this.currentPage + 1).catch(() => {});
+            router
+                .push({
+                    name: "search",
+                    params: {
+                        page: store.currentPage + 1,
+                        query: store.query.asQueryParams(),
+                    },
+                })
+                .then(() => resolve())
+                .catch(() => reject());
+        });
     },
 
-    prevPage(): Promise<void> | null {
-        if (this.currentPage <= 1) {
-            return null;
-        }
+    prevPage(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this.currentPage <= 1) {
+                return reject();
+            }
 
-        return this.searchPosts(this.currentPage - 1).catch(() => {});
+            router
+                .push({
+                    name: "search",
+                    params: {
+                        page: store.currentPage - 1,
+                        query: store.query.asQueryParams(),
+                    },
+                })
+                .then(() => resolve())
+                .catch(() => reject());
+        });
     },
 
     addQueryToHistory() {

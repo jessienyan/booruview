@@ -197,13 +197,10 @@ function showNextPost() {
     if (store.currentPage === nav.page) {
         store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
     } else {
-        store
-            .nextPage()
-            ?.then(
-                () =>
-                    (store.fullscreenPost =
-                        store.posts.get(nav.page)![nav.index] || null),
-            );
+        store.nextPage().then(() => {
+            store.fullscreenPost =
+                store.posts.get(nav.page)![nav.index] || null;
+        });
     }
 }
 
@@ -220,13 +217,10 @@ function showPrevPost() {
     if (store.currentPage === nav.page) {
         store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
     } else {
-        store
-            .prevPage()
-            ?.then(
-                () =>
-                    (store.fullscreenPost =
-                        store.posts.get(nav.page)![nav.index] || null),
-            );
+        store.prevPage().then(() => {
+            store.fullscreenPost =
+                store.posts.get(nav.page)![nav.index] || null;
+        });
     }
 }
 
