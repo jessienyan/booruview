@@ -2,6 +2,35 @@
 import store from "@/store";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import { RouterView } from "vue-router";
+
+import { computed, useTemplateRef, watch } from "vue";
+import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
+import ContentWarning from "./components/ContentWarning.vue";
+import ChipMenu from "./components/tag-chip/ChipMenu.vue";
+import Toast from "./components/Toast.vue";
+
+const mainContainer = useTemplateRef("main");
+
+// Focus main container when exiting fullscreen view
+watch(
+    () => store.fullscreenPost,
+    () => {
+        if (store.fullscreenPost === null) {
+            mainContainer.value!.focus();
+        }
+    },
+);
+
+const hasConsented = computed(() => {
+    if (store.settings.consented) {
+        return true;
+    }
+
+    // Don't show consent modal for search engine crawlers
+    const crawlers = /Googlebot|Bingbot|DuckDuckbot/;
+    const isCrawler = crawlers.exec(navigator.userAgent) !== null;
+    return isCrawler;
+});
 </script>
 
 <template>
@@ -12,6 +41,21 @@ import { RouterView } from "vue-router";
             'sidebar-open': !store.sidebarClosed,
         }"
     >
+        <Transition>
+            <Toast
+                v-if="store.toast.msg.length > 0"
+                :kind="store.toast.type"
+                @dismiss="store.toast.msg = ''"
+                >{{ store.toast.msg }}</Toast
+            >
+        </Transition>
+        <ChipMenu v-if="store.tagMenu !== null" />
+        <ContentWarning v-if="!hasConsented" />
+
+        <FullscreenView
+            v-if="store.fullscreenPost !== null"
+            :post="store.fullscreenPost"
+        />
         <Sidebar />
         <main
             ref="main"
@@ -24,3 +68,42 @@ import { RouterView } from "vue-router";
         </main>
     </div>
 </template>
+
+<style scoped lang="scss">
+@import "@/assets/breakpoints";
+@import "@/assets/colors";
+
+.app {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+
+    @media (max-width: $mobile-width) {
+        &.sidebar-closed {
+            flex-direction: column;
+        }
+    }
+}
+
+main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: scroll;
+    overscroll-behavior-x: contain;
+
+    @media (max-width: $mobile-width) {
+        .sidebar-open & {
+            display: none;
+        }
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.prevent-pull-to-refresh {
+    overscroll-behavior-y: contain;
+}
+</style>

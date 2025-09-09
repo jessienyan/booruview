@@ -23,6 +23,7 @@ onMounted(loadPosts);
 </script>
 
 <template>
+    <PageChangeGesture :scroll-container="$root?.$parent?.$el" />
     <NoResults v-if="store.totalPostCount === 0"> no results :( </NoResults>
     <template v-else>
         <PostContainer
