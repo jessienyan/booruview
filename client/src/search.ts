@@ -61,7 +61,7 @@ export class SearchQuery {
     }
 
     asQueryParams(): string {
-        return this.asList().join(",");
+        return this.asList().sort().join(",");
     }
 
     equals(o: SearchQuery): boolean {
