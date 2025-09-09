@@ -484,6 +484,10 @@ const store = reactive<Store>({
     },
 
     shouldSearchOnPageLoad(): boolean {
+        if (!store.settings.consented) {
+            return false;
+        }
+
         switch (store.settings.searchOnPageLoad) {
             case "always":
                 return true;

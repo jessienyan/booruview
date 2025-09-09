@@ -19,10 +19,26 @@ export const router = createRouter({
     ],
 });
 
+let justLoaded = true;
+
 router.beforeEach((to, from) => {
-    if (to.name === "search") {
-        const page = parseInt(to.params.page as string);
-        const query = to.params.query;
+    let shouldSearch = true;
+
+    if (justLoaded) {
+        shouldSearch = store.shouldSearchOnPageLoad();
+        justLoaded = false;
+
+        if (shouldSearch && to.name === "landing") {
+            return router.push({
+                name: "search",
+                params: { page: 1 },
+            });
+        }
+    }
+
+    if (shouldSearch && to.name === "search") {
+        const page = parseInt((to.params.page as string) || "1");
+        const query = to.params.query || "";
 
         return new Promise<void>((resolve, reject) => {
             tagsToSearchQuery(query || []).then((q) => {
