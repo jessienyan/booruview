@@ -240,6 +240,7 @@ const favoriteIndex = computed(() =>
     store.settings.favorites.findIndex((p) => p.id === post.id),
 );
 const isFavorited = computed(() => favoriteIndex.value !== -1);
+const mainContainer = useMainContainer();
 
 onMounted(() => {
     document.addEventListener("keydown", onKeyDown, { capture: true });
@@ -247,7 +248,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     document.removeEventListener("keydown", onKeyDown, { capture: true });
-    useMainContainer().value.focus();
+    mainContainer.value.focus();
 });
 </script>
 

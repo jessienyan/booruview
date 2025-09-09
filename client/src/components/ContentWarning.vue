@@ -2,8 +2,11 @@
 import { onMounted, ref } from "vue";
 import ScreenCover from "./ScreenCover.vue";
 import store from "@/store";
+import { useRoute, useRouter } from "vue-router";
 
 const timeRemaining = ref(3);
+const router = useRouter();
+const route = useRoute();
 
 onMounted(() => {
     const timer = setInterval(() => {
@@ -21,7 +24,20 @@ function consent() {
     // Auto search doesn't trigger on page load if the user hasn't consented.
     // Trigger it once they consent
     if (store.shouldSearchOnPageLoad()) {
-        store.searchPosts();
+        let params;
+
+        if (route.name === "search") {
+            params = route.params;
+        } else {
+            params = { page: 1, query: "" };
+        }
+
+        router.push({
+            name: "search",
+            params,
+            force: true,
+            replace: true,
+        });
     }
 }
 

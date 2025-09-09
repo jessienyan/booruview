@@ -4,7 +4,9 @@ import { useRelativeTime } from "@/composable";
 import type { SearchQuery } from "@/search";
 import store from "@/store";
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const relativeTime = useRelativeTime();
 
 function styledTags(query: SearchQuery) {
@@ -32,11 +34,11 @@ function onSearch(query: SearchQuery) {
         return;
     }
 
-    store.query = query.copy();
-    store.currentPage = 1;
-    store.clearPosts();
-
-    store.searchPosts().catch(() => store.clearPosts());
+    router.push({
+        name: "search",
+        params: { page: 1, query: query.asQueryParams() },
+        force: true,
+    });
 }
 </script>
 
