@@ -12,6 +12,7 @@ function doPostSearch() {
         return;
     }
 
+    // FIXME: search doesn't trigger if the params didn't change
     router.push({
         name: "search",
         params: { page: 1, query: store.query.asQueryParams() },
