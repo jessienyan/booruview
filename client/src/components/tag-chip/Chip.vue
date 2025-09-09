@@ -142,5 +142,6 @@ function onClick() {
 .tag-unknown {
     background-color: #6275ae;
     color: #0b1227;
+    text-shadow: none;
 }
 </style>
