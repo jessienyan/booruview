@@ -23,7 +23,9 @@ let justLoaded = true;
 
 router.beforeEach((to, from) => {
     const alwaysSearchOnLoad =
-        justLoaded && store.settings.searchOnPageLoad === "always";
+        justLoaded &&
+        store.settings.searchOnPageLoad === "always" &&
+        to.name !== "favorites";
     const searchIfNonEmptyQuery =
         justLoaded &&
         to.name === "search" &&
