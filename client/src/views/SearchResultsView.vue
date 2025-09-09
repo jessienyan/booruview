@@ -4,8 +4,11 @@ import NoResults from "@/components/NoResults.vue";
 import Footer from "@/components/Footer.vue";
 import PageChangeGesture from "@/PageChangeGesture.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { onMounted, watch } from "vue";
+import { inject, onMounted, watch, type ShallowRef } from "vue";
 import { tagsToSearchQuery } from "@/search";
+
+const mainContainer: Readonly<ShallowRef<HTMLElement>> =
+    inject("mainContainer")!;
 
 const props = defineProps<{
     page: string;
@@ -24,14 +27,14 @@ onMounted(loadPosts);
 </script>
 
 <template>
-    <PageChangeGesture :scroll-container="$root?.$parent?.$el" />
+    <PageChangeGesture :scroll-container="mainContainer" />
     <NoResults v-if="store.totalPostCount === 0 && !store.fetchingPosts">
         no results :(
     </NoResults>
     <template v-else-if="!store.fetchingPosts">
         <PostContainer
             :posts="store.postsForCurrentPage() || []"
-            :scroll-container="$root?.$parent?.$el"
+            :scroll-container="mainContainer"
         />
         <Footer />
     </template>

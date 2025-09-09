@@ -2,6 +2,10 @@
 import store from "@/store";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
+import { inject, type ShallowRef } from "vue";
+
+const mainContainer: Readonly<ShallowRef<HTMLElement>> =
+    inject("mainContainer")!;
 </script>
 
 <template>
@@ -11,6 +15,6 @@ import PostContainer from "@/components/PostContainer.vue";
     <PostContainer
         v-else
         :posts="store.settings.favorites"
-        :scroll-container="$root?.$parent?.$el"
+        :scroll-container="mainContainer"
     />
 </template>
