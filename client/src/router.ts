@@ -1,14 +1,13 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import FavoritesView from "./views/FavoritesView.vue";
 import LandingView from "./views/LandingView.vue";
 import SearchResultsView from "./views/SearchResultsView.vue";
 import { tagsToSearchQuery } from "./search";
 import store from "./store";
-import { useMainContainer } from "./composable";
 
 export const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         { path: "/", name: "landing", component: LandingView },
         {
@@ -31,8 +30,6 @@ router.beforeEach((to, from) => {
                 store
                     .searchPosts(page, true)
                     .then(() => {
-                        // TODO
-                        // useMainContainer().value.focus();
                         store.lastSearchRoute = to;
                         resolve();
                     })

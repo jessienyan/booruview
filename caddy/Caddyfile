@@ -6,7 +6,6 @@
 
 {$CADDY_HOST} {
     encode
-    file_server
 
     log stderr-log {
         level INFO
@@ -57,6 +56,11 @@
         ja4h_header
         log_append ja4h {http.request.header.Ja4h}
         reverse_proxy http://api:8000
+    }
+
+    handle {
+        file_server
+        try_files {path} /index.html
     }
 }
 
