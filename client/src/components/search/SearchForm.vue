@@ -301,7 +301,6 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
                 selectedIndex = -1;
                 showSuggestions = true;
             "
-            autofocus
         />
         <SearchSuggestions
             class="suggestions"

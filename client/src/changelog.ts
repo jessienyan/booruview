@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-10",
+        changes: [
+            "added vue-router which should help improve code readability",
+            "scroll position should now be remembered between pages (after many hours of frustration, it's finally here)",
+        ],
+    },
+    {
         date: "2025-09-09",
         changes: ["fixed thumbnails for video content not loading"],
     },

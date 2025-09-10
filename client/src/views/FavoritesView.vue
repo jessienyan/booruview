@@ -2,10 +2,11 @@
 import store from "@/store";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { inject, type ShallowRef } from "vue";
+import { onMounted } from "vue";
+import { useMainContainer } from "@/composable";
 
-const mainContainer: Readonly<ShallowRef<HTMLElement>> =
-    inject("mainContainer")!;
+const mainContainer = useMainContainer();
+onMounted(() => mainContainer.value.focus());
 </script>
 
 <template>

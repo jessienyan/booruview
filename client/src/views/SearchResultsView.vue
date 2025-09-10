@@ -8,7 +8,6 @@ import { useMainContainer } from "@/composable";
 import { onMounted } from "vue";
 
 const mainContainer = useMainContainer();
-
 onMounted(() => mainContainer.value.focus());
 </script>
 
