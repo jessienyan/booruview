@@ -49,6 +49,7 @@ const hasConsented = computed(() => {
         />
         <Sidebar />
         <main
+            id="scroll-container"
             ref="main"
             tabindex="-1"
             :class="{
