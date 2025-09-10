@@ -32,7 +32,13 @@ app.use(router);
 app.use(
     createRouterScroller({
         selectors: {
-            "#scroll-container": true,
+            "#scroll-container": ({ element, savedPosition }) => {
+                // Add a short delay in case the container needs to re-render a couple times
+                setTimeout(
+                    () => element.scrollTo(savedPosition ?? { top: 0 }),
+                    20,
+                );
+            },
         },
     }),
 );
