@@ -50,7 +50,7 @@ router.beforeEach((to, from) => {
             tagsToSearchQuery(to.params.query || []).then((q) => {
                 store.query = q;
                 store
-                    .searchPosts(page, true)
+                    .searchPosts(page)
                     .then(() => {
                         store.lastSearchRoute = to;
                         resolve();
