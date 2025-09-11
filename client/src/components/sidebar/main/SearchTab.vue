@@ -77,17 +77,22 @@ const styledTags = computed(() => {
             :show-spinner="store.fetchingPosts"
         />
 
-        <div class="taglist-container">
+        <div v-if="styledTags.length" class="taglist-container">
             <TagList
                 :jiggle="true"
                 :tags="styledTags"
                 :for-search-tags="true"
             />
+            <button class="btn-gray btn-rounded btn-clear-tags">
+                <i class="bi bi-x-lg"></i> clear tags
+            </button>
         </div>
     </div>
 </template>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+@import "@/assets/buttons";
+
 .search {
     min-height: 0;
     display: flex;
@@ -98,5 +103,10 @@ const styledTags = computed(() => {
     margin-top: 1rem;
     overflow-y: scroll;
     flex: 1;
+}
+
+.btn-clear-tags {
+    display: block;
+    margin-left: auto;
 }
 </style>
