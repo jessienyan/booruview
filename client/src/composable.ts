@@ -150,3 +150,17 @@ export function useMainContainer() {
         inject("mainContainer")!;
     return mainContainer;
 }
+
+export function useViewportSize() {
+    const size = ref({ width: window.innerWidth, height: window.innerHeight });
+
+    function updateSize() {
+        size.value.width = window.innerWidth;
+        size.value.height = window.innerHeight;
+    }
+
+    onMounted(() => window.addEventListener("resize", updateSize));
+    onUnmounted(() => window.removeEventListener("resize", updateSize));
+
+    return size;
+}

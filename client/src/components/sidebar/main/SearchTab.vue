@@ -4,6 +4,7 @@ import SearchForm from "@/components/search/SearchForm.vue";
 import TagList from "@/components/TagList.vue";
 import store from "@/store";
 import { useRouter } from "vue-router";
+import ClearTagsButton from "@/components/search/ClearTagsButton.vue";
 
 const router = useRouter();
 
@@ -83,9 +84,7 @@ const styledTags = computed(() => {
                 :tags="styledTags"
                 :for-search-tags="true"
             />
-            <button class="btn-gray btn-rounded btn-clear-tags">
-                <i class="bi bi-x-lg"></i> clear tags
-            </button>
+            <ClearTagsButton />
         </div>
     </div>
 </template>
@@ -105,8 +104,8 @@ const styledTags = computed(() => {
     flex: 1;
 }
 
-.btn-clear-tags {
-    display: block;
+.clear-tags {
     margin-left: auto;
+    display: block;
 }
 </style>
