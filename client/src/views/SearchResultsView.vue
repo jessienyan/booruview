@@ -6,12 +6,14 @@ import PageChangeGesture from "@/PageChangeGesture.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
 import { onMounted } from "vue";
+import LoadingResults from "@/components/LoadingResults.vue";
 
 const mainContainer = useMainContainer();
 onMounted(() => mainContainer.value.focus());
 </script>
 
 <template>
+    <LoadingResults v-if="store.fetchingPosts" />
     <PageChangeGesture :scroll-container="mainContainer" />
     <NoResults v-if="store.totalPostCount === 0 && store.hasSearched">
         no results :(
