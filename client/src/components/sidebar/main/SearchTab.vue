@@ -17,6 +17,8 @@ function doPostSearch() {
         store.currentPage === 1 &&
         store.lastQuery.equals(store.query);
 
+    store.justClickedSearchButton = true;
+
     router.push({
         name: "search",
         params: { page: 1, query: store.query.asQueryParams() },

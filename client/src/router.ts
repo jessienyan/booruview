@@ -67,14 +67,22 @@ router.beforeEach((to, from) => {
         });
     }
 
-    if (alwaysSearchOnLoad || searchIfNonEmptyQuery || navigatingToSearchPage) {
+    const justClickedSearchButton = store.justClickedSearchButton;
+    store.justClickedSearchButton = false;
+
+    if (
+        justClickedSearchButton ||
+        alwaysSearchOnLoad ||
+        searchIfNonEmptyQuery ||
+        navigatingToSearchPage
+    ) {
         const page = parseInt(to.params.page as string);
 
         return new Promise<void>((resolve, reject) => {
             tagsToSearchQuery(to.params.query || []).then((q) => {
                 store.query = q;
                 store
-                    .searchPosts(page)
+                    .searchPosts({ page, force: justClickedSearchButton })
                     .then(() => {
                         store.lastSearchRoute = to;
                         resolve();

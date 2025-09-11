@@ -45,6 +45,7 @@ type Store = {
     resultsPerPage: number;
     hasSearched: boolean;
     fetchingPosts: boolean;
+    justClickedSearchButton: boolean;
 
     toast: {
         msg: string;
@@ -103,7 +104,7 @@ type Store = {
     nextPage(): Promise<void>;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void>;
-    searchPosts(page?: number, force?: boolean): Promise<void>;
+    searchPosts(opts: { page?: number; force?: boolean }): Promise<void>;
     addQueryToHistory(): void;
     shouldSearchOnPageLoad(): boolean;
     clearPosts(): void;
@@ -116,6 +117,7 @@ const store = reactive<Store>({
     resultsPerPage: 0,
     hasSearched: false,
     fetchingPosts: false,
+    justClickedSearchButton: false,
 
     toast: {
         msg: "",
@@ -253,7 +255,13 @@ const store = reactive<Store>({
         });
     },
 
-    searchPosts(page?: number, force?: boolean): Promise<void> {
+    searchPosts({
+        page,
+        force,
+    }: {
+        page?: number;
+        force?: boolean;
+    }): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
             total_count: number;
