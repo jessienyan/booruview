@@ -33,11 +33,14 @@ app.use(
     createRouterScroller({
         selectors: {
             "#scroll-container": ({ element, savedPosition }) => {
-                // Add a short delay in case the container needs to re-render a couple times
-                setTimeout(
-                    () => element.scrollTo(savedPosition ?? { top: 0 }),
-                    20,
-                );
+                savedPosition = savedPosition ?? { top: 0 };
+
+                // Try scrolling immediately
+                element.scrollTo(savedPosition);
+
+                // Scroll again after a short delay in case the component is slow to re-render.
+                // The delayed scroll on its own can be a bit disorienting
+                setTimeout(() => element.scrollTo(savedPosition), 20);
             },
         },
     }),

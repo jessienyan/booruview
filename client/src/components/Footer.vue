@@ -1,18 +1,8 @@
 <script setup lang="ts">
 import store from "@/store";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
-watch(
-    () => store.fetchingPosts,
-    () => {
-        if (!store.fetchingPosts) {
-            clickedWhich.value = null;
-        }
-    },
-);
-
-const clickedWhich = ref<"prev" | "next" | null>(null);
 const fmt = new Intl.NumberFormat();
 const currentPageText = computed(() => fmt.format(store.currentPage));
 const maxPageText = computed(() => fmt.format(store.maxPage()));
@@ -44,17 +34,8 @@ const totalPostCountText = computed(() => fmt.format(store.totalPostCount));
                     class="btn-primary btn-rounded"
                     :disabled="store.fetchingPosts"
                     v-if="store.currentPage > 1"
-                    @click="clickedWhich = 'prev'"
                 >
-                    <div
-                        class="spinner"
-                        v-if="store.fetchingPosts && clickedWhich === 'prev'"
-                    >
-                        <span class="spinner-inner"></span>
-                    </div>
-                    <template v-else>
-                        <i class="bi bi-arrow-left"></i> prev
-                    </template>
+                    <i class="bi bi-arrow-left"></i> prev
                 </button>
             </RouterLink>
             <RouterLink
@@ -70,17 +51,8 @@ const totalPostCountText = computed(() => fmt.format(store.totalPostCount));
                 <button
                     class="btn-primary btn-rounded"
                     :disabled="store.fetchingPosts || store.currentPage >= 200"
-                    @click="clickedWhich = 'next'"
                 >
-                    <div
-                        class="spinner"
-                        v-if="store.fetchingPosts && clickedWhich === 'next'"
-                    >
-                        <span class="spinner-inner"></span>
-                    </div>
-                    <template v-else>
-                        next <i class="bi bi-arrow-right"></i>
-                    </template>
+                    next <i class="bi bi-arrow-right"></i>
                 </button>
             </RouterLink>
         </div>
