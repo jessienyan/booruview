@@ -7,8 +7,12 @@ export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-09-10",
         changes: [
-            "added vue-router which should help improve code readability",
-            "scroll position should now be remembered between pages (after many hours of frustration, it's finally here)",
+            "scroll position should now be remembered between pages",
+            "added a fullscreen loading spinner",
+            'removed the "auto search on page load" setting',
+            "added vue-router and changed the URLs (any old search URLs should automatically redirect)",
+            "fixed some issues with the page not grabbing focus which prevented scrolling via keyboard",
+            "thank you to everyone who has submitted feedback!",
         ],
     },
     {
