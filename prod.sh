@@ -34,33 +34,42 @@ get_release_tag() {
     echo $TAG
 }
 
-docker build -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
-docker build -t $VALKEY_IMG valkey/
-docker build -t $CLIENT_IMG client/
+echo ">>> building API image"
+docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
+echo ">>> building valkey image"
+docker build --quiet -t $VALKEY_IMG valkey/
+echo ">>> building client image"
+docker build --quiet -t $CLIENT_IMG client/
 
+echo ">>> bundling assets"
 mkdir -p client/dist
 docker run --rm \
     -e VITE_COMMIT_SHA=$COMMIT \
     -e VITE_LAST_COMMIT_DATE=$DATE \
     -v ./client/dist:/app/dist \
     $CLIENT_IMG yarn build
-docker build -t $CADDY_IMG -f caddy/Dockerfile .
 
+echo ">>> building caddy image"
+docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile .
+
+echo ">>> pushing API image"
 docker tag $API_IMG $API_IMG:$IMG_TAG
 docker tag $API_IMG $API_IMG:latest
-docker push $API_IMG:$IMG_TAG
-docker push $API_IMG:latest
+docker push --quiet $API_IMG:$IMG_TAG
+docker push --quiet $API_IMG:latest
 
+echo ">>> pushing caddy image"
 docker tag $CADDY_IMG $CADDY_IMG:$IMG_TAG
 docker tag $CADDY_IMG $CADDY_IMG:latest
-docker push $CADDY_IMG:$IMG_TAG
-docker push $CADDY_IMG:latest
+docker push --quiet $CADDY_IMG:$IMG_TAG
+docker push --quiet $CADDY_IMG:latest
 
+echo ">>> pushing valkey image"
 docker tag $VALKEY_IMG $VALKEY_IMG:$IMG_TAG
 docker tag $VALKEY_IMG $VALKEY_IMG:latest
-docker push $VALKEY_IMG:$IMG_TAG
-docker push $VALKEY_IMG:latest
+docker push --quiet $VALKEY_IMG:$IMG_TAG
+docker push --quiet $VALKEY_IMG:latest
 
 RELEASE_TAG=$(get_release_tag)
-git tag "$RELEASE_TAG" && git push --tags
-echo "Release tagged as $RELEASE_TAG"
+# git tag "$RELEASE_TAG" && git push --tags
+echo ">>> release tagged as $RELEASE_TAG"
