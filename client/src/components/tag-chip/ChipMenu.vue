@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import store from "@/store";
 import { computed, ref, useTemplateRef, watch } from "vue";
-import { useDismiss } from "@/composable";
+import { useDismiss, useViewportSize } from "@/composable";
 
 const containerRef = useTemplateRef("container");
 const showBlacklistConfirm = ref(false);
@@ -39,6 +39,8 @@ function closeMenu() {
     store.tagMenu = null;
 }
 
+const viewport = useViewportSize();
+
 const menuPosition = computed(() => {
     const ref = store.tagMenu?.ref;
 
@@ -46,12 +48,12 @@ const menuPosition = computed(() => {
         return;
     }
 
-    const windowHeight = window.innerHeight;
+    const height = viewport.value.height;
     const allowedMargin = 125;
     const { left, bottom, top } = ref.getBoundingClientRect();
 
     // Anchor the menu to the bottom of the chip if there is enough space in the viewport
-    if (windowHeight - bottom >= allowedMargin) {
+    if (height - bottom >= allowedMargin) {
         return {
             left: left + "px",
             top: bottom + "px",
@@ -59,7 +61,7 @@ const menuPosition = computed(() => {
     }
 
     // If space is limited move the anchor to the top of the chip
-    const bottomToTop = windowHeight - top;
+    const bottomToTop = height - top;
 
     return {
         left: left + "px",
