@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-11",
+        changes: [
+            "added a clear tags button to quickly clear parts of the search query",
+        ],
+    },
+    {
         date: "2025-09-10",
         changes: [
             "scroll position should now be remembered between pages",
