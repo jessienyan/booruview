@@ -18,7 +18,7 @@ DATE=$(git show -s --format=%cs master)
 # returns the git release tag as "YYYY-MM-DD". If a tag with that name already exists
 # a revision is appended, e.g. "YYYY-MM-DD.1"
 get_release_tag() {
-    TAG=$(date "+%F")
+    TAG=$DATE
     # looking at previous commits prevents re-tagging the same commit but with a higher revision
     PREV_TAGS=$(git tag -l --points-at HEAD~1)
     REVISION=$($PREV_TAGS | grep $TAG | wc -l)
