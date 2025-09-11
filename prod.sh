@@ -7,6 +7,14 @@ cd ${0%/*}
 IMG_TAG=$(git show -s --format=%ct-%h master)
 IMG_PREFIX=codeberg.org/jessienyan/booruview
 
+API_IMG=$IMG_PREFIX/api
+CADDY_IMG=$IMG_PREFIX/caddy
+CLIENT_IMG=$IMG_PREFIX/client
+VALKEY_IMG=$IMG_PREFIX/valkey
+
+COMMIT=$(git rev-parse --short master)
+DATE=$(git show -s --format=%cs master)
+
 # returns the git release tag as "YYYY-MM-DD". If a tag with that name already exists
 # a revision is appended, e.g. "YYYY-MM-DD.1"
 get_release_tag() {
@@ -21,11 +29,6 @@ get_release_tag() {
 
     echo $TAG
 }
-
-API_IMG=$IMG_PREFIX/api
-CADDY_IMG=$IMG_PREFIX/caddy
-CLIENT_IMG=$IMG_PREFIX/client
-VALKEY_IMG=$IMG_PREFIX/valkey
 
 docker build -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
 docker build -t $VALKEY_IMG valkey/
