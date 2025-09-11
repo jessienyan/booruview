@@ -55,6 +55,7 @@ type Store = {
         columnWidth: number;
         consented: boolean;
         favorites: Post[];
+        favoriteTags: Tag[];
         fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
         fullscreenViewMenuRotate: boolean;
         highResImages: boolean;
@@ -121,6 +122,7 @@ const store = reactive<Store>({
         columnWidth: 400,
         consented: false,
         favorites: [],
+        favoriteTags: [],
         fullscreenViewMenuAnchor: "bottomcenter",
         fullscreenViewMenuRotate: false,
         highResImages: true,

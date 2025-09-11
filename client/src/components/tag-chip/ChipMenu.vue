@@ -35,6 +35,14 @@ const isExcluded = computed(() => {
     return store.query.isExcluded(store.tagMenu.tag.name);
 });
 
+const favoriteIndex = computed(() => {
+    return store.settings.favoriteTags.findIndex(
+        (t) => store.tagMenu?.tag.name === t.name,
+    );
+});
+
+const isFavorited = computed(() => favoriteIndex.value !== -1);
+
 function closeMenu() {
     store.tagMenu = null;
 }
@@ -117,6 +125,26 @@ function onRemove() {
     closeMenu();
 }
 
+function onFavorite() {
+    if (store.tagMenu === null) {
+        return;
+    }
+
+    store.settings.favoriteTags.push(store.tagMenu.tag);
+    store.saveSettings();
+    closeMenu();
+}
+
+function onUnfavorite() {
+    if (store.tagMenu === null) {
+        return;
+    }
+
+    store.settings.favoriteTags.splice(favoriteIndex.value, 1);
+    store.saveSettings();
+    closeMenu();
+}
+
 function onWhitelist() {
     if (store.tagMenu === null) {
         return;
@@ -168,6 +196,20 @@ function onWhitelist() {
             @click="onRemove"
         >
             <i class="bi bi-x-lg"></i> remove
+        </button>
+        <button
+            class="btn-primary option-btn"
+            v-if="!isBlacklisted && !isFavorited"
+            @click="onFavorite"
+        >
+            <i class="bi bi-heart"></i> favorite
+        </button>
+        <button
+            class="btn-primary option-btn"
+            v-if="!isBlacklisted && isFavorited"
+            @click="onUnfavorite"
+        >
+            <i class="bi bi-heart-fill"></i> unfavorite
         </button>
 
         <!--
