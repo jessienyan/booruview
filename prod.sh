@@ -16,15 +16,19 @@ COMMIT=$(git rev-parse --short master)
 DATE=$(git show -s --format=%cs master)
 
 # returns the git release tag as "YYYY-MM-DD". If a tag with that name already exists
-# a revision is appended, e.g. "YYYY-MM-DD.1"
+# a revision is appended, e.g. "YYYY-MM-DD--rev1"
 get_release_tag() {
+    CURRENT_TAG=$(git tag --points-at HEAD)
+    if [[ $CURRENT_TAG != "" ]]; then
+        echo $CURRENT_TAG
+        return
+    fi
+
     TAG=$DATE
-    # looking at previous commits prevents re-tagging the same commit but with a higher revision
-    PREV_TAGS=$(git tag -l --points-at HEAD~1)
-    REVISION=$($PREV_TAGS | grep $TAG | wc -l)
+    REVISION=$(git tag --list "$TAG*" | wc -l)
 
     if [[ $REVISION > 0 ]]; then
-        TAG=$TAG.$REVISION
+        TAG=$TAG--rev$REVISION
     fi
 
     echo $TAG
@@ -57,4 +61,6 @@ docker tag $VALKEY_IMG $VALKEY_IMG:latest
 docker push $VALKEY_IMG:$IMG_TAG
 docker push $VALKEY_IMG:latest
 
-git tag "$(get_release_tag)" && git push --tags
+RELEASE_TAG=$(get_release_tag)
+git tag "$RELEASE_TAG" && git push --tags
+echo "Release tagged as $RELEASE_TAG"
