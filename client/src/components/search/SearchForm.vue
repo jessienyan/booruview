@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     computed,
+    nextTick,
     onMounted,
     onUnmounted,
     ref,
@@ -272,6 +273,16 @@ function editTag(e: Event) {
     store.query.removeTag(tag);
     inputRef.value?.focus();
 }
+
+// Focus search input when sidebar is opened
+watch(
+    () => store.sidebarClosed,
+    () => {
+        if (!store.sidebarClosed) {
+            nextTick(() => inputRef.value?.focus());
+        }
+    },
+);
 
 onMounted(() => store.onEditTag.addEventListener("edit_tag", editTag));
 onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
