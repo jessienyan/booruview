@@ -2,7 +2,6 @@
 import store, {
     type ColumnSizing,
     type FullscreenViewMenuAnchorPoint,
-    type PageLoadAutoSearch,
 } from "@/store";
 import { ref, useTemplateRef, watch } from "vue";
 
@@ -23,12 +22,6 @@ const fullscreenViewMenuAnchorOptions: Record<
     bottomcenter: "bottom center",
     bottomleft: "bottom left",
     left: "left",
-};
-
-const searchOnPageLoadOptions: Record<PageLoadAutoSearch, string> = {
-    always: "always",
-    "if-query": "if search isn't empty",
-    never: "never",
 };
 
 function onChangeColCount(e: Event) {
@@ -64,12 +57,6 @@ function onChangeCloseSidebarOnSearch(e: Event) {
     store.settings.closeSidebarOnSearch = (
         e.target as HTMLInputElement
     ).checked;
-    store.saveSettings();
-}
-
-function onChangeSearchOnPageLoad(e: Event) {
-    store.settings.searchOnPageLoad = (e.target as HTMLInputElement)
-        .value as any;
     store.saveSettings();
 }
 
@@ -328,23 +315,6 @@ function importData() {
         </div>
 
         <h3>search</h3>
-
-        <div class="input-group">
-            <label>auto-search when page loads</label>
-            <div class="input">
-                <select
-                    :value="store.settings.searchOnPageLoad"
-                    @change="onChangeSearchOnPageLoad"
-                >
-                    <option
-                        v-for="(label, val) in searchOnPageLoadOptions"
-                        :value="val"
-                    >
-                        {{ label }}
-                    </option>
-                </select>
-            </div>
-        </div>
 
         <div class="input-group">
             <label>

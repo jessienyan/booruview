@@ -43,51 +43,25 @@ export const router = createRouter({
     ],
 });
 
-let justLoaded = true;
+router.beforeEach((to) => {
+    if (to.name === "search") {
+        if (!store.settings.consented) {
+            return;
+        }
 
-router.beforeEach((to, from) => {
-    const alwaysSearchOnLoad =
-        justLoaded &&
-        store.settings.searchOnPageLoad === "always" &&
-        to.name !== "favorites";
-    const searchIfNonEmptyQuery =
-        justLoaded &&
-        to.name === "search" &&
-        store.settings.searchOnPageLoad === "if-query" &&
-        !!to.params.query;
-    const navigatingToSearchPage = !justLoaded && to.name === "search";
-
-    justLoaded = false;
-
-    // Redirect to search page if we always search on load
-    if (alwaysSearchOnLoad && to.name === "landing") {
-        return router.push({
-            name: "search",
-            params: { page: 1 },
-        });
-    }
-
-    const justClickedSearchButton = store.justClickedSearchButton;
-    store.justClickedSearchButton = false;
-
-    if (
-        justClickedSearchButton ||
-        alwaysSearchOnLoad ||
-        searchIfNonEmptyQuery ||
-        navigatingToSearchPage
-    ) {
         const page = parseInt(to.params.page as string);
 
         return new Promise<void>((resolve, reject) => {
             tagsToSearchQuery(to.params.query || []).then((q) => {
                 store.query = q;
                 store
-                    .searchPosts({ page, force: justClickedSearchButton })
+                    .searchPosts({ page, force: store.justClickedSearchButton })
                     .then(() => {
                         store.lastSearchRoute = to;
                         resolve();
                     })
-                    .catch(reject);
+                    .catch(reject)
+                    .finally(() => (store.justClickedSearchButton = false));
             });
         });
     }

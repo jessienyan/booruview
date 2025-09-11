@@ -21,23 +21,6 @@ export type FullscreenViewMenuAnchorPoint =
 const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
 
 export type ColumnSizing = "fixed" | "dynamic";
-export type PageLoadAutoSearch = "always" | "if-query" | "never";
-
-// Page load setting was changed from a checkbox to a dropdown. Convert the
-// existing bool to the new dropdown selection
-function onPageLoadDefaultValue(): PageLoadAutoSearch {
-    const oldKey = "searchOnLoad";
-    const val = localStorage.getItem(oldKey);
-
-    switch (val) {
-        case "true":
-            return "if-query";
-        case "false":
-            return "never";
-        default:
-            return "always";
-    }
-}
 
 type Store = {
     currentPage: number;
@@ -77,7 +60,6 @@ type Store = {
         highResImages: boolean;
         muteVideo: boolean;
         queryHistory: SearchHistory[];
-        searchOnPageLoad: PageLoadAutoSearch;
         sidebarTabsHidden: boolean;
     };
 
@@ -106,7 +88,6 @@ type Store = {
     prevPage(): Promise<void>;
     searchPosts(opts: { page?: number; force?: boolean }): Promise<void>;
     addQueryToHistory(): void;
-    shouldSearchOnPageLoad(): boolean;
     clearPosts(): void;
     getTag(name: string): Tag | undefined;
 };
@@ -145,7 +126,6 @@ const store = reactive<Store>({
         highResImages: true,
         muteVideo: true,
         queryHistory: [],
-        searchOnPageLoad: onPageLoadDefaultValue(),
         sidebarTabsHidden: false,
     },
 
@@ -489,23 +469,6 @@ const store = reactive<Store>({
         // Newest entries are added to the front of the list
         this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
         this.saveSettings();
-    },
-
-    shouldSearchOnPageLoad(): boolean {
-        if (!store.settings.consented) {
-            return false;
-        }
-
-        switch (store.settings.searchOnPageLoad) {
-            case "always":
-                return true;
-            case "if-query":
-                return !store.query.isEmpty();
-            case "never":
-                return false;
-            default:
-                return false;
-        }
     },
 
     clearPosts() {

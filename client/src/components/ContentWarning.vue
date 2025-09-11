@@ -23,22 +23,20 @@ function consent() {
 
     // Auto search doesn't trigger on page load if the user hasn't consented.
     // Trigger it once they consent
-    if (store.shouldSearchOnPageLoad()) {
-        let params;
+    let params;
 
-        if (route.name === "search") {
-            params = route.params;
-        } else {
-            params = { page: 1, query: "" };
-        }
-
-        router.push({
-            name: "search",
-            params,
-            force: true,
-            replace: true,
-        });
+    if (route.name === "search") {
+        params = route.params;
+    } else {
+        params = { page: 1, query: "" };
     }
+
+    router.push({
+        name: "search",
+        params,
+        force: true,
+        replace: true,
+    });
 }
 
 function consentSFW() {
