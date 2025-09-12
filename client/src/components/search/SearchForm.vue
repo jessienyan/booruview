@@ -306,6 +306,9 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         <div class="input-container">
             <input
                 class="input"
+                :class="{
+                    'remove-border': store.settings.favoriteTags.length > 0,
+                }"
                 type="text"
                 ref="input"
                 placeholder="e.g: blue sky"
@@ -354,6 +357,10 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         padding-left: 0.5rem;
         height: 40px;
         flex: 1;
+
+        &.remove-border {
+            border-right: 0;
+        }
     }
 }
 

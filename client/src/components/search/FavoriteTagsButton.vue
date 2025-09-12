@@ -81,7 +81,8 @@ const tags = computed<TagChip[]>(() => {
 @import "@/assets/buttons";
 
 .btn-favorite-tags {
-    border-left: none;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 .fav-tags {
