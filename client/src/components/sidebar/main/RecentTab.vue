@@ -52,7 +52,7 @@ function onSearch(query: SearchQuery) {
             <div class="tag-list">
                 <TagList
                     :tags="styledTags(entry.query).value"
-                    :for-search-tags="false"
+                    :can-edit="false"
                 />
             </div>
             <div class="entry-footer">
