@@ -8,8 +8,10 @@ const {
     jiggle = false,
     tag,
     canEdit,
+    showHeart = true,
 } = defineProps<{
     jiggle?: boolean;
+    showHeart?: boolean;
     tag: TagChip;
     canEdit: boolean;
 }>();
@@ -47,7 +49,10 @@ onMounted(() => {
         <span class="icons"
             ><i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i
             ><i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i
-            ><i class="fav-heart bi bi-heart-fill" v-if="isFavorited"></i></span
+            ><i
+                class="fav-heart bi bi-heart-fill"
+                v-if="showHeart && isFavorited"
+            ></i></span
         >{{ tag.tag.name
         }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
             (deprecated)</span
