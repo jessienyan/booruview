@@ -13,6 +13,12 @@ const {
 }>();
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
+const isFavorited = computed(
+    () =>
+        store.settings.favoriteTags.findIndex(
+            (t) => t.name === tag.tag.name,
+        ) !== -1,
+);
 
 const cls = computed(() => ({
     [`tag-${tag.tag.type}`]: true,
@@ -53,9 +59,11 @@ function onClick() {
 
 <template>
     <div class="chip" :class="cls" ref="chip" @click="onClick">
-        <i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i>
-        <i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i>
-        {{ tag.tag.name
+        <span class="icons"
+            ><i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i
+            ><i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i
+            ><i class="fav-heart bi bi-heart-fill" v-if="isFavorited"></i></span
+        >{{ tag.tag.name
         }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
             (deprecated)</span
         >
@@ -78,6 +86,16 @@ function onClick() {
     .warning {
         color: #f44;
     }
+}
+
+.icons:not(:empty) {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    top: 1px;
+    margin-right: 4px;
 }
 
 .chip-options {
@@ -113,6 +131,10 @@ function onClick() {
 
 .jiggle {
     animation: 300ms linear 0s jiggle-anim;
+}
+
+.fav-heart {
+    font-size: 0.9em;
 }
 
 .tag-deprecated,
