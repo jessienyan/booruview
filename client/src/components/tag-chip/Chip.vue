@@ -105,7 +105,7 @@ onMounted(() => {
 }
 
 .strikethrough {
-    filter: brightness(0.8);
+    filter: brightness(0.85);
     text-decoration: line-through;
 }
 
@@ -142,24 +142,22 @@ onMounted(() => {
 }
 
 .tag-artist {
-    background-color: #892020;
+    background-color: #7b1414;
 }
 
 .tag-copyright {
-    background-color: #872d87;
+    background-color: #721d72;
 }
 
 .tag-character {
-    background-color: #1d701d;
+    background-color: #126112;
 }
 
 .tag-metadata {
-    background-color: #a77411;
+    background-color: #9a6600;
 }
 
 .tag-unknown {
-    background-color: #6275ae;
-    color: #0b1227;
-    text-shadow: none;
+    background-color: #44527d;
 }
 </style>
