@@ -11,7 +11,7 @@ import {
 import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
-import Collapsable from "../Collapsable.vue";
+import FavoriteTagsButton from "./FavoriteTagsButton.vue";
 
 type MistakeSuggestion = {
     pattern: RegExp;
@@ -316,16 +316,7 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
                     showSuggestions = true;
                 "
             />
-            <button class="btn-favorite-tags btn-primary">
-                <i class="bi bi-heart-fill"></i>
-                <i
-                    class="bi"
-                    :class="{
-                        'bi-caret-down-fill': true,
-                        'bi-caret-up-fill': false,
-                    }"
-                ></i>
-            </button>
+            <FavoriteTagsButton />
         </div>
         <SearchSuggestions
             class="suggestions"
@@ -363,10 +354,6 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         padding-left: 0.5rem;
         height: 40px;
         flex: 1;
-    }
-
-    .btn-favorite-tags {
-        border-left: none;
     }
 }
 

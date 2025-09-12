@@ -50,7 +50,9 @@ const menuPosition = computed(() => {
 <template>
     <Teleport to="body">
         <div v-if="show" ref="container" class="dropdown" :style="menuPosition">
-            <slot></slot>
+            <slot>
+                <!-- The .dropdown-option class is available for slotted content -->
+            </slot>
         </div>
     </Teleport>
 </template>
