@@ -215,9 +215,10 @@ function onSubmit() {
     if (selectedIndex.value !== -1) {
         tag = suggestions.value[selectedIndex.value];
     } else {
-        const value = negated ? inputVal.value.slice(1) : inputVal.value;
+        // Strip all leading hyphens
+        const value = inputVal.value.replace(/^-+/, "");
         const match = suggestions.value.find(
-            (t) => t.name === value || t.name.replace("_", " ") === value,
+            (t) => t.name.replace("_", " ") === value,
         );
 
         if (match) {
