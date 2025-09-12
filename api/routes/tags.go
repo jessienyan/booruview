@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
 
@@ -34,23 +33,14 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Clean up the query so we're left with a sorted list of unique tags
-	query := req.Form["t"]
-	query = slices.DeleteFunc(
-		query,
-		func(s string) bool {
-			return len(s) == 0 || gelbooru.IsSearchFilter(s)
-		},
-	)
+	query := cleanTagList(req.Form["t"])
+
 	// Strip leading hyphen
 	for i := range query {
 		if query[i][0] == '-' {
 			query[i] = query[i][1:]
 		}
 	}
-
-	slices.Sort(query)
-	query = slices.Compact(query)
 
 	// write empty response
 	if len(query) == 0 {

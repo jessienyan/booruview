@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"unicode"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
@@ -26,10 +25,8 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		Results: []api.TagResponse{},
 	}
 
-	query := strings.TrimLeftFunc(req.FormValue("q"), unicode.IsSpace)
-	// Words are separated by underscores even though they are rendered using whitespace
+	query := cleanTag(req.FormValue("q"))
 	query = strings.ReplaceAll(query, " ", "_")
-	query = strings.ToLower(query)
 
 	if query == "" {
 		respondWithBadRequest(w, "required GET param `q` is missing or blank")

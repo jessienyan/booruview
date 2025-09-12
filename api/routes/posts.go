@@ -6,7 +6,6 @@ import (
 	"errors"
 	"math/rand"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -53,18 +52,9 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tags := req.Form["q"]
+	tags := cleanTagList(req.Form["q"])
+	query := strings.Join(tags, " ")
 
-	// Clean up the query so we're left with a sorted list of unique tags
-	normalized := slices.DeleteFunc(
-		tags,
-		func(s string) bool {
-			return len(s) == 0
-		},
-	)
-	slices.Sort(normalized)
-
-	query := strings.Join(normalized, " ")
 	cached, err := getCachedPosts(query, page)
 	if err != nil {
 		respondWithInternalError(w, err)
