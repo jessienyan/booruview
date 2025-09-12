@@ -50,30 +50,29 @@ function closeMenu() {
 const viewport = useViewportSize();
 
 const menuPosition = computed(() => {
-    const ref = store.tagMenu?.ref;
+    const chipRef = store.tagMenu?.ref;
 
-    if (ref == null) {
+    if (chipRef == null || !containerRef.value) {
         return;
     }
 
-    const height = viewport.value.height;
-    const allowedMargin = 125;
-    const { left, bottom, top } = ref.getBoundingClientRect();
+    const menuRect = containerRef.value.getBoundingClientRect();
+    const chipRect = chipRef.getBoundingClientRect();
+    const outOfBounds =
+        menuRect.height + chipRect.bottom >= viewport.value.height;
 
-    // Anchor the menu to the bottom of the chip if there is enough space in the viewport
-    if (height - bottom >= allowedMargin) {
+    if (!outOfBounds) {
+        // Render underneath the chip
         return {
-            left: left + "px",
-            top: bottom + "px",
+            left: chipRect.left + "px",
+            top: chipRect.bottom + "px",
         };
     }
 
-    // If space is limited move the anchor to the top of the chip
-    const bottomToTop = height - top;
-
+    // Render above
     return {
-        left: left + "px",
-        bottom: bottomToTop + "px",
+        left: chipRect.left + "px",
+        bottom: viewport.value.height - chipRect.top + "px",
     };
 });
 
