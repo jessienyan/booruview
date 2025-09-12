@@ -35,11 +35,6 @@ type Store = {
         type: "error" | "info";
     };
 
-    tagMenu: {
-        tag: Tag;
-        ref: HTMLElement | null;
-        fromSearch: boolean;
-    } | null;
     fullscreenPost: Post | null;
     sidebarClosed: boolean;
 
@@ -106,7 +101,6 @@ const store = reactive<Store>({
         type: "info",
     },
 
-    tagMenu: null,
     fullscreenPost: null,
     sidebarClosed: false,
 

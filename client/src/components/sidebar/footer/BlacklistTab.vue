@@ -13,7 +13,7 @@ const styledTags = computed<TagChip[]>(() =>
         v-if="store.settings.blacklist.length > 0"
         :jiggle="false"
         :tags="styledTags"
-        :for-search-tags="false"
+        :can-edit="false"
     />
     <template v-else>
         <p>

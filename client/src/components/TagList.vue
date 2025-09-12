@@ -7,11 +7,11 @@ type listCategories = Record<TagType, TagChip[]>;
 const {
     jiggle = false,
     tags = [],
-    forSearchTags,
+    canEdit,
 } = defineProps<{
     jiggle?: boolean;
     tags: TagChip[];
-    forSearchTags: boolean;
+    canEdit: boolean;
 }>();
 
 // TODO: accept type prop and pass to chips
@@ -57,7 +57,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>
@@ -70,7 +70,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>
@@ -83,7 +83,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>
@@ -96,7 +96,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>
@@ -109,7 +109,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>
@@ -122,7 +122,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :from-search="forSearchTags"
+                :can-edit="canEdit"
             />
         </div>
     </template>

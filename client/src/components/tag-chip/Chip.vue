@@ -7,11 +7,11 @@ import ChipMenuOptions from "./ChipMenuOptions.vue";
 const {
     jiggle = false,
     tag,
-    fromSearch,
+    canEdit,
 } = defineProps<{
     jiggle?: boolean;
     tag: TagChip;
-    fromSearch: boolean;
+    canEdit: boolean;
 }>();
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
@@ -55,7 +55,11 @@ onMounted(() => {
     </div>
 
     <DropdownMenu :el="chipRef" v-model:show="showOptions">
-        <ChipMenuOptions @click="showOptions = false" :tag="tag.tag" />
+        <ChipMenuOptions
+            @click="showOptions = false"
+            :tag="tag.tag"
+            :can-edit="canEdit"
+        />
     </DropdownMenu>
 </template>
 

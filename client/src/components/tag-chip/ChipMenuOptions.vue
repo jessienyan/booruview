@@ -3,7 +3,11 @@ import store from "@/store";
 import { computed, ref } from "vue";
 
 const showBlacklistConfirm = ref(false);
-const { onClick, tag } = defineProps<{ onClick: () => void; tag: Tag }>();
+const { onClick, tag, canEdit } = defineProps<{
+    onClick: () => void;
+    tag: Tag;
+    canEdit: boolean;
+}>();
 
 const isBlacklisted = computed(() => {
     const name = tag.name;
@@ -56,6 +60,11 @@ function onFavorite() {
     onClick();
 }
 
+function onEdit() {
+    store.editTag(tag);
+    onClick();
+}
+
 function onUnfavorite() {
     store.settings.favoriteTags.splice(favoriteIndex.value, 1);
     store.saveSettings();
@@ -80,11 +89,8 @@ function onWhitelist() {
 <template>
     <button
         class="dropdown-option btn-primary"
-        v-if="store.tagMenu?.fromSearch && (isExcluded || isIncluded)"
-        @click="
-            store.editTag(tag);
-            onClick();
-        "
+        v-if="canEdit && (isExcluded || isIncluded)"
+        @click="onEdit"
     >
         <i class="bi bi-pencil"></i> edit
     </button>
