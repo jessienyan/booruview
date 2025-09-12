@@ -11,6 +11,7 @@ import {
 import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
+import Collapsable from "../Collapsable.vue";
 
 type MistakeSuggestion = {
     pattern: RegExp;
@@ -302,18 +303,30 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         <!-- forceRenderKey triggers a re-render when changed -->
         <template :key="forceRenderKey" />
 
-        <input
-            class="input"
-            type="text"
-            ref="input"
-            placeholder="e.g: blue sky"
-            :value="inputVal"
-            @input="onInput"
-            @focus="
-                selectedIndex = -1;
-                showSuggestions = true;
-            "
-        />
+        <div class="input-container">
+            <input
+                class="input"
+                type="text"
+                ref="input"
+                placeholder="e.g: blue sky"
+                :value="inputVal"
+                @input="onInput"
+                @focus="
+                    selectedIndex = -1;
+                    showSuggestions = true;
+                "
+            />
+            <button class="btn-favorite-tags btn-primary">
+                <i class="bi bi-heart-fill"></i>
+                <i
+                    class="bi"
+                    :class="{
+                        'bi-caret-down-fill': true,
+                        'bi-caret-up-fill': false,
+                    }"
+                ></i>
+            </button>
+        </div>
         <SearchSuggestions
             class="suggestions"
             :tags="suggestions"
@@ -339,14 +352,23 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
-.input {
-    background-color: #252525;
-    border: 1px solid #555;
-    color: #ddd;
-    display: block;
-    width: 100%;
-    padding-left: 0.5rem;
-    height: 40px;
+.input-container {
+    display: flex;
+
+    .input {
+        background-color: #252525;
+        border: 1px solid #555;
+        color: #ddd;
+        display: block;
+        padding-left: 0.5rem;
+        height: 40px;
+        flex: 1;
+        z-index: 1;
+    }
+
+    .btn-favorite-tags {
+        border-left: none;
+    }
 }
 
 .container {

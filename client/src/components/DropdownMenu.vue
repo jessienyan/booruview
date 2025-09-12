@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useDismiss, useViewportSize } from "@/composable";
-import { computed, toValue, useTemplateRef, type MaybeRef } from "vue";
+import { computed, toValue, useTemplateRef, watch, type MaybeRef } from "vue";
 
 const container = useTemplateRef("container");
 const props = defineProps<{ el: MaybeRef<HTMLElement | null> }>();
-const show = defineModel("show", { default: false });
+const show = defineModel("show");
 
 const viewport = useViewportSize();
-useDismiss([container, props.el], () => (show.value = false));
+useDismiss(
+    () => [container, props.el],
+    () => (show.value = false),
+);
 
 const menuPosition = computed(() => {
     const el = toValue(props.el);
@@ -25,8 +28,8 @@ const menuPosition = computed(() => {
         bottom: "",
     };
 
-    const underneath = menuRect.height + elRect.bottom >= viewport.value.height;
-    const leftAlign = menuRect.width + elRect.left >= viewport.value.width;
+    const underneath = menuRect.height + elRect.bottom < viewport.value.height;
+    const leftAlign = menuRect.width + elRect.left < viewport.value.width;
 
     if (underneath) {
         pos.top = elRect.bottom + "px";
@@ -60,5 +63,31 @@ const menuPosition = computed(() => {
     z-index: 999;
     width: max-content;
     box-shadow: 0 0 0.8rem black;
+    margin: 4px 0;
+}
+
+:slotted(.dropdown-option) {
+    padding: 12px;
+    text-align: left;
+
+    .bi {
+        margin-right: 0.4rem;
+    }
+
+    &:first-of-type {
+        border-radius: 4px 4px 0 0;
+    }
+
+    &:last-of-type {
+        border-radius: 0 0 4px 4px;
+    }
+
+    &:not(:last-of-type):not(.rounded) {
+        border-bottom: none;
+    }
+
+    &.rounded {
+        border-radius: 4px;
+    }
 }
 </style>
