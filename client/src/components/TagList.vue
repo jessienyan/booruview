@@ -14,6 +14,8 @@ const {
     forSearchTags: boolean;
 }>();
 
+// TODO: accept type prop and pass to chips
+
 const categories = computed(() => {
     const ret: listCategories = {
         artist: [],

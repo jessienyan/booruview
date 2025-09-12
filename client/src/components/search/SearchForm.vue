@@ -363,7 +363,6 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         padding-left: 0.5rem;
         height: 40px;
         flex: 1;
-        z-index: 1;
     }
 
     .btn-favorite-tags {

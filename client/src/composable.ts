@@ -7,13 +7,12 @@ import {
     ref,
     toValue,
     type ComputedRef,
-    type MaybeRef,
     type MaybeRefOrGetter,
     type ShallowRef,
 } from "vue";
 
 export function useDismiss(
-    el: MaybeRefOrGetter<MaybeRef<HTMLElement | null>[]>,
+    el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
     onDismiss: () => void,
 ) {
     function handler(e: MouseEvent) {

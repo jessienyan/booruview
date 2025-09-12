@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import store from "@/store";
 import DropdownMenu from "../DropdownMenu.vue";
 
 const btnRef = useTemplateRef("button");
-const showMenu = defineModel<boolean>({ default: false });
+const showMenu = ref(false);
 
 const includeCount = computed(() => store.query._include.size);
 const excludeCount = computed(() => store.query._exclude.size);
@@ -37,20 +37,20 @@ function clearExcluded() {
     <DropdownMenu :el="btnRef" v-model:show="showMenu">
         <button
             v-if="includeCount > 0"
-            class="dropdown-option btn-gray"
+            class="btn-gray dropdown-option"
             @click="clearIncluded"
         >
             included ({{ includeCount }})
         </button>
         <button
             v-if="excludeCount > 0"
-            class="dropdown-option btn-gray"
+            class="btn-gray dropdown-option"
             @click="clearExcluded"
         >
             excluded ({{ excludeCount }})
         </button>
         <button
-            class="dropdown-option btn-gray"
+            class="btn-gray dropdown-option"
             @click="
                 clearIncluded();
                 clearExcluded();

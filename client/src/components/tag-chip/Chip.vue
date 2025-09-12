@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import store from "@/store";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
+import DropdownMenu from "../DropdownMenu.vue";
+import ChipMenuOptions from "./ChipMenuOptions.vue";
 
 const {
     jiggle = false,
@@ -19,12 +21,17 @@ const isFavorited = computed(
             (t) => t.name === tag.tag.name,
         ) !== -1,
 );
+const showOptions = ref(false);
 
 const cls = computed(() => ({
     [`tag-${tag.tag.type}`]: true,
     strikethrough: tag.style === "strikethrough" || tag.style === "blacklist",
     jiggle: jiggle && !hasJiggled,
 }));
+
+function onClick() {
+    showOptions.value = !showOptions.value;
+}
 
 onMounted(() => {
     if (jiggle) {
@@ -33,28 +40,6 @@ onMounted(() => {
         setTimeout(() => (hasJiggled.value = true), 1000);
     }
 });
-
-function onClick() {
-    if (!chipRef.value) {
-        return;
-    }
-
-    // Tag menu is currently open for this chip, close it
-    if (store.tagMenu?.ref === chipRef.value) {
-        store.tagMenu = null;
-        return;
-    }
-
-    // HACK: clicking another chip will cause the menu to be closed by ChipMenu.
-    // Deferring this allows a new tag to be set after the close is triggered.
-    setTimeout(() => {
-        store.tagMenu = {
-            tag: tag.tag,
-            ref: chipRef.value,
-            fromSearch,
-        };
-    }, 0);
-}
 </script>
 
 <template>
@@ -68,6 +53,10 @@ function onClick() {
             (deprecated)</span
         >
     </div>
+
+    <DropdownMenu :el="chipRef" v-model:show="showOptions">
+        <ChipMenuOptions @click="showOptions = false" :tag="tag.tag" />
+    </DropdownMenu>
 </template>
 
 <style lang="scss" scoped>

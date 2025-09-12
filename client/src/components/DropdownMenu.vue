@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useDismiss, useViewportSize } from "@/composable";
-import { computed, toValue, useTemplateRef, watch, type MaybeRef } from "vue";
+import { computed, toValue, useTemplateRef, type MaybeRefOrGetter } from "vue";
 
 const container = useTemplateRef("container");
-const props = defineProps<{ el: MaybeRef<HTMLElement | null> }>();
-const show = defineModel("show");
+const props = defineProps<{ el: MaybeRefOrGetter<HTMLElement | null> }>();
+const show = defineModel("show", { required: true });
 
 const viewport = useViewportSize();
 useDismiss(
@@ -66,7 +66,7 @@ const menuPosition = computed(() => {
     margin: 4px 0;
 }
 
-:slotted(.dropdown-option) {
+.dropdown :deep(.dropdown-option) {
     padding: 12px;
     text-align: left;
 
