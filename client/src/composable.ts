@@ -7,23 +7,25 @@ import {
     ref,
     toValue,
     type ComputedRef,
+    type MaybeRef,
     type MaybeRefOrGetter,
     type ShallowRef,
 } from "vue";
 
 export function useDismiss(
-    el: MaybeRefOrGetter<HTMLElement | null>[],
+    el: MaybeRefOrGetter<MaybeRef<HTMLElement | null>[]>,
     onDismiss: () => void,
 ) {
     function handler(e: MouseEvent) {
         const clickedOutside =
-            el.findIndex((v) => {
-                const real = toValue(v);
-                if (real === null) {
+            toValue(el).findIndex((v) => {
+                const child = toValue(v);
+
+                if (!child) {
                     return false;
                 }
 
-                return real.contains(e.target as Node);
+                return child.contains(e.target as Node);
             }) === -1; // Clicked element was not found in any of `el`
 
         if (clickedOutside) {
