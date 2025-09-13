@@ -6,13 +6,15 @@ import ChipMenuOptions from "./ChipMenuOptions.vue";
 import { useRouter } from "vue-router";
 
 const {
-    jiggle = false,
     tag,
     canEdit,
+    jiggle = false,
     showHeart = true,
+    canInteract = true,
 } = defineProps<{
     jiggle?: boolean;
     showHeart?: boolean;
+    canInteract?: boolean;
     tag: TagChip;
     canEdit: boolean;
 }>();
@@ -33,19 +35,33 @@ const cls = computed(() => ({
 }));
 
 const router = useRouter();
-const openInNewTabLink = computed(
-    () =>
-        router.resolve({
-            name: "search",
-            params: { page: 1, query: tag.tag.name },
-        }).path,
-);
+const openInNewTabLink = computed(() => {
+    const negated = tag.style === "strikethrough";
+    let query = tag.tag.name;
+    if (negated) {
+        query = "-" + query;
+    }
+
+    return router.resolve({
+        name: "search",
+        params: { page: 1, query },
+    }).path;
+});
 
 function onClick() {
+    if (!canInteract) {
+        return;
+    }
+
     showOptions.value = !showOptions.value;
 }
 
 function onClickLink(e: MouseEvent) {
+    if (!canInteract) {
+        e.preventDefault();
+        return;
+    }
+
     // Prevent the link from triggering if the user is just clicking it normally.
     // Control clicking or middle clicking will still trigger the link to open
     if (!e.ctrlKey && e.button === 0) {
@@ -79,7 +95,7 @@ onMounted(() => {
         </div>
     </a>
 
-    <DropdownMenu :el="chipRef" v-model:show="showOptions">
+    <DropdownMenu v-if="canInteract" :el="chipRef" v-model:show="showOptions">
         <ChipMenuOptions
             @click="showOptions = false"
             :tag="tag.tag"

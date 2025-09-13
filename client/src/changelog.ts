@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-13",
+        changes: [
+            "added a lot of documentation to the help tab",
+            "add link to tag chips that opens a new tab with the tag as the search query. only triggers if " +
+                "control clicking, middle clicking, or right click > open in new tab",
+        ],
+    },
+    {
         date: "2025-09-12",
         changes: [
             "added favorite tags",
