@@ -28,15 +28,10 @@ function toggleClose() {
     store.saveSettings();
 }
 
-const reminderDisableHD = useNewFeatureIndicator(
-    "remind-disable-hd",
-    new Date("2025-09-03"),
+const newHelpInfo = useNewFeatureIndicator(
+    "new-help-info-0913",
+    new Date("2025-09-17"),
 );
-
-// Don't remind users who already have HD images disabled
-if (!store.settings.highResImages) {
-    reminderDisableHD.onSeen();
-}
 </script>
 
 <template>
@@ -52,20 +47,20 @@ if (!store.settings.highResImages) {
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'help' && !closed }"
-                @click="switchTab('help')"
+                @click="
+                    switchTab('help');
+                    newHelpInfo.onSeen();
+                "
             >
                 help
+                <NewFeature v-if="newHelpInfo.show.value" />
             </button>
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'settings' && !closed }"
-                @click="
-                    switchTab('settings');
-                    reminderDisableHD.onSeen();
-                "
+                @click="switchTab('settings')"
             >
                 settings
-                <NewFeature v-if="reminderDisableHD.show.value" />
             </button>
             <button
                 class="tab-btn"
