@@ -12,6 +12,7 @@ import CodebergLogo from "@/assets/codeberg.svg";
         <a href="https://gelbooru.com" target="_blank">Gelbooru</a> viewer. It's
         simple, fast, and works on desktop and mobile.
     </p>
+    <p>Check the help tab for tips and useful info!</p>
     <ul class="links">
         <li>
             <a href="https://codeberg.org/jessienyan/booruview" target="_blank"
