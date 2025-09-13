@@ -23,6 +23,12 @@ const blueSkyTag = computed<TagChip>(() => {
 </script>
 
 <template>
+    <p>
+        <a href="#search-reference"
+            ><i class="bi bi-arrow-down"></i> Jump to search reference</a
+        >
+    </p>
+
     <h2>shortcuts</h2>
     <ul>
         <li><i class="bi bi-phone"></i> Swipe left or right to change pages</li>
@@ -165,7 +171,7 @@ const blueSkyTag = computed<TagChip>(() => {
         <code>{blue sky ~ sunset}</code> will not work.
     </p>
 
-    <h3>search reference</h3>
+    <h3 id="search-reference">search reference</h3>
     <ul>
         <li>Enter one tag at a time</li>
         <li>Searching without tags shows the most recent posts</li>
