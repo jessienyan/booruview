@@ -3,6 +3,7 @@ import store from "@/store";
 import { computed, onMounted, ref, useTemplateRef } from "vue";
 import DropdownMenu from "../DropdownMenu.vue";
 import ChipMenuOptions from "./ChipMenuOptions.vue";
+import { useRouter } from "vue-router";
 
 const {
     jiggle = false,
@@ -31,8 +32,25 @@ const cls = computed(() => ({
     jiggle: jiggle && !hasJiggled,
 }));
 
+const router = useRouter();
+const openInNewTabLink = computed(
+    () =>
+        router.resolve({
+            name: "search",
+            params: { page: 1, query: tag.tag.name },
+        }).path,
+);
+
 function onClick() {
     showOptions.value = !showOptions.value;
+}
+
+function onClickLink(e: MouseEvent) {
+    // Prevent the link from triggering if the user is just clicking it normally.
+    // Control clicking or middle clicking will still trigger the link to open
+    if (!e.ctrlKey && e.button === 0) {
+        e.preventDefault();
+    }
 }
 
 onMounted(() => {
@@ -45,19 +63,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="chip" :class="cls" ref="chip" @click="onClick">
-        <span class="icons"
-            ><i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i
-            ><i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i
-            ><i
-                class="fav-heart bi bi-heart-fill"
-                v-if="showHeart && isFavorited"
-            ></i></span
-        >{{ tag.tag.name
-        }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
-            (deprecated)</span
-        >
-    </div>
+    <a :href="openInNewTabLink" target="_blank" @click="onClickLink">
+        <div class="chip" :class="cls" ref="chip" @click="onClick">
+            <span class="icons"
+                ><i class="bi bi-check-lg" v-if="tag.style === 'checkmark'"></i
+                ><i class="bi bi-ban" v-if="tag.style === 'blacklist'"></i
+                ><i
+                    class="fav-heart bi bi-heart-fill"
+                    v-if="showHeart && isFavorited"
+                ></i></span
+            >{{ tag.tag.name
+            }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
+                (deprecated)</span
+            >
+        </div>
+    </a>
 
     <DropdownMenu :el="chipRef" v-model:show="showOptions">
         <ChipMenuOptions
