@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-14",
+        changes: ["tweak post API limit"],
+    },
+    {
         date: "2025-09-13",
         changes: [
             "added a lot of documentation to the help tab",
