@@ -10,7 +10,7 @@ import (
 
 const (
 	postApiCostIfCacheHit  = 1
-	postApiCostIfCacheMiss = 15
+	postApiCostIfCacheMiss = 12
 	settingExportApiCost   = 10
 	settingImportApiCost   = 1
 	tagSearchApiCost       = 1
