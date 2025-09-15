@@ -65,7 +65,7 @@ configs:
 
       limits_config:
         max_query_series: 100000
-        retention_period: 365d
+        retention_period: 90d
 
       ###### Below are defaults from container /etc/loki/local-config.yaml ######
       auth_enabled: false
