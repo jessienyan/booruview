@@ -94,9 +94,9 @@ export function useDontShowAgain(id: string) {
     return { show, onHide };
 }
 
-export function useNewFeatureIndicator(id: string, until: Date) {
+export function useNewFeatureIndicator(id: string, until?: Date) {
     // Feature indicator is no longer needed and will never be shown for new visitors
-    if (new Date() > until) {
+    if (until && new Date() > until) {
         const show = ref(false);
         return { show, onSeen: () => {} };
     }
