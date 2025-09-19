@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-19",
+        changes: ["setup cloudflare"],
+    },
+    {
         date: "2025-09-14",
         changes: ["tweak post API limit"],
     },
