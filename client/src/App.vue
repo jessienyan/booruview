@@ -13,7 +13,6 @@ import {
 } from "vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import ContentWarning from "./components/ContentWarning.vue";
-import ChipMenu from "./components/tag-chip/ChipMenuOptions.vue";
 import Toast from "./components/Toast.vue";
 
 const mainContainer = useTemplateRef("main");
