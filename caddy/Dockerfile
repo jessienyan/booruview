@@ -6,7 +6,8 @@ RUN xcaddy build \
 
 
 FROM caddy:2.10-alpine
+ARG caddyfile=Caddyfile
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-COPY caddy/Caddyfile /etc/caddy/Caddyfile
+COPY caddy/${caddyfile} /etc/caddy/Caddyfile
 COPY client/dist/ /srv
