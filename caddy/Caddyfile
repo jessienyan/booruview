@@ -2,9 +2,16 @@
     # Ensure the `ja4h_header` directive gets handled first before
     # other directives (like reverse_proxy)
     order ja4h_header first
+
+    servers {
+        trusted_proxies cloudflare {
+            timeout 15s
+        }
+        trusted_proxies_strict
+    }
 }
 
-:8080 {
+${CADDY_HOST} {
     encode
     request_body {
         max_size 10MB
