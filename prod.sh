@@ -3,8 +3,6 @@
 set -e
 cd ${0%/*}
 
-# tag images as {unixts}-{commit}
-IMG_TAG=$(git show -s --format=%ct-%h master)
 IMG_PREFIX=codeberg.org/jessienyan/booruview
 
 API_IMG=$IMG_PREFIX/api
@@ -34,6 +32,8 @@ get_release_tag() {
     echo $TAG
 }
 
+RELEASE_TAG=$(get_release_tag)
+
 echo ">>> building API image"
 docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
 echo ">>> building valkey image"
@@ -53,23 +53,22 @@ echo ">>> building caddy image"
 docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile .
 
 echo ">>> pushing API image"
-docker tag $API_IMG $API_IMG:$IMG_TAG
+docker tag $API_IMG $API_IMG:$RELEASE_TAG
 docker tag $API_IMG $API_IMG:latest
-docker push --quiet $API_IMG:$IMG_TAG
+docker push --quiet $API_IMG:$RELEASE_TAG
 docker push --quiet $API_IMG:latest
 
 echo ">>> pushing caddy image"
-docker tag $CADDY_IMG $CADDY_IMG:$IMG_TAG
+docker tag $CADDY_IMG $CADDY_IMG:$RELEASE_TAG
 docker tag $CADDY_IMG $CADDY_IMG:latest
-docker push --quiet $CADDY_IMG:$IMG_TAG
+docker push --quiet $CADDY_IMG:$RELEASE_TAG
 docker push --quiet $CADDY_IMG:latest
 
 echo ">>> pushing valkey image"
-docker tag $VALKEY_IMG $VALKEY_IMG:$IMG_TAG
+docker tag $VALKEY_IMG $VALKEY_IMG:$RELEASE_TAG
 docker tag $VALKEY_IMG $VALKEY_IMG:latest
-docker push --quiet $VALKEY_IMG:$IMG_TAG
+docker push --quiet $VALKEY_IMG:$RELEASE_TAG
 docker push --quiet $VALKEY_IMG:latest
 
-RELEASE_TAG=$(get_release_tag)
 git tag "$RELEASE_TAG" && git push --tags
 echo ">>> release tagged as $RELEASE_TAG"
