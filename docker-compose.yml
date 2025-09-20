@@ -23,6 +23,8 @@ services:
       dockerfile: caddy/Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      - "CADDY_HOST=:8080"
     volumes:
       - ./client/dist:/srv:ro   # Live client updates
       - caddy-data:/data
