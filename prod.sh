@@ -50,7 +50,7 @@ docker run --rm \
     $CLIENT_IMG yarn build
 
 echo ">>> building caddy image"
-docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile --build-arg caddyfile=caddy/Caddyfile.prod .
+docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile .
 
 echo ">>> pushing API image"
 docker tag $API_IMG $API_IMG:$RELEASE_TAG

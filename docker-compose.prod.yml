@@ -21,6 +21,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - "CADDY_HOST=booruview.com, www.booruview.com"
     logging: *logging
     volumes:
       - caddy-data:/data
