@@ -11,7 +11,7 @@
     }
 }
 
-${CADDY_HOST} {
+{$CADDY_HOST} {
     encode
     request_body {
         max_size 10MB
