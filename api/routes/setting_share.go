@@ -53,13 +53,13 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if !json.Valid(body) {
-		respondWithBadRequest(w, "must be valid json")
+	if len(body) > settingShareMaxLen {
+		respondWithBadRequest(w, fmt.Sprintf("settings data is too large (max %d bytes)", settingShareMaxLen))
 		return
 	}
 
-	if len(body) > settingShareMaxLen {
-		respondWithBadRequest(w, fmt.Sprintf("settings data is too large (max %d bytes)", settingShareMaxLen))
+	if !json.Valid(body) {
+		respondWithBadRequest(w, "must be valid json")
 		return
 	}
 
