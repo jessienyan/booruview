@@ -49,12 +49,13 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		respondWithInternalError(w, err)
+		respondWithInternalError(w, fmt.Errorf("error reading request body: %w", err))
 		return
 	}
 
 	if !json.Valid(body) {
 		respondWithBadRequest(w, "must be valid json")
+		return
 	}
 
 	if len(body) > settingShareMaxLen {
