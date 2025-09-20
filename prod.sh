@@ -71,5 +71,5 @@ docker push --quiet $VALKEY_IMG:$IMG_TAG
 docker push --quiet $VALKEY_IMG:latest
 
 RELEASE_TAG=$(get_release_tag)
-# git tag "$RELEASE_TAG" && git push --tags
+git tag "$RELEASE_TAG" && git push --tags
 echo ">>> release tagged as $RELEASE_TAG"
