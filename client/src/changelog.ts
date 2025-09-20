@@ -6,7 +6,11 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-09-19",
-        changes: ["setup cloudflare"],
+        changes: [
+            "setup cloudflare",
+            "configure cloudflare as a trusted proxy",
+            "increase settings export size limit to 5MB",
+        ],
     },
     {
         date: "2025-09-14",
