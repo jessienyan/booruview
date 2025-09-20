@@ -6,6 +6,9 @@
 
 {$CADDY_HOST} {
     encode
+    request_body {
+        max_size 10MB
+    }
 
     log stderr-log {
         level INFO
