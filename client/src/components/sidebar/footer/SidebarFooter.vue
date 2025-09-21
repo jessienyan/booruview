@@ -28,9 +28,9 @@ function toggleClose() {
     store.saveSettings();
 }
 
-const newHelpInfo = useNewFeatureIndicator(
-    "new-help-info-0913",
-    new Date("2025-09-17"),
+const donateInfo = useNewFeatureIndicator(
+    "donate-info-0921",
+    new Date("2025-09-24"),
 );
 </script>
 
@@ -40,20 +40,20 @@ const newHelpInfo = useNewFeatureIndicator(
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'about' && !closed }"
-                @click="switchTab('about')"
+                @click="
+                    switchTab('about');
+                    donateInfo.onSeen();
+                "
             >
                 about
+                <NewFeature v-if="donateInfo.show.value" />
             </button>
             <button
                 class="tab-btn"
                 :class="{ active: currentTab === 'help' && !closed }"
-                @click="
-                    switchTab('help');
-                    newHelpInfo.onSeen();
-                "
+                @click="switchTab('help')"
             >
                 help
-                <NewFeature v-if="newHelpInfo.show.value" />
             </button>
             <button
                 class="tab-btn"
