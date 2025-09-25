@@ -48,7 +48,7 @@
     @botscan header "Cf-Worker" *
     abort @botscan
 
-    @longUrl expression {path}.size() > 2000
+    @longUrl expression {path}.size() > 3000
     error @longUrl "URI Too Long" 414
 
     handle_errors {
