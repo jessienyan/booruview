@@ -59,7 +59,9 @@
     handle /api/settings/* {
         ja4h_header
         log_append ja4h {http.request.header.Ja4h}
-        reverse_proxy https://booruview.com
+        reverse_proxy https://booruview.com {
+            header_up Host booruview.com
+        }
     }
 
     handle_path /api/* {
