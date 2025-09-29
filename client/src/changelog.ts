@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-09-29",
+        changes: [
+            "(EXPERIMENTAL) eu.booruview.com 🇩🇪 new server in Germany. you can share your settings between booruview.com and eu.booruview.com",
+        ],
+    },
+    {
         date: "2025-09-19",
         changes: [
             "increase settings export size limit to 5MB",
