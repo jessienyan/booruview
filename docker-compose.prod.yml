@@ -25,8 +25,9 @@ services:
       - "443:443"
     logging: *logging
     volumes:
-      - caddy-data:/data
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./logs/:/var/log/caddy/
+      - caddy-data:/data
 
   db:
     image: codeberg.org/jessienyan/booruview/valkey:latest
