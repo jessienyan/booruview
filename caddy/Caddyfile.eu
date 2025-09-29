@@ -2,11 +2,6 @@
     # Ensure the `ja4h_header` directive gets handled first before
     # other directives (like reverse_proxy)
     order ja4h_header first
-
-    servers {
-        # eu.booruview.com
-        trusted_proxies static 91.98.44.44 2a01:4f8:c012:b465::1/64
-    }
 }
 
 {$CADDY_HOST} {
@@ -58,6 +53,13 @@
 
     handle_errors {
         respond "{err.status_code} {err.status_text}"
+    }
+
+    # Forward setting import/export to the US server so they are shared, e.g. export from booruview.com and import at eu.booruview.com
+    handle /api/settings/* {
+        ja4h_header
+        log_append ja4h {http.request.header.Ja4h}
+        reverse_proxy https://booruview.com
     }
 
     handle_path /api/* {
