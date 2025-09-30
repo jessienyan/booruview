@@ -2,7 +2,7 @@
 import store from "@/store";
 import NoResults from "@/components/NoResults.vue";
 import Footer from "@/components/Footer.vue";
-import PageChangeGesture from "@/PageChangeGesture.vue";
+import PageSwipeArrow from "@/PageSwipeArrow.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
 import { onMounted } from "vue";
@@ -14,7 +14,7 @@ onMounted(() => mainContainer.value.focus());
 
 <template>
     <LoadingResults v-if="store.fetchingPosts" />
-    <PageChangeGesture :scroll-container="mainContainer" />
+    <PageSwipeArrow :scroll-container="mainContainer" />
     <NoResults v-if="store.totalPostCount === 0 && store.hasSearched">
         no results :(
     </NoResults>

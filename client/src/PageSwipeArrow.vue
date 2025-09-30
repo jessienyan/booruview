@@ -87,7 +87,7 @@ onUnmounted(() => swipe.destroy());
 </script>
 
 <template>
-    <div class="page-gesture-container">
+    <div class="page-swipe-container">
         <div class="swipe swipe-left" v-if="swipeDirection === 'LEFT'">
             <i class="bi bi-arrow-left"></i>
         </div>
@@ -100,7 +100,7 @@ onUnmounted(() => swipe.destroy());
 <style lang="scss" scoped>
 @import "@/assets/colors";
 
-.page-gesture-container {
+.page-swipe-container {
     position: fixed;
     top: 0;
     bottom: 0;
