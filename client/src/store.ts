@@ -299,6 +299,10 @@ const store = reactive<Store>({
                     }
 
                     resp.json().then((json: PostListResponse) => {
+                        if(!sameQuery) {
+                            this.posts.clear();
+                        }
+
                         this.posts.set(page!, json.results);
                         this.resultsPerPage = json.count_per_page;
                         this.totalPostCount = json.total_count;
