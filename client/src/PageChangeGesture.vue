@@ -68,14 +68,16 @@ onMounted(() => {
         onSwiped() {
             switch (swipeDirection.value) {
                 case "LEFT":
-                    store.prevPage();
+                    store
+                        .prevPage()
+                        .finally(() => (swipeDirection.value = null));
                     break;
                 case "RIGHT":
-                    store.nextPage();
+                    store
+                        .nextPage()
+                        .finally(() => (swipeDirection.value = null));
                     break;
             }
-
-            swipeDirection.value = null;
         },
     });
     swipe.init();
@@ -110,7 +112,7 @@ onUnmounted(() => swipe.destroy());
     font-size: 36px;
     border-radius: 100%;
     filter: drop-shadow(0 0 10px black);
-    opacity: 0.8;
+    opacity: 0.9;
 
     user-select: none;
     pointer-events: none;
@@ -137,12 +139,12 @@ onUnmounted(() => swipe.destroy());
 }
 
 .swipe-left {
-    animation: slide-from-left 300ms cubic-bezier(0, 1, 0.25, 1) 1;
+    animation: slide-from-left 200ms cubic-bezier(0, 1, 0.25, 1) 1;
     left: 0;
 }
 
 .swipe-right {
-    animation: slide-from-right 300ms cubic-bezier(0, 1, 0.25, 1) 1;
+    animation: slide-from-right 200ms cubic-bezier(0, 1, 0.25, 1) 1;
     right: 0;
 }
 </style>
