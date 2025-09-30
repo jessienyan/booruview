@@ -30,22 +30,40 @@ const blueSkyTag = computed<TagChip>(() => {
     </p>
 
     <h2>shortcuts</h2>
+    <p><b>browsing posts</b></p>
     <ul>
         <li><i class="bi bi-phone"></i> Swipe left or right to change pages</li>
-        <li><i class="bi bi-phone"></i> Pinch and zoom when viewing a post</li>
         <li>
-            <i class="bi bi-display"></i> <code>Tab</code> when looking up a tag
-            to autofill
+            <i class="bi bi-display"></i> <code>←</code> or <code>→</code> to
+            change pages
         </li>
         <li>
-            <i class="bi bi-display"></i> <code>Up</code> or
-            <code>Down</code> to select a tag suggestion
+            <i class="bi bi-display"></i> <code>home</code> or
+            <code>end</code> to jump to top/bottom
+        </li>
+    </ul>
+
+    <p><b>fullscreen view</b></p>
+    <ul>
+        <li><i class="bi bi-phone"></i> drag to pan, pinch to zoom</li>
+        <li><i class="bi bi-display"></i> drag to pan, scroll to zoom</li>
+        <li>
+            <i class="bi bi-display"></i> <code>←</code> or <code>→</code> to
+            change posts
+        </li>
+        <li><i class="bi bi-display"></i> <code>f</code> to favorite</li>
+    </ul>
+
+    <p><b>searching tags</b></p>
+    <ul>
+        <li>
+            <i class="bi bi-display"></i> <code>tab</code> to use first (or
+            selected) suggestion
         </li>
         <li>
-            <i class="bi bi-display"></i> <code>Left</code> or
-            <code>Right</code> to change posts
+            <i class="bi bi-display"></i> <code>↑</code> or <code>↓</code> to
+            select autocomplete suggestion
         </li>
-        <li><i class="bi bi-display"></i> <code>F</code> to favorite a post</li>
     </ul>
 
     <h2>tips</h2>
