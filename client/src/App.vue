@@ -69,7 +69,8 @@ const hasConsented = computed(() => {
             tabindex="-1"
             :class="{
                 'prevent-pull-to-refresh': store.userIsSwipingToChangePage,
-                'hide-overflow': store.fetchingPosts,
+                'hide-overflow':
+                    store.fetchingPosts || store.userIsSwipingToChangePage,
             }"
         >
             <RouterView />
