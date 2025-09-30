@@ -8,6 +8,9 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-09-29",
         changes: [
             "(EXPERIMENTAL) eu.booruview.com 🇩🇪 new server in Germany. you can share your settings between booruview.com and eu.booruview.com",
+            'fixed posts getting "stuck" and not resetting when doing a new search',
+            "added keyboard shortcut for changing pages (left arrow / right arrow)",
+            "fixed the arrow graphic not appearing when swiping left/right",
         ],
     },
     {
