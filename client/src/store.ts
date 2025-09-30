@@ -299,7 +299,7 @@ const store = reactive<Store>({
                     }
 
                     resp.json().then((json: PostListResponse) => {
-                        if(!sameQuery) {
+                        if (!sameQuery) {
                             this.posts.clear();
                         }
 
