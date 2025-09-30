@@ -87,35 +87,42 @@ onUnmounted(() => swipe.destroy());
 </script>
 
 <template>
-    <div class="swipe swipe-left" v-if="swipeDirection === 'LEFT'">
-        <i class="bi bi-arrow-left"></i>
-    </div>
-    <div class="swipe swipe-right" v-if="swipeDirection === 'RIGHT'">
-        <i class="bi bi-arrow-right"></i>
+    <div class="page-gesture-container">
+        <div class="swipe swipe-left" v-if="swipeDirection === 'LEFT'">
+            <i class="bi bi-arrow-left"></i>
+        </div>
+        <div class="swipe swipe-right" v-if="swipeDirection === 'RIGHT'">
+            <i class="bi bi-arrow-right"></i>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/colors";
 
+.page-gesture-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
 .swipe {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1;
-
-    padding: 20px;
-    margin: 20px;
-
-    background-color: $color-primary;
-    color: $color-primary-light;
+    padding: 15px;
+    margin: 0 20px;
+    background-color: $color-primary-light;
+    color: $color-primary;
     font-size: 36px;
+    line-height: 0;
     border-radius: 100%;
     filter: drop-shadow(0 0 10px black);
     opacity: 0.9;
-
-    user-select: none;
-    pointer-events: none;
 }
 
 @keyframes slide-from-left {
