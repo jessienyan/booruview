@@ -5,3 +5,4 @@ client/dist
 logs
 node_modules
 grafana.sh
+deploy.sh
