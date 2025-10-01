@@ -27,7 +27,10 @@ func cleanTag(tag string) string {
 	}
 
 	tag = strings.ToLower(tag)
-	tag = strings.ReplaceAll(tag, " ", "_")
+
+	if tag[0] != '{' {
+		tag = strings.ReplaceAll(tag, " ", "_")
+	}
 
 	return tag
 }

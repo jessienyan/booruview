@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-10-01",
+        changes: ["fixed OR search not working"],
+    },
+    {
         date: "2025-09-29",
         changes: [
             "(EXPERIMENTAL) eu.booruview.com 🇩🇪 new server in Germany. you can share your settings between booruview.com and eu.booruview.com",
