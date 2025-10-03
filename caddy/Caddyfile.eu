@@ -54,15 +54,6 @@
         respond "{err.status_code} {err.status_text}"
     }
 
-    # Forward setting import/export to the US server so they are shared, e.g. export from booruview.com and import at eu.booruview.com
-    handle /api/settings/* {
-        ja4h_header
-        log_append ja4h {http.request.header.Ja4h}
-        reverse_proxy https://booruview.com {
-            header_up Host booruview.com
-        }
-    }
-
     handle_path /api/* {
         ja4h_header
         log_append ja4h {http.request.header.Ja4h}
@@ -70,6 +61,13 @@
             db_path /etc/caddy/GeoLite2-Country.mmdb
         }
         log_append country {geoip.country_code}
+
+        # Forward setting import/export to the US server so they are shared
+        # e.g. export from booruview.com and import at eu.booruview.com
+        reverse_proxy /api/settings/* {
+            to https://booruview.com
+            header_up Host booruview.com
+        }
         reverse_proxy http://api:8000
     }
 
