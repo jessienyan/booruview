@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-10-03",
+        changes: [
+            "added country code to caddy logs to help determine where to host server",
+        ],
+    },
+    {
         date: "2025-10-01",
         changes: ["fixed OR search not working"],
     },
