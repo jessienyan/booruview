@@ -108,7 +108,7 @@ const content = computed(() => {
         :src="content.url"
         :width="content.width"
         :height="content.height"
-        :key="`img-${post.id}"
+        :key="`img-${post.id}`"
     />
 </template>
 
