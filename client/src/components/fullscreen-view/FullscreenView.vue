@@ -68,18 +68,25 @@ function close() {
 }
 
 function onKeyDown(e: KeyboardEvent) {
+    let caught = false;
+
     if (e.key === "Esc" || e.key === "Escape") {
-        e.preventDefault();
+        caught = true;
         close();
     } else if (e.key === "ArrowLeft" || e.key.toUpperCase() === "A") {
-        e.preventDefault();
+        caught = true;
         showPrevPost();
     } else if (e.key === "ArrowRight" || e.key.toUpperCase() === "D") {
-        e.preventDefault();
+        caught = true;
         showNextPost();
     } else if (e.key.toUpperCase() === "F") {
-        e.preventDefault();
+        caught = true;
         toggleFavorite();
+    }
+
+    if (caught) {
+        e.preventDefault();
+        e.stopPropagation();
     }
 }
 
