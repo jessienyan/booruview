@@ -86,11 +86,12 @@ onUnmounted(() => {
         ref="container"
     >
         <img
+            v-if="showImage"
             class="content"
+            referrerpolicy="no-referrer"
             :src="content.url"
             :width="content.width"
             :height="content.height"
-            v-if="showImage"
         />
 
         <div class="icons" v-if="favorited || cropped">

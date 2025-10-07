@@ -102,11 +102,12 @@ const content = computed(() => {
     <!-- Using a key on the image prevents it from stretching when changing between posts -->
     <img
         v-else
+        ref="imgRef"
+        referrerpolicy="no-referrer"
         :src="content.url"
         :width="content.width"
         :height="content.height"
         :key="post.id"
-        ref="imgRef"
     />
 </template>
 
