@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-10-07",
+        changes: [
+            "fix images not loading on some mobile browsers",
+            "fix videos not changing when viewing in fullscreen and changing to prev/next post",
+        ],
+    },
+    {
         date: "2025-10-03",
         changes: [
             "added country code to caddy logs to help determine where to host server",
