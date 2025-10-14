@@ -3,12 +3,14 @@ import store, {
     type ColumnSizing,
     type FullscreenViewMenuAnchorPoint,
 } from "@/store";
-import { ref, useTemplateRef, watch } from "vue";
+import { computed, ref, useTemplateRef, watch } from "vue";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
     fixed: "fixed",
 };
+
+const MAX_POST_HEIGHT = 1500;
 
 const fullscreenViewMenuAnchorOptions: Record<
     FullscreenViewMenuAnchorPoint,
@@ -37,6 +39,18 @@ function onChangeColSizing(e: Event) {
 
 function onChangeColWidth(e: Event) {
     store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value);
+    store.saveSettings();
+}
+
+function onChangePostHeight(e: Event) {
+    const $el = e.target as HTMLInputElement;
+
+    if ($el.value === $el.max) {
+        store.settings.maxPostHeight = null;
+    } else {
+        store.settings.maxPostHeight = parseInt($el.value);
+    }
+
     store.saveSettings();
 }
 
@@ -283,6 +297,25 @@ function importData() {
                     @input="onChangeColWidth"
                 />
                 <span class="value">{{ store.settings.columnWidth }}px</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>max post height</label>
+            <div class="input">
+                <input
+                    type="range"
+                    min="100"
+                    :max="MAX_POST_HEIGHT"
+                    step="50"
+                    :value="store.settings.maxPostHeight ?? MAX_POST_HEIGHT"
+                    @input="onChangePostHeight"
+                />
+                <span class="value">{{
+                    store.settings.maxPostHeight != null
+                        ? `${store.settings.maxPostHeight}px`
+                        : "none"
+                }}</span>
             </div>
         </div>
 

@@ -57,6 +57,7 @@ type Store = {
         muteVideo: boolean;
         queryHistory: SearchHistory[];
         sidebarTabsHidden: boolean;
+        maxPostHeight: number | null;
     };
 
     loadSettings(): void;
@@ -123,6 +124,7 @@ const store = reactive<Store>({
         muteVideo: true,
         queryHistory: [],
         sidebarTabsHidden: false,
+        maxPostHeight: 600,
     },
 
     loadSettings() {
