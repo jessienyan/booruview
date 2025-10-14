@@ -21,7 +21,7 @@ const { scrollContainer, posts } = defineProps<{
 const container = useTemplateRef("container");
 const containerWidth = ref(0);
 
-const maxPostHeight = 600;
+const maxPostHeight = computed(() => store.settings.maxPostHeight ?? 99999);
 const colGap = 5;
 const postGap = 5;
 
@@ -75,11 +75,11 @@ const croppedPosts = computed<CroppedPost[]>(() => {
     return posts.map<CroppedPost>((p) => {
         const zoom = columnWidth / p.width;
         const renderHeight = p.height * zoom;
-        const cropped = renderHeight > maxPostHeight;
+        const cropped = renderHeight > maxPostHeight.value;
         return {
             post: p,
             cropped,
-            renderHeight: cropped ? maxPostHeight : renderHeight,
+            renderHeight: cropped ? maxPostHeight.value : renderHeight,
         };
     });
 });
