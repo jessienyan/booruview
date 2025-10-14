@@ -8,6 +8,7 @@ import {
     toValue,
     type ComputedRef,
     type MaybeRefOrGetter,
+    type Ref,
     type ShallowRef,
 } from "vue";
 
@@ -94,15 +95,24 @@ export function useDontShowAgain(id: string) {
     return { show, onHide };
 }
 
-export function useNewFeatureIndicator(id: string, until?: Date) {
+interface FeatureIndicator {
+    expired: boolean;
+    show: Ref<boolean>;
+    onSeen: () => void;
+}
+
+export function useNewFeatureIndicator(
+    id: string,
+    until?: Date,
+): FeatureIndicator {
     // Feature indicator is no longer needed and will never be shown for new visitors
     if (until && new Date() > until) {
         const show = ref(false);
-        return { show, onSeen: () => {} };
+        return { expired: true, show, onSeen: () => {} };
     }
 
     const { show, onHide: onSeen } = useDontShowAgain("feat-" + id);
-    return { show, onSeen };
+    return { expired: false, show, onSeen };
 }
 
 const now = ref(new Date());

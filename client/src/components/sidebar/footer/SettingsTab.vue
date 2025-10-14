@@ -3,14 +3,14 @@ import store, {
     type ColumnSizing,
     type FullscreenViewMenuAnchorPoint,
 } from "@/store";
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { ref, useTemplateRef, watch } from "vue";
+import NewFeature from "@/components/NewFeature.vue";
+import indicators from "@/indicators";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
     fixed: "fixed",
 };
-
-const MAX_POST_HEIGHT = 1500;
 
 const fullscreenViewMenuAnchorOptions: Record<
     FullscreenViewMenuAnchorPoint,
@@ -41,6 +41,8 @@ function onChangeColWidth(e: Event) {
     store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value);
     store.saveSettings();
 }
+
+const MAX_POST_HEIGHT = 1500;
 
 function onChangePostHeight(e: Event) {
     const $el = e.target as HTMLInputElement;
@@ -210,11 +212,6 @@ function importData() {
 
         <h3>content</h3>
 
-        <p class="text-pink">
-            Gelbooru's CDN has been slow lately. If fullscreen images are taking
-            a while to load, uncheck this <i class="bi bi-arrow-down"></i>
-        </p>
-
         <div class="input-group">
             <label>
                 <input
@@ -301,7 +298,10 @@ function importData() {
         </div>
 
         <div class="input-group">
-            <label>max post height</label>
+            <label
+                >max post height
+                <NewFeature v-if="!indicators.maxPostHeight.expired"
+            /></label>
             <div class="input">
                 <input
                     type="range"

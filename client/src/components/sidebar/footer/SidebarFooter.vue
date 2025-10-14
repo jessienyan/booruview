@@ -5,73 +5,81 @@ import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
 import BlacklistTab from "./BlacklistTab.vue";
-import { useNewFeatureIndicator } from "@/composable";
+import indicators from "@/indicators";
 import NewFeature from "@/components/NewFeature.vue";
 
 type Tab = "about" | "help" | "settings" | "blacklist";
 const currentTab = ref<Tab>("about");
 
-// CBA writing the full setting each time
-const closed = computed({
-    get: () => store.settings.sidebarTabsHidden,
-    set: (val: boolean) => (store.settings.sidebarTabsHidden = val),
-});
-
 function switchTab(tab: Tab) {
     currentTab.value = tab;
-    closed.value = false;
+    store.settings.sidebarTabsHidden = false;
     store.saveSettings();
 }
 
 function toggleClose() {
-    closed.value = !closed.value;
+    store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
     store.saveSettings();
 }
-
-const donateInfo = useNewFeatureIndicator(
-    "donate-info-0921",
-    new Date("2025-09-24"),
-);
 </script>
 
 <template>
-    <div class="tab-container" :class="{ closed }">
+    <div
+        class="tab-container"
+        :class="{ closed: store.settings.sidebarTabsHidden }"
+    >
         <header class="tabs">
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'about' && !closed }"
-                @click="
-                    switchTab('about');
-                    donateInfo.onSeen();
-                "
+                :class="{
+                    active:
+                        currentTab === 'about' &&
+                        !store.settings.sidebarTabsHidden,
+                }"
+                @click="switchTab('about')"
             >
                 about
-                <NewFeature v-if="donateInfo.show.value" />
             </button>
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'help' && !closed }"
+                :class="{
+                    active:
+                        currentTab === 'help' &&
+                        !store.settings.sidebarTabsHidden,
+                }"
                 @click="switchTab('help')"
             >
                 help
             </button>
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'settings' && !closed }"
-                @click="switchTab('settings')"
+                :class="{
+                    active:
+                        currentTab === 'settings' &&
+                        !store.settings.sidebarTabsHidden,
+                }"
+                @click="
+                    switchTab('settings');
+                    indicators.maxPostHeight.onSeen();
+                "
             >
                 settings
+                <NewFeature v-if="indicators.maxPostHeight.show.value" />
             </button>
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'blacklist' && !closed }"
+                :class="{
+                    active:
+                        currentTab === 'blacklist' &&
+                        !store.settings.sidebarTabsHidden,
+                }"
                 @click="switchTab('blacklist')"
             >
                 blacklist
             </button>
 
             <button
-                v-if="!closed"
+                v-if="!store.settings.sidebarTabsHidden"
                 class="tab-btn close-btn"
                 @click="toggleClose"
             >
@@ -79,7 +87,10 @@ const donateInfo = useNewFeatureIndicator(
             </button>
         </header>
 
-        <div class="tab-content-container" v-if="!closed">
+        <div
+            class="tab-content-container"
+            v-if="!store.settings.sidebarTabsHidden"
+        >
             <div class="tab-content">
                 <KeepAlive>
                     <HelpTab v-if="currentTab === 'help'" />
@@ -98,7 +109,7 @@ const donateInfo = useNewFeatureIndicator(
     flex-direction: column;
     min-height: 0;
 
-    &:not(.closed) {
+    &:not(.store.settings.sidebarTabsHidden) {
         .tabs {
             border-bottom: 1px solid #555;
         }
