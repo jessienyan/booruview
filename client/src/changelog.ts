@@ -8,6 +8,7 @@ export const changeLog: ChangeLogEntry[] = [
         date: "2025-10-20",
         changes: [
             "fixed extra hyphens being added to raw excluded tags",
+            "added a default opt-in nsfw blacklist",
         ],
     },
     {
