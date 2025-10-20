@@ -4,6 +4,8 @@ import ScreenCover from "./ScreenCover.vue";
 import store from "@/store";
 import { useRoute, useRouter } from "vue-router";
 
+const view = ref<"initial" | "nsfw-blacklist">("initial");
+
 const timeRemaining = ref(3);
 const router = useRouter();
 const route = useRoute();
@@ -41,26 +43,24 @@ function consent() {
 
 function consentSFW() {
     store.settings.blacklist = store.settings.blacklist.concat([
-        {
-            name: "rating:explicit",
-            type: "unknown",
-            count: 0,
-        },
-        {
-            name: "rating:questionable",
-            type: "unknown",
-            count: 0,
-        },
-        {
-            name: "rating:sensitive",
-            type: "unknown",
-            count: 0,
-        },
+        { name: "rating:explicit", type: "unknown", count: 0 },
+        { name: "rating:questionable", type: "unknown", count: 0 },
+        { name: "rating:sensitive", type: "unknown", count: 0 },
     ]);
     consent();
 }
 
-function consentNSFW() {
+function consentNSFWWithBlacklist() {
+    store.settings.blacklist = store.settings.blacklist.concat([
+        { name: "all_the_way_through", type: "tag", count: 0 },
+        { name: "guro", type: "tag", count: 0 },
+        { name: "loli", type: "tag", count: 0 },
+        { name: "rape", type: "tag", count: 0 },
+        { name: "scat", type: "tag", count: 0 },
+        { name: "shota", type: "tag", count: 0 },
+        { name: "torture", type: "tag", count: 0 },
+        { name: "vomit", type: "tag", count: 0 },
+    ]);
     consent();
 }
 </script>
@@ -68,7 +68,7 @@ function consentNSFW() {
 <template>
     <ScreenCover blackout />
     <div class="cw-container">
-        <div class="content-warning">
+        <div v-if="view === 'initial'" class="content-warning">
             <p>
                 Booruview is an image browser for Gelbooru, an image board that
                 hosts
@@ -80,18 +80,42 @@ function consentNSFW() {
             </p>
             <p class="btn-container">
                 <button
-                    class="btn-consent btn-sfw"
+                    class="btn-consent btn-green"
                     :disabled="timeRemaining > 0"
                     @click="consentSFW"
                 >
                     only view SFW content
                 </button>
                 <button
-                    class="btn-consent btn-nsfw"
+                    class="btn-consent btn-red"
                     :disabled="timeRemaining > 0"
-                    @click="consentNSFW"
+                    @click="view = 'nsfw-blacklist'"
                 >
                     view all content (18+)
+                </button>
+            </p>
+        </div>
+
+        <div v-else-if="view === 'nsfw-blacklist'" class="content-warning">
+            <p>Some content is considered controversial or extreme.</p>
+            <p>
+                Do you want to use the default blacklist? You can always edit
+                your blacklist later.
+            </p>
+            <p class="btn-container">
+                <button
+                    class="btn-consent btn-green"
+                    :disabled="timeRemaining > 0"
+                    @click="consentNSFWWithBlacklist"
+                >
+                    yes, use default blacklist
+                </button>
+                <button
+                    class="btn-consent btn-red"
+                    :disabled="timeRemaining > 0"
+                    @click="consent"
+                >
+                    no, don't filter anything
                 </button>
             </p>
         </div>
@@ -101,11 +125,11 @@ function consentNSFW() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
-.btn-sfw {
+.btn-green {
     background-color: #70e570;
 }
 
-.btn-nsfw {
+.btn-red {
     background-color: #830b0b;
     color: white;
 }
