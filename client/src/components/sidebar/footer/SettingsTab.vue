@@ -4,8 +4,6 @@ import store, {
     type FullscreenViewMenuAnchorPoint,
 } from "@/store";
 import { ref, useTemplateRef, watch } from "vue";
-import NewFeature from "@/components/NewFeature.vue";
-import indicators from "@/indicators";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
@@ -300,8 +298,7 @@ function importData() {
         <div class="input-group">
             <label
                 >max post height
-                <NewFeature v-if="!indicators.maxPostHeight.expired"
-            /></label>
+                </label>
             <div class="input">
                 <input
                     type="range"
