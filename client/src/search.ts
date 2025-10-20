@@ -122,7 +122,7 @@ export function tagsToSearchQuery(
                     if (tag === undefined) {
                         tag = {
                             count: 0,
-                            name: name,
+                            name: name.replace(/^\-+/, ""),
                             type: "unknown",
                         };
                     }
