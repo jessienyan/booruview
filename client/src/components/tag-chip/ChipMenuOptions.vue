@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import store from "@/store";
+import type { ChipActions } from "@/types";
 import { computed, ref } from "vue";
 
 const showBlacklistConfirm = ref(false);
-const { onClick, tag, canEdit } = defineProps<{
+const {
+    onClick,
+    tag,
+    actions: actionProps = {},
+} = defineProps<{
     onClick: () => void;
     tag: Tag;
-    canEdit: boolean;
+    actions?: ChipActions;
 }>();
+
+const actions = computed(() => ({
+    edit: actionProps.edit ?? false,
+    blacklist: actionProps.blacklist ?? true,
+    includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
+    favorite: actionProps.favorite ?? true,
+}));
 
 const isBlacklisted = computed(() => {
     const name = tag.name;
@@ -89,42 +101,53 @@ function onWhitelist() {
 <template>
     <button
         class="dropdown-option btn-primary"
-        v-if="canEdit && (isExcluded || isIncluded)"
+        v-if="actions.edit && (isExcluded || isIncluded)"
         @click="onEdit"
     >
         <i class="bi bi-pencil"></i> edit
     </button>
     <button
         class="dropdown-option btn-primary"
-        v-if="!isBlacklisted && (isExcluded || !isIncluded)"
+        v-if="
+            actions.includeExcludeRemove &&
+            !isBlacklisted &&
+            (isExcluded || !isIncluded)
+        "
         @click="onAdd"
     >
         <i class="bi bi-plus-lg"></i> include
     </button>
     <button
         class="dropdown-option btn-primary"
-        v-if="!isBlacklisted && (!isExcluded || isIncluded)"
+        v-if="
+            actions.includeExcludeRemove &&
+            !isBlacklisted &&
+            (!isExcluded || isIncluded)
+        "
         @click="onExclude"
     >
         <i class="bi bi-dash-lg"></i> exclude
     </button>
     <button
         class="dropdown-option btn-primary"
-        v-if="(!isBlacklisted && isExcluded) || isIncluded"
+        v-if="
+            (actions.includeExcludeRemove && !isBlacklisted && isExcluded) ||
+            isIncluded
+        "
         @click="onRemove"
     >
         <i class="bi bi-x-lg"></i> remove
     </button>
     <button
         class="dropdown-option btn-primary"
-        v-if="!isBlacklisted && !isFavorited"
+        v-if="actions.favorite && !isBlacklisted && !isFavorited"
         @click="onFavorite"
     >
         <i class="bi bi-heart"></i> favorite
     </button>
     <button
         class="dropdown-option btn-primary"
-        v-if="!isBlacklisted && isFavorited"
+        v-if="actions.favorite && !isBlacklisted && isFavorited"
         @click="onUnfavorite"
     >
         <i class="bi bi-heart-fill"></i> unfavorite
@@ -137,7 +160,7 @@ function onWhitelist() {
         -->
     <button
         class="dropdown-option btn-primary blacklist"
-        v-show="!isBlacklisted && !showBlacklistConfirm"
+        v-show="actions.blacklist && !isBlacklisted && !showBlacklistConfirm"
         @click="onBlacklist"
     >
         <i class="bi bi-ban"></i> blacklist
@@ -151,7 +174,7 @@ function onWhitelist() {
     </button>
     <button
         class="dropdown-option btn-primary rounded"
-        v-if="isBlacklisted"
+        v-if="actions.blacklist && isBlacklisted"
         @click="onWhitelist"
     >
         <i class="bi bi-x-lg"></i> remove from blacklist

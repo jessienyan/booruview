@@ -64,7 +64,7 @@ const styledTags = computed(() =>
 
 <template>
     <div class="tag-list" :style="containerStyle">
-        <TagList :jiggle="false" :tags="styledTags" :can-edit="false" />
+        <TagList :jiggle="false" :tags="styledTags" />
     </div>
 </template>
 

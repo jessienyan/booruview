@@ -50,10 +50,7 @@ function onSearch(query: SearchQuery) {
             :key="entry.date.getTime()"
         >
             <div class="tag-list">
-                <TagList
-                    :tags="styledTags(entry.query).value"
-                    :can-edit="false"
-                />
+                <TagList :tags="styledTags(entry.query).value" />
             </div>
             <div class="entry-footer">
                 <button

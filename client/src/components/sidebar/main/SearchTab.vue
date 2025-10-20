@@ -79,7 +79,11 @@ const styledTags = computed(() => {
         />
 
         <div v-if="styledTags.length" class="taglist-container">
-            <TagList :jiggle="true" :tags="styledTags" :can-edit="true" />
+            <TagList
+                :jiggle="true"
+                :tags="styledTags"
+                :actions="{ edit: true }"
+            />
             <ClearTagsButton />
         </div>
     </div>

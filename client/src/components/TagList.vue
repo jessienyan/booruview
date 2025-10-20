@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Chip from "./tag-chip/Chip.vue";
+import type { ChipActions } from "@/types";
 
 type listCategories = Record<TagType, TagChip[]>;
 
 const {
     jiggle = false,
     tags = [],
-    canEdit,
+    actions,
 } = defineProps<{
     jiggle?: boolean;
     tags: TagChip[];
-    canEdit: boolean;
+    actions?: ChipActions;
 }>();
 
 // TODO: accept type prop and pass to chips
@@ -57,7 +58,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>
@@ -70,7 +71,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>
@@ -83,7 +84,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>
@@ -96,7 +97,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>
@@ -109,7 +110,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>
@@ -122,7 +123,7 @@ const categories = computed(() => {
                 :key="tag.tag.name"
                 :tag="tag"
                 :jiggle="jiggle"
-                :can-edit="canEdit"
+                :actions="actions"
             />
         </div>
     </template>

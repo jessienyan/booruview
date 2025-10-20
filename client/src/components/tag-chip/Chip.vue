@@ -4,20 +4,20 @@ import { computed, onMounted, ref, useTemplateRef } from "vue";
 import DropdownMenu from "../DropdownMenu.vue";
 import ChipMenuOptions from "./ChipMenuOptions.vue";
 import { useRouter } from "vue-router";
+import type { ChipActions } from "@/types";
 
 const {
     tag,
-    canEdit,
+    actions = {},
     jiggle = false,
     showHeart = true,
-    canInteract = true,
 } = defineProps<{
     jiggle?: boolean;
     showHeart?: boolean;
-    canInteract?: boolean;
     tag: TagChip;
-    canEdit: boolean;
+    actions?: ChipActions;
 }>();
+
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
 const isFavorited = computed(
@@ -49,7 +49,7 @@ const openInNewTabLink = computed(() => {
 });
 
 function onClick() {
-    if (!canInteract) {
+    if (actions.static) {
         return;
     }
 
@@ -57,7 +57,7 @@ function onClick() {
 }
 
 function onClickLink(e: MouseEvent) {
-    if (!canInteract) {
+    if (actions.static) {
         e.preventDefault();
         return;
     }
@@ -95,11 +95,15 @@ onMounted(() => {
         </div>
     </a>
 
-    <DropdownMenu v-if="canInteract" :el="chipRef" v-model:show="showOptions">
+    <DropdownMenu
+        v-if="!actions.static"
+        :el="chipRef"
+        v-model:show="showOptions"
+    >
         <ChipMenuOptions
             @click="showOptions = false"
             :tag="tag.tag"
-            :can-edit="canEdit"
+            :actions="actions"
         />
     </DropdownMenu>
 </template>

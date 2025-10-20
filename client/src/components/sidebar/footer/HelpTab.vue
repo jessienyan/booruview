@@ -99,7 +99,7 @@ const blueSkyTag = computed<TagChip>(() => {
         it:
     </p>
     <p>
-        <Chip :can-edit="false" :show-heart="false" :tag="blueSkyTag" />
+        <Chip :show-heart="false" :tag="blueSkyTag" />
     </p>
     <p>
         You can look up tags by typing them into the search box. Be sure to
@@ -138,16 +138,14 @@ const blueSkyTag = computed<TagChip>(() => {
     <p>Your search query should look like this:</p>
     <p>
         <Chip
-            :can-interact="false"
-            :can-edit="false"
+            :actions="{ static: true }"
             :tag="{
                 style: 'default',
                 tag: { count: 0, name: '1girl', type: 'tag' },
             }"
         />
         <Chip
-            :can-interact="false"
-            :can-edit="false"
+            :actions="{ static: true }"
             :tag="{
                 style: 'strikethrough',
                 tag: { count: 0, name: 'sunglasses', type: 'tag' },
@@ -157,8 +155,7 @@ const blueSkyTag = computed<TagChip>(() => {
     <p>Not this (blue tags are "raw"):</p>
     <p>
         <Chip
-            :can-interact="false"
-            :can-edit="false"
+            :actions="{ static: true }"
             :tag="{
                 style: 'default',
                 tag: { count: 0, name: '1girl -sunglasses', type: 'unknown' },
@@ -175,8 +172,7 @@ const blueSkyTag = computed<TagChip>(() => {
     <p>In Booruview it is the same:</p>
     <p>
         <Chip
-            :can-interact="false"
-            :can-edit="false"
+            :actions="{ static: true }"
             :tag="{
                 style: 'default',
                 tag: { count: 0, name: '{blue_sky ~ sunset}', type: 'unknown' },

@@ -67,12 +67,7 @@ const tags = computed<TagChip[]>(() => {
     </button>
     <DropdownMenu :el="favoritesBtn" v-model:show="showFavorites">
         <div class="fav-tags">
-            <Chip
-                v-for="t of tags"
-                :tag="t"
-                :can-edit="false"
-                :show-heart="false"
-            />
+            <Chip v-for="t of tags" :tag="t" :show-heart="false" />
         </div>
     </DropdownMenu>
 </template>
