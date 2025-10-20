@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import AboutTab from "./AboutTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
@@ -58,13 +58,9 @@ function toggleClose() {
                         currentTab === 'settings' &&
                         !store.settings.sidebarTabsHidden,
                 }"
-                @click="
-                    switchTab('settings');
-                    indicators.maxPostHeight.onSeen();
-                "
+                @click="switchTab('settings')"
             >
                 settings
-                <NewFeature v-if="indicators.maxPostHeight.show.value" />
             </button>
             <button
                 class="tab-btn"
@@ -73,9 +69,13 @@ function toggleClose() {
                         currentTab === 'blacklist' &&
                         !store.settings.sidebarTabsHidden,
                 }"
-                @click="switchTab('blacklist')"
+                @click="
+                    switchTab('blacklist');
+                    indicators.defaultBlacklist.onSeen();
+                "
             >
                 blacklist
+                <NewFeature v-if="indicators.defaultBlacklist.show.value" />
             </button>
 
             <button
