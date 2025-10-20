@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import ScreenCover from "./ScreenCover.vue";
 import store from "@/store";
 import { useRoute, useRouter } from "vue-router";
+import { defaultSFWBlacklist, defaultNSFWBlacklist } from "@/blacklist";
 
 const view = ref<"initial" | "nsfw-blacklist">("initial");
 
@@ -42,25 +43,16 @@ function consent() {
 }
 
 function consentSFW() {
-    store.settings.blacklist = store.settings.blacklist.concat([
-        { name: "rating:explicit", type: "unknown", count: 0 },
-        { name: "rating:questionable", type: "unknown", count: 0 },
-        { name: "rating:sensitive", type: "unknown", count: 0 },
-    ]);
+    store.settings.blacklist = store.settings.blacklist.concat(
+        defaultSFWBlacklist(),
+    );
     consent();
 }
 
 function consentNSFWWithBlacklist() {
-    store.settings.blacklist = store.settings.blacklist.concat([
-        { name: "all_the_way_through", type: "tag", count: 0 },
-        { name: "guro", type: "tag", count: 0 },
-        { name: "loli", type: "tag", count: 0 },
-        { name: "rape", type: "tag", count: 0 },
-        { name: "scat", type: "tag", count: 0 },
-        { name: "shota", type: "tag", count: 0 },
-        { name: "torture", type: "tag", count: 0 },
-        { name: "vomit", type: "tag", count: 0 },
-    ]);
+    store.settings.blacklist = store.settings.blacklist.concat(
+        defaultNSFWBlacklist(),
+    );
     consent();
 }
 </script>
