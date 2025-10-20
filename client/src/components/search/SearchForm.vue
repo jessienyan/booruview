@@ -319,7 +319,7 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
                     showSuggestions = true;
                 "
             />
-            <FavoriteTagsButton />
+            <FavoriteTagsButton v-if="store.settings.favoriteTags.length > 0" />
         </div>
         <SearchSuggestions
             class="suggestions"
