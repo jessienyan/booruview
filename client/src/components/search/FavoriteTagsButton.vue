@@ -4,7 +4,7 @@ import { computed } from "vue";
 import CollapsableTagMenu from "@/components/CollapsableTagMenu.vue";
 
 const tags = computed<TagChip[]>(() =>
-    store.settings.favoriteTags.map<TagChip>(tag => {
+    store.settings.favoriteTags.map<TagChip>((tag) => {
         let style: ChipStyle = "default";
 
         if (store.query.isIncluded(tag.name)) {
@@ -15,11 +15,14 @@ const tags = computed<TagChip[]>(() =>
 
         return {
             tag,
-            style
+            style,
         };
-    }));
+    }),
+);
 </script>
 
 <template>
-    <CollapsableTagMenu :tags="tags"><i class="bi bi-heart-fill"></i>{{ " " }}</CollapsableTagMenu>
+    <CollapsableTagMenu :tags="tags"
+        ><i class="bi bi-heart-fill"></i
+    ></CollapsableTagMenu>
 </template>

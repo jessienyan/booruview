@@ -1,19 +1,108 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import TagList from "@/components/TagList.vue";
+import Chip from "@/components/tag-chip/Chip.vue";
 import store from "@/store";
+import Collapsable from "@/components/Collapsable.vue";
+import { defaultNSFWBlacklist } from "@/blacklist";
+import { useDontShowAgain } from "@/composable";
 
 const styledTags = computed<TagChip[]>(() =>
     store.settings.blacklist.map((tag) => ({ tag, style: "default" })),
 );
+
+const defaultBlacklistVisibility = useDontShowAgain("hide-default-blacklist");
+
+// Consider NSFW enabled if the user hasn't blacklisted rating:explicit
+const nsfwEnabled = computed(
+    () =>
+        store.settings.blacklist.findIndex(
+            (t) => t.name === "rating:explicit",
+        ) === -1,
+);
+
+const defaultBlacklistTags = computed(() =>
+    defaultNSFWBlacklist().map<TagChip>((tag) => {
+        const isBlacklisted =
+            store.settings.blacklist.findIndex((t) => t.name === tag.name) !==
+            -1;
+
+        return {
+            tag,
+            style: isBlacklisted ? "strikethrough" : "default",
+        };
+    }),
+);
+
+function addAllFromDefaultBlacklist() {
+    let list: Tag[] = [];
+
+    for (const tag of defaultNSFWBlacklist()) {
+        if (
+            store.settings.blacklist.findIndex((t) => t.name === tag.name) ===
+            -1
+        ) {
+            list.push(tag);
+        }
+    }
+
+    if (list.length) {
+        store.settings.blacklist = store.settings.blacklist.concat(list);
+        store.saveSettings();
+
+        store.toast = {
+            msg: `added ${list.length} tags to blacklist`,
+            type: "info",
+        };
+    }
+}
 </script>
 
 <template>
+    <div
+        v-if="defaultBlacklistVisibility.show.value && nsfwEnabled"
+        class="default-blacklist"
+    >
+        <p>
+            A default blacklist is available to filter content which may be
+            considered controversial or extreme.
+        </p>
+        <p>
+            <Collapsable text="tags">
+                <div class="default-blacklist-chips">
+                    <Chip
+                        v-for="t in defaultBlacklistTags"
+                        :tag="t"
+                        :actions="{
+                            edit: false,
+                            includeExcludeRemove: false,
+                            favorite: false,
+                        }"
+                    />
+                </div>
+            </Collapsable>
+        </p>
+        <p>You can blacklist the tags individually if you prefer.</p>
+        <p>
+            <button
+                class="btn-primary btn-rounded"
+                @click="addAllFromDefaultBlacklist"
+            >
+                add all to blacklist
+            </button>
+            <button
+                class="btn-primary-darker btn-rounded"
+                @click="defaultBlacklistVisibility.onHide"
+            >
+                don't show again
+            </button>
+        </p>
+    </div>
+
     <TagList
         v-if="store.settings.blacklist.length > 0"
         :jiggle="false"
         :tags="styledTags"
-        :can-edit="false"
     />
     <template v-else>
         <p>
@@ -23,3 +112,34 @@ const styledTags = computed<TagChip[]>(() =>
         <p>To blacklist, click a tag and then select "blacklist".</p>
     </template>
 </template>
+
+<style lang="scss" scoped>
+@import "@/assets/buttons";
+@import "@/assets/colors";
+
+.default-blacklist {
+    padding: 0.8rem;
+    background-color: $color-primary-darker;
+
+    p {
+        color: $color-primary-light;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.default-blacklist-chips {
+    margin-top: 1rem;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+</style>

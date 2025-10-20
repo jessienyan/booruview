@@ -3,7 +3,7 @@ import { ref, computed, useTemplateRef } from "vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import Chip from "./tag-chip/Chip.vue";
 
-const {tags} = defineProps<{tags: TagChip[]}>();
+const { tags } = defineProps<{ tags: TagChip[] }>();
 
 const btnRef = useTemplateRef("btnRef");
 const open = ref(false);
@@ -22,23 +22,24 @@ const categoryOrder: TagType[] = [
 const sortedTags = computed<TagChip[]>(() =>
     [...tags].sort((a, b) => {
         const category =
-            categoryOrder.indexOf(a.tag.type) - categoryOrder.indexOf(b.tag.type);
+            categoryOrder.indexOf(a.tag.type) -
+            categoryOrder.indexOf(b.tag.type);
         if (category !== 0) {
             return category;
         }
         return a.tag.name.localeCompare(b.tag.name);
-    })
+    }),
 );
 </script>
 
 <template>
     <button
         ref="btnRef"
-        class="btn-menu-toggle btn-primary"
+        class="btn-menu-toggle btn-primary btn-rounded"
         @click="open = !open"
     >
         <slot></slot>
-    <i
+        <i
             class="bi"
             :class="{
                 'bi-caret-down-fill': !open,
@@ -48,18 +49,21 @@ const sortedTags = computed<TagChip[]>(() =>
     </button>
     <DropdownMenu :el="btnRef" v-model:show="open">
         <div class="tag-list">
-            <Chip v-for="t of sortedTags" :tag="t" />
+            <Chip
+                v-for="t of sortedTags"
+                :tag="t"
+                :actions="{
+                    edit: false,
+                    favorite: false,
+                    includeExcludeRemove: false,
+                }"
+            />
         </div>
     </DropdownMenu>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
-
-.btn-menu-toggle {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
 
 .tag-list {
     display: flex;
