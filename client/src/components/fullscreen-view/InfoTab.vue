@@ -65,6 +65,15 @@ const styledTags = computed(() =>
 <template>
     <div class="tag-list" :style="containerStyle">
         <TagList :jiggle="false" :tags="styledTags" />
+        <p>
+            <a
+                :href="`https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`"
+                target="_blank"
+                >view on Gelbooru<i
+                    class="external-link bi bi-box-arrow-up-right"
+                ></i
+            ></a>
+        </p>
     </div>
 </template>
 
@@ -78,5 +87,15 @@ const styledTags = computed(() =>
     max-height: 100%;
 
     @include hide-scrollbar;
+}
+
+p {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.external-link {
+    margin-left: 6px;
+    vertical-align: baseline;
 }
 </style>
