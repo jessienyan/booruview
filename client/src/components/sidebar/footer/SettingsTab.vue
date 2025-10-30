@@ -296,9 +296,7 @@ function importData() {
         </div>
 
         <div class="input-group">
-            <label
-                >max post height
-                </label>
+            <label>max post height </label>
             <div class="input">
                 <input
                     type="range"
@@ -360,15 +358,19 @@ function importData() {
         <h3>import/export</h3>
 
         <p>
-            <i class="bi bi-info-circle"></i> Copy your data to another device
-            (settings, blacklist, favorites). Importing will combine/merge your
-            blacklist and favorites.
+            Copy your data to another device (settings/blacklist/favorites).
+            Your blacklist and favorites will be merged together.
+        </p>
+
+        <p>
+            First, click export to generate a code from your device. Then on
+            another device, enter the code and click import.
         </p>
 
         <div class="input-group">
             <label
-                >1. Export data and generate a code. The code will expire after
-                15 minutes.</label
+                >1. Export your data and generate a code. The code will expire
+                after 15 minutes.</label
             >
             <div class="input text-btn-combo">
                 <input
@@ -390,7 +392,10 @@ function importData() {
         </div>
 
         <div class="input-group">
-            <label>2. Import using the generated code.</label>
+            <label
+                >2. Import your data onto another device using the code
+                generated above.</label
+            >
             <div class="input text-btn-combo">
                 <input
                     type="text"
