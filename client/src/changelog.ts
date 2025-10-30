@@ -5,6 +5,13 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-10-30",
+        changes: [
+            "added a link to view post on gelbooru",
+            "fixed swipe arrow being half off-screen on some mobile browsers",
+        ],
+    },
+    {
         date: "2025-10-20",
         changes: [
             "fixed extra hyphens being added to raw excluded tags",
