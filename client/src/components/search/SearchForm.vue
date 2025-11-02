@@ -11,7 +11,7 @@ import {
 import SearchSuggestions from "./Suggestions.vue";
 import store from "@/store";
 import { useDismiss } from "@/composable";
-import FavoriteTagsButton from "./FavoriteTagsButton.vue";
+import QuickTagsButton from "./QuickTagsButton.vue";
 
 type MistakeSuggestion = {
     pattern: RegExp;
@@ -305,10 +305,7 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 
         <div class="input-container">
             <input
-                class="input"
-                :class="{
-                    'remove-border': store.settings.favoriteTags.length > 0,
-                }"
+                class="input remove-border"
                 type="text"
                 ref="input"
                 placeholder="e.g: blue sky"
@@ -319,7 +316,7 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
                     showSuggestions = true;
                 "
             />
-            <FavoriteTagsButton />
+            <QuickTagsButton />
         </div>
         <SearchSuggestions
             class="suggestions"

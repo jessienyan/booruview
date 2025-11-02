@@ -5,9 +5,9 @@ import DropdownMenu from "../DropdownMenu.vue";
 import Chip from "../tag-chip/Chip.vue";
 import { sortTags } from "@/tag";
 
-const showFavorites = ref(false);
+const open = ref(false);
 const hasFavorites = computed(() => store.settings.favoriteTags.length > 0);
-const favoritesBtn = useTemplateRef("favoritesBtn");
+const btnRef = useTemplateRef("button");
 
 // Favorited tags sorted by category then by name
 const tags = computed<TagChip[]>(() => {
@@ -35,22 +35,21 @@ const tags = computed<TagChip[]>(() => {
 
 <template>
     <button
-        v-if="hasFavorites"
-        ref="favoritesBtn"
-        class="btn-favorite-tags btn-primary"
-        @click="showFavorites = !showFavorites"
+        ref="button"
+        class="btn-quick-tags btn-primary"
+        @click="open = !open"
     >
-        <i class="bi bi-heart-fill"></i>{{ " "
+        <i class="bi bi-tags-fill"></i>{{ " "
         }}<i
             class="bi"
             :class="{
-                'bi-caret-down-fill': !showFavorites,
-                'bi-caret-up-fill': showFavorites,
+                'bi-caret-down-fill': !open,
+                'bi-caret-up-fill': open,
             }"
         ></i>
     </button>
-    <DropdownMenu :el="favoritesBtn" v-model:show="showFavorites">
-        <div class="fav-tags">
+    <DropdownMenu :el="btnRef" v-model:show="open">
+        <div class="chip-list">
             <Chip v-for="t of tags" :tag="t" :show-heart="false" />
         </div>
     </DropdownMenu>
@@ -59,12 +58,12 @@ const tags = computed<TagChip[]>(() => {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
-.btn-favorite-tags {
+.btn-quick-tags {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
 
-.fav-tags {
+.chip-list {
     display: flex;
     flex-direction: column;
     background-color: #1c1c1c;
