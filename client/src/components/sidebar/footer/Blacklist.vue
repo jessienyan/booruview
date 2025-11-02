@@ -104,8 +104,7 @@ function addAllFromDefaultBlacklist() {
     <p v-if="styledTags.length > 0">
         <Collapsable text="view blacklist">
             <div class="chips-container">
-                <Chip v-for="t in styledTags"
-                :tag="t" />
+                <Chip v-for="t in styledTags" :tag="t" />
             </div>
         </Collapsable>
     </p>

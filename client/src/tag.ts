@@ -5,14 +5,14 @@ const tagTypeSortOrder: Record<TagType, number> = {
     tag: 3,
     deprecated: 3,
     metadata: 4,
-    unknown: 5
-}
+    unknown: 5,
+};
 
 export function sortTags(tags: Tag[]): Tag[] {
-    return [...tags].sort((a,b) => {
+    return [...tags].sort((a, b) => {
         const typeCompare = tagTypeSortOrder[a.type] - tagTypeSortOrder[b.type];
 
-        if(typeCompare !== 0) {
+        if (typeCompare !== 0) {
             return typeCompare;
         }
 
