@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
         changes: [
             "moved blacklist into settings tab",
             "added some example filters",
+            "changed recent 'search' button to be a hyperlink",
         ],
     },
     {
