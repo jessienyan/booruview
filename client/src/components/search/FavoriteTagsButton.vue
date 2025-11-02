@@ -3,31 +3,15 @@ import store from "@/store";
 import { ref, computed, useTemplateRef } from "vue";
 import DropdownMenu from "../DropdownMenu.vue";
 import Chip from "../tag-chip/Chip.vue";
+import { sortTags } from "@/tag";
 
 const showFavorites = ref(false);
 const hasFavorites = computed(() => store.settings.favoriteTags.length > 0);
 const favoritesBtn = useTemplateRef("favoritesBtn");
 
-const categoryOrder: TagType[] = [
-    "artist",
-    "character",
-    "copyright",
-    "tag",
-    "unknown",
-    "metadata",
-    "deprecated",
-];
-
 // Favorited tags sorted by category then by name
 const tags = computed<TagChip[]>(() => {
-    const sorted = [...store.settings.favoriteTags].sort((a, b) => {
-        const category =
-            categoryOrder.indexOf(a.type) - categoryOrder.indexOf(b.type);
-        if (category !== 0) {
-            return category;
-        }
-        return a.name.localeCompare(b.name);
-    });
+    const sorted = sortTags(store.settings.favoriteTags);
     const styled: TagChip[] = [];
 
     for (const tag of sorted) {
