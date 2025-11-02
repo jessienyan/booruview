@@ -195,8 +195,8 @@ const favTags = computed<TagChip[]>(() => {
 }
 
 .content-container {
-    padding: 1rem;
-    background-color: #222;
+    padding: 0.8rem;
+    background-color: #1c1c1c;
     overflow-y: scroll;
     max-width: 300px;
     max-height: 350px;
@@ -213,7 +213,7 @@ const favTags = computed<TagChip[]>(() => {
 .chip-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.8rem;
 
     &:deep(.chip) {
         margin: 0;
