@@ -128,8 +128,7 @@ const favTags = computed<TagChip[]>(() => {
 
             <template v-else>
                 <p>
-                    These are just some examples. Check the help tab for more
-                    info.
+                    These are some examples, check the help tab for more info.
                 </p>
 
                 <h3>sorting</h3>
