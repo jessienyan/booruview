@@ -43,9 +43,9 @@ const examples = computed<Examples>(() => ({
     ],
     rating: [
         styledTag({ count: 0, name: "rating:general", type: "metadata" }).value,
-        styledTag({ count: 0, name: "rating:questionable", type: "metadata" })
-            .value,
         styledTag({ count: 0, name: "rating:sensitive", type: "metadata" })
+            .value,
+        styledTag({ count: 0, name: "rating:questionable", type: "metadata" })
             .value,
         styledTag({ count: 0, name: "rating:explicit", type: "metadata" })
             .value,
@@ -135,11 +135,7 @@ const favTags = computed<TagChip[]>(() => {
                 <h3>sorting</h3>
 
                 <div class="chip-list">
-                    <Chip
-                        v-for="t of examples.sorting"
-                        :tag="t"
-                        :actions="{ blacklist: false }"
-                    />
+                    <Chip v-for="t of examples.sorting" :tag="t" />
                 </div>
 
                 <h3>score</h3>
@@ -152,7 +148,9 @@ const favTags = computed<TagChip[]>(() => {
                     />
                 </div>
 
-                <h3>rating</h3>
+                <p>Tip: include and then edit the tag by clicking it again.</p>
+
+                <h3>content rating</h3>
 
                 <div class="chip-list">
                     <Chip v-for="t of examples.rating" :tag="t" />
