@@ -118,7 +118,7 @@ const favTags = computed<TagChip[]>(() => {
         <div class="content-container">
             <template v-if="currentTab === 'favs'">
                 <div
-                    v-if="favTags.length === 0"
+                    v-if="favTags.length > 0"
                     class="chip-list chip-list-vertical"
                 >
                     <Chip v-for="t of favTags" :tag="t" :show-heart="false" />
