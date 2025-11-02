@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-11-02",
+        changes: ["moved blacklist into settings tab"]
+    },
+    {
         date: "2025-10-30",
         changes: [
             "added a link to view post on gelbooru",
