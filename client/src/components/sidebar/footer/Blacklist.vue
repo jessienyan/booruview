@@ -71,7 +71,7 @@ function addAllFromDefaultBlacklist() {
         </p>
         <p>
             <Collapsable text="tags">
-                <div class="chips-container default-blacklist-chips">
+                <div class="chips-container">
                     <Chip
                         v-for="t in defaultBlacklistTags"
                         :tag="t"
@@ -101,9 +101,13 @@ function addAllFromDefaultBlacklist() {
         </p>
     </div>
 
-    <p v-if="styledTags.length > 0" class="chips-container">
-        <Chip v-for="t in styledTags"
-        :tag="t" />
+    <p v-if="styledTags.length > 0">
+        <Collapsable text="view blacklist">
+            <div class="chips-container">
+                <Chip v-for="t in styledTags"
+                :tag="t" />
+            </div>
+        </Collapsable>
     </p>
 
     <template v-else>
@@ -137,13 +141,10 @@ function addAllFromDefaultBlacklist() {
 }
 
 .chips-container {
+    margin-top: 1rem;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0.3rem;
-}
-
-.default-blacklist-chips {
-    margin-top: 1rem;
 }
 </style>
