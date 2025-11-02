@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import TagList from "@/components/TagList.vue";
 import Chip from "@/components/tag-chip/Chip.vue";
 import store from "@/store";
 import Collapsable from "@/components/Collapsable.vue";
 import { defaultNSFWBlacklist } from "@/blacklist";
 import { useDontShowAgain } from "@/composable";
+import { sortTags } from "@/tag";
 
-const styledTags = computed<TagChip[]>(() =>
-    store.settings.blacklist.map((tag) => ({ tag, style: "default" })),
-);
+const styledTags = computed<TagChip[]>(() => {
+    const sorted = sortTags(store.settings.blacklist);
+    const styled = sorted.map<TagChip>((tag) => ({ tag, style: "default" }));
+    return styled;
+});
 
 const defaultBlacklistVisibility = useDontShowAgain("hide-default-blacklist");
 
@@ -69,7 +71,7 @@ function addAllFromDefaultBlacklist() {
         </p>
         <p>
             <Collapsable text="tags">
-                <div class="default-blacklist-chips">
+                <div class="chips-container default-blacklist-chips">
                     <Chip
                         v-for="t in defaultBlacklistTags"
                         :tag="t"
@@ -99,11 +101,11 @@ function addAllFromDefaultBlacklist() {
         </p>
     </div>
 
-    <TagList
-        v-if="store.settings.blacklist.length > 0"
-        :jiggle="false"
-        :tags="styledTags"
-    />
+    <p v-if="styledTags.length > 0" class="chips-container">
+        <Chip v-for="t in styledTags"
+        :tag="t" />
+    </p>
+
     <template v-else>
         <p>
             Any tags you've blacklisted will appear here. Posts that have
@@ -134,12 +136,14 @@ function addAllFromDefaultBlacklist() {
     }
 }
 
-.default-blacklist-chips {
-    margin-top: 1rem;
-
+.chips-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 0.3rem;
+}
+
+.default-blacklist-chips {
+    margin-top: 1rem;
 }
 </style>
