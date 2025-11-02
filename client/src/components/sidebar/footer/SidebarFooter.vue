@@ -9,7 +9,7 @@ type Tab = "about" | "help" | "settings";
 const tabComponents: Record<Tab, Component> = {
     about: AboutTab,
     help: HelpTab,
-    settings: SettingsTab
+    settings: SettingsTab,
 };
 const currentTab = ref<Tab>("about");
 
