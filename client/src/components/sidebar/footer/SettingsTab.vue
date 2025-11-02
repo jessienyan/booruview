@@ -196,7 +196,7 @@ function importData() {
 
 <template>
     <div class="settings-container">
-        <h3>app</h3>
+        <h2>app</h2>
 
         <div class="input-group">
             <label>
@@ -209,11 +209,11 @@ function importData() {
             >
         </div>
 
-        <h3>blacklist</h3>
+        <h2>blacklist</h2>
 
         <Blacklist />
 
-        <h3>content</h3>
+        <h2>content</h2>
 
         <div class="input-group">
             <label>
@@ -248,7 +248,7 @@ function importData() {
             >
         </div>
 
-        <h3>layout</h3>
+        <h2>layout</h2>
 
         <div class="input-group">
             <label># of columns</label>
@@ -347,7 +347,7 @@ function importData() {
             >
         </div>
 
-        <h3>search</h3>
+        <h2>search</h2>
 
         <div class="input-group">
             <label>
@@ -360,7 +360,7 @@ function importData() {
             >
         </div>
 
-        <h3>import/export</h3>
+        <h2>import/export</h2>
 
         <p>
             Copy your data to another device (settings/blacklist/favorites).
