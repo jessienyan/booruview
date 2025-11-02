@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, type Component } from "vue";
 import AboutTab from "./AboutTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
 
 type Tab = "about" | "help" | "settings";
+const tabComponents: Record<Tab, Component> = {
+    about: AboutTab,
+    help: HelpTab,
+    settings: SettingsTab
+};
 const currentTab = ref<Tab>("about");
 
 function switchTab(tab: Tab) {
@@ -75,9 +80,7 @@ function toggleClose() {
         >
             <div class="tab-content">
                 <KeepAlive>
-                    <HelpTab v-if="currentTab === 'help'" />
-                    <AboutTab v-else-if="currentTab === 'about'" />
-                    <SettingsTab v-else-if="currentTab === 'settings'" />
+                    <component :is="tabComponents[currentTab]" />
                 </KeepAlive>
             </div>
         </div>

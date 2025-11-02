@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, type Component } from "vue";
 import SearchTab from "./SearchTab.vue";
 import RecentTab from "./RecentTab.vue";
 
 type Tab = "search" | "recent";
+const tabComponents: Record<Tab, Component> = {
+    search: SearchTab,
+    recent: RecentTab,
+};
 const currentTab = ref<Tab>("search");
 
 function switchTab(tab: Tab) {
@@ -33,8 +37,7 @@ function switchTab(tab: Tab) {
         <div class="tab-content-container">
             <div class="tab-content">
                 <KeepAlive>
-                    <SearchTab v-if="currentTab === 'search'" />
-                    <RecentTab v-else-if="currentTab === 'recent'" />
+                    <component :is="tabComponents[currentTab]" />
                 </KeepAlive>
             </div>
         </div>
