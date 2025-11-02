@@ -28,18 +28,6 @@ function onDelete(index: number) {
     store.settings.queryHistory.splice(index, 1);
     store.saveSettings();
 }
-
-function onSearch(query: SearchQuery) {
-    if (store.fetchingPosts) {
-        return;
-    }
-
-    router.push({
-        name: "search",
-        params: { page: 1, query: query.asQueryParams() },
-        force: true,
-    });
-}
 </script>
 
 <template>
@@ -63,12 +51,16 @@ function onSearch(query: SearchQuery) {
                 <span class="time" :title="entry.date.toLocaleString()">{{
                     relativeTime(entry.date)
                 }}</span>
-                <button
-                    class="btn-primary btn-rounded btn-search"
-                    @click="onSearch(entry.query)"
+                <RouterLink
+                    class="btn-search"
+                    :to="{
+                        name: 'search',
+                        params: { page: 1, query: entry.query.asQueryParams() },
+                        force: true,
+                    }"
                 >
-                    search
-                </button>
+                    <button class="btn-primary btn-rounded">search</button>
+                </RouterLink>
             </div>
         </div>
     </div>
