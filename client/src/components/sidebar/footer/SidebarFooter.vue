@@ -78,7 +78,6 @@ function toggleClose() {
                     <HelpTab v-if="currentTab === 'help'" />
                     <AboutTab v-else-if="currentTab === 'about'" />
                     <SettingsTab v-else-if="currentTab === 'settings'" />
-                    <BlacklistTab v-else-if="currentTab === 'blacklist'" />
                 </KeepAlive>
             </div>
         </div>
@@ -91,7 +90,7 @@ function toggleClose() {
     flex-direction: column;
     min-height: 0;
 
-    &:not(.store.settings.sidebarTabsHidden) {
+    &:not(.closed) {
         .tabs {
             border-bottom: 1px solid #555;
         }
