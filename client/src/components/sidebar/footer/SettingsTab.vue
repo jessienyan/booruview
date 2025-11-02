@@ -4,6 +4,7 @@ import store, {
     type FullscreenViewMenuAnchorPoint,
 } from "@/store";
 import { ref, useTemplateRef, watch } from "vue";
+import Blacklist from "./Blacklist.vue";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
     dynamic: "dynamic",
@@ -207,6 +208,10 @@ function importData() {
                 periodically check for updates</label
             >
         </div>
+
+        <h3>blacklist</h3>
+
+        <Blacklist />
 
         <h3>content</h3>
 

@@ -4,11 +4,8 @@ import AboutTab from "./AboutTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 import store from "@/store";
-import BlacklistTab from "./BlacklistTab.vue";
-import indicators from "@/indicators";
-import NewFeature from "@/components/NewFeature.vue";
 
-type Tab = "about" | "help" | "settings" | "blacklist";
+type Tab = "about" | "help" | "settings";
 const currentTab = ref<Tab>("about");
 
 function switchTab(tab: Tab) {
@@ -61,21 +58,6 @@ function toggleClose() {
                 @click="switchTab('settings')"
             >
                 settings
-            </button>
-            <button
-                class="tab-btn"
-                :class="{
-                    active:
-                        currentTab === 'blacklist' &&
-                        !store.settings.sidebarTabsHidden,
-                }"
-                @click="
-                    switchTab('blacklist');
-                    indicators.defaultBlacklist.onSeen();
-                "
-            >
-                blacklist
-                <NewFeature v-if="indicators.defaultBlacklist.show.value" />
             </button>
 
             <button
