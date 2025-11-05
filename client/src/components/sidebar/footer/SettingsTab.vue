@@ -106,6 +106,10 @@ watch(
     () => (canGenerate.value = true),
 );
 
+const ignoredSettingsForImportExport: Array<
+    Partial<keyof typeof store.settings>
+> = ["consented", "queryHistory"];
+
 function generateExportCode() {
     generatingCode.value = true;
 
@@ -113,7 +117,10 @@ function generateExportCode() {
         {},
         store.settings,
     );
-    delete data["queryHistory"];
+
+    for (const k of ignoredSettingsForImportExport) {
+        delete data[k];
+    }
 
     fetch("/api/settings/export", {
         method: "POST",
@@ -132,7 +139,10 @@ const importingData = ref(false);
 
 function mergeSettings(data: Record<string, any>) {
     Object.entries(data).forEach(([_k, v]) => {
-        const k = _k as Exclude<keyof typeof store.settings, "queryHistory">;
+        const k = _k as Exclude<
+            keyof typeof store.settings,
+            typeof ignoredSettingsForImportExport
+        >;
 
         // Remove any duplicates
         if (k === "blacklist") {
