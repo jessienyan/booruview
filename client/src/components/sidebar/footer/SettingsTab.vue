@@ -143,6 +143,10 @@ function mergeSettings(data: Record<string, any>) {
             // prettier-ignore
             v = (v as Post[]).filter((a) => store.settings.favorites.findIndex((b) => a.id === b.id) === -1);
             v = v.concat(store.settings.favorites);
+        } else if (k === "favoriteTags") {
+            // prettier-ignore
+            v = (v as Tag[]).filter((a) => store.settings.favoriteTags.findIndex((b) => a.name === b.name) === -1);
+            v = v.concat(store.settings.favoriteTags);
         }
 
         (store.settings as any)[k] = v;
