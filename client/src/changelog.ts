@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-11-05",
+        changes: [
+            "fixed favorited tags being duplicated when importing settings",
+        ],
+    },
+    {
         date: "2025-11-02",
         changes: [
             "moved blacklist into settings tab",
