@@ -56,14 +56,6 @@ function onDragEnter(e: DragEvent, index: number) {
     dropTargetIndex.value = index;
 }
 
-function onDragLeave(e: DragEvent, index: number) {
-    if(draggingPostIndex.value == null) {
-        return;
-    }
-
-    // dropTargetIndex.value = null;
-}
-
 function onDragEnd(e: DragEvent) {
     if(draggingPostIndex.value == null) {
         return;
@@ -97,7 +89,6 @@ const postDragId = computed(() => {
 
         @post-dragstart="onDragStart"
         @post-dragenter="onDragEnter"
-        @post-dragleave="onDragLeave"
         @post-dragend="onDragEnd"
     />
 </template>
