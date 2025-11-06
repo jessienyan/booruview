@@ -16,10 +16,11 @@ type ColumnDimensions = {
     width: number;
 };
 
-const { scrollContainer, posts, keyed } = defineProps<{
+const { scrollContainer, posts, keyed, postDragId } = defineProps<{
     scrollContainer: HTMLElement;
     posts: Post[];
     keyed: boolean;
+    postDragId?: number;
 }>();
 
 const emit = defineEmits<{
@@ -147,6 +148,7 @@ onMounted(() => {
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
                 :key="post.key"
+                :beingDragged="postDragId === post.post.id"
 
                 @dragstart="(e: DragEvent) => emit('post-dragstart', e, post.index)"
                 @dragenter="(e: DragEvent) => emit('post-dragenter', e, post.index)"

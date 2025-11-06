@@ -3,13 +3,14 @@ import { useIsVideo } from "@/composable";
 import store from "@/store";
 import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 
-const { cropped, maxHeight, renderHeight, post, scrollContainer } =
+const { cropped, maxHeight, renderHeight, post, scrollContainer, beingDragged } =
     defineProps<{
         cropped: boolean;
         maxHeight: number;
         renderHeight: number;
         post: Post;
         scrollContainer: HTMLElement;
+        beingDragged?: boolean;
     }>();
 
 const isVideo = useIsVideo(() => post);
@@ -95,6 +96,14 @@ onUnmounted(() => {
             :height="content.height"
         />
 
+        <div class="drag-container" v-if="beingDragged">
+            <div class="drag-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-arrows-move drag-icon" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+</svg>
+            </div>
+        </div>
+
         <div class="icons" v-if="favorited || cropped">
             <i
                 v-if="favorited"
@@ -112,6 +121,8 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/colors";
+
 .post {
     break-inside: avoid;
     font-size: 0;
@@ -166,5 +177,29 @@ onUnmounted(() => {
     filter: drop-shadow(0 0 3px black);
     color: #fff;
     opacity: 0.6;
+}
+
+.drag-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 5px solid yellow;
+}
+
+.drag-icon-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    padding: 15px;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.drag-icon {
+    filter: drop-shadow(0 0 3px black);
+    color: #eee;
 }
 </style>
