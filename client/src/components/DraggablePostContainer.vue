@@ -7,6 +7,7 @@ type CroppedPost = {
     post: Post;
     cropped: boolean;
     renderHeight: number;
+    index: number;
 };
 
 type ColumnDimensions = {
@@ -29,6 +30,48 @@ const theme = {
     colGap: colGap + "px",
     postGap: postGap + "px",
 };
+
+const draggingPost = ref<Post|null>(null);
+const dropTarget = ref<Post|null>(null);
+
+const orderedPosts = computed<CroppedPost[]>(() => {
+    if(dropTarget.value == null || draggingPost.value == null || columnDimensions.value == null) {
+        return [];
+    }
+
+    const dropIndex = posts.findIndex(p => p.id === dropTarget.value!.id);
+    const dragIndex = posts.findIndex(p => p.id === draggingPost.value!.id);
+    let ordered = [...posts];
+
+    if(dragIndex < dropIndex) {
+        // Shift right
+        for(let i = dragIndex; i < dropIndex; i++) {
+            ordered[i] = ordered[i+1]
+        }
+    } else {
+        // Shift left
+        for(let i = dragIndex; i > dropIndex; i--) {
+            ordered[i] = ordered[i-1]
+        }
+    }
+
+    // Update drop target
+    ordered[dropIndex] = draggingPost.value;
+
+    const columnWidth = columnDimensions.value.width;
+
+    return ordered.map<CroppedPost>((p, i) => {
+        const zoom = columnWidth / p.width;
+        const renderHeight = p.height * zoom;
+        const cropped = renderHeight > maxPostHeight.value;
+        return {
+            post: p,
+            cropped,
+            renderHeight: cropped ? maxPostHeight.value : renderHeight,
+            index: i,
+        };
+    });
+});
 
 const columnDimensions = computed<ColumnDimensions | null>(() => {
     if (!container.value) {
@@ -65,26 +108,7 @@ function onResize() {
     containerWidth.value = container.value.clientWidth;
 }
 
-const croppedPosts = computed<CroppedPost[]>(() => {
-    if (columnDimensions.value == null) {
-        return [];
-    }
-
-    const { width: columnWidth } = columnDimensions.value;
-
-    return posts.map<CroppedPost>((p) => {
-        const zoom = columnWidth / p.width;
-        const renderHeight = p.height * zoom;
-        const cropped = renderHeight > maxPostHeight.value;
-        return {
-            post: p,
-            cropped,
-            renderHeight: cropped ? maxPostHeight.value : renderHeight,
-        };
-    });
-});
-
-const orderedPosts = computed<CroppedPost[][]>(() => {
+const postsByColumn = computed<CroppedPost[][]>(() => {
     if (columnDimensions.value == null) {
         return [];
     }
@@ -92,7 +116,7 @@ const orderedPosts = computed<CroppedPost[][]>(() => {
     const { count: columnCount } = columnDimensions.value;
 
     if (columnCount <= 1) {
-        return [croppedPosts.value];
+        return [orderedPosts.value];
     }
 
     let ordered: CroppedPost[][] = [];
@@ -102,7 +126,7 @@ const orderedPosts = computed<CroppedPost[][]>(() => {
         colHeight = colHeight.concat(0);
     }
 
-    for (const p of croppedPosts.value) {
+    for (const p of orderedPosts.value) {
         let shortestCol = 0;
 
         for (let i = 1; i < columnCount; i++) {
@@ -118,6 +142,27 @@ const orderedPosts = computed<CroppedPost[][]>(() => {
     return ordered;
 });
 
+function onDragStart(e: DragEvent, index: number) {
+    e.dataTransfer!.effectAllowed = "move";
+    draggingPost.value = orderedPosts.value[index].post;
+}
+
+function onDragEnter(e: DragEvent, index: number) {
+    if(draggingPost.value === null || draggingPost.value.id === orderedPosts.value[index].post.id) {
+        return;
+    }
+
+    dropTarget.value = orderedPosts.value[index].post;
+}
+
+function onDragLeave(e: DragEvent, index: number) {
+    if(draggingPost.value === null || draggingPost.value.id === orderedPosts.value[index].post.id) {
+        return;
+    }
+
+    dropTarget.value = null;
+}
+
 onMounted(() => {
     new ResizeObserver(onResize).observe(container.value!);
 });
@@ -125,16 +170,19 @@ onMounted(() => {
 
 <template>
     <div class="post-container" ref="container">
-        <div class="post-column" v-for="col in orderedPosts">
-            <!-- NOTE: intentionally not using keys here to reuse the component instances
-                       when the post list changes. Saves about 50ms on garbage collection -->
+        <div class="post-column" v-for="col in postsByColumn" >
             <PostContent
                 v-for="post in col"
+                :key="post.post.id"
                 :post="post.post"
                 :renderHeight="post.renderHeight"
                 :maxHeight="maxPostHeight"
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
+
+                @dragstart="(e: DragEvent) => onDragStart(e, post.index)"
+                @dragenter="(e: DragEvent) => onDragEnter(e, post.index)"
+                @dragleave="(e: DragEvent) => onDragLeave(e, post.index)"
             />
         </div>
     </div>

@@ -84,7 +84,8 @@ onUnmounted(() => {
         :style="{ maxHeight: maxHeight + 'px', height: renderHeight + 'px' }"
         @click="store.fullscreenPost = post"
         ref="container"
-    >
+        :draggable="true"
+        >
         <img
             v-if="showImage"
             class="content"
