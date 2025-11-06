@@ -23,7 +23,7 @@ onMounted(() => mainContainer.value.focus());
         <PostContainer
             :posts="store.postsForCurrentPage() || []"
             :scroll-container="mainContainer"
-            :keyed=false
+            :keyed="false"
         />
         <Footer />
     </template>

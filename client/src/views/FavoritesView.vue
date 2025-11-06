@@ -18,5 +18,10 @@ function onChangeFavOrder(posts: Post[]) {
     <NoResults v-if="store.settings.favorites.length === 0">
         you don't have any favorites yet
     </NoResults>
-    <DraggablePostContainer v-else :posts="store.settings.favorites" :scroll-container="mainContainer" @change="onChangeFavOrder" />
+    <DraggablePostContainer
+        v-else
+        :posts="store.settings.favorites"
+        :scroll-container="mainContainer"
+        @change="onChangeFavOrder"
+    />
 </template>
