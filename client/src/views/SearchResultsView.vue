@@ -19,9 +19,11 @@ onMounted(() => mainContainer.value.focus());
         no results :(
     </NoResults>
     <template v-else-if="store.totalPostCount > 0">
+        <!-- Using keyed=false to save time on garbage collection when changing pages -->
         <PostContainer
             :posts="store.postsForCurrentPage() || []"
             :scroll-container="mainContainer"
+            :keyed=false
         />
         <Footer />
     </template>

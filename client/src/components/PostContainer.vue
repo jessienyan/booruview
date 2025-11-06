@@ -7,6 +7,8 @@ type CroppedPost = {
     post: Post;
     cropped: boolean;
     renderHeight: number;
+    index: number;
+    key?: number;
 };
 
 type ColumnDimensions = {
@@ -14,10 +16,19 @@ type ColumnDimensions = {
     width: number;
 };
 
-const { scrollContainer, posts } = defineProps<{
+const { scrollContainer, posts, keyed } = defineProps<{
     scrollContainer: HTMLElement;
     posts: Post[];
+    keyed: boolean;
 }>();
+
+const emit = defineEmits<{
+    "post-dragstart": [event: DragEvent, postIndex: number],
+    "post-dragenter": [event: DragEvent, postIndex: number],
+    "post-dragleave": [event: DragEvent, postIndex: number],
+    "post-dragend": [event: DragEvent, postIndex: number],
+}>();
+
 const container = useTemplateRef("container");
 const containerWidth = ref(0);
 
@@ -72,14 +83,16 @@ const croppedPosts = computed<CroppedPost[]>(() => {
 
     const { width: columnWidth } = columnDimensions.value;
 
-    return posts.map<CroppedPost>((p) => {
-        const zoom = columnWidth / p.width;
-        const renderHeight = p.height * zoom;
+    return posts.map<CroppedPost>((post, index) => {
+        const zoom = columnWidth / post.width;
+        const renderHeight = post.height * zoom;
         const cropped = renderHeight > maxPostHeight.value;
         return {
-            post: p,
+            index,
+            post,
             cropped,
             renderHeight: cropped ? maxPostHeight.value : renderHeight,
+            key: keyed ? post.id : undefined,
         };
     });
 });
@@ -126,8 +139,6 @@ onMounted(() => {
 <template>
     <div class="post-container" ref="container">
         <div class="post-column" v-for="col in orderedPosts">
-            <!-- NOTE: intentionally not using keys here to reuse the component instances
-                       when the post list changes. Saves about 50ms on garbage collection -->
             <PostContent
                 v-for="post in col"
                 :post="post.post"
@@ -135,6 +146,12 @@ onMounted(() => {
                 :maxHeight="maxPostHeight"
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
+                :key="post.key"
+
+                @dragstart="(e: DragEvent) => emit('post-dragstart', e, post.index)"
+                @dragenter="(e: DragEvent) => emit('post-dragenter', e, post.index)"
+                @dragleave="(e: DragEvent) => emit('post-dragleave', e, post.index)"
+                @dragend="(e: DragEvent) => emit('post-dragend', e, post.index)"
             />
         </div>
     </div>
