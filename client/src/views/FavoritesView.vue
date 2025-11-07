@@ -7,11 +7,11 @@ import { useDontShowAgain, useMainContainer } from "@/composable";
 
 const desktopNotice = useDontShowAgain("desktop-fav-experimental-notice");
 
-if(desktopNotice.show.value) {
+if (desktopNotice.show.value) {
     store.toast = {
         msg: "new: drag-and-drop favorites to sort them. DESKTOP ONLY & experimental. mobile support coming soon",
         type: "info",
-    }
+    };
     desktopNotice.ack();
 }
 

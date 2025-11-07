@@ -6,7 +6,9 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
     {
         date: "2025-11-06",
-        changes: ["added desktop support for reordering favorites (experimental)"]
+        changes: [
+            "added desktop support for reordering favorites (experimental)",
+        ],
     },
     {
         date: "2025-11-05",
