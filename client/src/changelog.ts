@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
     {
+        date: "2025-11-06",
+        changes: ["added desktop support for reordering favorites (experimental)"]
+    },
+    {
         date: "2025-11-05",
         changes: [
             "fixed favorited tags being duplicated when importing settings",
