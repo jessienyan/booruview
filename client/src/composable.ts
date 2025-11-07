@@ -87,12 +87,16 @@ export function useDontShowAgain(id: string) {
     const flag = localStorage.getItem(id);
     const show = ref(flag === null);
 
-    function onHide() {
+    function ack() {
         localStorage.setItem(id, "1");
+    }
+
+    function onHide() {
+        ack();
         show.value = false;
     }
 
-    return { show, onHide };
+    return { show, onHide, ack };
 }
 
 interface FeatureIndicator {
