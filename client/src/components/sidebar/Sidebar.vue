@@ -3,9 +3,9 @@ import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
 import { useDontShowAgain } from "@/composable";
-import { SURVEY_LINK } from "@/config";
+import { ORGANIZE_FAVS_SURVEY_LINK } from "@/config";
 
-const survey = useDontShowAgain("hide-survey");
+const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
 </script>
 
 <template>
@@ -41,19 +41,17 @@ const survey = useDontShowAgain("hide-survey");
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
-            <div class="survey" v-if="survey.show.value">
-                <p>Have any suggestions? Two questions, 100% anonymous:</p>
+            <div class="survey" v-if="favOrganizeSurvey.show.value">
+                <p>How should favorites be improved? 100% anonymous:</p>
                 <p>
-                    <a :href="SURVEY_LINK" target="_blank">{{ SURVEY_LINK }}</a>
-                </p>
-                <p>
-                    <i class="bi bi-info-circle"></i> The survey can also be
-                    found in the "about" tab.
+                    <a :href="ORGANIZE_FAVS_SURVEY_LINK" target="_blank">{{
+                        ORGANIZE_FAVS_SURVEY_LINK
+                    }}</a>
                 </p>
                 <p>
                     <button
                         class="btn-primary btn-rounded"
-                        @click="survey.onHide"
+                        @click="favOrganizeSurvey.onHide"
                     >
                         don't show again
                     </button>
