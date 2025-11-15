@@ -255,6 +255,10 @@ func (c authClient) ListPosts(tags string, page int) (*PostList, error) {
 			log.Warn().Str("val", p.CreatedAt).Err(err).Msg("failed to parse post created_at")
 		}
 
+		// Video URL host is video-cdn3.gelbooru.com but that seems to be broken. Viewing the post
+		// on Gelbooru uses video-cdn4.gelbooru.com instead
+		data.ImageUrl = strings.Replace(data.ImageUrl, "video-cdn3.gelbooru.com", "video-cdn4.gelbooru.com", 1)
+
 		posts = append(posts, data)
 	}
 
