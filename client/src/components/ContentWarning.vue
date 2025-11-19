@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, type RouteParamsRawGeneric } from "vue-router";
 import { defaultNSFWBlacklist, defaultSFWBlacklist } from "@/blacklist";
 import store from "@/store";
 import ScreenCover from "./ScreenCover.vue";
@@ -26,7 +26,7 @@ function consent() {
 
 	// Auto search doesn't trigger on page load if the user hasn't consented.
 	// Trigger it once they consent
-	let params;
+	let params: RouteParamsRawGeneric;
 
 	if (route.name === "search") {
 		params = route.params;
