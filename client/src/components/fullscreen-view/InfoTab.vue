@@ -11,7 +11,9 @@ watchEffect(() => {
 		return;
 	}
 
-	store.tagsForPost(post).then((val) => (tags.value = val));
+	store.tagsForPost(post).then((val) => {
+		tags.value = val;
+	});
 });
 
 // Add padding if the menu would cover part of the container

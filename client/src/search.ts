@@ -56,7 +56,7 @@ export class SearchQuery {
 
 	asList(): string[] {
 		const include = Array.from(this._include.values(), (t) => t.name);
-		const exclude = Array.from(this._exclude.values(), (t) => "-" + t.name);
+		const exclude = Array.from(this._exclude.values(), (t) => `-${t.name}`);
 		return include.concat(exclude);
 	}
 

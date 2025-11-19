@@ -233,7 +233,9 @@ function toggleFavorite() {
 	} else {
 		store.settings.favorites = [post].concat(store.settings.favorites);
 		favAnimation.value = true;
-		setTimeout(() => (favAnimation.value = false), 300);
+		setTimeout(() => {
+			favAnimation.value = false;
+		}, 300);
 	}
 
 	store.saveSettings();

@@ -26,7 +26,10 @@ const fullscreenViewMenuAnchorOptions: Record<
 };
 
 function onChangeColCount(e: Event) {
-	store.settings.columnCount = parseInt((e.target as HTMLInputElement).value);
+	store.settings.columnCount = parseInt(
+		(e.target as HTMLInputElement).value,
+		10,
+	);
 	store.saveSettings();
 }
 
@@ -37,7 +40,10 @@ function onChangeColSizing(e: Event) {
 }
 
 function onChangeColWidth(e: Event) {
-	store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value);
+	store.settings.columnWidth = parseInt(
+		(e.target as HTMLInputElement).value,
+		10,
+	);
 	store.saveSettings();
 }
 
@@ -49,7 +55,7 @@ function onChangePostHeight(e: Event) {
 	if ($el.value === $el.max) {
 		store.settings.maxPostHeight = null;
 	} else {
-		store.settings.maxPostHeight = parseInt($el.value);
+		store.settings.maxPostHeight = parseInt($el.value, 10);
 	}
 
 	store.saveSettings();
@@ -101,7 +107,9 @@ const generatingCode = ref(false);
 // Re-enable code generation once a change is made
 watch(
 	() => store.settings,
-	() => (canGenerate.value = true),
+	() => {
+		canGenerate.value = true;
+	},
 );
 
 const ignoredSettingsForImportExport: Array<
@@ -125,11 +133,15 @@ function generateExportCode() {
 		body: JSON.stringify(data),
 	})
 		.then((resp) => {
-			resp.json().then(({ code }) => (exportCode.value = code));
+			resp.json().then(({ code }) => {
+				exportCode.value = code;
+			});
 			canGenerate.value = false;
 		})
 		.catch((e) => console.error(e))
-		.finally(() => (generatingCode.value = false));
+		.finally(() => {
+			generatingCode.value = false;
+		});
 }
 
 const importCode = ref("");
@@ -144,20 +156,17 @@ function mergeSettings(data: Record<string, any>) {
 
 		// Remove any duplicates
 		if (k === "blacklist") {
-			// prettier-ignore
 			v = (v as Tag[]).filter(
 				(a) =>
 					store.settings.blacklist.findIndex((b) => a.name === b.name) === -1,
 			);
 			v = v.concat(store.settings.blacklist);
 		} else if (k === "favorites") {
-			// prettier-ignore
 			v = (v as Post[]).filter(
 				(a) => store.settings.favorites.findIndex((b) => a.id === b.id) === -1,
 			);
 			v = v.concat(store.settings.favorites);
 		} else if (k === "favoriteTags") {
-			// prettier-ignore
 			v = (v as Tag[]).filter(
 				(a) =>
 					store.settings.favoriteTags.findIndex((b) => a.name === b.name) ===
@@ -187,7 +196,7 @@ function importData() {
 						let msg = "Something went wrong";
 
 						if ("error" in val) {
-							msg = val["error"];
+							msg = val.error;
 						}
 
 						store.toast = {
@@ -212,7 +221,9 @@ function importData() {
 			importCode.value = "";
 		})
 		.catch((e) => console.error(e))
-		.finally(() => (importingData.value = false));
+		.finally(() => {
+			importingData.value = false;
+		});
 }
 </script>
 

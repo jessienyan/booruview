@@ -113,12 +113,14 @@ export function useNewFeatureIndicator(
 		return { expired: true, show, onSeen: () => {} };
 	}
 
-	const { show, onHide: onSeen } = useDontShowAgain("feat-" + id);
+	const { show, onHide: onSeen } = useDontShowAgain(`feat-${id}`);
 	return { expired: false, show, onSeen };
 }
 
 const now = ref(new Date());
-setInterval(() => (now.value = new Date()), 5 * 1000);
+setInterval(() => {
+	now.value = new Date();
+}, 5 * 1000);
 
 /** Returns a reactive `new Date()` that periodically updates */
 export function useDateNow() {

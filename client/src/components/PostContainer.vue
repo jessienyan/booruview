@@ -38,8 +38,8 @@ const colGap = 5;
 const postGap = 5;
 
 const theme = {
-	colGap: colGap + "px",
-	postGap: postGap + "px",
+	colGap: `${colGap}px`,
+	postGap: `${postGap}px`,
 };
 
 const columnDimensions = computed<ColumnDimensions | null>(() => {

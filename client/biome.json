@@ -6,7 +6,18 @@
     "linter": {
         "domains": {
             "vue": "recommended"
-        }
+        },
+		"rules": {
+			"correctness": {
+					"noUnusedFunctionParameters": "off"
+				},
+			"style": {
+				"noNonNullAssertion": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "off"
+			}
+		}
     },
     "overrides": [
 	{
@@ -16,6 +27,7 @@
 		"linter": {
 			"rules": {
 				"correctness": {
+					"noUnusedImports": "off",
 					"noUnusedVariables": "off"
 				}
 			}

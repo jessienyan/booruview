@@ -137,12 +137,12 @@ const store = reactive<Store>({
 			}
 
 			// The old settings code didn't stringify columnSizing, fix it
-			if (k === "columnSizing" && raw.length > 0 && raw[0] != '"') {
+			if (k === "columnSizing" && raw.length > 0 && raw[0] !== '"') {
 				raw = JSON.stringify(raw);
 				localStorage.setItem(k, raw);
 			}
 
-			let val;
+			let val: any;
 
 			// Ignore bad values and just use the default
 			try {
@@ -165,8 +165,12 @@ const store = reactive<Store>({
 						query: new SearchQuery(),
 					};
 
-					query.include.forEach((tag) => entry.query.includeTag(tag));
-					query.exclude.forEach((tag) => entry.query.excludeTag(tag));
+					query.include.forEach((tag) => {
+						entry.query.includeTag(tag);
+					});
+					query.exclude.forEach((tag) => {
+						entry.query.excludeTag(tag);
+					});
 
 					return entry;
 				});
@@ -266,7 +270,7 @@ const store = reactive<Store>({
 
 			this.fetchingPosts = true;
 
-			fetch("/api/posts?" + queryParams.toString())
+			fetch(`/api/posts?${queryParams.toString()}`)
 				.then((resp) => {
 					if (resp.status >= 400) {
 						resp
@@ -275,7 +279,7 @@ const store = reactive<Store>({
 								let msg = "Something went wrong";
 
 								if ("error" in val) {
-									msg = val["error"];
+									msg = val.error;
 								}
 
 								store.toast = {
@@ -292,7 +296,9 @@ const store = reactive<Store>({
 								};
 								reject();
 							})
-							.finally(() => (store.hasSearched = true));
+							.finally(() => {
+								store.hasSearched = true;
+							});
 						return;
 					}
 
@@ -373,10 +379,12 @@ const store = reactive<Store>({
 				queryParams.append("t", t);
 			}
 
-			fetch("/api/tags?" + queryParams.toString())
+			fetch(`/api/tags?${queryParams.toString()}`)
 				.then((resp) => {
 					resp.json().then((json: TagResponse) => {
-						json.results.forEach((t) => this.cachedTags.set(t.name, t));
+						json.results.forEach((t) => {
+							this.cachedTags.set(t.name, t);
+						});
 						resolve();
 					});
 				})

@@ -46,7 +46,9 @@ const timer = ref();
 const inputRef = useTemplateRef("input");
 const showSuggestions = ref(false);
 
-useDismiss([containerRef.value], () => (showSuggestions.value = false));
+useDismiss([containerRef.value], () => {
+	showSuggestions.value = false;
+});
 
 function setSuggestions(tags: Tag[]) {
 	// Filter out blacklist/already in search
@@ -70,7 +72,7 @@ function doTagSearch(query: string) {
 	}
 
 	// Encoding the query prevents trailing whitespace from being stripped
-	fetch("/api/tagsearch?q=" + encodeURIComponent(smartSuggestionValue.value))
+	fetch(`/api/tagsearch?q=${encodeURIComponent(smartSuggestionValue.value)}`)
 		.then((resp) => {
 			// Request took too long and results don't match the input, discard
 			if (query !== inputVal.value) {
@@ -263,7 +265,7 @@ function editTag(e: Event) {
 	const tag = (e as CustomEvent).detail as Tag;
 
 	if (store.query.isExcluded(tag.name)) {
-		inputVal.value = "-" + tag.name;
+		inputVal.value = `-${tag.name}`;
 	} else {
 		inputVal.value = tag.name;
 	}

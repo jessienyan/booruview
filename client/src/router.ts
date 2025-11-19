@@ -48,7 +48,7 @@ router.beforeEach((to) => {
 			return;
 		}
 
-		const page = parseInt(to.params.page as string);
+		const page = parseInt(to.params.page as string, 10);
 
 		return new Promise<void>((resolve, reject) => {
 			tagsToSearchQuery(to.params.query || []).then((q) => {
@@ -60,7 +60,9 @@ router.beforeEach((to) => {
 						resolve();
 					})
 					.catch(reject)
-					.finally(() => (store.justClickedSearchButton = false));
+					.finally(() => {
+						store.justClickedSearchButton = false;
+					});
 			});
 		});
 	}

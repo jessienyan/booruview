@@ -38,7 +38,7 @@ const openInNewTabLink = computed(() => {
 	const negated = tag.style === "strikethrough";
 	let query = tag.tag.name;
 	if (negated) {
-		query = "-" + query;
+		query = `-${query}`;
 	}
 
 	return router.resolve({
@@ -72,7 +72,9 @@ onMounted(() => {
 	if (jiggle) {
 		// Prevents the jiggle animation from playing when the sidebar
 		// is opened (display:none triggers animations)
-		setTimeout(() => (hasJiggled.value = true), 1000);
+		setTimeout(() => {
+			hasJiggled.value = true;
+		}, 1000);
 	}
 });
 </script>

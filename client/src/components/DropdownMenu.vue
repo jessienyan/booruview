@@ -34,15 +34,15 @@ const menuPosition = computed(() => {
 	const leftAlign = menuRect.width + elRect.left < viewport.value.width;
 
 	if (underneath) {
-		pos.top = elRect.bottom + "px";
+		pos.top = `${elRect.bottom}px`;
 	} else {
-		pos.bottom = viewport.value.height - elRect.top + "px";
+		pos.bottom = `${viewport.value.height - elRect.top}px`;
 	}
 
 	if (leftAlign) {
-		pos.left = elRect.left + "px";
+		pos.left = `${elRect.left}px`;
 	} else {
-		pos.right = viewport.value.width - elRect.right + "px";
+		pos.right = `${viewport.value.width - elRect.right}px`;
 	}
 
 	return pos;
