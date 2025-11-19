@@ -68,10 +68,14 @@ onMounted(() => {
 		onSwiped() {
 			switch (swipeDirection.value) {
 				case "LEFT":
-					store.prevPage().finally(() => {swipeDirection.value = null});
+					store.prevPage().finally(() => {
+						swipeDirection.value = null;
+					});
 					break;
 				case "RIGHT":
-					store.nextPage().finally(() => {swipeDirection.value = null});
+					store.nextPage().finally(() => {
+						swipeDirection.value = null;
+					});
 					break;
 			}
 		},

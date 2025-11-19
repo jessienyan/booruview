@@ -9,7 +9,9 @@ const show = defineModel("show", { required: true });
 const viewport = useViewportSize();
 useDismiss(
 	() => [container, props.el],
-	() => { show.value = false },
+	() => {
+		show.value = false;
+	},
 );
 
 const menuPosition = computed(() => {

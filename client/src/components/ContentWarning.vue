@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useRoute, useRouter, type RouteParamsRawGeneric } from "vue-router";
+import { type RouteParamsRawGeneric, useRoute, useRouter } from "vue-router";
 import { defaultNSFWBlacklist, defaultSFWBlacklist } from "@/blacklist";
 import store from "@/store";
 import ScreenCover from "./ScreenCover.vue";
