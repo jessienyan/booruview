@@ -1,0 +1,25 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
+    "files": {
+        "includes": ["src/**", "!src/vue-router-better-scroller/**"]
+    },
+    "linter": {
+        "domains": {
+            "vue": "recommended"
+        }
+    },
+    "overrides": [
+	{
+		"includes": [
+			"**/*.vue"
+		],
+		"linter": {
+			"rules": {
+				"correctness": {
+					"noUnusedVariables": "off"
+				}
+			}
+		}
+	}
+]
+}
