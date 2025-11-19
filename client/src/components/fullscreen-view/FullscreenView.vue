@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { type CSSProperties, computed, onMounted, onUnmounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useIsVideo, useMainContainer, useStationaryClick } from "@/composable";
 import store, { type FullscreenViewMenuAnchorPoint } from "@/store";
-import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
+import ScreenCover from "../ScreenCover.vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
-import ScreenCover from "../ScreenCover.vue";
-import { useIsVideo, useMainContainer, useStationaryClick } from "@/composable";
-import { useRoute } from "vue-router";
 
 type Tab = "content" | "info";
 type PostNavInfo = { page: number; index: number } | null;
@@ -17,243 +17,241 @@ const favAnimation = ref(false);
 const borderRadius = "15px";
 
 const menuAnchorPoints: Record<FullscreenViewMenuAnchorPoint, CSSProperties> = {
-    topleft: { top: "0px", left: "0px", borderBottomRightRadius: borderRadius },
-    topcenter: {
-        top: "0px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        borderBottomLeftRadius: borderRadius,
-        borderBottomRightRadius: borderRadius,
-    },
-    topright: {
-        top: "0px",
-        right: "0px",
-        borderBottomLeftRadius: borderRadius,
-    },
-    right: {
-        top: "50%",
-        right: "0px",
-        transform: "translateY(-50%)",
-        borderTopLeftRadius: borderRadius,
-        borderBottomLeftRadius: borderRadius,
-    },
-    bottomright: {
-        bottom: "0px",
-        right: "0px",
-        borderTopLeftRadius: borderRadius,
-    },
-    bottomcenter: {
-        bottom: "0px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        borderTopLeftRadius: borderRadius,
-        borderTopRightRadius: borderRadius,
-    },
-    bottomleft: {
-        bottom: "0px",
-        left: "0px",
-        borderTopRightRadius: borderRadius,
-    },
-    left: {
-        top: "50%",
-        left: "0px",
-        transform: "translateY(-50%)",
-        borderTopRightRadius: borderRadius,
-        borderBottomRightRadius: borderRadius,
-    },
+	topleft: { top: "0px", left: "0px", borderBottomRightRadius: borderRadius },
+	topcenter: {
+		top: "0px",
+		left: "50%",
+		transform: "translateX(-50%)",
+		borderBottomLeftRadius: borderRadius,
+		borderBottomRightRadius: borderRadius,
+	},
+	topright: {
+		top: "0px",
+		right: "0px",
+		borderBottomLeftRadius: borderRadius,
+	},
+	right: {
+		top: "50%",
+		right: "0px",
+		transform: "translateY(-50%)",
+		borderTopLeftRadius: borderRadius,
+		borderBottomLeftRadius: borderRadius,
+	},
+	bottomright: {
+		bottom: "0px",
+		right: "0px",
+		borderTopLeftRadius: borderRadius,
+	},
+	bottomcenter: {
+		bottom: "0px",
+		left: "50%",
+		transform: "translateX(-50%)",
+		borderTopLeftRadius: borderRadius,
+		borderTopRightRadius: borderRadius,
+	},
+	bottomleft: {
+		bottom: "0px",
+		left: "0px",
+		borderTopRightRadius: borderRadius,
+	},
+	left: {
+		top: "50%",
+		left: "0px",
+		transform: "translateY(-50%)",
+		borderTopRightRadius: borderRadius,
+		borderBottomRightRadius: borderRadius,
+	},
 };
 
 function close() {
-    store.fullscreenPost = null;
+	store.fullscreenPost = null;
 }
 
 function onKeyDown(e: KeyboardEvent) {
-    let caught = false;
+	let caught = false;
 
-    if (e.key === "Esc" || e.key === "Escape") {
-        caught = true;
-        close();
-    } else if (e.key === "ArrowLeft" || e.key.toUpperCase() === "A") {
-        caught = true;
-        showPrevPost();
-    } else if (e.key === "ArrowRight" || e.key.toUpperCase() === "D") {
-        caught = true;
-        showNextPost();
-    } else if (e.key.toUpperCase() === "F") {
-        caught = true;
-        toggleFavorite();
-    }
+	if (e.key === "Esc" || e.key === "Escape") {
+		caught = true;
+		close();
+	} else if (e.key === "ArrowLeft" || e.key.toUpperCase() === "A") {
+		caught = true;
+		showPrevPost();
+	} else if (e.key === "ArrowRight" || e.key.toUpperCase() === "D") {
+		caught = true;
+		showNextPost();
+	} else if (e.key.toUpperCase() === "F") {
+		caught = true;
+		toggleFavorite();
+	}
 
-    if (caught) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+	if (caught) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
 }
 
 const isVideo = useIsVideo(() => post);
 
 const tabClasses = computed(() => {
-    // Center unless we're displaying an image and viewing the content tab.
-    // Image viewing uses panzoom which breaks when the container is flexbox
-    const centered = !(currentTab.value === "content" && !isVideo.value);
-    return {
-        "tab-centered": centered,
-    };
+	// Center unless we're displaying an image and viewing the content tab.
+	// Image viewing uses panzoom which breaks when the container is flexbox
+	const centered = !(currentTab.value === "content" && !isVideo.value);
+	return {
+		"tab-centered": centered,
+	};
 });
 
 const tabHandler = useStationaryClick(close);
 const route = useRoute(); // TODO: refactor
 
 const currentPostIndex = computed(() => {
-    let index = -1;
+	let index = -1;
 
-    if (route.name === "search") {
-        index = store.posts
-            .get(store.currentPage)!
-            .findIndex((p) => p.id === post.id);
-    } else if (route.name === "favorites") {
-        index = store.settings.favorites.findIndex((p) => p.id === post.id);
-    }
+	if (route.name === "search") {
+		index = store.posts
+			.get(store.currentPage)!
+			.findIndex((p) => p.id === post.id);
+	} else if (route.name === "favorites") {
+		index = store.settings.favorites.findIndex((p) => p.id === post.id);
+	}
 
-    return index === -1 ? null : index;
+	return index === -1 ? null : index;
 });
 const nextPost = computed<PostNavInfo>(() => {
-    if (currentPostIndex.value == null) {
-        return null;
-    }
+	if (currentPostIndex.value == null) {
+		return null;
+	}
 
-    if (route.name === "favorites") {
-        if (currentPostIndex.value === store.settings.favorites.length - 1) {
-            return null;
-        }
+	if (route.name === "favorites") {
+		if (currentPostIndex.value === store.settings.favorites.length - 1) {
+			return null;
+		}
 
-        return {
-            page: 1,
-            index: currentPostIndex.value + 1,
-        };
-    }
+		return {
+			page: 1,
+			index: currentPostIndex.value + 1,
+		};
+	}
 
-    const isLastPage = store.currentPage === store.maxPage();
-    const isLastResult = currentPostIndex.value === store.resultsPerPage - 1;
+	const isLastPage = store.currentPage === store.maxPage();
+	const isLastResult = currentPostIndex.value === store.resultsPerPage - 1;
 
-    if (isLastPage && isLastResult) {
-        return null;
-    }
+	if (isLastPage && isLastResult) {
+		return null;
+	}
 
-    if (isLastResult) {
-        return {
-            page: store.currentPage + 1,
-            index: 0,
-        };
-    }
+	if (isLastResult) {
+		return {
+			page: store.currentPage + 1,
+			index: 0,
+		};
+	}
 
-    return {
-        page: store.currentPage,
-        index: currentPostIndex.value + 1,
-    };
+	return {
+		page: store.currentPage,
+		index: currentPostIndex.value + 1,
+	};
 });
 
 const prevPost = computed<PostNavInfo>(() => {
-    if (currentPostIndex.value == null) {
-        return null;
-    }
+	if (currentPostIndex.value == null) {
+		return null;
+	}
 
-    if (route.name === "favorites") {
-        if (currentPostIndex.value === 0) {
-            return null;
-        }
+	if (route.name === "favorites") {
+		if (currentPostIndex.value === 0) {
+			return null;
+		}
 
-        return {
-            page: 1,
-            index: currentPostIndex.value - 1,
-        };
-    }
+		return {
+			page: 1,
+			index: currentPostIndex.value - 1,
+		};
+	}
 
-    const isFirstPage = store.currentPage === 1;
-    const isFirstResult = currentPostIndex.value === 0;
+	const isFirstPage = store.currentPage === 1;
+	const isFirstResult = currentPostIndex.value === 0;
 
-    if (isFirstPage && isFirstResult) {
-        return null;
-    }
+	if (isFirstPage && isFirstResult) {
+		return null;
+	}
 
-    if (isFirstResult) {
-        return {
-            page: store.currentPage - 1,
-            index: store.resultsPerPage - 1,
-        };
-    }
+	if (isFirstResult) {
+		return {
+			page: store.currentPage - 1,
+			index: store.resultsPerPage - 1,
+		};
+	}
 
-    return {
-        page: store.currentPage,
-        index: currentPostIndex.value - 1,
-    };
+	return {
+		page: store.currentPage,
+		index: currentPostIndex.value - 1,
+	};
 });
 
 function showNextPost() {
-    const nav = nextPost.value;
+	const nav = nextPost.value;
 
-    if (nav === null) {
-        return;
-    } else if (route.name === "favorites") {
-        store.fullscreenPost = store.settings.favorites[nav.index];
-        return;
-    }
+	if (nav === null) {
+		return;
+	} else if (route.name === "favorites") {
+		store.fullscreenPost = store.settings.favorites[nav.index];
+		return;
+	}
 
-    if (store.currentPage === nav.page) {
-        store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
-    } else {
-        store.nextPage().then(() => {
-            store.fullscreenPost =
-                store.posts.get(nav.page)![nav.index] || null;
-        });
-    }
+	if (store.currentPage === nav.page) {
+		store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+	} else {
+		store.nextPage().then(() => {
+			store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+		});
+	}
 }
 
 function showPrevPost() {
-    const nav = prevPost.value;
+	const nav = prevPost.value;
 
-    if (nav === null) {
-        return;
-    } else if (route.name === "favorites") {
-        store.fullscreenPost = store.settings.favorites[nav.index];
-        return;
-    }
+	if (nav === null) {
+		return;
+	} else if (route.name === "favorites") {
+		store.fullscreenPost = store.settings.favorites[nav.index];
+		return;
+	}
 
-    if (store.currentPage === nav.page) {
-        store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
-    } else {
-        store.prevPage().then(() => {
-            store.fullscreenPost =
-                store.posts.get(nav.page)![nav.index] || null;
-        });
-    }
+	if (store.currentPage === nav.page) {
+		store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+	} else {
+		store.prevPage().then(() => {
+			store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+		});
+	}
 }
 
 function toggleFavorite() {
-    if (isFavorited.value) {
-        store.settings.favorites.splice(favoriteIndex.value, 1);
-    } else {
-        store.settings.favorites = [post].concat(store.settings.favorites);
-        favAnimation.value = true;
-        setTimeout(() => (favAnimation.value = false), 300);
-    }
+	if (isFavorited.value) {
+		store.settings.favorites.splice(favoriteIndex.value, 1);
+	} else {
+		store.settings.favorites = [post].concat(store.settings.favorites);
+		favAnimation.value = true;
+		setTimeout(() => (favAnimation.value = false), 300);
+	}
 
-    store.saveSettings();
+	store.saveSettings();
 }
 
 const favoriteIndex = computed(() =>
-    store.settings.favorites.findIndex((p) => p.id === post.id),
+	store.settings.favorites.findIndex((p) => p.id === post.id),
 );
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 const mainContainer = useMainContainer();
 
 onMounted(() => {
-    document.addEventListener("keydown", onKeyDown, { capture: true });
+	document.addEventListener("keydown", onKeyDown, { capture: true });
 });
 
 onUnmounted(() => {
-    document.removeEventListener("keydown", onKeyDown, { capture: true });
-    mainContainer.value.focus();
+	document.removeEventListener("keydown", onKeyDown, { capture: true });
+	mainContainer.value.focus();
 });
 </script>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useDontShowAgain } from "@/composable";
+import { ORGANIZE_FAVS_SURVEY_LINK } from "@/config";
 import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
-import { useDontShowAgain } from "@/composable";
-import { ORGANIZE_FAVS_SURVEY_LINK } from "@/config";
 
 const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
 </script>

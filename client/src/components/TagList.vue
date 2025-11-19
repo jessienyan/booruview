@@ -1,51 +1,51 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import Chip from "./tag-chip/Chip.vue";
 import type { ChipActions } from "@/types";
+import Chip from "./tag-chip/Chip.vue";
 
 type listCategories = Record<TagType, TagChip[]>;
 
 const {
-    jiggle = false,
-    tags = [],
-    actions,
+	jiggle = false,
+	tags = [],
+	actions,
 } = defineProps<{
-    jiggle?: boolean;
-    tags: TagChip[];
-    actions?: ChipActions;
+	jiggle?: boolean;
+	tags: TagChip[];
+	actions?: ChipActions;
 }>();
 
 // TODO: accept type prop and pass to chips
 
 const categories = computed(() => {
-    const ret: listCategories = {
-        artist: [],
-        character: [],
-        copyright: [],
-        tag: [],
-        metadata: [],
-        deprecated: [],
-        unknown: [],
-    };
+	const ret: listCategories = {
+		artist: [],
+		character: [],
+		copyright: [],
+		tag: [],
+		metadata: [],
+		deprecated: [],
+		unknown: [],
+	};
 
-    tags.forEach((t) => (ret[t.tag.type] = ret[t.tag.type].concat(t)));
+	tags.forEach((t) => (ret[t.tag.type] = ret[t.tag.type].concat(t)));
 
-    // Move deprecated tags into the regular tag section
-    ret.tag = ret.tag.concat(ret.deprecated);
-    ret.deprecated = [];
+	// Move deprecated tags into the regular tag section
+	ret.tag = ret.tag.concat(ret.deprecated);
+	ret.deprecated = [];
 
-    function sortTags(list: TagChip[]) {
-        list.sort((a, b) => a.tag.name.localeCompare(b.tag.name));
-    }
+	function sortTags(list: TagChip[]) {
+		list.sort((a, b) => a.tag.name.localeCompare(b.tag.name));
+	}
 
-    sortTags(ret.artist);
-    sortTags(ret.character);
-    sortTags(ret.copyright);
-    sortTags(ret.tag);
-    sortTags(ret.metadata);
-    sortTags(ret.unknown);
+	sortTags(ret.artist);
+	sortTags(ret.character);
+	sortTags(ret.copyright);
+	sortTags(ret.tag);
+	sortTags(ret.metadata);
+	sortTags(ret.unknown);
 
-    return ret;
+	return ret;
 });
 </script>
 

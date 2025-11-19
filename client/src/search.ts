@@ -1,141 +1,141 @@
 import store from "./store";
 
 export type SerializedSearchQuery = {
-    include: Tag[];
-    exclude: Tag[];
+	include: Tag[];
+	exclude: Tag[];
 };
 
 export class SearchQuery {
-    _include: Map<string, Tag>;
-    _exclude: Map<string, Tag>;
+	_include: Map<string, Tag>;
+	_exclude: Map<string, Tag>;
 
-    constructor() {
-        this._include = new Map();
-        this._exclude = new Map();
-    }
+	constructor() {
+		this._include = new Map();
+		this._exclude = new Map();
+	}
 
-    includedList(): Tag[] {
-        return Array.from(this._include.values());
-    }
+	includedList(): Tag[] {
+		return Array.from(this._include.values());
+	}
 
-    excludedList(): Tag[] {
-        return Array.from(this._exclude.values());
-    }
+	excludedList(): Tag[] {
+		return Array.from(this._exclude.values());
+	}
 
-    clear() {
-        this._include.clear();
-        this._exclude.clear();
-    }
+	clear() {
+		this._include.clear();
+		this._exclude.clear();
+	}
 
-    isExcluded(name: string) {
-        return this._exclude.has(name);
-    }
+	isExcluded(name: string) {
+		return this._exclude.has(name);
+	}
 
-    isIncluded(name: string) {
-        return this._include.has(name);
-    }
+	isIncluded(name: string) {
+		return this._include.has(name);
+	}
 
-    isEmpty() {
-        return this._include.size + this._exclude.size === 0;
-    }
+	isEmpty() {
+		return this._include.size + this._exclude.size === 0;
+	}
 
-    includeTag(t: Tag) {
-        this._include.set(t.name, t);
-        this._exclude.delete(t.name);
-    }
+	includeTag(t: Tag) {
+		this._include.set(t.name, t);
+		this._exclude.delete(t.name);
+	}
 
-    excludeTag(t: Tag) {
-        this._exclude.set(t.name, t);
-        this._include.delete(t.name);
-    }
+	excludeTag(t: Tag) {
+		this._exclude.set(t.name, t);
+		this._include.delete(t.name);
+	}
 
-    removeTag(t: Tag) {
-        this._include.delete(t.name);
-        this._exclude.delete(t.name);
-    }
+	removeTag(t: Tag) {
+		this._include.delete(t.name);
+		this._exclude.delete(t.name);
+	}
 
-    asList(): string[] {
-        const include = Array.from(this._include.values(), (t) => t.name);
-        const exclude = Array.from(this._exclude.values(), (t) => "-" + t.name);
-        return include.concat(exclude);
-    }
+	asList(): string[] {
+		const include = Array.from(this._include.values(), (t) => t.name);
+		const exclude = Array.from(this._exclude.values(), (t) => "-" + t.name);
+		return include.concat(exclude);
+	}
 
-    asQueryParams(): string {
-        return this.asList().sort().join(",");
-    }
+	asQueryParams(): string {
+		return this.asList().sort().join(",");
+	}
 
-    equals(o: SearchQuery): boolean {
-        if (
-            this._include.size !== o._include.size ||
-            this._exclude.size !== o._exclude.size
-        ) {
-            return false;
-        }
+	equals(o: SearchQuery): boolean {
+		if (
+			this._include.size !== o._include.size ||
+			this._exclude.size !== o._exclude.size
+		) {
+			return false;
+		}
 
-        for (const k of this._include.keys()) {
-            if (!o._include.has(k)) {
-                return false;
-            }
-        }
+		for (const k of this._include.keys()) {
+			if (!o._include.has(k)) {
+				return false;
+			}
+		}
 
-        for (const k of this._exclude.keys()) {
-            if (!o._exclude.has(k)) {
-                return false;
-            }
-        }
+		for (const k of this._exclude.keys()) {
+			if (!o._exclude.has(k)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    copy(): SearchQuery {
-        const clone = new SearchQuery();
-        clone._include = new Map(this._include);
-        clone._exclude = new Map(this._exclude);
-        return clone;
-    }
+	copy(): SearchQuery {
+		const clone = new SearchQuery();
+		clone._include = new Map(this._include);
+		clone._exclude = new Map(this._exclude);
+		return clone;
+	}
 
-    toJSON(): SerializedSearchQuery {
-        return {
-            include: this.includedList(),
-            exclude: this.excludedList(),
-        };
-    }
+	toJSON(): SerializedSearchQuery {
+		return {
+			include: this.includedList(),
+			exclude: this.excludedList(),
+		};
+	}
 }
 
 export function tagsToSearchQuery(
-    tagNames: string | string[],
+	tagNames: string | string[],
 ): Promise<SearchQuery> {
-    if (typeof tagNames === "string") {
-        tagNames = tagNames.split(",");
-    }
+	if (typeof tagNames === "string") {
+		tagNames = tagNames.split(",");
+	}
 
-    return new Promise<SearchQuery>((resolve, reject) => {
-        store
-            .loadTags(tagNames)
-            .then(() => {
-                const query = new SearchQuery();
+	return new Promise<SearchQuery>((resolve, reject) => {
+		store
+			.loadTags(tagNames)
+			.then(() => {
+				const query = new SearchQuery();
 
-                for (const name of tagNames) {
-                    let tag = store.getTag(name);
+				for (const name of tagNames) {
+					let tag = store.getTag(name);
 
-                    // Handle raw tags
-                    if (tag === undefined) {
-                        tag = {
-                            count: 0,
-                            name: name.replace(/^\-+/, ""),
-                            type: "unknown",
-                        };
-                    }
+					// Handle raw tags
+					if (tag === undefined) {
+						tag = {
+							count: 0,
+							name: name.replace(/^-+/, ""),
+							type: "unknown",
+						};
+					}
 
-                    if (name.startsWith("-")) {
-                        query.excludeTag(tag);
-                    } else {
-                        query.includeTag(tag);
-                    }
-                }
+					if (name.startsWith("-")) {
+						query.excludeTag(tag);
+					} else {
+						query.includeTag(tag);
+					}
+				}
 
-                resolve(query);
-            })
-            .catch(reject);
-    });
+				resolve(query);
+			})
+			.catch(reject);
+	});
 }

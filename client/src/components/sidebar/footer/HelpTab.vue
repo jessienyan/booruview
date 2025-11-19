@@ -1,24 +1,24 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Chip from "@/components/tag-chip/Chip.vue";
 import store from "@/store";
-import { computed } from "vue";
 
 const emit = defineEmits(["on-close"]);
 const blueSkyTag = computed<TagChip>(() => {
-    let style: ChipStyle = "default";
-    if (store.query.isIncluded("blue_sky")) {
-        style = "checkmark";
-    } else if (store.query.isExcluded("blue_sky")) {
-        style = "strikethrough";
-    }
-    return {
-        style,
-        tag: {
-            count: 0,
-            name: "blue_sky",
-            type: "tag",
-        },
-    };
+	let style: ChipStyle = "default";
+	if (store.query.isIncluded("blue_sky")) {
+		style = "checkmark";
+	} else if (store.query.isExcluded("blue_sky")) {
+		style = "strikethrough";
+	}
+	return {
+		style,
+		tag: {
+			count: 0,
+			name: "blue_sky",
+			type: "tag",
+		},
+	};
 });
 </script>
 

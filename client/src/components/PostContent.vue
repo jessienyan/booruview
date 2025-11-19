@@ -1,87 +1,87 @@
 <script setup lang="ts">
+import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import { useIsVideo } from "@/composable";
 import store from "@/store";
-import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 
 const {
-    cropped,
-    maxHeight,
-    renderHeight,
-    post,
-    scrollContainer,
-    beingDragged,
+	cropped,
+	maxHeight,
+	renderHeight,
+	post,
+	scrollContainer,
+	beingDragged,
 } = defineProps<{
-    cropped: boolean;
-    maxHeight: number;
-    renderHeight: number;
-    post: Post;
-    scrollContainer: HTMLElement;
-    beingDragged?: boolean;
+	cropped: boolean;
+	maxHeight: number;
+	renderHeight: number;
+	post: Post;
+	scrollContainer: HTMLElement;
+	beingDragged?: boolean;
 }>();
 
 const isVideo = useIsVideo(() => post);
 const favorited = computed(
-    () => store.settings.favorites.findIndex((p) => p.id === post.id) !== -1,
+	() => store.settings.favorites.findIndex((p) => p.id === post.id) !== -1,
 );
 
 const content = computed<{ url: string; width: number; height: number }>(() => {
-    if (isVideo.value) {
-        return {
-            url: post.thumbnail_url,
-            width: post.thumbnail_width,
-            height: post.thumbnail_height,
-        };
-    }
+	if (isVideo.value) {
+		return {
+			url: post.thumbnail_url,
+			width: post.thumbnail_width,
+			height: post.thumbnail_height,
+		};
+	}
 
-    if (post.lowres_url.length > 0) {
-        return {
-            url: post.lowres_url,
-            width: post.lowres_width,
-            height: post.lowres_height,
-        };
-    }
+	if (post.lowres_url.length > 0) {
+		return {
+			url: post.lowres_url,
+			width: post.lowres_width,
+			height: post.lowres_height,
+		};
+	}
 
-    return {
-        url: post.image_url,
-        width: post.width,
-        height: post.height,
-    };
+	return {
+		url: post.image_url,
+		width: post.width,
+		height: post.height,
+	};
 });
 
 const showImage = ref(false);
 const containerRef = useTemplateRef("container");
 const scrollObserver = new IntersectionObserver(onIntersectionChange, {
-    root: scrollContainer,
+	root: scrollContainer,
 
-    // Preload images when they are within this distance from the bottom of the viewport
-    rootMargin: "600px 0px 600px 0px",
+	// Preload images when they are within this distance from the bottom of the viewport
+	rootMargin: "600px 0px 600px 0px",
 });
 
 function onIntersectionChange(entries: IntersectionObserverEntry[]) {
-    const e = entries[0];
+	const e = entries[0];
 
-    // Once: render the image when it comes into view and cleanup the observer
-    if (e.isIntersecting) {
-        showImage.value = true;
-        scrollObserver.disconnect();
-    }
+	// Once: render the image when it comes into view and cleanup the observer
+	if (e.isIntersecting) {
+		showImage.value = true;
+		scrollObserver.disconnect();
+	}
 }
 
 // Reset showImage state if post changes. Allows component to be reused
 watch(
-    () => [post.id, containerRef.value],
-    () => {
-        if (containerRef.value === null) {
-            return;
-        }
+	() => [post.id, containerRef.value],
+	() => {
+		if (containerRef.value === null) {
+			return;
+		}
 
-        showImage.value = false;
-        scrollObserver.observe(containerRef.value!);
-    },
+		showImage.value = false;
+		scrollObserver.observe(containerRef.value!);
+	},
 );
 
 onUnmounted(() => {
-    scrollObserver.disconnect();
+	scrollObserver.disconnect();
 });
 </script>
 

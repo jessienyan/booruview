@@ -1,100 +1,100 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import store from "@/store";
 import type { ChipActions } from "@/types";
-import { computed, ref } from "vue";
 
 const showBlacklistConfirm = ref(false);
 const {
-    onClick,
-    tag,
-    actions: actionProps = {},
+	onClick,
+	tag,
+	actions: actionProps = {},
 } = defineProps<{
-    onClick: () => void;
-    tag: Tag;
-    actions?: ChipActions;
+	onClick: () => void;
+	tag: Tag;
+	actions?: ChipActions;
 }>();
 
 const actions = computed(() => ({
-    edit: actionProps.edit ?? false,
-    blacklist: actionProps.blacklist ?? true,
-    includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
-    favorite: actionProps.favorite ?? true,
+	edit: actionProps.edit ?? false,
+	blacklist: actionProps.blacklist ?? true,
+	includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
+	favorite: actionProps.favorite ?? true,
 }));
 
 const isBlacklisted = computed(() => {
-    const name = tag.name;
-    return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
+	const name = tag.name;
+	return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
 });
 
 const isIncluded = computed(() => {
-    return store.query.isIncluded(tag.name);
+	return store.query.isIncluded(tag.name);
 });
 
 const isExcluded = computed(() => {
-    return store.query.isExcluded(tag.name);
+	return store.query.isExcluded(tag.name);
 });
 
 const favoriteIndex = computed(() => {
-    return store.settings.favoriteTags.findIndex((t) => tag.name === t.name);
+	return store.settings.favoriteTags.findIndex((t) => tag.name === t.name);
 });
 
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 
 function onAdd() {
-    store.query.includeTag(tag);
-    onClick();
+	store.query.includeTag(tag);
+	onClick();
 }
 
 function onBlacklist() {
-    showBlacklistConfirm.value = true;
+	showBlacklistConfirm.value = true;
 }
 
 function onConfirmBlacklist() {
-    store.settings.blacklist = store.settings.blacklist.concat(tag);
-    store.saveSettings();
-    store.query.removeTag(tag);
-    onClick();
+	store.settings.blacklist = store.settings.blacklist.concat(tag);
+	store.saveSettings();
+	store.query.removeTag(tag);
+	onClick();
 }
 
 function onExclude() {
-    store.query.excludeTag(tag);
-    onClick();
+	store.query.excludeTag(tag);
+	onClick();
 }
 
 function onRemove() {
-    store.query.removeTag(tag);
-    onClick();
+	store.query.removeTag(tag);
+	onClick();
 }
 
 function onFavorite() {
-    store.settings.favoriteTags.push(tag);
-    store.saveSettings();
-    onClick();
+	store.settings.favoriteTags.push(tag);
+	store.saveSettings();
+	onClick();
 }
 
 function onEdit() {
-    store.editTag(tag);
-    onClick();
+	store.editTag(tag);
+	onClick();
 }
 
 function onUnfavorite() {
-    store.settings.favoriteTags.splice(favoriteIndex.value, 1);
-    store.saveSettings();
-    onClick();
+	store.settings.favoriteTags.splice(favoriteIndex.value, 1);
+	store.saveSettings();
+	onClick();
 }
 
 function onWhitelist() {
-    const name = tag.name;
-    const i = store.settings.blacklist.findIndex((t) => t.name === name);
+	const name = tag.name;
+	const i = store.settings.blacklist.findIndex((t) => t.name === name);
 
-    // shouldn't happen
-    if (i === -1) {
-        return;
-    }
+	// shouldn't happen
+	if (i === -1) {
+		return;
+	}
 
-    store.settings.blacklist.splice(i, 1);
-    store.saveSettings();
-    onClick();
+	store.settings.blacklist.splice(i, 1);
+	store.saveSettings();
+	onClick();
 }
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useMainContainer } from "@/composable";
 import { onMounted, ref } from "vue";
+import { useMainContainer } from "@/composable";
 
 const top = ref("");
 const scrollContainer = useMainContainer();

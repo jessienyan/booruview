@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ChangeLog from "./ChangeLog.vue";
+import CodebergLogo from "@/assets/codeberg.svg";
 import { changeLog } from "@/changelog";
 import Collapsable from "@/components/Collapsable.vue";
 import { COMMIT_SHA, LAST_COMMIT_DATE, SURVEY_LINK } from "@/config";
-import CodebergLogo from "@/assets/codeberg.svg";
+import ChangeLog from "./ChangeLog.vue";
 </script>
 
 <template>

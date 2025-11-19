@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import store from "@/store";
-import {
-    computed,
-    onActivated,
-    onDeactivated,
-    onMounted,
-    onUnmounted,
-    useTemplateRef,
-    watch,
-} from "vue";
 import createPanZoom, { type PanZoom } from "panzoom";
+import {
+	computed,
+	onActivated,
+	onDeactivated,
+	onMounted,
+	onUnmounted,
+	useTemplateRef,
+	watch,
+} from "vue";
 import { useIsVideo } from "@/composable";
+import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");
 let pz: PanZoom | undefined;
@@ -20,61 +20,61 @@ const overscrollCssClass = "prevent-overscroll";
 const isVideo = useIsVideo(() => post);
 
 function setupPanZoom() {
-    pz?.dispose();
+	pz?.dispose();
 
-    // Don't use panzoom for videos
-    if (isVideo.value) {
-        return;
-    }
+	// Don't use panzoom for videos
+	if (isVideo.value) {
+		return;
+	}
 
-    pz = createPanZoom(imgRef.value!, {
-        autocenter: true,
-        bounds: true,
-        boundsPadding: 0.1,
-        maxZoom: 4,
-        minZoom: 0.05,
-        onTouch() {
-            // Don't block the touch event so the user can right click
-            return false;
-        },
-    });
+	pz = createPanZoom(imgRef.value!, {
+		autocenter: true,
+		bounds: true,
+		boundsPadding: 0.1,
+		maxZoom: 4,
+		minZoom: 0.05,
+		onTouch() {
+			// Don't block the touch event so the user can right click
+			return false;
+		},
+	});
 }
 
 watch(() => post.id, setupPanZoom, { flush: "post" });
 
 onMounted(() => {
-    setupPanZoom();
+	setupPanZoom();
 
-    // Since the touch event isn't being blocked we need to prevent the user from
-    // overscrolling the page (refresh by pulling down)
-    htmlRoot.classList.add(overscrollCssClass);
+	// Since the touch event isn't being blocked we need to prevent the user from
+	// overscrolling the page (refresh by pulling down)
+	htmlRoot.classList.add(overscrollCssClass);
 });
 
 onUnmounted(() => {
-    pz?.dispose();
-    htmlRoot.classList.remove(overscrollCssClass);
+	pz?.dispose();
+	htmlRoot.classList.remove(overscrollCssClass);
 });
 
 onDeactivated(() => pz?.pause());
 onActivated(() => pz?.resume());
 
 const content = computed(() => {
-    const hasHighRes = post.image_url.length > 0;
-    const hasLowRes = post.lowres_url.length > 0;
+	const hasHighRes = post.image_url.length > 0;
+	const hasLowRes = post.lowres_url.length > 0;
 
-    if (!hasLowRes || (hasHighRes && store.settings.highResImages)) {
-        return {
-            url: post.image_url,
-            height: post.height,
-            width: post.width,
-        };
-    }
+	if (!hasLowRes || (hasHighRes && store.settings.highResImages)) {
+		return {
+			url: post.image_url,
+			height: post.height,
+			width: post.width,
+		};
+	}
 
-    return {
-        url: post.lowres_url,
-        height: post.lowres_height,
-        width: post.lowres_width,
-    };
+	return {
+		url: post.lowres_url,
+		height: post.lowres_height,
+		width: post.lowres_width,
+	};
 });
 </script>
 

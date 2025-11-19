@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { ref, type Component } from "vue";
+import { type Component, ref } from "vue";
+import store from "@/store";
 import AboutTab from "./AboutTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
-import store from "@/store";
 
 type Tab = "about" | "help" | "settings";
 const tabComponents: Record<Tab, Component> = {
-    about: AboutTab,
-    help: HelpTab,
-    settings: SettingsTab,
+	about: AboutTab,
+	help: HelpTab,
+	settings: SettingsTab,
 };
 const currentTab = ref<Tab>("about");
 
 function switchTab(tab: Tab) {
-    currentTab.value = tab;
-    store.settings.sidebarTabsHidden = false;
-    store.saveSettings();
+	currentTab.value = tab;
+	store.settings.sidebarTabsHidden = false;
+	store.saveSettings();
 }
 
 function toggleClose() {
-    store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
-    store.saveSettings();
+	store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
+	store.saveSettings();
 }
 </script>
 

@@ -1,122 +1,120 @@
 import {
-    computed,
-    inject,
-    onMounted,
-    onUnmounted,
-    readonly,
-    ref,
-    toValue,
-    type ComputedRef,
-    type MaybeRefOrGetter,
-    type Ref,
-    type ShallowRef,
+	type ComputedRef,
+	computed,
+	inject,
+	type MaybeRefOrGetter,
+	onMounted,
+	onUnmounted,
+	type Ref,
+	readonly,
+	ref,
+	type ShallowRef,
+	toValue,
 } from "vue";
 
 export function useDismiss(
-    el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
-    onDismiss: () => void,
+	el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
+	onDismiss: () => void,
 ) {
-    function handler(e: MouseEvent) {
-        const clickedOutside =
-            toValue(el).findIndex((v) => {
-                const child = toValue(v);
+	function handler(e: MouseEvent) {
+		const clickedOutside =
+			toValue(el).findIndex((v) => {
+				const child = toValue(v);
 
-                if (!child) {
-                    return false;
-                }
+				if (!child) {
+					return false;
+				}
 
-                return child.contains(e.target as Node);
-            }) === -1; // Clicked element was not found in any of `el`
+				return child.contains(e.target as Node);
+			}) === -1; // Clicked element was not found in any of `el`
 
-        if (clickedOutside) {
-            onDismiss();
-        }
-    }
+		if (clickedOutside) {
+			onDismiss();
+		}
+	}
 
-    onMounted(() => document.addEventListener("click", handler));
-    onUnmounted(() => document.removeEventListener("click", handler));
+	onMounted(() => document.addEventListener("click", handler));
+	onUnmounted(() => document.removeEventListener("click", handler));
 }
 
 export function useIsVideo(post: MaybeRefOrGetter<Post>): ComputedRef<boolean> {
-    return computed(() => {
-        const val = toValue(post);
+	return computed(() => {
+		const val = toValue(post);
 
-        return (
-            val.image_url.endsWith(".mp4") || val.image_url.endsWith(".webm")
-        );
-    });
+		return val.image_url.endsWith(".mp4") || val.image_url.endsWith(".webm");
+	});
 }
 
 type StationaryClickReturn = {
-    mouseDown: (e: MouseEvent) => void;
-    mouseUp: (e: MouseEvent) => void;
+	mouseDown: (e: MouseEvent) => void;
+	mouseUp: (e: MouseEvent) => void;
 };
 
 // Fires a click event only if the cursor didn't move.
 export function useStationaryClick(
-    onClick: (e: MouseEvent) => void,
+	onClick: (e: MouseEvent) => void,
 ): StationaryClickReturn {
-    const originX = ref(0);
-    const originY = ref(0);
+	const originX = ref(0);
+	const originY = ref(0);
 
-    // Number of pixels the cursor can move and still be considered a stationary click
-    const allowedDistance = 10;
+	// Number of pixels the cursor can move and still be considered a stationary click
+	const allowedDistance = 10;
 
-    function mouseDown(e: MouseEvent) {
-        originX.value = e.x;
-        originY.value = e.y;
-    }
+	function mouseDown(e: MouseEvent) {
+		originX.value = e.x;
+		originY.value = e.y;
+	}
 
-    function mouseUp(e: MouseEvent) {
-        const dist = Math.sqrt(
-            Math.pow(e.x - originX.value, 2) + Math.pow(e.y - originY.value, 2),
-        );
+	function mouseUp(e: MouseEvent) {
+		const dist = Math.sqrt(
+			(e.x - originX.value) ** 2 + (e.y - originY.value) ** 2,
+		);
 
-        // Not a stationary click
-        if (dist > allowedDistance) {
-            return;
-        }
+		// Not a stationary click
+		if (dist > allowedDistance) {
+			return;
+		}
 
-        onClick(e);
-    }
+		onClick(e);
+	}
 
-    return { mouseDown, mouseUp };
+	return { mouseDown, mouseUp };
 }
 
 export function useDontShowAgain(id: string) {
-    const flag = localStorage.getItem(id);
-    const show = ref(flag === null);
+	const flag = localStorage.getItem(id);
+	const show = ref(flag === null);
 
-    function ack() {
-        localStorage.setItem(id, "1");
-    }
+	function ack() {
+		localStorage.setItem(id, "1");
+	}
 
-    function onHide() {
-        ack();
-        show.value = false;
-    }
+	function onHide() {
+		ack();
+		show.value = false;
+	}
 
-    return { show, onHide, ack };
+	return { show, onHide, ack };
 }
 
 interface FeatureIndicator {
-    expired: boolean;
-    show: Ref<boolean>;
-    onSeen: () => void;
+	expired: boolean;
+	show: Ref<boolean>;
+	onSeen: () => void;
 }
 
 export function useNewFeatureIndicator(
-    id: string,
-    until?: Date,
+	id: string,
+	until?: Date,
 ): FeatureIndicator {
-    // Feature indicator is no longer needed and will never be shown for new visitors
-    if (until && new Date() > until) {
-        const show = ref(false);
-        return { expired: true, show, onSeen: () => {} };
-    }
+	// Feature indicator is no longer needed and will never be shown for new visitors
+	if (until && new Date() > until) {
+		const show = ref(false);
+		return { expired: true, show, onSeen: () => {} };
+	}
 
-    const { show, onHide: onSeen } = useDontShowAgain("feat-" + id);
-    return { expired: false, show, onSeen };
+	const { show, onHide: onSeen } = useDontShowAgain("feat-" + id);
+	return { expired: false, show, onSeen };
 }
 
 const now = ref(new Date());
@@ -124,58 +122,56 @@ setInterval(() => (now.value = new Date()), 5 * 1000);
 
 /** Returns a reactive `new Date()` that periodically updates */
 export function useDateNow() {
-    return readonly(now);
+	return readonly(now);
 }
 
 /** Returns a reactive function that converts a Date into a relative string like "3 hours ago" */
 export function useRelativeTime() {
-    function timeString(date: Date) {
-        return computed(() => {
-            const now = useDateNow().value;
-            const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
-            const months = Math.floor(days / 30);
-            const years = Math.floor(days / 365);
+	function timeString(date: Date) {
+		return computed(() => {
+			const now = useDateNow().value;
+			const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+			const minutes = Math.floor(seconds / 60);
+			const hours = Math.floor(minutes / 60);
+			const days = Math.floor(hours / 24);
+			const months = Math.floor(days / 30);
+			const years = Math.floor(days / 365);
 
-            if (seconds < 60) {
-                return "just now";
-            } else if (minutes < 60) {
-                return minutes === 1
-                    ? "1 minute ago"
-                    : `${minutes} minutes ago`;
-            } else if (hours < 24) {
-                return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-            } else if (days < 30) {
-                return days === 1 ? "1 day ago" : `${days} days ago`;
-            } else if (months < 12) {
-                return months === 1 ? "1 month ago" : `${months} months ago`;
-            } else {
-                return years === 1 ? "1 year ago" : `${years} years ago`;
-            }
-        });
-    }
+			if (seconds < 60) {
+				return "just now";
+			} else if (minutes < 60) {
+				return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+			} else if (hours < 24) {
+				return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+			} else if (days < 30) {
+				return days === 1 ? "1 day ago" : `${days} days ago`;
+			} else if (months < 12) {
+				return months === 1 ? "1 month ago" : `${months} months ago`;
+			} else {
+				return years === 1 ? "1 year ago" : `${years} years ago`;
+			}
+		});
+	}
 
-    return timeString;
+	return timeString;
 }
 
 export function useMainContainer() {
-    const mainContainer: Readonly<ShallowRef<HTMLElement>> =
-        inject("mainContainer")!;
-    return mainContainer;
+	const mainContainer: Readonly<ShallowRef<HTMLElement>> =
+		inject("mainContainer")!;
+	return mainContainer;
 }
 
 export function useViewportSize() {
-    const size = ref({ width: window.innerWidth, height: window.innerHeight });
+	const size = ref({ width: window.innerWidth, height: window.innerHeight });
 
-    function updateSize() {
-        size.value.width = window.innerWidth;
-        size.value.height = window.innerHeight;
-    }
+	function updateSize() {
+		size.value.width = window.innerWidth;
+		size.value.height = window.innerHeight;
+	}
 
-    onMounted(() => window.addEventListener("resize", updateSize));
-    onUnmounted(() => window.removeEventListener("resize", updateSize));
+	onMounted(() => window.addEventListener("resize", updateSize));
+	onUnmounted(() => window.removeEventListener("resize", updateSize));
 
-    return size;
+	return size;
 }

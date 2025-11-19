@@ -10,11 +10,11 @@ const includeCount = computed(() => store.query._include.size);
 const excludeCount = computed(() => store.query._exclude.size);
 
 function clearIncluded() {
-    store.query._include.clear();
+	store.query._include.clear();
 }
 
 function clearExcluded() {
-    store.query._exclude.clear();
+	store.query._exclude.clear();
 }
 </script>
 

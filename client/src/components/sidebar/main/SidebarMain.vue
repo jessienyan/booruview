@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, type Component } from "vue";
-import SearchTab from "./SearchTab.vue";
+import { type Component, ref } from "vue";
 import RecentTab from "./RecentTab.vue";
+import SearchTab from "./SearchTab.vue";
 
 type Tab = "search" | "recent";
 const tabComponents: Record<Tab, Component> = {
-    search: SearchTab,
-    recent: RecentTab,
+	search: SearchTab,
+	recent: RecentTab,
 };
 const currentTab = ref<Tab>("search");
 
 function switchTab(tab: Tab) {
-    currentTab.value = tab;
+	currentTab.value = tab;
 }
 </script>
 

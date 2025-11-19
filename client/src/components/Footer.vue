@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import store from "@/store";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import store from "@/store";
 
 const fmt = new Intl.NumberFormat();
 const currentPageText = computed(() => fmt.format(store.currentPage));

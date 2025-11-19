@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import store from "@/store";
-import Sidebar from "@/components/sidebar/Sidebar.vue";
-import { RouterView } from "vue-router";
-
 import {
-    computed,
-    nextTick,
-    provide,
-    readonly,
-    useTemplateRef,
-    watch,
+	computed,
+	nextTick,
+	provide,
+	readonly,
+	useTemplateRef,
+	watch,
 } from "vue";
-import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
+import { RouterView } from "vue-router";
+import Sidebar from "@/components/sidebar/Sidebar.vue";
+import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
+import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
 
 const mainContainer = useTemplateRef("main");
@@ -20,23 +19,23 @@ provide("mainContainer", readonly(mainContainer));
 
 // Focus scroll container when sidebar is closed
 watch(
-    () => store.sidebarClosed,
-    () => {
-        if (store.sidebarClosed) {
-            nextTick(() => mainContainer.value?.focus());
-        }
-    },
+	() => store.sidebarClosed,
+	() => {
+		if (store.sidebarClosed) {
+			nextTick(() => mainContainer.value?.focus());
+		}
+	},
 );
 
 const hasConsented = computed(() => {
-    if (store.settings.consented) {
-        return true;
-    }
+	if (store.settings.consented) {
+		return true;
+	}
 
-    // Don't show consent modal for search engine crawlers
-    const crawlers = /Googlebot|Bingbot|DuckDuckbot/;
-    const isCrawler = crawlers.exec(navigator.userAgent) !== null;
-    return isCrawler;
+	// Don't show consent modal for search engine crawlers
+	const crawlers = /Googlebot|Bingbot|DuckDuckbot/;
+	const isCrawler = crawlers.exec(navigator.userAgent) !== null;
+	return isCrawler;
 });
 </script>
 

@@ -1,32 +1,30 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 import TagList from "@/components/TagList.vue";
 import { useRelativeTime } from "@/composable";
 import type { SearchQuery } from "@/search";
 import store from "@/store";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
 
 const router = useRouter();
 const relativeTime = useRelativeTime();
 
 function styledTags(query: SearchQuery) {
-    return computed(() => {
-        let ret: TagChip[];
+	return computed(() => {
+		let ret: TagChip[];
 
-        ret = query.includedList().map((tag) => ({ tag, style: "default" }));
-        ret = ret.concat(
-            query
-                .excludedList()
-                .map((tag) => ({ tag, style: "strikethrough" })),
-        );
+		ret = query.includedList().map((tag) => ({ tag, style: "default" }));
+		ret = ret.concat(
+			query.excludedList().map((tag) => ({ tag, style: "strikethrough" })),
+		);
 
-        return ret;
-    });
+		return ret;
+	});
 }
 
 function onDelete(index: number) {
-    store.settings.queryHistory.splice(index, 1);
-    store.saveSettings();
+	store.settings.queryHistory.splice(index, 1);
+	store.saveSettings();
 }
 </script>
 

@@ -2,8 +2,8 @@
 import { ref } from "vue";
 
 const { text, defaultOpen = false } = defineProps<{
-    text: string;
-    defaultOpen?: boolean;
+	text: string;
+	defaultOpen?: boolean;
 }>();
 const show = ref(defaultOpen);
 </script>

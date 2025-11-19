@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, useTemplateRef } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import Chip from "./tag-chip/Chip.vue";
 
@@ -9,26 +9,25 @@ const btnRef = useTemplateRef("btnRef");
 const open = ref(false);
 
 const categoryOrder: TagType[] = [
-    "artist",
-    "character",
-    "copyright",
-    "tag",
-    "unknown",
-    "metadata",
-    "deprecated",
+	"artist",
+	"character",
+	"copyright",
+	"tag",
+	"unknown",
+	"metadata",
+	"deprecated",
 ];
 
 // Tags sorted by category then by name
 const sortedTags = computed<TagChip[]>(() =>
-    [...tags].sort((a, b) => {
-        const category =
-            categoryOrder.indexOf(a.tag.type) -
-            categoryOrder.indexOf(b.tag.type);
-        if (category !== 0) {
-            return category;
-        }
-        return a.tag.name.localeCompare(b.tag.name);
-    }),
+	[...tags].sort((a, b) => {
+		const category =
+			categoryOrder.indexOf(a.tag.type) - categoryOrder.indexOf(b.tag.type);
+		if (category !== 0) {
+			return category;
+		}
+		return a.tag.name.localeCompare(b.tag.name);
+	}),
 );
 </script>
 

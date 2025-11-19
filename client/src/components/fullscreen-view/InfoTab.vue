@@ -1,64 +1,63 @@
 <script setup lang="ts">
+import { type CSSProperties, computed, ref, watchEffect } from "vue";
 import store from "@/store";
-import { computed, ref, watchEffect, type CSSProperties } from "vue";
 import TagList from "../TagList.vue";
 
 const tags = ref<Tag[]>([]);
 const { post } = defineProps<{ post: Post }>();
 
 watchEffect(() => {
-    if (post === null) {
-        return;
-    }
+	if (post === null) {
+		return;
+	}
 
-    store.tagsForPost(post).then((val) => (tags.value = val));
+	store.tagsForPost(post).then((val) => (tags.value = val));
 });
 
 // Add padding if the menu would cover part of the container
 const containerStyle = computed<CSSProperties>(() => {
-    if (!store.settings.fullscreenViewMenuRotate) {
-        return {};
-    }
+	if (!store.settings.fullscreenViewMenuRotate) {
+		return {};
+	}
 
-    switch (store.settings.fullscreenViewMenuAnchor) {
-        case "bottomleft":
-        case "left":
-        case "topleft":
-            return {
-                paddingLeft: "3.5rem",
-            };
+	switch (store.settings.fullscreenViewMenuAnchor) {
+		case "bottomleft":
+		case "left":
+		case "topleft":
+			return {
+				paddingLeft: "3.5rem",
+			};
 
-        case "bottomright":
-        case "right":
-        case "topright":
-            return {
-                paddingRight: "3.5rem",
-            };
-    }
+		case "bottomright":
+		case "right":
+		case "topright":
+			return {
+				paddingRight: "3.5rem",
+			};
+	}
 
-    return {};
+	return {};
 });
 
 const styledTags = computed(() =>
-    tags.value.map((t) => {
-        const ret: TagChip = {
-            tag: t,
-            style: "default",
-        };
+	tags.value.map((t) => {
+		const ret: TagChip = {
+			tag: t,
+			style: "default",
+		};
 
-        if (store.query.isIncluded(t.name)) {
-            ret.style = "checkmark";
-        } else if (store.query.isExcluded(t.name)) {
-            ret.style = "strikethrough";
-        } else if (
-            store.settings.blacklist.findIndex((bl) => bl.name === t.name) !==
-            -1
-        ) {
-            ret.style = "blacklist";
-        }
+		if (store.query.isIncluded(t.name)) {
+			ret.style = "checkmark";
+		} else if (store.query.isExcluded(t.name)) {
+			ret.style = "strikethrough";
+		} else if (
+			store.settings.blacklist.findIndex((bl) => bl.name === t.name) !== -1
+		) {
+			ret.style = "blacklist";
+		}
 
-        return ret;
-    }),
+		return ret;
+	}),
 );
 </script>
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import store from "@/store";
-import NoResults from "@/components/NoResults.vue";
+import { onMounted } from "vue";
 import Footer from "@/components/Footer.vue";
-import PageSwipeArrow from "@/PageSwipeArrow.vue";
+import LoadingResults from "@/components/LoadingResults.vue";
+import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
-import { onMounted } from "vue";
-import LoadingResults from "@/components/LoadingResults.vue";
+import PageSwipeArrow from "@/PageSwipeArrow.vue";
+import store from "@/store";
 
 const mainContainer = useMainContainer();
 onMounted(() => mainContainer.value.focus());
