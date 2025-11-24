@@ -69,6 +69,10 @@
         reverse_proxy http://api:8000
     }
 
+    handle /assets/* {
+        file_server
+    }
+
     handle {
         file_server
         try_files {path} /index.html
