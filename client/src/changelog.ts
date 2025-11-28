@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2025-11-28",
+		changes: [
+			"fixed rating tags having the wrong color when they are excluded",
+			"fixed header icon position on mobile",
+			"removed coal generator, you were nice this year 🎅",
+		],
+	},
+	{
 		date: "2025-11-18",
 		changes: [
 			"removed search input getting autofocused when opening the sidebar",
