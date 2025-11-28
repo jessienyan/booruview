@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/gelbooru"
 	"codeberg.org/jessienyan/booruview/routes"
 )
 
@@ -52,6 +53,8 @@ func main() {
 			break
 		}
 	}
+
+	gelbooru.AddRatingTagsToValkey()
 
 	listenAddr := ":8000"
 	router := routes.NewRouter()
