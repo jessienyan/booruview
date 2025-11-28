@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 	"sync"
 	"time"
@@ -163,7 +164,7 @@ func getLimiter(ip string) *rate.Limiter {
 // Rate limiting is handled using the token bucket algorithm. Clients have a bucket
 // of tokens that slowly refill. Requests remove tokens from the bucket equal to their cost.
 // If a request costs more than what's available, the client is rate limited.
-func IsRateLimited(ip string, cost int) (cb *ClientBan, err error) {
+func IsRateLimited(req *http.Request, ip string, cost int) (cb *ClientBan, err error) {
 	cb, err = getClientBan(ip)
 	if err != nil {
 		return
@@ -171,9 +172,10 @@ func IsRateLimited(ip string, cost int) (cb *ClientBan, err error) {
 
 	if banned := cb.Banned(); banned {
 		log.Info().
-			Str("ip", ip).
 			Int("banCount", cb.BanCount).
-			Time("bannedUntil", cb.BannedUntil).
+			Str("banDuration", time.Until(cb.BannedUntil).String()).
+			Str("ip", ip).
+			Str("url", req.URL.Path).
 			Msg("request blocked (rate limited)")
 		return
 	}

@@ -18,7 +18,7 @@ const (
 )
 
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) bool {
-	cb, err := api.IsRateLimited(clientIP(req), cost)
+	cb, err := api.IsRateLimited(req, clientIP(req), cost)
 
 	if err != nil {
 		respondWithInternalError(w, err)
