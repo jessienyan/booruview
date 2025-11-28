@@ -16,26 +16,32 @@ const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
                 @click="store.sidebarClosed = !store.sidebarClosed"
                 title="toggle sidebar"
             >
-                <i class="bi bi-list"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+</svg>
             </button>
 
             <div class="spacing"></div>
 
             <RouterLink :to="store.lastSearchRoute || { name: 'landing' }">
                 <button
-                    class="btn-sidebar btn-small"
+                    class="btn-sidebar btn-nav"
                     title="view search results"
                 >
-                    <i class="bi bi-search"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi" viewBox="0 0 16 16">
+  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+</svg>
                 </button>
             </RouterLink>
             <RouterLink :to="{ name: 'favorites' }">
                 <button
-                    class="btn-sidebar btn-small"
+                    class="btn-sidebar btn-nav"
                     title="view favorites"
                     ref="favorites-btn"
                 >
-                    <i class="bi bi-heart"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi" viewBox="0 0 16 16">
+  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+</svg>
                 </button>
             </RouterLink>
         </div>
@@ -101,7 +107,7 @@ const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
     }
 }
 
-$sidebar-width: 60px;
+$sidebar-btn-width: 60px;
 
 .buttons {
     display: flex;
@@ -126,26 +132,23 @@ $sidebar-width: 60px;
     border: none;
     cursor: pointer;
     font-size: 0;
-    padding: 0;
-    width: $sidebar-width;
-    height: $sidebar-width;
+    width: 60px;
+    height: 60px;
     color: $color-primary-lighter;
 
     .bi {
-        font-size: 48px;
+        width: 100%;
+        height: 100%;
     }
 }
 
-.btn-small {
-    width: $sidebar-width - 10px;
+.btn-toggle {
+    padding: 6px;
+}
 
-    &:hover {
-        color: $color-primary-light;
-    }
-
-    .bi {
-        font-size: 30px;
-    }
+.btn-nav {
+    padding: 14px 9px;
+    width: $sidebar-btn-width - 10px
 }
 
 @media (min-width: $mobile-width) {
@@ -153,11 +156,11 @@ $sidebar-width: 60px;
         .buttons {
             flex-direction: column;
             height: 100%;
-            width: $sidebar-width;
+            width: $sidebar-btn-width;
         }
 
         .btn-small {
-            width: $sidebar-width;
+            width: $sidebar-btn-width;
         }
     }
 }
