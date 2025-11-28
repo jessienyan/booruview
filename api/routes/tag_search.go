@@ -62,9 +62,9 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func getCachedTagSearch(query string) ([]byte, error) {
-	vc := api.Valkey()
-	cached := vc.Do(context.Background(),
-		vc.B().
+	vk := api.Valkey()
+	cached := vk.Do(context.Background(),
+		vk.B().
 			Get().
 			Key(gelbooru.TagSearchCacheKey(query)).
 			Build(),
@@ -87,14 +87,14 @@ func getCachedTagSearch(query string) ([]byte, error) {
 }
 
 func writeTagSearchToCache(query string, data []byte) error {
-	vc := api.Valkey()
+	vk := api.Valkey()
 	buf := bytes.Buffer{}
 	if err := api.CompressData(&buf, data); err != nil {
 		return err
 	}
 
-	return vc.Do(context.Background(),
-		vc.B().
+	return vk.Do(context.Background(),
+		vk.B().
 			Setex().
 			Key(gelbooru.TagSearchCacheKey(query)).
 			Seconds(api.TagSearchTtl).

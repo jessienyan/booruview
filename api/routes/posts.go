@@ -113,9 +113,9 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func getCachedPosts(tags string, page int) ([]byte, error) {
-	vc := api.Valkey()
-	cached := vc.Do(context.Background(),
-		vc.B().
+	vk := api.Valkey()
+	cached := vk.Do(context.Background(),
+		vk.B().
 			Get().
 			Key(gelbooru.PostCacheKey(tags, page)).
 			Build(),
@@ -138,14 +138,14 @@ func getCachedPosts(tags string, page int) ([]byte, error) {
 }
 
 func writePostsToCache(query string, afterId int, data []byte) error {
-	vc := api.Valkey()
+	vk := api.Valkey()
 	buf := bytes.Buffer{}
 	if err := api.CompressData(&buf, data); err != nil {
 		return err
 	}
 
-	return vc.Do(context.Background(),
-		vc.B().
+	return vk.Do(context.Background(),
+		vk.B().
 			Setex().
 			Key(gelbooru.PostCacheKey(query, afterId)).
 			Seconds(api.PostTtl).

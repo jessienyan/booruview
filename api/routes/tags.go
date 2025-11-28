@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -90,21 +89,21 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func writeCachedTags(tags []api.TagResponse) {
-	vc := api.Valkey()
+	vk := api.Valkey()
 	cmds := make(valkey.Commands, 0, len(tags))
 
 	for _, tag := range tags {
 		key := gelbooru.TagCacheKey(tag.Name)
 
 		cmds = append(cmds,
-			vc.B().
+			vk.B().
 				Setex().
 				Key(key).
 				Seconds(api.TagTtl).
-				Value(tagToCache(tag)).
+				Value(api.TagToCacheValue(tag)).
 				Build())
 	}
-	vc.DoMulti(context.Background(), cmds...)
+	vk.DoMulti(context.Background(), cmds...)
 }
 
 func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagResponse, error) {
@@ -113,9 +112,9 @@ func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagRespons
 		keys[i] = gelbooru.TagCacheKey(query)
 	}
 
-	vc := api.Valkey()
-	cached := vc.Do(context.Background(),
-		vc.B().
+	vk := api.Valkey()
+	cached := vk.Do(context.Background(),
+		vk.B().
 			Mget().
 			Key(keys...).
 			Build(),
@@ -141,7 +140,7 @@ func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagRespons
 			continue
 		}
 
-		tag, err := tagFromCache(query[i], entry)
+		tag, err := api.TagFromCacheValue(query[i], entry)
 		if err != nil {
 			log.Err(err).Msg("failed to parse tag from cache")
 			continue
@@ -152,30 +151,4 @@ func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagRespons
 	}
 
 	return resp, respMap, nil
-}
-
-func tagToCache(tag api.TagResponse) string {
-	return fmt.Sprintf("%s,%d", tag.Type, tag.Count)
-}
-
-func tagFromCache(tagName string, val string) (tag api.TagResponse, err error) {
-	parts := strings.Split(val, ",")
-	if len(parts) != 2 {
-		err = fmt.Errorf("tagFromCache: expected value to have 2 fields (has %d)", len(parts))
-		return
-	}
-
-	var count int
-	count, err = strconv.Atoi(parts[1])
-	if err != nil {
-		return
-	}
-
-	tag = api.TagResponse{
-		Name:  tagName,
-		Type:  api.ParseTagType(parts[0]),
-		Count: count,
-	}
-
-	return
 }

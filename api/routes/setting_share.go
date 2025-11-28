@@ -64,12 +64,12 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	code := generateShareCode(body)
-	vc := api.Valkey()
+	vk := api.Valkey()
 
 	// Write to redis
-	err = vc.Do(
+	err = vk.Do(
 		req.Context(),
-		vc.B().Setex().
+		vk.B().Setex().
 			Key(cacheShareKey(code)).
 			Seconds(api.SettingShareTtl).
 			Value(string(body)).
@@ -109,8 +109,8 @@ func SettingImportHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	vc := api.Valkey()
-	settings, err := vc.Do(req.Context(), vc.B().Get().Key(cacheShareKey(data.Code)).Build()).AsBytes()
+	vk := api.Valkey()
+	settings, err := vk.Do(req.Context(), vk.B().Get().Key(cacheShareKey(data.Code)).Build()).AsBytes()
 	if err != nil {
 		if valkey.IsValkeyNil(err) {
 			respondWithNotFound(w, "code is invalid or may have expired")
