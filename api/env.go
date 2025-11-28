@@ -12,10 +12,8 @@ var (
 	ValkeyAddr = os.Getenv("VALKEY_ADDR")
 
 	// Optional
-	GelbooruUserIds     = []string(nil)
-	GelbooruApiKeys     = []string(nil)
-	NaughtyFingerprints = make(map[string]bool)
-	FakePostHashes      = []string(nil)
+	GelbooruUserIds = []string(nil)
+	GelbooruApiKeys = []string(nil)
 )
 
 func init() {
@@ -33,17 +31,5 @@ func init() {
 
 	if len(GelbooruUserIds) != len(GelbooruApiKeys) {
 		log.Fatal().Msg("number of gelbooru userids and apikeys does not match")
-	}
-
-	if fingerprints := os.Getenv("NAUGHTY_JA4H_FINGERPRINTS"); fingerprints != "" {
-		for fp := range strings.SplitSeq(fingerprints, ",") {
-			NaughtyFingerprints[fp] = true
-		}
-
-		log.Info().Msgf("loaded %d ja4h fingerprints", len(NaughtyFingerprints))
-	}
-
-	if hashes := os.Getenv("FAKEDATA_POST_HASHES"); hashes != "" {
-		FakePostHashes = strings.Split(hashes, ",")
 	}
 }

@@ -4,15 +4,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
-	"github.com/rs/zerolog/log"
 	"github.com/valkey-io/valkey-go"
 )
 
@@ -25,12 +22,6 @@ type PostsResponse struct {
 func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	// NOTE: post rate limiting happens after checking the cache. The cost increases
 	// if there's a cache miss
-
-	isNaughty := api.NaughtyFingerprints[req.Header.Get("Ja4h")]
-	resp := PostsResponse{
-		Results: []api.PostResponse{},
-	}
-
 	if err := req.ParseForm(); err != nil {
 		respondWithInternalError(w, err)
 		return
@@ -52,6 +43,9 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	resp := PostsResponse{
+		Results: []api.PostResponse{},
+	}
 	tags := cleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
@@ -61,8 +55,8 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Nice users get a cache :)
-	if !isNaughty && cached != nil {
+	// Cache hit
+	if cached != nil {
 		if isRateLimited(w, req, postApiCostIfCacheHit) {
 			return
 		}
@@ -71,21 +65,12 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Cache miss, check with increased rate limit cost
 	if isRateLimited(w, req, postApiCostIfCacheMiss) {
 		return
 	}
 
-	var client gelbooru.Client
-
-	if isNaughty {
-		// Naughty users get fake data and latency :)
-		client = gelbooru.NewFakeClientv2()
-		fakeLatency := time.Duration(rand.Int()%2_000+500) * time.Millisecond
-		log.Info().Float64("latency", fakeLatency.Seconds()).Str("ja4h", req.Header.Get("Ja4h")).Msg("sending client coal :)")
-		time.Sleep(fakeLatency)
-	} else {
-		client = gelbooru.NewClient()
-	}
+	client := gelbooru.NewClient()
 
 	results, err := client.ListPosts(query, page)
 	if err != nil {
@@ -98,18 +83,12 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Used by the fake client for sending random posts
-	gelbooru.CollectRecentPosts(results.Posts)
-
 	resp.CountPerPage = gelbooru.PostsPerPage
 	resp.TotalCount = results.TotalCount
 	resp.Results = results.Posts
 
 	respData := respondJson(w, http.StatusOK, resp)
-
-	if !isNaughty {
-		writePostsToCache(query, page, respData)
-	}
+	writePostsToCache(query, page, respData)
 }
 
 func getCachedPosts(tags string, page int) ([]byte, error) {

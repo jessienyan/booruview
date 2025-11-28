@@ -192,22 +192,7 @@ const store = reactive<Store>({
 	lastQuery: new SearchQuery(),
 	lastSearchRoute: null,
 	posts: new Map<number, Post[]>(),
-	cachedTags: new Map<string, Tag>([
-		// Fake rating:* as metadata tags
-		["rating:general", { name: "rating:general", count: 0, type: "metadata" }],
-		[
-			"rating:sensitive",
-			{ name: "rating:sensitive", count: 0, type: "metadata" },
-		],
-		[
-			"rating:questionable",
-			{ name: "rating:questionable", count: 0, type: "metadata" },
-		],
-		[
-			"rating:explicit",
-			{ name: "rating:explicit", count: 0, type: "metadata" },
-		],
-	]),
+	cachedTags: new Map<string, Tag>(),
 	cachedTagSearch: new Map<string, Tag[]>(),
 
 	onEditTag: new EventTarget(),
