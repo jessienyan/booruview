@@ -2,6 +2,7 @@ package gelbooru
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -54,7 +55,11 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	resp, err := doRequest(req)
 	if err != nil {
 		resetByPeer := errors.Is(err, syscall.ECONNRESET)
-		if resetByPeer || os.IsTimeout(err) {
+		isTimeout := os.IsTimeout(err)
+		isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
+
+		// Timeouts or closed connections generally mean Gelbooru isn't available
+		if resetByPeer || isTimeout || isCtxDeadline {
 			err = errors.Join(GelbooruError{Code: -1}, err)
 		}
 
