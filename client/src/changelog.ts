@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2025-12-02",
+		changes: ["changed hosting providers (linode -> hetzner)"],
+	},
+	{
 		date: "2025-11-30",
 		changes: [
 			"fixed API returning 500 instead of 503 when gelbooru request times out",
