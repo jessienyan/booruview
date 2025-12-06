@@ -1,8 +1,11 @@
 export interface ChipActions {
-	static?: boolean;
-
-	edit?: boolean;
+	// buttons
 	blacklist?: boolean;
-	includeExcludeRemove?: boolean;
+	edit?: boolean;
 	favorite?: boolean;
+	includeExcludeRemove?: boolean;
+	openInNewTab?: boolean;
+
+	// if true, clicking the chip doesn't open a menu
+	static?: boolean;
 }

@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import store from "@/store";
 import type { ChipActions } from "@/types";
+import { useRouter } from "vue-router";
 
 const showBlacklistConfirm = ref(false);
 const {
@@ -19,6 +20,7 @@ const actions = computed(() => ({
 	blacklist: actionProps.blacklist ?? true,
 	includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
 	favorite: actionProps.favorite ?? true,
+    openInNewTab: actionProps.openInNewTab ?? true,
 }));
 
 const isBlacklisted = computed(() => {
@@ -39,6 +41,12 @@ const favoriteIndex = computed(() => {
 });
 
 const isFavorited = computed(() => favoriteIndex.value !== -1);
+
+const openInNewTabUrl = computed(() => {
+    const router = useRouter();
+    const url = router.resolve({name: "search", params: {page: 1, query: tag.name}});
+    return (new URL(url.path, window.location.origin)).href;
+});
 
 function onAdd() {
 	store.query.includeTag(tag);
@@ -138,6 +146,12 @@ function onWhitelist() {
     >
         <i class="bi bi-x-lg"></i> remove
     </button>
+    <a :href="openInNewTabUrl" target="_blank">
+        <button class="dropdown-option btn-primary"
+            v-if="actions.openInNewTab && !isBlacklisted && !isExcluded">
+            <i class="bi bi-box-arrow-up-right"></i> open in new tab
+        </button>
+    </a>
     <button
         class="dropdown-option btn-primary"
         v-if="actions.favorite && !isBlacklisted && !isFavorited"
