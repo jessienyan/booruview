@@ -146,9 +146,9 @@ function onWhitelist() {
     >
         <i class="bi bi-x-lg"></i> remove
     </button>
-    <a :href="openInNewTabUrl" target="_blank">
-        <button class="dropdown-option btn-primary"
-            v-if="actions.openInNewTab && !isBlacklisted && !isExcluded">
+    <a :href="openInNewTabUrl" target="_blank"
+    v-if="actions.openInNewTab && !isBlacklisted && !isExcluded">
+        <button class="dropdown-option btn-primary">
             <i class="bi bi-box-arrow-up-right"></i> open in new tab
         </button>
     </a>
@@ -198,7 +198,19 @@ function onWhitelist() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
+// Styles are defined in client/src/components/DropdownMenu.vue
+
 .blacklist {
     color: #ff5d5d;
+}
+
+.rounded {
+    border-radius: 4px;
+}
+
+a .dropdown-option {
+    // hack :)
+    border-radius: 0 !important;
+    border-bottom: 0 !important;
 }
 </style>

@@ -79,19 +79,17 @@ const menuPosition = computed(() => {
     }
 
     &:first-of-type {
-        border-radius: 4px 4px 0 0;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
     }
 
     &:last-of-type {
-        border-radius: 0 0 4px 4px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
     }
 
-    &:not(:last-of-type):not(.rounded) {
-        border-bottom: none;
-    }
-
-    &.rounded {
-        border-radius: 4px;
+    &:not(:last-of-type) {
+        border-bottom: 0;
     }
 }
 </style>
