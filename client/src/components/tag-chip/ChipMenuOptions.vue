@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import store from "@/store";
 import type { ChipActions } from "@/types";
-import { useRouter } from "vue-router";
 
 const showBlacklistConfirm = ref(false);
 const {
@@ -20,7 +20,7 @@ const actions = computed(() => ({
 	blacklist: actionProps.blacklist ?? true,
 	includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
 	favorite: actionProps.favorite ?? true,
-    openInNewTab: actionProps.openInNewTab ?? true,
+	openInNewTab: actionProps.openInNewTab ?? true,
 }));
 
 const isBlacklisted = computed(() => {
@@ -43,9 +43,12 @@ const favoriteIndex = computed(() => {
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 
 const openInNewTabUrl = computed(() => {
-    const router = useRouter();
-    const url = router.resolve({name: "search", params: {page: 1, query: tag.name}});
-    return (new URL(url.path, window.location.origin)).href;
+	const router = useRouter();
+	const url = router.resolve({
+		name: "search",
+		params: { page: 1, query: tag.name },
+	});
+	return new URL(url.path, window.location.origin).href;
 });
 
 function onAdd() {
