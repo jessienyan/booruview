@@ -9,7 +9,11 @@ import {
 	useTemplateRef,
 	watch,
 } from "vue";
-import { useGelbooruImageURL, useGelbooruVideoURL, useIsVideo } from "@/composable";
+import {
+	useGelbooruImageURL,
+	useGelbooruVideoURL,
+	useIsVideo,
+} from "@/composable";
 import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");

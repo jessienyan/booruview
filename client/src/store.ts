@@ -107,13 +107,13 @@ const store = reactive<Store>({
 	cdnHosts: null,
 
 	updateCDNHosts() {
-		fetch("/api/hosts").then(resp => {
+		fetch("/api/hosts").then((resp) => {
 			resp.json().then((data) => {
 				this.cdnHosts = {
 					image: data.image,
 					video: data.video,
 				};
-			})
+			});
 		});
 	},
 

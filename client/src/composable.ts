@@ -183,27 +183,27 @@ export function useViewportSize() {
 // Rewrites an image URL to use the current CDN host
 export function useGelbooruImageURL(url: string): ComputedRef<string> {
 	return computed<string>(() => {
-		if(store.cdnHosts === null) {
+		if (store.cdnHosts === null) {
 			return url;
 		}
 
 		const newURL = new URL(url);
 		newURL.host = store.cdnHosts.image;
 
-		return newURL.toString()
+		return newURL.toString();
 	});
 }
 
 // Rewrites a video URL to use the current CDN host
 export function useGelbooruVideoURL(url: string): ComputedRef<string> {
 	return computed<string>(() => {
-		if(store.cdnHosts === null) {
+		if (store.cdnHosts === null) {
 			return url;
 		}
 
 		const newURL = new URL(url);
 		newURL.host = store.cdnHosts.video;
 
-		return newURL.toString()
+		return newURL.toString();
 	});
 }
