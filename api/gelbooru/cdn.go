@@ -3,6 +3,8 @@ package gelbooru
 import (
 	"net/url"
 	"sync"
+
+	"github.com/rs/zerolog/log"
 )
 
 type GelbooruCDN struct {
@@ -23,14 +25,12 @@ func GetCDNHosts() GelbooruCDN {
 }
 
 func UpdateCDNHosts() error {
-	c := NewClient()
-
-	images, err := c.ListPosts("-video", 1)
+	images, err := NewClient().ListPosts("-video", 1)
 	if err != nil {
 		return err
 	}
 
-	videos, err := c.ListPosts("video", 1)
+	videos, err := NewClient().ListPosts("video", 1)
 	if err != nil {
 		return err
 	}
@@ -45,6 +45,8 @@ func UpdateCDNHosts() error {
 		ImageHost: imgUrl.Hostname(),
 		VideoHost: videoUrl.Hostname(),
 	}
+
+	log.Info().Str("img", cdn.ImageHost).Str("video", cdn.VideoHost).Msg("refreshed gelbooru CDN hosts")
 
 	return nil
 }

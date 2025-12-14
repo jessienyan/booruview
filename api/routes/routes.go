@@ -14,6 +14,7 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/tagsearch", TagSearchHandler)
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
 	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
+	r.HandleFunc("/hosts", CDNHostHandler)
 	r.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
 		type versionResponse struct {
 			Version string `json:"version"`
