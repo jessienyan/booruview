@@ -12,6 +12,8 @@ import {
 	toValue,
 } from "vue";
 
+import store from "./store";
+
 export function useDismiss(
 	el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
 	onDismiss: () => void,
@@ -176,4 +178,32 @@ export function useViewportSize() {
 	onUnmounted(() => window.removeEventListener("resize", updateSize));
 
 	return size;
+}
+
+// Rewrites an image URL to use the current CDN host
+export function useGelbooruImageURL(url: string): ComputedRef<string> {
+	return computed<string>(() => {
+		if(store.cdnHosts === null) {
+			return url;
+		}
+
+		const newURL = new URL(url);
+		newURL.host = store.cdnHosts.image;
+
+		return newURL.toString()
+	});
+}
+
+// Rewrites a video URL to use the current CDN host
+export function useGelbooruVideoURL(url: string): ComputedRef<string> {
+	return computed<string>(() => {
+		if(store.cdnHosts === null) {
+			return url;
+		}
+
+		const newURL = new URL(url);
+		newURL.host = store.cdnHosts.video;
+
+		return newURL.toString()
+	});
 }

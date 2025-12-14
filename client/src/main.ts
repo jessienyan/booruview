@@ -26,6 +26,7 @@ setInterval(() => {
 }, 60 * 1000);
 
 store.loadSettings();
+store.updateCDNHosts();
 
 const app = createApp(App);
 app.use(router);

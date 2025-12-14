@@ -9,7 +9,7 @@ import {
 	useTemplateRef,
 	watch,
 } from "vue";
-import { useIsVideo } from "@/composable";
+import { useGelbooruImageURL, useGelbooruVideoURL, useIsVideo } from "@/composable";
 import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");
@@ -18,6 +18,28 @@ const { post } = defineProps<{ post: Post }>();
 const htmlRoot = document.body.parentElement as HTMLElement;
 const overscrollCssClass = "prevent-overscroll";
 const isVideo = useIsVideo(() => post);
+
+const content = computed(() => {
+	const hasHighRes = post.image_url.length > 0;
+	const hasLowRes = post.lowres_url.length > 0;
+
+	if (!hasLowRes || (hasHighRes && store.settings.highResImages)) {
+		return {
+			url: post.image_url,
+			height: post.height,
+			width: post.width,
+		};
+	}
+
+	return {
+		url: post.lowres_url,
+		height: post.lowres_height,
+		width: post.lowres_width,
+	};
+});
+
+const imageURL = useGelbooruImageURL(content.value.url);
+const videoURL = useGelbooruVideoURL(content.value.url);
 
 function setupPanZoom() {
 	pz?.dispose();
@@ -57,31 +79,12 @@ onUnmounted(() => {
 
 onDeactivated(() => pz?.pause());
 onActivated(() => pz?.resume());
-
-const content = computed(() => {
-	const hasHighRes = post.image_url.length > 0;
-	const hasLowRes = post.lowres_url.length > 0;
-
-	if (!hasLowRes || (hasHighRes && store.settings.highResImages)) {
-		return {
-			url: post.image_url,
-			height: post.height,
-			width: post.width,
-		};
-	}
-
-	return {
-		url: post.lowres_url,
-		height: post.lowres_height,
-		width: post.lowres_width,
-	};
-});
 </script>
 
 <template>
     <video
         v-if="isVideo"
-        :poster="post.thumbnail_url || post.lowres_url"
+        :poster="imageURL"
         :autoplay="store.settings.autoplayVideo"
         :muted="store.settings.muteVideo"
         :key="`video-${post.id}`"
@@ -89,14 +92,14 @@ const content = computed(() => {
         loop
     >
         <source
-            :src="content.url"
+            :src="videoURL"
             type="video/mp4"
-            v-if="content.url.endsWith('.mp4')"
+            v-if="videoURL.endsWith('.mp4')"
         />
         <source
-            :src="content.url"
+            :src="videoURL"
             type="video/webm"
-            v-if="content.url.endsWith('.webm')"
+            v-if="videoURL.endsWith('.webm')"
         />
     </video>
 
@@ -105,7 +108,7 @@ const content = computed(() => {
         v-else
         ref="imgRef"
         referrerpolicy="no-referrer"
-        :src="content.url"
+        :src="imageURL"
         :width="content.width"
         :height="content.height"
         :key="`img-${post.id}`"

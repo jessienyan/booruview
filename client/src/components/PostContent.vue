@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
-import { useIsVideo } from "@/composable";
+import { useGelbooruImageURL, useIsVideo } from "@/composable";
 import store from "@/store";
 
 const {
@@ -47,6 +47,8 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
 		height: post.height,
 	};
 });
+
+const imageURL = useGelbooruImageURL(content.value.url);
 
 const showImage = ref(false);
 const containerRef = useTemplateRef("container");
@@ -97,7 +99,7 @@ onUnmounted(() => {
             v-if="showImage"
             class="content"
             referrerpolicy="no-referrer"
-            :src="content.url"
+            :src="imageURL"
             :width="content.width"
             :height="content.height"
         />

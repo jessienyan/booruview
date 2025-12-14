@@ -30,6 +30,13 @@ type Store = {
 	fetchingPosts: boolean;
 	justClickedSearchButton: boolean;
 
+	cdnHosts: {
+		image: string;
+		video: string;
+	} | null;
+
+	updateCDNHosts(): void;
+
 	toast: {
 		msg: string;
 		type: "error" | "info";
@@ -96,6 +103,19 @@ const store = reactive<Store>({
 	hasSearched: false,
 	fetchingPosts: false,
 	justClickedSearchButton: false,
+
+	cdnHosts: null,
+
+	updateCDNHosts() {
+		fetch("/api/hosts").then(resp => {
+			resp.json().then((data) => {
+				this.cdnHosts = {
+					image: data.image,
+					video: data.video,
+				};
+			})
+		});
+	},
 
 	toast: {
 		msg: "",
