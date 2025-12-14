@@ -20,8 +20,6 @@ var (
 	// Selects which userid/apikey pair to use
 	authPairIndex      = 0
 	authPairIndexMutex sync.Mutex
-
-	cdnHost string
 )
 
 type Client struct {
