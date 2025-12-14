@@ -1,3 +1,5 @@
+import type { MaybeRefOrGetter } from "vue";
+
 export interface ChipActions {
 	// buttons
 	blacklist?: boolean;
@@ -9,3 +11,5 @@ export interface ChipActions {
 	// if true, clicking the chip doesn't open a menu
 	static?: boolean;
 }
+
+export type RefOrGetter<T> = Exclude<MaybeRefOrGetter<T>, T>;

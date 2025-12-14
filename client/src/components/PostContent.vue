@@ -48,7 +48,7 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
 	};
 });
 
-const imageURL = useGelbooruImageURL(content.value.url);
+const imageURL = useGelbooruImageURL(() => content.value.url);
 
 const showImage = ref(false);
 const containerRef = useTemplateRef("container");

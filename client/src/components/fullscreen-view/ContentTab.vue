@@ -42,8 +42,8 @@ const content = computed(() => {
 	};
 });
 
-const imageURL = useGelbooruImageURL(content.value.url);
-const videoURL = useGelbooruVideoURL(content.value.url);
+const imageURL = useGelbooruImageURL(() => content.value.url);
+const videoURL = useGelbooruVideoURL(() => content.value.url);
 
 function setupPanZoom() {
 	pz?.dispose();

@@ -13,6 +13,7 @@ import {
 } from "vue";
 
 import store from "./store";
+import type { RefOrGetter } from "./types";
 
 export function useDismiss(
 	el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
@@ -181,8 +182,12 @@ export function useViewportSize() {
 }
 
 // Rewrites an image URL to use the current CDN host
-export function useGelbooruImageURL(url: string): ComputedRef<string> {
+export function useGelbooruImageURL(
+	url_: RefOrGetter<string>,
+): ComputedRef<string> {
 	return computed<string>(() => {
+		const url = toValue(url_);
+
 		if (store.cdnHosts === null) {
 			return url;
 		}
@@ -195,8 +200,12 @@ export function useGelbooruImageURL(url: string): ComputedRef<string> {
 }
 
 // Rewrites a video URL to use the current CDN host
-export function useGelbooruVideoURL(url: string): ComputedRef<string> {
+export function useGelbooruVideoURL(
+	url_: RefOrGetter<string>,
+): ComputedRef<string> {
 	return computed<string>(() => {
+		const url = toValue(url_);
+
 		if (store.cdnHosts === null) {
 			return url;
 		}
