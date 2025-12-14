@@ -20,22 +20,18 @@ var (
 	// Selects which userid/apikey pair to use
 	authPairIndex      = 0
 	authPairIndexMutex sync.Mutex
+
+	cdnHost string
 )
 
-type authClient struct {
+type Client struct {
 	UserId string
 	ApiKey string
 }
 
-type Client interface {
-	ListPosts(tags string, page int) (*PostList, error)
-	ListTags(tags string) ([]api.TagResponse, error)
-	SearchTags(query string) ([]api.TagResponse, error)
-}
-
 func NewClient() Client {
 	if api.GelbooruApiKeys == nil {
-		return authClient{}
+		return Client{}
 	}
 
 	authPairIndexMutex.Lock()
@@ -45,10 +41,10 @@ func NewClient() Client {
 	uid, apiKey := api.GelbooruUserIds[authPairIndex], api.GelbooruApiKeys[authPairIndex]
 	authPairIndex = (authPairIndex + 1) % len(api.GelbooruApiKeys)
 
-	return authClient{UserId: uid, ApiKey: apiKey}
+	return Client{UserId: uid, ApiKey: apiKey}
 }
 
-func (c authClient) withAuth(params url.Values) {
+func (c Client) withAuth(params url.Values) {
 	if c.UserId == "" || c.ApiKey == "" {
 		return
 	}
@@ -99,7 +95,7 @@ func ParseTagNumericType(raw int) api.TagType {
 	return api.Unknown
 }
 
-func (c authClient) doApiTagSearch(query string) ([]api.TagResponse, error) {
+func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	var resp []TagSearchResponse
 	params := url.Values{}
 	params.Add("page", "autocomplete2")
@@ -133,7 +129,7 @@ func (c authClient) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	return tags, nil
 }
 
-func (c authClient) SearchTags(query string) ([]api.TagResponse, error) {
+func (c Client) SearchTags(query string) ([]api.TagResponse, error) {
 	isFilter, suggestions := SuggestedSearchFilters(query)
 
 	if !isFilter {
@@ -203,7 +199,7 @@ var (
 	postLimitStr = strconv.Itoa(PostsPerPage)
 )
 
-func (c authClient) ListPosts(tags string, page int) (*PostList, error) {
+func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 	var resp FullPostResponse
 	params := url.Values{}
 	params.Add("page", "dapi")
@@ -288,7 +284,7 @@ type FullTagInfoResponse struct {
 
 // ListTags returns a list of info found on the given tags (e.g. count, type).
 // tags should be one or more tags separated by a space.
-func (c authClient) ListTags(tags string) ([]api.TagResponse, error) {
+func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
 	var resp FullTagInfoResponse
 	params := url.Values{}
 	params.Add("page", "dapi")
