@@ -2,13 +2,17 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME,
-    username VARCHAR(16) UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    username VARCHAR(16) NOT NULL,
+    password VARCHAR(32) NOT NULL,
+    password_salt VARCHAR(16) NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_users_username ON users(LOWER(username));
 
 CREATE TABLE IF NOT EXISTS user_data (
     user_id INTEGER PRIMARY KEY,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     data TEXT NOT NULL,
+
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
