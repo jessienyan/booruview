@@ -54,6 +54,11 @@ func main() {
 		}
 	}
 
+	if err := api.InitUserDatabase(); err != nil {
+		log.Err(err).Msg("failed to open sqlite database")
+		os.Exit(1)
+	}
+
 	gelbooru.AddRatingTagsToValkey()
 
 	// Periodically check if the CDN hosts changed. Runs immediately on server start

@@ -16,6 +16,7 @@ services:
       - ".env"
     volumes:
       - ./api:/app
+      - ./database/sqlite.db:/database/sqlite.db
 
   caddy:
     build:
