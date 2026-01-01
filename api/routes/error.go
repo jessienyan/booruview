@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/pkg/errors"
@@ -71,8 +72,12 @@ type stackTracer interface {
 
 func respondWithInternalError(w http.ResponseWriter, err error) {
 	log.Err(err).Msg("api error")
+
 	if err, ok := err.(stackTracer); ok {
 		log.Info().Msgf("Stacktrace%+v", err.StackTrace())
+	} else {
+		log.Info().Msgf("Stacktrace\n%s", string(debug.Stack()))
 	}
+
 	respondWithError(w, http.StatusInternalServerError, "An unexpected error occurred :(", "")
 }
