@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-01-01",
+		changes: ["improved stack traces for backend errors", "happy new year"],
+	},
+	{
 		date: "2025-12-13",
 		changes: ["fixed favorites not loading"],
 	},
