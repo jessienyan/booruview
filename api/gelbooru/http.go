@@ -3,7 +3,6 @@ package gelbooru
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/rs/zerolog/log"
 )
@@ -59,20 +60,17 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 
 		// Timeouts or closed connections generally mean Gelbooru isn't available
 		if resetByPeer || isTimeout || isCtxDeadline {
-			err = errors.Join(GelbooruError{Code: -1}, err)
+			err = errors.Wrap(GelbooruError{Code: 503}, "gelbooru timeout")
 		}
 
 		return nil, err
 	}
 
-	// Gelbooru is down (cloudflare error)
-	if resp.StatusCode == 521 {
-		err = GelbooruError{Code: -1}
-		return nil, err
-	} else if resp.StatusCode != 200 {
+	if resp.StatusCode != 200 {
 		body, _ := httputil.DumpResponse(resp, true)
 		log.Error().Msgf("non-200 response: %s", string(body))
-		return nil, GelbooruError{Code: resp.StatusCode}
+		err := errors.Wrap(GelbooruError{Code: resp.StatusCode}, "non-200 response")
+		return nil, err
 	}
 
 	return resp, nil
@@ -84,18 +82,15 @@ func httpGetJson[T any](params url.Values, dst T) error {
 		return err
 	}
 
-	if resp.StatusCode >= 400 {
-		return GelbooruError{Code: resp.StatusCode}
-	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
 	if err := json.Unmarshal(body, &dst); err != nil {
-		log.Err(err).Str("body", string(body)).Msg("failed to parse json")
-		return GelbooruError{Code: 500}
+		err = errors.Wrap(err, "failed to parse json")
+		log.Err(err).Msg("")
+		return err
 	}
 
 	return nil

@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,9 +25,9 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 				if asErr, ok := recoverErr.(error); ok {
 					err = asErr
 				} else {
-					err = fmt.Errorf("%v", recoverErr)
+					err = errors.Errorf("%v", recoverErr)
 				}
-				respondWithInternalError(w, fmt.Errorf("recovered from panic: %w", err))
+				respondWithInternalError(w, errors.Wrap(err, "recovered from panic"))
 			}
 		}()
 

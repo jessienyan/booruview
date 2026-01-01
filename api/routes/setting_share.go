@@ -9,6 +9,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"github.com/valkey-io/valkey-go"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -49,7 +50,7 @@ func SettingExportHandler(w http.ResponseWriter, req *http.Request) {
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		respondWithInternalError(w, fmt.Errorf("error reading request body: %w", err))
+		respondWithInternalError(w, errors.Wrap(err, "error reading request body"))
 		return
 	}
 

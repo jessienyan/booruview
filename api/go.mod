@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/gorilla/mux v1.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.34.0
 	github.com/valkey-io/valkey-go v1.0.59
 	golang.org/x/time v0.11.0

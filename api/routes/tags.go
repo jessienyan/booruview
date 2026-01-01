@@ -2,10 +2,11 @@ package routes
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/rs/zerolog/log"
 

@@ -3,10 +3,11 @@ package routes
 import (
 	"bytes"
 	"context"
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
