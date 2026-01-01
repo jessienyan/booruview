@@ -1,7 +1,6 @@
 package gelbooru
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -92,11 +91,6 @@ func httpGetJson[T any](params url.Values, dst T) error {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
-	}
-
-	// This gets received sometimes with status=200, very cool
-	if bytes.HasPrefix(body, []byte("Too deep!")) {
-		return GelbooruError{Code: 429}
 	}
 
 	if err := json.Unmarshal(body, &dst); err != nil {
