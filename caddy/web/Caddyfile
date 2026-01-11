@@ -1,11 +1,6 @@
 {
     order ja4h_header first
     order geo_ip first
-
-    servers {
-        # eu.booruview.com
-        trusted_proxies static 91.98.44.44 2a01:4f8:c012:b465::1/64
-    }
 }
 
 {$CADDY_HOST} {
