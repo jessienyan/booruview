@@ -25,7 +25,6 @@ services:
       - "443:443"
     logging: *logging
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
 

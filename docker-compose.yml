@@ -26,7 +26,6 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./client/dist:/srv:ro   # Live client updates
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
