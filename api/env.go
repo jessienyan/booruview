@@ -2,6 +2,7 @@ package api
 
 import (
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -14,6 +15,11 @@ var (
 	// Optional
 	GelbooruUserIds = []string(nil)
 	GelbooruApiKeys = []string(nil)
+	MediaProxyHost  string
+)
+
+var (
+	reProxy = regexp.MustCompile(`^https?:\/\/.+[^\/]$`)
 )
 
 func init() {
@@ -27,6 +33,11 @@ func init() {
 		GelbooruApiKeys = strings.Split(apiKeys, ",")
 	} else {
 		log.Warn().Msg("GELBOORU_APIKEY is not set (may be subject to rate limiting)")
+	}
+
+	MediaProxyHost = os.Getenv("MEDIA_PROXY_HOST")
+	if MediaProxyHost != "" && !reProxy.MatchString(MediaProxyHost) {
+		log.Fatal().Msg("MEDIA_PROXY_HOST must either be blank, or a http/https origin, e.g. 'https://example.com'")
 	}
 
 	if len(GelbooruUserIds) != len(GelbooruApiKeys) {
