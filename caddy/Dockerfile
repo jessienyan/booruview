@@ -5,8 +5,17 @@ RUN xcaddy build \
 
 FROM caddy:2-alpine
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
-COPY caddy/web/Caddyfile /etc/caddy/Caddyfile
+
+ENV USE_GRAFANA=1
+ENV USE_PROXY=0
+
+COPY caddy/generate_caddyfile.sh caddy/start.sh /etc/caddy
+RUN mkdir -p /etc/caddy/components/
+COPY caddy/Caddyfile* /etc/caddy/components/
+
 COPY client/dist/ /srv
 
 # This is intentionally at the end to prevent caching
 RUN wget -O /etc/caddy/GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb
+
+CMD ["/bin/ash", "/etc/caddy/start.sh"]

@@ -77,7 +77,3 @@
         try_files {path} /index.html
     }
 }
-
-{$GRAFANA_HOST:grafana.localhost} {
-    reverse_proxy http://grafana:3000
-}

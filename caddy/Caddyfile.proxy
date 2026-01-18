@@ -1,0 +1,59 @@
+# {$MEDIA_PROXY_HOST} {
+:9999 {
+	encode
+
+	log stderr-log {
+        level INFO
+        output stderr
+    }
+
+    # # Used to expose a file log for fail2ban
+    # log file-log {
+    #     level INFO
+    #     output file /var/log/caddy/caddy.log {
+    #         mode 644
+    #     }
+    # }
+
+	# # Bots running on workers.dev are scanning URLs
+    # @botscan header "Cf-Worker" *
+    # abort @botscan
+
+    # handle_errors {
+    #     respond "{err.status_code} {err.status_text}"
+    # }
+
+	# @proxyurl {
+	# 	path /
+	# 	query to=*
+	# 	expression <<CEL
+	# 		{query.to}.matches("(?P<proxyorigin>https:\\/\\/img[0-9]\\.gelbooru\\.com)\\/.+")
+	# 		||{query.to}.matches("(?P<proxyorigin>https:\\/\\/video-cdn[0-9]\\.gelbooru\\.com)\\/.+")
+	# 		||{query.to}.matches("(?P<proxyorigin>https:\\/\\/gelbooru\\.com)\\/thumbnails\\/.+")
+	# 		CEL
+	# 	# expression <<CEL
+	# 	# 	{query.to}.matches("https:\\/\\/img[0-9]\\.gelbooru\\.com\\/.+")
+	# 	# 	||{query.to}.matches("https:\\/\\/video-cdn[0-9]\\.gelbooru\\.com\\/.+")
+	# 	# 	||{query.to}.matches("https:\\/\\/gelbooru\\.com\\/thumbnails\\/.+")
+	# 	# 	CEL
+	# }
+
+	map {query.to}															{proxy_upstream} 	{proxy_path} {
+		~^(https:\/\/img[0-9]\.gelbooru\.com)(\/(?:images|samples)\/.+)$	"${1}"				"${2}"
+		~^(https:\/\/video-cdn[0-9]\.gelbooru\.com)(\/images\/.+)$			"${1}"				"${2}"
+		~^(https:\/\/gelbooru\.com)(\/thumbnails\/.+)$						"${1}"				"${2}"
+
+		default																""					""
+	}
+
+	@invalid_url `{proxy_upstream} == ""`
+	respond @invalid_url "Invalid URL" 400
+
+	log_append proxy_upstream {proxy_upstream}
+	log_append proxy_path {proxy_path}
+
+	reverse_proxy {
+		to 		{proxy_upstream}
+		rewrite {proxy_path}
+	}
+}

@@ -1,0 +1,3 @@
+{$GRAFANA_HOST:grafana.localhost} {
+    reverse_proxy http://grafana:3000
+}
