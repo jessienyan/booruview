@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: api
+      context: ./api/
       args:
         - COMMIT_HASH=$VITE_COMMIT_SHA
     #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/main.go
@@ -20,9 +20,11 @@ services:
   caddy:
     build:
       context: .
-      dockerfile: caddy/web/Dockerfile
+      dockerfile: caddy/Dockerfile
     environment:
-      - "CADDY_HOST=:8080"
+      - CADDY_HOST=:8080
+      - USE_GRAFANA=0
+      - USE_MEDIA_PROXY=0
     ports:
       - "8080:8080"
     volumes:
@@ -32,7 +34,7 @@ services:
 
   client:
     build:
-      context: client
+      context: ./client/
     command: yarn build --watch --sourcemap
     environment:
       - NODE_ENV=development
