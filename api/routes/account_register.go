@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"crypto/rand"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -11,17 +10,12 @@ import (
 	"strings"
 
 	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/models"
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/crypto/argon2"
+	"github.com/rs/zerolog/log"
 )
 
 const (
-	hashTime      = 3
-	hashMemory    = 16 * 1024 // 16MB
-	hashThreads   = 1
-	hashKeyLength = 32
-	saltLength    = 16
-
 	minUsernameLength = 3
 	maxUsernameLength = 16
 	minPasswordLength = 8
@@ -31,21 +25,12 @@ var (
 	reUsername = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 )
 
-func hashPassword(password string, salt []byte) []byte {
-	return argon2.IDKey([]byte(password), salt, hashTime, hashMemory, hashThreads, hashKeyLength)
-}
-
-func generateSalt() []byte {
-	buf := make([]byte, saltLength)
-	rand.Read(buf)
-	return buf
-}
-
 type CreateUserParams struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+// Creates a new user account
 func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 	if req.Header.Get("Content-Type") != "application/json" {
 		respondWithBadRequest(w, "expected Content-Type header to be application/json")
@@ -81,11 +66,11 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	db := api.UserDB()
-	row := db.QueryRow(`SELECT 1 FROM users WHERE LOWER(username) = ?`, strings.ToLower(params.Username))
-	err = row.Err()
+	db := models.New(api.UserDB())
+	_, err = db.GetUser(req.Context(), params.Username)
 	usernameTaken := err == nil
-	otherError := err != nil && err != sql.ErrNoRows
+	usernameAvailable := err == sql.ErrNoRows
+	otherError := !usernameAvailable && !usernameTaken
 
 	if usernameTaken {
 		respondWithBadRequest(w, "username is already taken")
@@ -95,4 +80,21 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	salt := api.GenerateSalt()
+	passHash := api.HashPassword(params.Password, salt)
+
+	u, err := db.CreateUser(req.Context(), models.CreateUserParams{
+		Username:     params.Username,
+		Password:     passHash,
+		PasswordSalt: salt,
+	})
+
+	if err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
+
+	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user registered")
+
+	// TODO: generate and return auth token
 }
