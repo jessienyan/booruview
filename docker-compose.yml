@@ -21,12 +21,16 @@ services:
     build:
       context: .
       dockerfile: caddy/Dockerfile
+    env_file:
+      - .env
     environment:
       - CADDY_HOST=:8080
       - USE_GRAFANA=0
-      - USE_MEDIA_PROXY=0
+      - USE_MEDIA_PROXY=1
+      - MEDIA_PROXY_HOST=:9999
     ports:
       - "8080:8080"
+      - "9999:9999"
     volumes:
       - ./client/dist:/srv:ro   # Live client updates
       - ./logs/:/var/log/caddy/
