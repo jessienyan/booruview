@@ -40,7 +40,7 @@
         Strict-Transport-Security       "max-age=2592000; includeSubDomains"
         Cross-Origin-Opener-Policy      "same-origin"
         Cross-Origin-Resource-Policy    "same-site"
-        Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' gelbooru.com *.gelbooru.com; media-src 'self' gelbooru.com *.gelbooru.com; object-src 'none'; frame-src 'none'; base-uri 'none'"
+        Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; media-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; object-src 'none'; frame-src 'none'; base-uri 'none'"
     }
 
     # Bots running on workers.dev are scanning URLs
