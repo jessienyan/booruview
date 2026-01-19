@@ -256,6 +256,9 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		// Rewrite media URLs to use a proxy
 		if api.UseMediaProxy {
 			toProxyUrl := func(rawUrl string) string {
+				if rawUrl == "" {
+					return ""
+				}
 				return fmt.Sprintf("%s/?to=%s", api.MediaProxyHost, url.PathEscape(rawUrl))
 			}
 
