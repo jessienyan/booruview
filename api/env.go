@@ -10,6 +10,7 @@ import (
 var (
 	AppVersion = "unset" // embedded using flags at build time, check Dockerfile
 	ValkeyAddr = os.Getenv("VALKEY_ADDR")
+	SecretKey  = os.Getenv("SECRET_KEY")
 
 	// Optional
 	GelbooruUserIds = []string(nil)
@@ -17,6 +18,15 @@ var (
 )
 
 func init() {
+	ok := true
+
+	if SecretKey == "" {
+		log.Error().Msg("SECRET_KEY cannot be blank")
+		ok = false
+	} else if SecretKey == "CHANGEME" {
+		log.Warn().Msg("SECRET_KEY should be changed")
+	}
+
 	if userIds := os.Getenv("GELBOORU_USERID"); userIds != "" {
 		GelbooruUserIds = strings.Split(userIds, ",")
 	} else {
@@ -30,6 +40,11 @@ func init() {
 	}
 
 	if len(GelbooruUserIds) != len(GelbooruApiKeys) {
-		log.Fatal().Msg("number of gelbooru userids and apikeys does not match")
+		log.Error().Msg("number of gelbooru userids and apikeys does not match")
+		ok = false
+	}
+
+	if !ok {
+		os.Exit(1)
 	}
 }
