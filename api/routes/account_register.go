@@ -30,6 +30,10 @@ type CreateUserParams struct {
 	Password string `json:"password"`
 }
 
+type RegisterResponse struct {
+	AuthToken string `json:"auth_token"`
+}
+
 // Creates a new user account
 func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 	if req.Header.Get("Content-Type") != "application/json" {
@@ -96,5 +100,11 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 
 	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user registered")
 
-	// TODO: generate and return auth token
+	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
+	if err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
+
+	respondJson(w, 200, RegisterResponse{token})
 }
