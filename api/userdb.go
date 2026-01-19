@@ -1,13 +1,17 @@
 package api
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "modernc.org/sqlite"
+)
 
 var (
 	userDB *sql.DB
 )
 
 func InitUserDatabase() (err error) {
-	userDB, err = sql.Open("sqlite3", "/database/sqlite.db")
+	userDB, err = sql.Open("sqlite", "/database/sqlite.db")
 	return err
 }
 
