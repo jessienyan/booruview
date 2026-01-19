@@ -26,4 +26,4 @@ export VITE_LAST_COMMIT_DATE=$(git show -s --format=%cs master)
 
 migrate_db
 
-# $COMPOSE up --build $@
+$COMPOSE up --build $@
