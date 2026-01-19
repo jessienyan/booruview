@@ -11,7 +11,6 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog/log"
 )
 
