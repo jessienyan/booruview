@@ -254,7 +254,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		data.ImageUrl = strings.Replace(data.ImageUrl, "video-cdn3.gelbooru.com", "video-cdn4.gelbooru.com", 1)
 
 		// Rewrite media URLs to use a proxy
-		if api.MediaProxyHost != "" {
+		if api.UseMediaProxy {
 			toProxyUrl := func(rawUrl string) string {
 				return fmt.Sprintf("%s/?to=%s", api.MediaProxyHost, url.PathEscape(rawUrl))
 			}

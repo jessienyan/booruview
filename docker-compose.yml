@@ -25,9 +25,6 @@ services:
       - .env
     environment:
       - CADDY_HOST=:8080
-      - USE_GRAFANA=0
-      - USE_MEDIA_PROXY=1
-      - MEDIA_PROXY_HOST=:9999
     ports:
       - "8080:8080"
       - "9999:9999"

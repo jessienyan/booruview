@@ -20,6 +20,8 @@ services:
     restart: unless-stopped
     env_file:
       - ".env"
+    environment:
+      - USE_GRAFANA=1
     ports:
       - "80:80"
       - "443:443"
