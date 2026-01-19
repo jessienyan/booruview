@@ -18,8 +18,8 @@ RETURNING id, created_at, last_login, username, password, password_salt
 
 type CreateUserParams struct {
 	Username     string `db:"username"`
-	Password     string `db:"password"`
-	PasswordSalt string `db:"password_salt"`
+	Password     []byte `db:"password"`
+	PasswordSalt []byte `db:"password_salt"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (Users, error) {

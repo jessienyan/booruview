@@ -19,6 +19,6 @@ type Users struct {
 	CreatedAt    sql.NullTime `db:"created_at"`
 	LastLogin    sql.NullTime `db:"last_login"`
 	Username     string       `db:"username"`
-	Password     string       `db:"password"`
-	PasswordSalt string       `db:"password_salt"`
+	Password     []byte       `db:"password"`
+	PasswordSalt []byte       `db:"password_salt"`
 }
