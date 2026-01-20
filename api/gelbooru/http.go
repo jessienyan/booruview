@@ -20,6 +20,20 @@ var (
 	httpClient = &http.Client{Timeout: 4 * time.Second}
 )
 
+// Checks if the error is timeout related, and if so, replaces it with a GelbooruError
+func transformTimeoutError(err error) error {
+	resetByPeer := errors.Is(err, syscall.ECONNRESET)
+	isTimeout := os.IsTimeout(err)
+	isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
+
+	// Timeouts or closed connections generally mean Gelbooru isn't available
+	if resetByPeer || isTimeout || isCtxDeadline {
+		err = errors.Join(GelbooruError{Code: 503}, err)
+	}
+
+	return err
+}
+
 func doRequest(req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
 	resp, err := httpClient.Do(req)
@@ -54,16 +68,7 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 
 	resp, err := doRequest(req)
 	if err != nil {
-		resetByPeer := errors.Is(err, syscall.ECONNRESET)
-		isTimeout := os.IsTimeout(err)
-		isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
-
-		// Timeouts or closed connections generally mean Gelbooru isn't available
-		if resetByPeer || isTimeout || isCtxDeadline {
-			err = errors.Wrap(GelbooruError{Code: 503}, "gelbooru timeout")
-		}
-
-		return nil, err
+		return nil, transformTimeoutError(err)
 	}
 
 	if resp.StatusCode != 200 {
@@ -82,9 +87,14 @@ func httpGetJson[T any](params url.Values, dst T) error {
 		return err
 	}
 
+	if resp.StatusCode >= 400 {
+		return GelbooruError{Code: resp.StatusCode}
+	}
+
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return transformTimeoutError(err)
 	}
 
 	if err := json.Unmarshal(body, &dst); err != nil {
