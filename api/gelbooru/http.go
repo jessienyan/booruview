@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	stderrors "errors"
+
 	"github.com/pkg/errors"
 
 	"github.com/rs/zerolog/log"
@@ -28,7 +30,7 @@ func transformTimeoutError(err error) error {
 
 	// Timeouts or closed connections generally mean Gelbooru isn't available
 	if resetByPeer || isTimeout || isCtxDeadline {
-		err = errors.Join(GelbooruError{Code: 503}, err)
+		err = stderrors.Join(GelbooruError{Code: 503}, err)
 	}
 
 	return err
