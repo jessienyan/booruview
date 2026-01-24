@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"regexp"
-	"strings"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
@@ -51,8 +50,6 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		respondWithBadRequest(w, "json body is not valid")
 		return
 	}
-
-	params.Username = strings.TrimSpace(params.Username)
 
 	if !reUsername.MatchString(params.Username) {
 		respondWithBadRequest(w, "username can only contain letters, numbers, hyphens, and underscores")
