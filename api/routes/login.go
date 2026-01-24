@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
@@ -36,7 +38,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 	var params LoginParams
 	if err := json.Unmarshal(body, &params); err != nil {
-		respondWithBadRequest(w, "json body is not valid")
+		respondWithBadRequest(w, "failed to parse json: "+err.Error())
 		return
 	}
 
@@ -63,7 +65,18 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user logged in")
+	u.LastLogin.Time = time.Now()
+	u.LastLogin.Valid = true
+
+	err = db.UserLoggedIn(req.Context(), models.UserLoggedInParams{
+		LastLogin: u.LastLogin,
+		ID:        u.ID,
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to update user login time: %w", err)
+		respondWithInternalError(w, err)
+		return
+	}
 
 	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
 	if err != nil {
@@ -71,5 +84,6 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user logged in")
 	respondJson(w, 200, RegisterResponse{token})
 }

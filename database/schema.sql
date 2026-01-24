@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login      DATETIME,
     username        VARCHAR(16) NOT NULL,
     password        BLOB NOT NULL,

@@ -1,3 +1,6 @@
+# After changing the queries or schema, run:
+# $ sqlc generate
+
 version: "2"
 sql:
   - engine: "sqlite"

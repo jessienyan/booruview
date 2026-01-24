@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -98,5 +99,21 @@ type UpdateUserDataParams struct {
 
 func (q *Queries) UpdateUserData(ctx context.Context, arg UpdateUserDataParams) error {
 	_, err := q.db.ExecContext(ctx, updateUserData, arg.Data, arg.UserID)
+	return err
+}
+
+const userLoggedIn = `-- name: UserLoggedIn :exec
+UPDATE users
+SET last_login = ?
+WHERE id = ?
+`
+
+type UserLoggedInParams struct {
+	LastLogin sql.NullTime `db:"last_login"`
+	ID        int64        `db:"id"`
+}
+
+func (q *Queries) UserLoggedIn(ctx context.Context, arg UserLoggedInParams) error {
+	_, err := q.db.ExecContext(ctx, userLoggedIn, arg.LastLogin, arg.ID)
 	return err
 }

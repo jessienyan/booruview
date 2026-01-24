@@ -6,6 +6,7 @@ package models
 
 import (
 	"database/sql"
+	"time"
 )
 
 type UserData struct {
@@ -16,7 +17,7 @@ type UserData struct {
 
 type Users struct {
 	ID           int64        `db:"id"`
-	CreatedAt    sql.NullTime `db:"created_at"`
+	CreatedAt    time.Time    `db:"created_at"`
 	LastLogin    sql.NullTime `db:"last_login"`
 	Username     string       `db:"username"`
 	Password     []byte       `db:"password"`

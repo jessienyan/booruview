@@ -7,6 +7,11 @@ INSERT INTO users
 VALUES (?, ?, ?)
 RETURNING *;
 
+-- name: UserLoggedIn :exec
+UPDATE users
+SET last_login = ?
+WHERE id = ?;
+
 -- name: GetUserData :one
 SELECT * FROM user_data
 WHERE user_id = ?;
