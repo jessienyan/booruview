@@ -1,6 +1,9 @@
 -- name: GetUser :one
 SELECT * FROM users WHERE LOWER(username) = LOWER(@username);
 
+-- name: GetUserByID :one
+SELECT * FROM users WHERE id = ?;
+
 -- name: CreateUser :one
 INSERT INTO users
 (username, password, password_salt)

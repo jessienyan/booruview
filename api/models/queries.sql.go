@@ -74,6 +74,24 @@ func (q *Queries) GetUser(ctx context.Context, username string) (Users, error) {
 	return i, err
 }
 
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, created_at, last_login, username, password, password_salt FROM users WHERE id = ?
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (Users, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i Users
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.LastLogin,
+		&i.Username,
+		&i.Password,
+		&i.PasswordSalt,
+	)
+	return i, err
+}
+
 const getUserData = `-- name: GetUserData :one
 SELECT user_id, updated_at, data FROM user_data
 WHERE user_id = ?
