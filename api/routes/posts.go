@@ -68,8 +68,8 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 			}
 
 			data.SearchHistory.Add(models.SearchHistoryEntry{
-				SearchedAt: time.Now(),
-				Tags:       tags,
+				CreatedAt: time.Now(),
+				Tags:      tags,
 			})
 
 			if err := user.Data.Set(data); err != nil {

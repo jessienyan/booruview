@@ -10,8 +10,8 @@ const (
 )
 
 type SearchHistoryEntry struct {
-	SearchedAt time.Time `json:"searched_at"`
-	Tags       []string  `json:"tags"`
+	CreatedAt time.Time `json:"created_at"`
+	Tags      []string  `json:"tags"`
 }
 
 // Items in the search history are sorted by newest first.
@@ -28,7 +28,7 @@ func (h *SearchHistory) Add(item SearchHistoryEntry) {
 
 	// If repeating the last search, just update the timestamp
 	if i == 0 {
-		(*h)[0].SearchedAt = item.SearchedAt
+		(*h)[0].CreatedAt = item.CreatedAt
 		return
 	}
 
@@ -47,9 +47,24 @@ func (h *SearchHistory) Add(item SearchHistoryEntry) {
 	*h = newHistory[:min(len(newHistory), SearchHistoryLimit)]
 }
 
+type FavoritePost struct {
+	CreatedAt time.Time `json:"created_at"`
+	Post      any       `json:"post"`
+}
+
+type FavoriteTag struct {
+	CreatedAt time.Time `json:"created_at"`
+	Tag       any       `json:"tag"`
+}
+
+type BlacklistEntry struct {
+	CreatedAt time.Time `json:"created_at"`
+	Tag       any       `json:"tag"`
+}
+
 type UserDataJSON struct {
-	FavoritePosts []any         `json:"favorite_posts"`
-	FavoriteTags  []any         `json:"favorite_tags"`
-	Blacklist     []any         `json:"blacklist"`
-	SearchHistory SearchHistory `json:"search_history"`
+	FavoritePosts []FavoritePost   `json:"favorite_posts"`
+	FavoriteTags  []FavoriteTag    `json:"favorite_tags"`
+	Blacklist     []BlacklistEntry `json:"blacklist"`
+	SearchHistory SearchHistory    `json:"search_history"`
 }
