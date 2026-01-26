@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"slices"
 	"time"
+
+	api "codeberg.org/jessienyan/booruview"
 )
 
 const (
@@ -49,18 +51,18 @@ func (h *SearchHistory) Add(item SearchHistoryEntry) {
 }
 
 type FavoritePost struct {
-	CreatedAt time.Time `json:"created_at"`
-	Post      any       `json:"post"`
+	CreatedAt time.Time        `json:"created_at"`
+	Post      api.PostResponse `json:"post"`
 }
 
 type FavoriteTag struct {
-	CreatedAt time.Time `json:"created_at"`
-	Tag       any       `json:"tag"`
+	CreatedAt time.Time       `json:"created_at"`
+	Tag       api.TagResponse `json:"tag"`
 }
 
 type BlacklistEntry struct {
-	CreatedAt time.Time `json:"created_at"`
-	Tag       any       `json:"tag"`
+	CreatedAt time.Time       `json:"created_at"`
+	Tag       api.TagResponse `json:"tag"`
 }
 
 type UserDataJSON struct {
