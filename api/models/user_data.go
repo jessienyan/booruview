@@ -44,7 +44,7 @@ func (h *SearchHistory) Add(item SearchHistoryEntry) {
 		newHistory = append(newHistory, (*h)[i+1:]...)
 	}
 
-	*h = newHistory[:SearchHistoryLimit]
+	*h = newHistory[:min(len(newHistory), SearchHistoryLimit)]
 }
 
 type UserDataJSON struct {

@@ -58,33 +58,35 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// Update post history
-	user := getUser(req)
-	if user != nil {
-		data, err := user.Data.ParseJSON()
-		if err != nil {
-			respondWithInternalError(w, err)
-			return
-		}
+	if len(tags) > 0 {
+		user := getUser(req)
+		if user != nil {
+			data, err := user.Data.ParseJSON()
+			if err != nil {
+				respondWithInternalError(w, err)
+				return
+			}
 
-		data.SearchHistory.Add(models.SearchHistoryEntry{
-			SearchedAt: time.Now(),
-			Tags:       tags,
-		})
-
-		if err := user.Data.Set(data); err != nil {
-			respondWithInternalError(w, err)
-			return
-		}
-
-		db := models.New(api.UserDB())
-		err = db.UpdateUserData(req.Context(),
-			models.UpdateUserDataParams{
-				Data:   user.Data.Data,
-				UserID: user.User.ID,
+			data.SearchHistory.Add(models.SearchHistoryEntry{
+				SearchedAt: time.Now(),
+				Tags:       tags,
 			})
-		if err != nil {
-			respondWithInternalError(w, err)
-			return
+
+			if err := user.Data.Set(data); err != nil {
+				respondWithInternalError(w, err)
+				return
+			}
+
+			db := models.New(api.UserDB())
+			err = db.UpdateUserData(req.Context(),
+				models.UpdateUserDataParams{
+					Data:   user.Data.Data,
+					UserID: user.User.ID,
+				})
+			if err != nil {
+				respondWithInternalError(w, err)
+				return
+			}
 		}
 	}
 
