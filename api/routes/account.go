@@ -2,19 +2,13 @@ package routes
 
 import (
 	"net/http"
+
+	"codeberg.org/jessienyan/booruview/models"
 )
 
-type jsonString string
-
-// Marshal the data as-is without adding string quotes. The data is stored as a JSON
-// string in the DB.
-func (s jsonString) MarshalJSON() ([]byte, error) {
-	return []byte(s), nil
-}
-
 type AccountResponse struct {
-	Data     jsonString `json:"data"`
-	Username string     `json:"username"`
+	Data     models.UserDataJSON `json:"data"`
+	Username string              `json:"username"`
 }
 
 func AccountHandler(w http.ResponseWriter, req *http.Request) {
@@ -24,8 +18,14 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	data, err := user.Data.ParseJSON()
+	if err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
+
 	respondJson(w, 200, AccountResponse{
-		Data:     jsonString(user.Data.Data),
+		Data:     data,
 		Username: user.User.Username,
 	})
 }

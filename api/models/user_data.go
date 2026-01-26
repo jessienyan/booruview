@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"slices"
 	"time"
 )
@@ -67,4 +68,23 @@ type UserDataJSON struct {
 	FavoriteTags  []FavoriteTag    `json:"favorite_tags"`
 	Blacklist     []BlacklistEntry `json:"blacklist"`
 	SearchHistory SearchHistory    `json:"search_history"`
+}
+
+func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
+	if ud.Blacklist == nil {
+		ud.Blacklist = []BlacklistEntry{}
+	}
+	if ud.FavoritePosts == nil {
+		ud.FavoritePosts = []FavoritePost{}
+	}
+	if ud.FavoriteTags == nil {
+		ud.FavoriteTags = []FavoriteTag{}
+	}
+	if ud.SearchHistory == nil {
+		ud.SearchHistory = SearchHistory{}
+	}
+
+	// Use a different type for marshalling, otherwise this will go into an infinite loop
+	type marshalType UserDataJSON
+	return json.Marshal(marshalType(ud))
 }
