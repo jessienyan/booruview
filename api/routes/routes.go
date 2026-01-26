@@ -22,7 +22,7 @@ func NewRouter() *mux.Router {
 		}
 		respondJson(w, http.StatusOK, versionResponse{Version: api.AppVersion})
 	})
-	r.Use(EmptyResponseMiddleware, RecoverMiddleware)
+	r.Use(RecoverMiddleware)
 
 	return r
 }
