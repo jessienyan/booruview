@@ -48,7 +48,7 @@ func NewAuthToken(userID int, ttl time.Duration) (string, error) {
 
 // Parses the auth token to grab the user ID it belongs to. Also verifies it hasn't
 // expired and that it wasn't tampered with.
-func ParseAuthToken(tokenString string) (int, error) {
+func ParseAuthToken(tokenString string) (int64, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return SecretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithExpirationRequired())
@@ -78,5 +78,5 @@ func ParseAuthToken(tokenString string) (int, error) {
 		return 0, AuthTokenInvalid
 	}
 
-	return uid, nil
+	return int64(uid), nil
 }

@@ -88,7 +88,12 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		Password:     passHash,
 		PasswordSalt: salt,
 	})
+	if err != nil {
+		respondWithInternalError(w, err)
+		return
+	}
 
+	_, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{Data: "{}", UserID: u.ID})
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
