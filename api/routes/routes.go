@@ -26,6 +26,7 @@ func NewRouter() *mux.Router {
 
 	authRouter := r.NewRoute().Subrouter()
 	authRouter.Use(LoadUserMiddleware)
+	authRouter.HandleFunc("/account", AccountHandler)
 	authRouter.HandleFunc("/posts", PostsHandler)
 
 	return r
