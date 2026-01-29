@@ -69,10 +69,14 @@
         reverse_proxy http://api:8000
     }
 
-    handle /assets/* {
+    # Including some common file extensions here will prevent the server from
+    # falling back to index.html
+    @static path /assets/* *.html *.css *.js *.png *.jpg *.ico *.txt
+    handle @static {
         file_server
     }
 
+    # index.html fallback to handle SPA routing
     handle {
         file_server
         try_files {path} /index.html
