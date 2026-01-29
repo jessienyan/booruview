@@ -32,8 +32,8 @@ func ParseTagType(val string) TagType {
 }
 
 type TagResponse struct {
-	Name  string  `json:"name"`
-	Type  TagType `json:"type"`
+	Name  string  `json:"name" validate:"required"`
+	Type  TagType `json:"type" validate:"required"`
 	Count int     `json:"count"`
 }
 

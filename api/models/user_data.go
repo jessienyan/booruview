@@ -50,37 +50,22 @@ func (h *SearchHistory) Add(item SearchHistoryEntry) {
 	*h = newHistory[:min(len(newHistory), SearchHistoryLimit)]
 }
 
-type FavoritePost struct {
-	CreatedAt time.Time        `json:"created_at"`
-	Post      api.PostResponse `json:"post"`
-}
-
-type FavoriteTag struct {
-	CreatedAt time.Time       `json:"created_at"`
-	Tag       api.TagResponse `json:"tag"`
-}
-
-type BlacklistEntry struct {
-	CreatedAt time.Time       `json:"created_at"`
-	Tag       api.TagResponse `json:"tag"`
-}
-
 type UserDataJSON struct {
-	FavoritePosts []FavoritePost   `json:"favorite_posts"`
-	FavoriteTags  []FavoriteTag    `json:"favorite_tags"`
-	Blacklist     []BlacklistEntry `json:"blacklist"`
-	SearchHistory SearchHistory    `json:"search_history"`
+	FavoritePosts []api.PostResponse `json:"favorite_posts" validate:"dive"`
+	FavoriteTags  []api.TagResponse  `json:"favorite_tags" validate:"dive"`
+	Blacklist     []api.TagResponse  `json:"blacklist" validate:"dive"`
+	SearchHistory SearchHistory      `json:"search_history"`
 }
 
 func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
 	if ud.Blacklist == nil {
-		ud.Blacklist = []BlacklistEntry{}
+		ud.Blacklist = []api.TagResponse{}
 	}
 	if ud.FavoritePosts == nil {
-		ud.FavoritePosts = []FavoritePost{}
+		ud.FavoritePosts = []api.PostResponse{}
 	}
 	if ud.FavoriteTags == nil {
-		ud.FavoriteTags = []FavoriteTag{}
+		ud.FavoriteTags = []api.TagResponse{}
 	}
 	if ud.SearchHistory == nil {
 		ud.SearchHistory = SearchHistory{}
