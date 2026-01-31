@@ -1,10 +1,15 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	api "codeberg.org/jessienyan/booruview"
+)
 
 func (ud UserData) ParseJSON() (UserDataJSON, error) {
 	var parsed UserDataJSON
-	err := json.Unmarshal([]byte(ud.Data), &parsed)
+	decompressed := api.DecompressData([]byte(ud.Data))
+	err := json.Unmarshal(decompressed, &parsed)
 	return parsed, err
 }
 
@@ -13,6 +18,12 @@ func (ud *UserData) Set(udJSON UserDataJSON) error {
 	if err != nil {
 		return err
 	}
-	ud.Data = string(marshalled)
+
+	compressed, err := api.CompressData(marshalled)
+	if err != nil {
+		return err
+	}
+
+	ud.Data = string(compressed)
 	return nil
 }

@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"net/http"
@@ -88,8 +87,8 @@ func getCachedTagSearch(query string) ([]byte, error) {
 
 func writeTagSearchToCache(query string, data []byte) error {
 	vk := api.Valkey()
-	buf := bytes.Buffer{}
-	if err := api.CompressData(&buf, data); err != nil {
+	compressed, err := api.CompressData(data)
+	if err != nil {
 		return err
 	}
 
@@ -98,7 +97,7 @@ func writeTagSearchToCache(query string, data []byte) error {
 			Setex().
 			Key(gelbooru.TagSearchCacheKey(query)).
 			Seconds(api.TagSearchTtl).
-			Value(buf.String()).
+			Value(string(compressed)).
 			Build(),
 	).Error()
 }

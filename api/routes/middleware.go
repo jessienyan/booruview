@@ -87,10 +87,22 @@ func LoadUserMiddleware(next http.Handler) http.Handler {
 			}
 
 			data, err := db.GetUserData(req.Context(), userID)
-			if err != nil {
-				if err != sql.ErrNoRows {
+			if err == sql.ErrNoRows {
+				var userData models.UserData
+				userData.Set(models.UserDataJSON{})
+
+				// Create user data if it's missing
+				data, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{
+					Data:   userData.Data,
+					UserID: user.ID,
+				})
+				if err != nil {
 					respondWithInternalError(w, err)
+					return
 				}
+
+				log.Info().Int64("userid", user.ID).Msg("created missing user data")
+			} else if err != nil {
 				return
 			}
 

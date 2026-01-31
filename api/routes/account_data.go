@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -9,6 +10,10 @@ import (
 	"codeberg.org/jessienyan/booruview/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	maxDataSize = 2 * 1024 * 1024 // MB
 )
 
 type AccountResponse struct {
@@ -41,6 +46,11 @@ func AccountDataHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 		defer req.Body.Close()
+
+		if len(body) > maxDataSize {
+			respondWithBadRequest(w, fmt.Sprintf("body is too large (max %d bytes)", maxDataSize))
+			return
+		}
 
 		var form models.UserDataJSON
 		if err := json.Unmarshal(body, &form); err != nil {
@@ -75,27 +85,27 @@ func AccountDataHandler(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if changed {
-			newData, err := data.MarshalJSON()
-			if err != nil {
+			if err := user.Data.Set(data); err != nil {
 				respondWithInternalError(w, err)
 				return
 			}
 
 			db := models.New(api.UserDB())
 			params := models.UpdateUserDataParams{
-				Data:   string(newData),
+				Data:   user.Data.Data,
 				UserID: user.User.ID,
 			}
+
 			if err := db.UpdateUserData(req.Context(), params); err != nil {
 				respondWithInternalError(w, err)
 				return
 			}
 
-			log.Info().Any("data", data).Int64("userid", user.User.ID).Msg("updated user data")
-
-			respondJson(w, 200, data)
-			return
+			log.Info().Int64("userid", user.User.ID).Msg("updated user data")
 		}
+
+		respondJson(w, 200, data)
+		return
 	}
 
 	respondJson(w, 200, AccountResponse{
