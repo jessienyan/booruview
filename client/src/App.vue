@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-	computed,
-	nextTick,
-	provide,
-	readonly,
-	useTemplateRef,
-	watch,
-} from "vue";
+import { computed, nextTick, provide, readonly, useTemplateRef, watch } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import store from "@/store";

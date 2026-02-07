@@ -12,7 +12,7 @@ setInterval(() => {
 		return;
 	}
 
-	fetch("/api/version").then((resp) =>
+	fetch("/api/version").then(resp =>
 		resp.json().then(({ version }: { version: string }) => {
 			if (version !== currentVersion) {
 				store.toast = {

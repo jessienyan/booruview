@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"time"
 
-	api "codeberg.org/jessienyan/booruview"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -65,9 +66,19 @@ func respondWithGelbooruUnavailable(w http.ResponseWriter) {
 	respondWithError(w, http.StatusServiceUnavailable, "Gelbooru is currently unavailable", "")
 }
 
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
+
 func respondWithInternalError(w http.ResponseWriter, err error) {
-	log.Err(err).Stack().Msg("api error")
-	api.LogStackTrace()
+	log.Err(err).Msg("api error")
+
+	if err, ok := err.(stackTracer); ok {
+		log.Info().Msgf("Stacktrace%+v", err.StackTrace())
+	} else {
+		log.Info().Msgf("Stacktrace\n%s", string(debug.Stack()))
+	}
+
 	respondWithError(w, http.StatusInternalServerError, "An unexpected error occurred :(", "")
 }
 

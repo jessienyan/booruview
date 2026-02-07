@@ -20,11 +20,7 @@ const {
 
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
-const isFavorited = computed(
-	() =>
-		store.settings.favoriteTags.findIndex((t) => t.name === tag.tag.name) !==
-		-1,
-);
+const isFavorited = computed(() => store.settings.favoriteTags.findIndex(t => t.name === tag.tag.name) !== -1);
 const showOptions = ref(false);
 
 const cls = computed(() => ({

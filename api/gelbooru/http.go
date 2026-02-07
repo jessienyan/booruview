@@ -1,10 +1,8 @@
 package gelbooru
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -13,12 +11,30 @@ import (
 	"syscall"
 	"time"
 
+	stderrors "errors"
+
+	"github.com/pkg/errors"
+
 	"github.com/rs/zerolog/log"
 )
 
 var (
 	httpClient = &http.Client{Timeout: 4 * time.Second}
 )
+
+// Checks if the error is timeout related, and if so, replaces it with a GelbooruError
+func transformTimeoutError(err error) error {
+	resetByPeer := errors.Is(err, syscall.ECONNRESET)
+	isTimeout := os.IsTimeout(err)
+	isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
+
+	// Timeouts or closed connections generally mean Gelbooru isn't available
+	if resetByPeer || isTimeout || isCtxDeadline {
+		err = stderrors.Join(GelbooruError{Code: 503}, err)
+	}
+
+	return err
+}
 
 func doRequest(req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
@@ -54,26 +70,14 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 
 	resp, err := doRequest(req)
 	if err != nil {
-		resetByPeer := errors.Is(err, syscall.ECONNRESET)
-		isTimeout := os.IsTimeout(err)
-		isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
-
-		// Timeouts or closed connections generally mean Gelbooru isn't available
-		if resetByPeer || isTimeout || isCtxDeadline {
-			err = errors.Join(GelbooruError{Code: -1}, err)
-		}
-
-		return nil, err
+		return nil, transformTimeoutError(err)
 	}
 
-	// Gelbooru is down (cloudflare error)
-	if resp.StatusCode == 521 {
-		err = GelbooruError{Code: -1}
-		return nil, err
-	} else if resp.StatusCode != 200 {
+	if resp.StatusCode != 200 {
 		body, _ := httputil.DumpResponse(resp, true)
 		log.Error().Msgf("non-200 response: %s", string(body))
-		return nil, GelbooruError{Code: resp.StatusCode}
+		err := errors.Wrap(GelbooruError{Code: resp.StatusCode}, "non-200 response")
+		return nil, err
 	}
 
 	return resp, nil
@@ -89,19 +93,16 @@ func httpGetJson[T any](params url.Values, dst T) error {
 		return GelbooruError{Code: resp.StatusCode}
 	}
 
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
-	}
-
-	// This gets received sometimes with status=200, very cool
-	if bytes.HasPrefix(body, []byte("Too deep!")) {
-		return GelbooruError{Code: 429}
+		return transformTimeoutError(err)
 	}
 
 	if err := json.Unmarshal(body, &dst); err != nil {
-		log.Err(err).Str("body", string(body)).Msg("failed to parse json")
-		return GelbooruError{Code: 500}
+		err = errors.Wrap(err, "failed to parse json")
+		log.Err(err).Msg("")
+		return err
 	}
 
 	return nil

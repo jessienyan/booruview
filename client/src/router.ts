@@ -17,9 +17,7 @@ export const router = createRouter({
 					return;
 				}
 
-				const queryParams = new URLSearchParams(
-					window.location.hash.replace(/^#/, ""),
-				);
+				const queryParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
 
 				// Redirect old URL scheme: /#page=N&q=tag,tag
 				if (queryParams.has("page") && queryParams.has("q")) {
@@ -42,7 +40,7 @@ export const router = createRouter({
 	],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(to => {
 	if (to.name === "search") {
 		if (!store.settings.consented) {
 			return;
@@ -51,7 +49,7 @@ router.beforeEach((to) => {
 		const page = parseInt(to.params.page as string, 10);
 
 		return new Promise<void>((resolve, reject) => {
-			tagsToSearchQuery(to.params.query || []).then((q) => {
+			tagsToSearchQuery(to.params.query || []).then(q => {
 				store.query = q;
 				store
 					.searchPosts({ page, force: store.justClickedSearchButton })

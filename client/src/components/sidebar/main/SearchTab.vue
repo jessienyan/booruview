@@ -14,9 +14,7 @@ function doPostSearch() {
 	}
 
 	const searchDidntChange =
-		router.currentRoute.value.name === "search" &&
-		store.currentPage === 1 &&
-		store.lastQuery.equals(store.query);
+		router.currentRoute.value.name === "search" && store.currentPage === 1 && store.lastQuery.equals(store.query);
 
 	store.justClickedSearchButton = true;
 
@@ -59,10 +57,8 @@ function onTagSelect(tag: Tag, negated: boolean) {
 const styledTags = computed(() => {
 	let ret: TagChip[];
 
-	ret = store.query.includedList().map((tag) => ({ tag, style: "default" }));
-	ret = ret.concat(
-		store.query.excludedList().map((tag) => ({ tag, style: "strikethrough" })),
-	);
+	ret = store.query.includedList().map(tag => ({ tag, style: "default" }));
+	ret = ret.concat(store.query.excludedList().map(tag => ({ tag, style: "strikethrough" })));
 
 	return ret;
 });

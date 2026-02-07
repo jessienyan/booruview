@@ -14,8 +14,7 @@ const styledTag = (tag: Tag) =>
 		} else if (store.query.isExcluded(tag.name)) {
 			style = "strikethrough";
 		} else {
-			const isBlacklisted =
-				store.settings.blacklist.findIndex((t) => t.name === tag.name) !== -1;
+			const isBlacklisted = store.settings.blacklist.findIndex(t => t.name === tag.name) !== -1;
 			if (isBlacklisted) {
 				style = "strikethrough";
 			}
@@ -42,8 +41,7 @@ const examples = computed<Examples>(() => ({
 	rating: [
 		styledTag({ count: 0, name: "rating:general", type: "metadata" }).value,
 		styledTag({ count: 0, name: "rating:sensitive", type: "metadata" }).value,
-		styledTag({ count: 0, name: "rating:questionable", type: "metadata" })
-			.value,
+		styledTag({ count: 0, name: "rating:questionable", type: "metadata" }).value,
 		styledTag({ count: 0, name: "rating:explicit", type: "metadata" }).value,
 	],
 }));

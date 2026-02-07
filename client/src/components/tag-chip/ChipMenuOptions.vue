@@ -25,7 +25,7 @@ const actions = computed(() => ({
 
 const isBlacklisted = computed(() => {
 	const name = tag.name;
-	return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
+	return store.settings.blacklist.findIndex(t => t.name === name) !== -1;
 });
 
 const isIncluded = computed(() => {
@@ -37,7 +37,7 @@ const isExcluded = computed(() => {
 });
 
 const favoriteIndex = computed(() => {
-	return store.settings.favoriteTags.findIndex((t) => tag.name === t.name);
+	return store.settings.favoriteTags.findIndex(t => tag.name === t.name);
 });
 
 const isFavorited = computed(() => favoriteIndex.value !== -1);
@@ -96,7 +96,7 @@ function onUnfavorite() {
 
 function onWhitelist() {
 	const name = tag.name;
-	const i = store.settings.blacklist.findIndex((t) => t.name === name);
+	const i = store.settings.blacklist.findIndex(t => t.name === name);
 
 	// shouldn't happen
 	if (i === -1) {

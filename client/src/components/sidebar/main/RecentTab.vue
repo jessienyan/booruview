@@ -13,10 +13,8 @@ function styledTags(query: SearchQuery) {
 	return computed(() => {
 		let ret: TagChip[];
 
-		ret = query.includedList().map((tag) => ({ tag, style: "default" }));
-		ret = ret.concat(
-			query.excludedList().map((tag) => ({ tag, style: "strikethrough" })),
-		);
+		ret = query.includedList().map(tag => ({ tag, style: "default" }));
+		ret = ret.concat(query.excludedList().map(tag => ({ tag, style: "strikethrough" })));
 
 		return ret;
 	});

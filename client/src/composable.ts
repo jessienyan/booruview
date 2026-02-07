@@ -15,13 +15,10 @@ import {
 import store from "./store";
 import type { RefOrGetter } from "./types";
 
-export function useDismiss(
-	el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>,
-	onDismiss: () => void,
-) {
+export function useDismiss(el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>, onDismiss: () => void) {
 	function handler(e: MouseEvent) {
 		const clickedOutside =
-			toValue(el).findIndex((v) => {
+			toValue(el).findIndex(v => {
 				const child = toValue(v);
 
 				if (!child) {
@@ -54,9 +51,7 @@ type StationaryClickReturn = {
 };
 
 // Fires a click event only if the cursor didn't move.
-export function useStationaryClick(
-	onClick: (e: MouseEvent) => void,
-): StationaryClickReturn {
+export function useStationaryClick(onClick: (e: MouseEvent) => void): StationaryClickReturn {
 	const originX = ref(0);
 	const originY = ref(0);
 
@@ -69,9 +64,7 @@ export function useStationaryClick(
 	}
 
 	function mouseUp(e: MouseEvent) {
-		const dist = Math.sqrt(
-			(e.x - originX.value) ** 2 + (e.y - originY.value) ** 2,
-		);
+		const dist = Math.sqrt((e.x - originX.value) ** 2 + (e.y - originY.value) ** 2);
 
 		// Not a stationary click
 		if (dist > allowedDistance) {
@@ -106,10 +99,7 @@ interface FeatureIndicator {
 	onSeen: () => void;
 }
 
-export function useNewFeatureIndicator(
-	id: string,
-	until?: Date,
-): FeatureIndicator {
+export function useNewFeatureIndicator(id: string, until?: Date): FeatureIndicator {
 	// Feature indicator is no longer needed and will never be shown for new visitors
 	if (until && new Date() > until) {
 		const show = ref(false);
@@ -162,8 +152,7 @@ export function useRelativeTime() {
 }
 
 export function useMainContainer() {
-	const mainContainer: Readonly<ShallowRef<HTMLElement>> =
-		inject("mainContainer")!;
+	const mainContainer: Readonly<ShallowRef<HTMLElement>> = inject("mainContainer")!;
 	return mainContainer;
 }
 
@@ -182,9 +171,7 @@ export function useViewportSize() {
 }
 
 // Rewrites an image URL to use the current CDN host
-export function useGelbooruImageURL(
-	url_: RefOrGetter<string>,
-): ComputedRef<string> {
+export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
 		const url = toValue(url_);
 
@@ -200,9 +187,7 @@ export function useGelbooruImageURL(
 }
 
 // Rewrites a video URL to use the current CDN host
-export function useGelbooruVideoURL(
-	url_: RefOrGetter<string>,
-): ComputedRef<string> {
+export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
 		const url = toValue(url_);
 

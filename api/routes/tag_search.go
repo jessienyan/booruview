@@ -2,9 +2,10 @@ package routes
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"

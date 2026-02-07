@@ -2,11 +2,12 @@ package routes
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"

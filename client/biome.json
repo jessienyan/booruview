@@ -1,16 +1,20 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.0.5/schema.json",
-    "files": {
-        "includes": ["src/**", "!src/vue-router-better-scroller/**"]
-    },
-    "linter": {
-        "domains": {
-            "vue": "recommended"
-        },
+	"$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+	"files": {
+		"includes": ["src/**", "!src/vue-router-better-scroller"]
+	},
+	"formatter": {
+		"indentWidth": 4,
+		"lineWidth": 120
+	},
+	"linter": {
+		"domains": {
+			"vue": "recommended"
+		},
 		"rules": {
 			"correctness": {
-					"noUnusedFunctionParameters": "off"
-				},
+				"noUnusedFunctionParameters": "off"
+			},
 			"style": {
 				"noNonNullAssertion": "off"
 			},
@@ -18,20 +22,28 @@
 				"noExplicitAny": "off"
 			}
 		}
-    },
-    "overrides": [
-	{
-		"includes": [
-			"**/*.vue"
-		],
-		"linter": {
-			"rules": {
-				"correctness": {
-					"noUnusedImports": "off",
-					"noUnusedVariables": "off"
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.vue"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedImports": "off",
+						"noUnusedVariables": "off"
+					}
 				}
 			}
 		}
+	],
+	"css": {
+		"formatter": {
+			"enabled": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"arrowParentheses": "asNeeded"
+		}
 	}
-]
 }
