@@ -26,9 +26,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-11-30",
-		changes: [
-			"fixed API returning 500 instead of 503 when gelbooru request times out",
-		],
+		changes: ["fixed API returning 500 instead of 503 when gelbooru request times out"],
 	},
 	{
 		date: "2025-11-28",
@@ -74,10 +72,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-10-20",
-		changes: [
-			"fixed extra hyphens being added to raw excluded tags",
-			"added a default opt-in nsfw blacklist",
-		],
+		changes: ["fixed extra hyphens being added to raw excluded tags", "added a default opt-in nsfw blacklist"],
 	},
 	{
 		date: "2025-10-14",
@@ -92,9 +87,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-10-03",
-		changes: [
-			"added country code to caddy logs to help determine where to host server",
-		],
+		changes: ["added country code to caddy logs to help determine where to host server"],
 	},
 	{
 		date: "2025-10-01",
@@ -111,10 +104,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-09-19",
-		changes: [
-			"increase settings export size limit to 5MB",
-			"revert cloudflare migration, return to monke",
-		],
+		changes: ["increase settings export size limit to 5MB", "revert cloudflare migration, return to monke"],
 	},
 	{
 		date: "2025-09-14",
@@ -140,9 +130,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-09-11",
-		changes: [
-			"added a clear tags button to quickly clear parts of the search query",
-		],
+		changes: ["added a clear tags button to quickly clear parts of the search query"],
 	},
 	{
 		date: "2025-09-10",
@@ -198,17 +186,11 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-08-23",
-		changes: [
-			"added icon to show which posts are favorited",
-			"cache search suggestions on frontend",
-		],
+		changes: ["added icon to show which posts are favorited", "cache search suggestions on frontend"],
 	},
 	{
 		date: "2025-08-22",
-		changes: [
-			"added survey CTA to sidebar",
-			"fixed alignment of sidebar buttons on mobile",
-		],
+		changes: ["added survey CTA to sidebar", "fixed alignment of sidebar buttons on mobile"],
 	},
 	{
 		date: "2025-08-21",
@@ -227,16 +209,11 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-08-18",
-		changes: [
-			"improved gelbooru error handling to avoid vague 'something went wrong' error",
-		],
+		changes: ["improved gelbooru error handling to avoid vague 'something went wrong' error"],
 	},
 	{
 		date: "2025-08-15",
-		changes: [
-			"moved source code to codeberg",
-			"made a list and checked it twice 🎅",
-		],
+		changes: ["moved source code to codeberg", "made a list and checked it twice 🎅"],
 	},
 	{
 		date: "2025-08-10",
@@ -244,9 +221,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-08-06",
-		changes: [
-			"added search hints for commonly misused filters, e.g. order:favcount instead of sort:score",
-		],
+		changes: ["added search hints for commonly misused filters, e.g. order:favcount instead of sort:score"],
 	},
 	{
 		date: "2025-08-05",
@@ -277,10 +252,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-07-29",
-		changes: [
-			"added swipe gesture to change the page",
-			"reduced flashing when changing pages",
-		],
+		changes: ["added swipe gesture to change the page", "reduced flashing when changing pages"],
 	},
 	{
 		date: "2025-07-28",
@@ -291,9 +263,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-07-24",
-		changes: [
-			"added settings to customize the menu position when viewing a post in fullscreen",
-		],
+		changes: ["added settings to customize the menu position when viewing a post in fullscreen"],
 	},
 	{
 		date: "2025-07-21",
@@ -312,9 +282,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-07-11",
-		changes: [
-			"added a notification when making too many requests and triggering the rate limit",
-		],
+		changes: ["added a notification when making too many requests and triggering the rate limit"],
 	},
 	{
 		date: "2025-07-09",
@@ -322,10 +290,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-07-08",
-		changes: [
-			"added a notification when a new version is released",
-			"increased results per page from 50 to 100",
-		],
+		changes: ["added a notification when a new version is released", "increased results per page from 50 to 100"],
 	},
 	{
 		date: "2025-07-06",
@@ -336,10 +301,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-07-04",
-		changes: [
-			"added this changelog",
-			"fixed autocomplete not working when doing an OR search",
-		],
+		changes: ["added this changelog", "fixed autocomplete not working when doing an OR search"],
 	},
 	{
 		date: "2025-07-01",
@@ -354,10 +316,7 @@ export const changeLog: ChangeLogEntry[] = [
 	},
 	{
 		date: "2025-??-??",
-		changes: [
-			"too lazy to go back and write them all out",
-			"check the commit history lol",
-		],
+		changes: ["too lazy to go back and write them all out", "check the commit history lol"],
 	},
 	{
 		date: "2025-05-11",

@@ -108,11 +108,9 @@ const currentPostIndex = computed(() => {
 	let index = -1;
 
 	if (route.name === "search") {
-		index = store.posts
-			.get(store.currentPage)!
-			.findIndex((p) => p.id === post.id);
+		index = store.posts.get(store.currentPage)!.findIndex(p => p.id === post.id);
 	} else if (route.name === "favorites") {
-		index = store.settings.favorites.findIndex((p) => p.id === post.id);
+		index = store.settings.favorites.findIndex(p => p.id === post.id);
 	}
 
 	return index === -1 ? null : index;
@@ -241,9 +239,7 @@ function toggleFavorite() {
 	store.saveSettings();
 }
 
-const favoriteIndex = computed(() =>
-	store.settings.favorites.findIndex((p) => p.id === post.id),
-);
+const favoriteIndex = computed(() => store.settings.favorites.findIndex(p => p.id === post.id));
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 const mainContainer = useMainContainer();
 

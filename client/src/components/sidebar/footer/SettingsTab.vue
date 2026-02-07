@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from "vue";
-import store, {
-	type ColumnSizing,
-	type FullscreenViewMenuAnchorPoint,
-} from "@/store";
+import store, { type ColumnSizing, type FullscreenViewMenuAnchorPoint } from "@/store";
 import Blacklist from "./Blacklist.vue";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
@@ -11,10 +8,7 @@ const columnSizingOptions: Record<ColumnSizing, string> = {
 	fixed: "fixed",
 };
 
-const fullscreenViewMenuAnchorOptions: Record<
-	FullscreenViewMenuAnchorPoint,
-	string
-> = {
+const fullscreenViewMenuAnchorOptions: Record<FullscreenViewMenuAnchorPoint, string> = {
 	topleft: "top left",
 	topcenter: "top center",
 	topright: "top right",
@@ -26,24 +20,17 @@ const fullscreenViewMenuAnchorOptions: Record<
 };
 
 function onChangeColCount(e: Event) {
-	store.settings.columnCount = parseInt(
-		(e.target as HTMLInputElement).value,
-		10,
-	);
+	store.settings.columnCount = parseInt((e.target as HTMLInputElement).value, 10);
 	store.saveSettings();
 }
 
 function onChangeColSizing(e: Event) {
-	store.settings.columnSizing = (e.target as HTMLInputElement)
-		.value as ColumnSizing;
+	store.settings.columnSizing = (e.target as HTMLInputElement).value as ColumnSizing;
 	store.saveSettings();
 }
 
 function onChangeColWidth(e: Event) {
-	store.settings.columnWidth = parseInt(
-		(e.target as HTMLInputElement).value,
-		10,
-	);
+	store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value, 10);
 	store.saveSettings();
 }
 
@@ -62,15 +49,12 @@ function onChangePostHeight(e: Event) {
 }
 
 function onChangeFullscreenViewMenuAnchor(e: Event) {
-	store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement)
-		.value as FullscreenViewMenuAnchorPoint;
+	store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement).value as FullscreenViewMenuAnchorPoint;
 	store.saveSettings();
 }
 
 function onChangeFullscreenViewMenuRotate(e: Event) {
-	store.settings.fullscreenViewMenuRotate = (
-		e.target as HTMLInputElement
-	).checked;
+	store.settings.fullscreenViewMenuRotate = (e.target as HTMLInputElement).checked;
 	store.saveSettings();
 }
 
@@ -112,17 +96,12 @@ watch(
 	},
 );
 
-const ignoredSettingsForImportExport: Array<
-	Partial<keyof typeof store.settings>
-> = ["consented", "queryHistory"];
+const ignoredSettingsForImportExport: Array<Partial<keyof typeof store.settings>> = ["consented", "queryHistory"];
 
 function generateExportCode() {
 	generatingCode.value = true;
 
-	const data: Partial<typeof store.settings> = Object.assign(
-		{},
-		store.settings,
-	);
+	const data: Partial<typeof store.settings> = Object.assign({}, store.settings);
 
 	for (const k of ignoredSettingsForImportExport) {
 		delete data[k];
@@ -132,13 +111,13 @@ function generateExportCode() {
 		method: "POST",
 		body: JSON.stringify(data),
 	})
-		.then((resp) => {
+		.then(resp => {
 			resp.json().then(({ code }) => {
 				exportCode.value = code;
 			});
 			canGenerate.value = false;
 		})
-		.catch((e) => console.error(e))
+		.catch(e => console.error(e))
 		.finally(() => {
 			generatingCode.value = false;
 		});
@@ -149,29 +128,17 @@ const importingData = ref(false);
 
 function mergeSettings(data: Record<string, any>) {
 	Object.entries(data).forEach(([_k, v]) => {
-		const k = _k as Exclude<
-			keyof typeof store.settings,
-			typeof ignoredSettingsForImportExport
-		>;
+		const k = _k as Exclude<keyof typeof store.settings, typeof ignoredSettingsForImportExport>;
 
 		// Remove any duplicates
 		if (k === "blacklist") {
-			v = (v as Tag[]).filter(
-				(a) =>
-					store.settings.blacklist.findIndex((b) => a.name === b.name) === -1,
-			);
+			v = (v as Tag[]).filter(a => store.settings.blacklist.findIndex(b => a.name === b.name) === -1);
 			v = v.concat(store.settings.blacklist);
 		} else if (k === "favorites") {
-			v = (v as Post[]).filter(
-				(a) => store.settings.favorites.findIndex((b) => a.id === b.id) === -1,
-			);
+			v = (v as Post[]).filter(a => store.settings.favorites.findIndex(b => a.id === b.id) === -1);
 			v = v.concat(store.settings.favorites);
 		} else if (k === "favoriteTags") {
-			v = (v as Tag[]).filter(
-				(a) =>
-					store.settings.favoriteTags.findIndex((b) => a.name === b.name) ===
-					-1,
-			);
+			v = (v as Tag[]).filter(a => store.settings.favoriteTags.findIndex(b => a.name === b.name) === -1);
 			v = v.concat(store.settings.favoriteTags);
 		}
 
@@ -188,11 +155,10 @@ function importData() {
 		method: "POST",
 		body: JSON.stringify({ code: importCode.value }),
 	})
-		.then((resp) => {
+		.then(resp => {
 			if (resp.status >= 400) {
-				resp
-					.json()
-					.then((val) => {
+				resp.json()
+					.then(val => {
 						let msg = "Something went wrong";
 
 						if ("error" in val) {
@@ -213,14 +179,14 @@ function importData() {
 				return;
 			}
 
-			resp.json().then((data) => mergeSettings(data));
+			resp.json().then(data => mergeSettings(data));
 			store.toast = {
 				msg: "data imported successfully",
 				type: "info",
 			};
 			importCode.value = "";
 		})
-		.catch((e) => console.error(e))
+		.catch(e => console.error(e))
 		.finally(() => {
 			importingData.value = false;
 		});

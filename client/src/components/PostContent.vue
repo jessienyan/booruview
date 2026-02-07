@@ -3,14 +3,7 @@ import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import { useGelbooruImageURL, useIsVideo } from "@/composable";
 import store from "@/store";
 
-const {
-	cropped,
-	maxHeight,
-	renderHeight,
-	post,
-	scrollContainer,
-	beingDragged,
-} = defineProps<{
+const { cropped, maxHeight, renderHeight, post, scrollContainer, beingDragged } = defineProps<{
 	cropped: boolean;
 	maxHeight: number;
 	renderHeight: number;
@@ -20,9 +13,7 @@ const {
 }>();
 
 const isVideo = useIsVideo(() => post);
-const favorited = computed(
-	() => store.settings.favorites.findIndex((p) => p.id === post.id) !== -1,
-);
+const favorited = computed(() => store.settings.favorites.findIndex(p => p.id === post.id) !== -1);
 
 const content = computed<{ url: string; width: number; height: number }>(() => {
 	if (isVideo.value) {

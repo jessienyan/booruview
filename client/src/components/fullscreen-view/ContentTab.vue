@@ -1,19 +1,7 @@
 <script setup lang="ts">
 import createPanZoom, { type PanZoom } from "panzoom";
-import {
-	computed,
-	onActivated,
-	onDeactivated,
-	onMounted,
-	onUnmounted,
-	useTemplateRef,
-	watch,
-} from "vue";
-import {
-	useGelbooruImageURL,
-	useGelbooruVideoURL,
-	useIsVideo,
-} from "@/composable";
+import { computed, onActivated, onDeactivated, onMounted, onUnmounted, useTemplateRef, watch } from "vue";
+import { useGelbooruImageURL, useGelbooruVideoURL, useIsVideo } from "@/composable";
 import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");

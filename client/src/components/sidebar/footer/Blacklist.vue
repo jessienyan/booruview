@@ -9,23 +9,18 @@ import { sortTags } from "@/tag";
 
 const styledTags = computed<TagChip[]>(() => {
 	const sorted = sortTags(store.settings.blacklist);
-	const styled = sorted.map<TagChip>((tag) => ({ tag, style: "default" }));
+	const styled = sorted.map<TagChip>(tag => ({ tag, style: "default" }));
 	return styled;
 });
 
 const defaultBlacklistVisibility = useDontShowAgain("hide-default-blacklist");
 
 // Consider NSFW enabled if the user hasn't blacklisted rating:explicit
-const nsfwEnabled = computed(
-	() =>
-		store.settings.blacklist.findIndex((t) => t.name === "rating:explicit") ===
-		-1,
-);
+const nsfwEnabled = computed(() => store.settings.blacklist.findIndex(t => t.name === "rating:explicit") === -1);
 
 const defaultBlacklistTags = computed(() =>
-	defaultNSFWBlacklist().map<TagChip>((tag) => {
-		const isBlacklisted =
-			store.settings.blacklist.findIndex((t) => t.name === tag.name) !== -1;
+	defaultNSFWBlacklist().map<TagChip>(tag => {
+		const isBlacklisted = store.settings.blacklist.findIndex(t => t.name === tag.name) !== -1;
 
 		return {
 			tag,
@@ -38,7 +33,7 @@ function addAllFromDefaultBlacklist() {
 	const list: Tag[] = [];
 
 	for (const tag of defaultNSFWBlacklist()) {
-		if (store.settings.blacklist.findIndex((t) => t.name === tag.name) === -1) {
+		if (store.settings.blacklist.findIndex(t => t.name === tag.name) === -1) {
 			list.push(tag);
 		}
 	}

@@ -107,8 +107,8 @@ const store = reactive<Store>({
 	cdnHosts: null,
 
 	updateCDNHosts() {
-		fetch("/api/hosts").then((resp) => {
-			resp.json().then((data) => {
+		fetch("/api/hosts").then(resp => {
+			resp.json().then(data => {
 				this.cdnHosts = {
 					image: data.image,
 					video: data.video,
@@ -185,10 +185,10 @@ const store = reactive<Store>({
 						query: new SearchQuery(),
 					};
 
-					query.include.forEach((tag) => {
+					query.include.forEach(tag => {
 						entry.query.includeTag(tag);
 					});
-					query.exclude.forEach((tag) => {
+					query.exclude.forEach(tag => {
 						entry.query.excludeTag(tag);
 					});
 
@@ -226,24 +226,12 @@ const store = reactive<Store>({
 		return new Promise<Tag[]>((resolve, reject) => {
 			store
 				.loadTags(post.tags)
-				.then(() =>
-					resolve(
-						post.tags
-							.map((t) => store.cachedTags.get(t))
-							.filter((t) => t != null),
-					),
-				)
+				.then(() => resolve(post.tags.map(t => store.cachedTags.get(t)).filter(t => t != null)))
 				.catch(reject);
 		});
 	},
 
-	searchPosts({
-		page,
-		force,
-	}: {
-		page?: number;
-		force?: boolean;
-	}): Promise<void> {
+	searchPosts({ page, force }: { page?: number; force?: boolean }): Promise<void> {
 		type PostListResponse = {
 			count_per_page: number;
 			total_count: number;
@@ -262,9 +250,7 @@ const store = reactive<Store>({
 				return;
 			}
 
-			const searchTags = this.query
-				.asList()
-				.concat(this.settings.blacklist.map((t) => `-${t.name}`));
+			const searchTags = this.query.asList().concat(this.settings.blacklist.map(t => `-${t.name}`));
 
 			const queryParams = new URLSearchParams();
 			queryParams.append("page", page.toString());
@@ -276,11 +262,10 @@ const store = reactive<Store>({
 			this.fetchingPosts = true;
 
 			fetch(`/api/posts?${queryParams.toString()}`)
-				.then((resp) => {
+				.then(resp => {
 					if (resp.status >= 400) {
-						resp
-							.json()
-							.then((val) => {
+						resp.json()
+							.then(val => {
 								let msg = "Something went wrong";
 
 								if ("error" in val) {
@@ -327,7 +312,7 @@ const store = reactive<Store>({
 						resolve();
 					});
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.error(err);
 					store.toast = {
 						msg: "Something went wrong",
@@ -371,7 +356,7 @@ const store = reactive<Store>({
 		}
 
 		return new Promise((resolve, reject) => {
-			const missing = tags.filter((t) => !this.cachedTags.has(t));
+			const missing = tags.filter(t => !this.cachedTags.has(t));
 
 			if (missing.length === 0) {
 				resolve();
@@ -385,15 +370,15 @@ const store = reactive<Store>({
 			}
 
 			fetch(`/api/tags?${queryParams.toString()}`)
-				.then((resp) => {
+				.then(resp => {
 					resp.json().then((json: TagResponse) => {
-						json.results.forEach((t) => {
+						json.results.forEach(t => {
 							this.cachedTags.set(t.name, t);
 						});
 						resolve();
 					});
 				})
-				.catch((err) => {
+				.catch(err => {
 					console.error(err);
 					reject();
 				});

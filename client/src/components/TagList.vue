@@ -28,7 +28,7 @@ const categories = computed(() => {
 		unknown: [],
 	};
 
-	tags.forEach((t) => {
+	tags.forEach(t => {
 		ret[t.tag.type] = ret[t.tag.type].concat(t);
 	});
 

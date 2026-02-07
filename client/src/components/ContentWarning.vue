@@ -43,16 +43,12 @@ function consent() {
 }
 
 function consentSFW() {
-	store.settings.blacklist = store.settings.blacklist.concat(
-		defaultSFWBlacklist(),
-	);
+	store.settings.blacklist = store.settings.blacklist.concat(defaultSFWBlacklist());
 	consent();
 }
 
 function consentNSFWWithBlacklist() {
-	store.settings.blacklist = store.settings.blacklist.concat(
-		defaultNSFWBlacklist(),
-	);
+	store.settings.blacklist = store.settings.blacklist.concat(defaultNSFWBlacklist());
 	consent();
 }
 </script>

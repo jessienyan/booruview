@@ -55,8 +55,8 @@ export class SearchQuery {
 	}
 
 	asList(): string[] {
-		const include = Array.from(this._include.values(), (t) => t.name);
-		const exclude = Array.from(this._exclude.values(), (t) => `-${t.name}`);
+		const include = Array.from(this._include.values(), t => t.name);
+		const exclude = Array.from(this._exclude.values(), t => `-${t.name}`);
 		return include.concat(exclude);
 	}
 
@@ -65,10 +65,7 @@ export class SearchQuery {
 	}
 
 	equals(o: SearchQuery): boolean {
-		if (
-			this._include.size !== o._include.size ||
-			this._exclude.size !== o._exclude.size
-		) {
+		if (this._include.size !== o._include.size || this._exclude.size !== o._exclude.size) {
 			return false;
 		}
 
@@ -102,9 +99,7 @@ export class SearchQuery {
 	}
 }
 
-export function tagsToSearchQuery(
-	tagNames: string | string[],
-): Promise<SearchQuery> {
+export function tagsToSearchQuery(tagNames: string | string[]): Promise<SearchQuery> {
 	if (typeof tagNames === "string") {
 		tagNames = tagNames.split(",");
 	}

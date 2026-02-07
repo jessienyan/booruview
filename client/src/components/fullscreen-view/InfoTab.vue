@@ -11,7 +11,7 @@ watchEffect(() => {
 		return;
 	}
 
-	store.tagsForPost(post).then((val) => {
+	store.tagsForPost(post).then(val => {
 		tags.value = val;
 	});
 });
@@ -42,7 +42,7 @@ const containerStyle = computed<CSSProperties>(() => {
 });
 
 const styledTags = computed(() =>
-	tags.value.map((t) => {
+	tags.value.map(t => {
 		const ret: TagChip = {
 			tag: t,
 			style: "default",
@@ -52,9 +52,7 @@ const styledTags = computed(() =>
 			ret.style = "checkmark";
 		} else if (store.query.isExcluded(t.name)) {
 			ret.style = "strikethrough";
-		} else if (
-			store.settings.blacklist.findIndex((bl) => bl.name === t.name) !== -1
-		) {
+		} else if (store.settings.blacklist.findIndex(bl => bl.name === t.name) !== -1) {
 			ret.style = "blacklist";
 		}
 

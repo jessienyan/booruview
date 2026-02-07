@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-	computed,
-	onMounted,
-	onUnmounted,
-	ref,
-	useTemplateRef,
-	watch,
-} from "vue";
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import { useDismiss } from "@/composable";
 import store from "@/store";
 import QuickTagsButton from "./QuickTagsButton.vue";
@@ -53,10 +46,10 @@ useDismiss([containerRef.value], () => {
 function setSuggestions(tags: Tag[]) {
 	// Filter out blacklist/already in search
 	suggestions.value = tags.filter(
-		(t) =>
+		t =>
 			!store.query.isIncluded(t.name) &&
 			!store.query.isExcluded(t.name) &&
-			store.settings.blacklist.findIndex((bl) => t.name === bl.name) === -1,
+			store.settings.blacklist.findIndex(bl => t.name === bl.name) === -1,
 	);
 }
 
@@ -73,7 +66,7 @@ function doTagSearch(query: string) {
 
 	// Encoding the query prevents trailing whitespace from being stripped
 	fetch(`/api/tagsearch?q=${encodeURIComponent(smartSuggestionValue.value)}`)
-		.then((resp) => {
+		.then(resp => {
 			// Request took too long and results don't match the input, discard
 			if (query !== inputVal.value) {
 				return;
@@ -84,7 +77,7 @@ function doTagSearch(query: string) {
 				setSuggestions(json.results);
 			});
 		})
-		.catch((err) => console.error(err));
+		.catch(err => console.error(err));
 }
 
 function changeSelection(direction: number) {
@@ -216,9 +209,7 @@ function onSubmit() {
 	} else {
 		// Strip all leading hyphens
 		const value = inputVal.value.replace(/^-+/, "");
-		const match = suggestions.value.find(
-			(t) => t.name.replace("_", " ") === value,
-		);
+		const match = suggestions.value.find(t => t.name.replace("_", " ") === value);
 
 		if (match) {
 			tag = match;
