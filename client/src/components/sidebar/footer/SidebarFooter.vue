@@ -11,7 +11,7 @@ const tabComponents: Record<Tab, Component> = {
 	about: AboutTab,
 	help: HelpTab,
 	settings: SettingsTab,
-    account: AccountTab,
+	account: AccountTab,
 };
 const currentTab = ref<Tab>("about");
 

@@ -23,6 +23,12 @@ const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
 export type ColumnSizing = "fixed" | "dynamic";
 
 type Store = {
+	account: {
+		authToken: string;
+		username: string;
+	} | null;
+	saveAccount(): void;
+
 	currentPage: number;
 	totalPostCount: number;
 	resultsPerPage: number;
@@ -97,6 +103,11 @@ type Store = {
 };
 
 const store = reactive<Store>({
+	account: JSON.parse(localStorage.getItem("account") || "null"),
+	saveAccount() {
+		localStorage.setItem("account", JSON.stringify(this.account));
+	},
+
 	currentPage: 1,
 	totalPostCount: 0,
 	resultsPerPage: 0,

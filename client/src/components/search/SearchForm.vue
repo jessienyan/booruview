@@ -270,117 +270,86 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 </script>
 
 <template>
-    <div
-        class="container"
-        @keydown.enter.prevent="onSubmit()"
-        @keydown.tab.prevent="autoComplete()"
-        @keydown.up.prevent="changeSelection(-1)"
-        @keydown.down.prevent="changeSelection(1)"
-        @keydown.esc.prevent="showSuggestions = false"
-        ref="container"
-    >
-        <!-- forceRenderKey triggers a re-render when changed -->
-        <template :key="forceRenderKey" />
+	<div class="container" @keydown.enter.prevent="onSubmit()" @keydown.tab.prevent="autoComplete()"
+		@keydown.up.prevent="changeSelection(-1)" @keydown.down.prevent="changeSelection(1)"
+		@keydown.esc.prevent="showSuggestions = false" ref="container">
+		<!-- forceRenderKey triggers a re-render when changed -->
+		<template :key="forceRenderKey" />
 
-        <div class="input-container">
-            <input
-                class="input remove-border"
-                type="text"
-                ref="input"
-                placeholder="e.g: blue sky"
-                :value="inputVal"
-                @input="onInput"
-                @focus="
-                    selectedIndex = -1;
-                    showSuggestions = true;
-                "
-            />
-            <QuickTagsButton />
-        </div>
-        <SearchSuggestions
-            class="suggestions"
-            :tags="suggestions"
-            :selected-index="selectedIndex"
-            @click="onSuggestionClick"
-            v-if="showSuggestions"
-        />
-    </div>
-    <button
-        class="submit-btn btn-primary btn-rounded"
-        type="submit"
-        @click="onSubmit"
-        :disabled="showSpinner"
-    >
-        <span v-if="showSpinner" class="spinner"></span>
-        <span v-else-if="inputVal.length > 0"
-            ><i class="bi bi-plus"></i> add to search</span
-        >
-        <span v-else>search</span>
-    </button>
+		<div class="input-container">
+			<input class="input remove-border" type="text" ref="input" placeholder="e.g: blue sky" :value="inputVal"
+				@input="onInput" @focus="
+					selectedIndex = -1;
+				showSuggestions = true;
+				" />
+			<QuickTagsButton />
+		</div>
+		<SearchSuggestions class="suggestions" :tags="suggestions" :selected-index="selectedIndex"
+			@click="onSuggestionClick" v-if="showSuggestions" />
+	</div>
+	<button class="submit-btn btn-primary btn-rounded" type="submit" @click="onSubmit" :disabled="showSpinner">
+		<span v-if="showSpinner" class="spinner"></span>
+		<span v-else-if="inputVal.length > 0"><i class="bi bi-plus"></i> add to search</span>
+		<span v-else>search</span>
+	</button>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
+@import "@/assets/form";
 
 .input-container {
-    display: flex;
+	display: flex;
 
-    .input {
-        background-color: #252525;
-        border: 1px solid #555;
-        color: #ddd;
-        display: block;
-        padding-left: 0.5rem;
-        height: 40px;
-        flex: 1;
-
-        &.remove-border {
-            border-right: 0;
-        }
-    }
+	.remove-border {
+		border-right: 0;
+	}
 }
 
 .container {
-    position: relative;
-    margin-bottom: 0.8rem;
+	position: relative;
+	margin-bottom: 0.8rem;
 }
 
 .suggestions {
-    position: absolute;
-    width: 100%;
-    z-index: 1;
-    padding-bottom: 1rem;
+	position: absolute;
+	width: 100%;
+	z-index: 1;
+	padding-bottom: 1rem;
 }
 
 .submit-btn {
-    $spinner-size: 20px;
+	$spinner-size: 20px;
 
-    display: block;
-    width: 100%;
-    line-height: $spinner-size;
+	display: block;
+	width: 100%;
+	line-height: $spinner-size;
 
-    span {
-        display: block;
-        margin: 0 auto;
-    }
+	span {
+		display: block;
+		margin: 0 auto;
+	}
 
-    .spinner {
-        width: $spinner-size;
-        height: $spinner-size;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        border-bottom-color: transparent;
-        animation: linear 1s spin-anim infinite;
-        display: block;
+	.spinner {
+		width: $spinner-size;
+		height: $spinner-size;
+		border-radius: 50%;
+		border: 2px solid #fff;
+		border-bottom-color: transparent;
+		animation: linear 1s spin-anim infinite;
+		display: block;
 
-        @keyframes spin-anim {
-            from {
-                rotate: 0;
-            }
-            to {
-                rotate: 360deg;
-            }
-        }
-    }
+		@keyframes spin-anim {
+			from {
+				rotate: 0;
+			}
+
+			$spinner-size: 20px;
+
+			to {
+				rotate: 360deg;
+			}
+		}
+	}
 }
 </style>
