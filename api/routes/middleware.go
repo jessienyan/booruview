@@ -3,7 +3,6 @@ package routes
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 
