@@ -251,7 +251,7 @@ function importData() {
 
         <div class="input-group">
             <label># of columns</label>
-            <div class="input">
+            <div class="input-container">
                 <select
                     :value="store.settings.columnSizing"
                     @change="onChangeColSizing"
@@ -268,7 +268,7 @@ function importData() {
 
         <div class="input-group" v-if="store.settings.columnSizing === 'fixed'">
             <label>column count</label>
-            <div class="input">
+            <div class="input-container">
                 <input
                     type="range"
                     min="1"
@@ -286,7 +286,7 @@ function importData() {
             v-if="store.settings.columnSizing === 'dynamic'"
         >
             <label>max column width</label>
-            <div class="input">
+            <div class="input-container">
                 <input
                     type="range"
                     min="100"
@@ -301,7 +301,7 @@ function importData() {
 
         <div class="input-group">
             <label>max post height </label>
-            <div class="input">
+            <div class="input-container">
                 <input
                     type="range"
                     min="100"
@@ -320,7 +320,7 @@ function importData() {
 
         <div class="input-group">
             <label>fullscreen view menu position</label>
-            <div class="input">
+            <div class="input-container">
                 <select
                     :value="store.settings.fullscreenViewMenuAnchor"
                     @change="onChangeFullscreenViewMenuAnchor"
@@ -376,8 +376,9 @@ function importData() {
                 >1. Export your data and generate a code. The code will expire
                 after 15 minutes.</label
             >
-            <div class="input text-btn-combo">
+            <div class="input-container text-btn-combo">
                 <input
+                    class="text-input rounded-start"
                     ref="export-code"
                     type="text"
                     placeholder="export to generate code"
@@ -400,8 +401,9 @@ function importData() {
                 >2. Import your data onto another device using the code
                 generated above.</label
             >
-            <div class="input text-btn-combo">
+            <div class="input-container text-btn-combo">
                 <input
+                    class="text-input rounded-start"
                     type="text"
                     placeholder="xxxx-xxxx-xxxx"
                     v-model="importCode"
@@ -422,18 +424,14 @@ function importData() {
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
+@import "@/assets/form";
 
-.input {
+.input-container {
     display: flex;
 
     input,
     select {
         flex: 1;
-    }
-
-    input[type="text"] {
-        background-color: #252525;
-        border: 1px solid #555;
     }
 
     .value {
@@ -447,7 +445,7 @@ p,
     margin: 1rem 0 1rem 1rem;
 }
 
-label + .input {
+label + .input-container {
     margin-top: 0.4rem;
 }
 
@@ -456,12 +454,9 @@ label {
 }
 
 .text-btn-combo {
-    input[type="text"] {
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+    .text-input {
         border-right: 0;
         text-align: center;
-        color: #aaa;
     }
 
     button {
