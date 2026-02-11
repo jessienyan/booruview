@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	reUsername = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+	reUsername = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 )
 
 type CreateUserParams struct {
@@ -52,7 +52,7 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if !reUsername.MatchString(params.Username) {
-		respondWithBadRequest(w, "username can only contain letters, numbers, hyphens, and underscores")
+		respondWithBadRequest(w, "username can only contain letters or numbers")
 		return
 	}
 
