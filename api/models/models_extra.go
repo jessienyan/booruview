@@ -8,6 +8,10 @@ import (
 
 func (ud UserData) ParseJSON() (UserDataJSON, error) {
 	var parsed UserDataJSON
+	if ud.Data == "" {
+		return parsed, nil
+	}
+
 	decompressed := api.DecompressData([]byte(ud.Data))
 	err := json.Unmarshal(decompressed, &parsed)
 	return parsed, err

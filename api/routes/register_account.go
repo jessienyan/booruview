@@ -93,7 +93,7 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{Data: "{}", UserID: u.ID})
+	_, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{Data: "", UserID: u.ID})
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
