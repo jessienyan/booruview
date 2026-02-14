@@ -1,5 +1,5 @@
 import type { MaybeRefOrGetter } from "vue";
-import type {SearchHistory} from "@/store";
+import type { SearchHistory } from "@/store";
 
 export interface ChipActions {
 	// buttons
@@ -14,4 +14,3 @@ export interface ChipActions {
 }
 
 export type RefOrGetter<T> = Exclude<MaybeRefOrGetter<T>, T>;
-

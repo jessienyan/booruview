@@ -24,9 +24,9 @@ async function onSubmit(e: Event) {
 		const resp = await fetch("/api/register", {
 			method: "POST",
 			body: JSON.stringify({
-		username: username.value,
-		password: password.value,
-	}),
+				username: username.value,
+				password: password.value,
+			}),
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -36,7 +36,7 @@ async function onSubmit(e: Event) {
 		if (data.error) {
 			formErr.value = data.error;
 			return;
-		} else if(!resp.ok) {
+		} else if (!resp.ok) {
 			formErr.value = `Unexpected error (${resp.status}): ${await resp.text()}`;
 			return;
 		}
@@ -44,10 +44,10 @@ async function onSubmit(e: Event) {
 		store.account = {
 			username: username.value!,
 			authToken: data.auth_token,
-		}
+		};
 	} catch (e) {
 		console.error(e);
-		formErr.value = "Something went wrong :("
+		formErr.value = "Something went wrong :(";
 		return;
 	}
 
@@ -62,17 +62,17 @@ async function onSubmit(e: Event) {
 		favorite_tags: store.settings.favoriteTags,
 		blacklist: store.settings.blacklist,
 		search_history: store.settings.queryHistory,
-	}
+	};
 
-	try{
-		const resp = await fetch("/api/account", {
+	try {
+		await fetch("/api/account", {
 			method: "PATCH",
 			body: JSON.stringify(saveData),
 			headers: {
 				"Content-Type": "application/json",
 			},
 		});
-	} catch(e) {
+	} catch (e) {
 		console.error(e);
 	}
 }

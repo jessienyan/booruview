@@ -13,7 +13,7 @@ export type AccountData = {
 	favorite_tags: Tag[];
 	blacklist: Tag[];
 	search_history: SearchHistory[];
-}
+};
 
 export type FullscreenViewMenuAnchorPoint =
 	| "topleft"
