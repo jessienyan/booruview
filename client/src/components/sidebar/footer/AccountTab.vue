@@ -5,18 +5,23 @@ import store, { type AccountData } from "@/store";
 const username = ref<string | null>(null);
 const password = ref<string | null>(null);
 const passwordConfirm = ref<string | null>(null);
-const formErr = ref("");
+
+function toastError(msg: string) {
+	store.toast = {
+		msg,
+		type: "error",
+	};
+}
 
 async function onSubmit(e: Event) {
 	e.preventDefault();
 
-	formErr.value = "";
 	const $form = e.target as HTMLFormElement;
 
 	if (!$form.reportValidity()) {
 		return;
 	} else if (password.value !== passwordConfirm.value) {
-		formErr.value = "Password don't match";
+		toastError("Password don't match");
 		return;
 	}
 
@@ -34,10 +39,10 @@ async function onSubmit(e: Event) {
 
 		const data = await resp.json();
 		if (data.error) {
-			formErr.value = data.error;
+			toastError(data.error);
 			return;
 		} else if (!resp.ok) {
-			formErr.value = `Unexpected error (${resp.status}): ${await resp.text()}`;
+			toastError(`Unexpected error (${resp.status}): ${await resp.text()}`);
 			return;
 		}
 
@@ -47,7 +52,7 @@ async function onSubmit(e: Event) {
 		};
 	} catch (e) {
 		console.error(e);
-		formErr.value = "Something went wrong :(";
+		toastError("Something went wrong :(");
 		return;
 	}
 
@@ -69,6 +74,7 @@ async function onSubmit(e: Event) {
 			method: "PATCH",
 			body: JSON.stringify(saveData),
 			headers: {
+				Authorization: `Bearer ${store.account.authToken}`,
 				"Content-Type": "application/json",
 			},
 		});
@@ -138,7 +144,7 @@ form {
 	width: 100%;
 }
 
-.field-error, .tip {
+.tip {
 	display: block;
 	font-size: 14px;
 	font-style: italic;
