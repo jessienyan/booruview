@@ -3,10 +3,17 @@ import type { RouteLocation } from "vue-router";
 import { router } from "./router";
 import { SearchQuery, type SerializedSearchQuery } from "./search";
 
-type SearchHistory = {
+export type SearchHistory = {
 	date: Date;
 	query: SearchQuery;
 };
+
+export type AccountData = {
+	favorite_posts: Post[];
+	favorite_tags: Tag[];
+	blacklist: Tag[];
+	search_history: SearchHistory[];
+}
 
 export type FullscreenViewMenuAnchorPoint =
 	| "topleft"

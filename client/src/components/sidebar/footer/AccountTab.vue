@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import store from "@/store";
+import store, { type AccountData } from "@/store";
 
 const username = ref<string | null>(null);
 const password = ref<string | null>(null);
@@ -20,15 +20,13 @@ async function onSubmit(e: Event) {
 		return;
 	}
 
-	const body = JSON.stringify({
-		username: username.value,
-		password: password.value,
-	});
-
 	try {
 		const resp = await fetch("/api/register", {
 			method: "POST",
-			body,
+			body: JSON.stringify({
+		username: username.value,
+		password: password.value,
+	}),
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -38,8 +36,43 @@ async function onSubmit(e: Event) {
 		if (data.error) {
 			formErr.value = data.error;
 			return;
+		} else if(!resp.ok) {
+			formErr.value = `Unexpected error (${resp.status}): ${await resp.text()}`;
+			return;
+		}
+
+		store.account = {
+			username: username.value!,
+			authToken: data.auth_token,
 		}
 	} catch (e) {
+		console.error(e);
+		formErr.value = "Something went wrong :("
+		return;
+	}
+
+	store.saveAccount();
+	store.toast = {
+		msg: "You are now logged in.",
+		type: "info",
+	};
+
+	const saveData: AccountData = {
+		favorite_posts: store.settings.favorites,
+		favorite_tags: store.settings.favoriteTags,
+		blacklist: store.settings.blacklist,
+		search_history: store.settings.queryHistory,
+	}
+
+	try{
+		const resp = await fetch("/api/account", {
+			method: "PATCH",
+			body: JSON.stringify(saveData),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+	} catch(e) {
 		console.error(e);
 	}
 }
