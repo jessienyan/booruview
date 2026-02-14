@@ -270,22 +270,29 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 </script>
 
 <template>
-	<div class="container" @keydown.enter.prevent="onSubmit()" @keydown.tab.prevent="autoComplete()"
-		@keydown.up.prevent="changeSelection(-1)" @keydown.down.prevent="changeSelection(1)"
-		@keydown.esc.prevent="showSuggestions = false" ref="container">
+	<div class="container"
+		@keydown.enter.prevent="onSubmit()"
+		@keydown.tab.prevent="autoComplete()"
+		@keydown.up.prevent="changeSelection(-1)"
+		@keydown.down.prevent="changeSelection(1)"
+		@keydown.esc.prevent="showSuggestions = false"
+		ref="container">
+
 		<!-- forceRenderKey triggers a re-render when changed -->
-		<template :key="forceRenderKey" />
+		<template :key="forceRenderKey"></template>
 
 		<div class="input-container">
-			<input class="input remove-border" type="text" ref="input" placeholder="e.g: blue sky" :value="inputVal"
-				@input="onInput" @focus="
-					selectedIndex = -1;
-				showSuggestions = true;
-				" />
+			<input class="text-input remove-border rounded-start" type="text" ref="input" placeholder="e.g: blue sky" :value="inputVal"
+				@input="onInput" @focus="selectedIndex = -1; showSuggestions = true" />
 			<QuickTagsButton />
 		</div>
-		<SearchSuggestions class="suggestions" :tags="suggestions" :selected-index="selectedIndex"
-			@click="onSuggestionClick" v-if="showSuggestions" />
+		<SearchSuggestions
+			class="suggestions"
+			:tags="suggestions"
+			:selected-index="selectedIndex"
+			@click="onSuggestionClick"
+			v-if="showSuggestions"
+		/>
 	</div>
 	<button class="submit-btn btn-primary btn-rounded" type="submit" @click="onSubmit" :disabled="showSpinner">
 		<span v-if="showSpinner" class="spinner"></span>
@@ -298,8 +305,13 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 @import "@/assets/buttons";
 @import "@/assets/form";
 
+
 .input-container {
 	display: flex;
+
+	.text-input {
+		flex: 1;
+	}
 
 	.remove-border {
 		border-right: 0;
