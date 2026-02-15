@@ -1,5 +1,4 @@
 import type { MaybeRefOrGetter } from "vue";
-import type { SearchHistory } from "@/store";
 
 export interface ChipActions {
 	// buttons
