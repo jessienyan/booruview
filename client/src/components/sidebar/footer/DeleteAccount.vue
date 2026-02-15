@@ -10,19 +10,39 @@ const canDelete = computed(
 );
 
 async function doDelete() {
-    store.toast = {
-        msg: "TODO",
-        type: "error",
-    };
-    return;
+    try {
+        const resp = await fetch("/api/account", {
+            method: "DELETE",
+            body: JSON.stringify({ permanently_delete_account: true }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
-    // try {
-    // 	const resp = await fetch("/api/account", {
-    // 		method: "DELETE",
-    // 	});
-    // } catch (e) {
-    // 	console.log(e);
-    // }
+        if (resp.ok) {
+            store.account = null;
+            store.saveAccount();
+            store.toast = {
+                msg: "Account deleted successfully",
+                type: "info",
+            };
+            return;
+        }
+
+        const data = await resp.json();
+        if (data.error) {
+            store.toast = {
+                msg: data.error,
+                type: "error",
+            };
+        }
+    } catch (e) {
+        console.log(e);
+        store.toast = {
+            msg: "Something went wrong :(",
+            type: "error",
+        };
+    }
 }
 </script>
 
