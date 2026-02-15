@@ -21,7 +21,7 @@ type AccountResponse struct {
 	Username string              `json:"username"`
 }
 
-func AccountDataHandler(w http.ResponseWriter, req *http.Request) {
+func AccountHandler(w http.ResponseWriter, req *http.Request) {
 	user := getUser(req)
 	if user == nil {
 		respondWithUnauthorized(w)
@@ -34,7 +34,12 @@ func AccountDataHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if req.Method == "PATCH" {
+	if req.Method == "GET" {
+		respondJson(w, 200, AccountResponse{
+			Data:     data,
+			Username: user.User.Username,
+		})
+	} else if req.Method == "PATCH" {
 		if req.Header.Get("Content-Type") != "application/json" {
 			respondWithBadRequest(w, "expected content-type to be application/json")
 			return
@@ -105,11 +110,62 @@ func AccountDataHandler(w http.ResponseWriter, req *http.Request) {
 		}
 
 		respondJson(w, 200, data)
-		return
-	}
+	} else if req.Method == "DELETE" {
+		if req.Header.Get("Content-Type") != "application/json" {
+			respondWithBadRequest(w, "expected content-type to be application/json")
+			return
+		}
 
-	respondJson(w, 200, AccountResponse{
-		Data:     data,
-		Username: user.User.Username,
-	})
+		body, err := io.ReadAll(req.Body)
+		if err != nil {
+			respondWithInternalError(w, err)
+			return
+		}
+		defer req.Body.Close()
+
+		type deleteRequest struct {
+			// This is a simple failsafe against accidentally sending a DELETE request
+			Confirm bool `json:"permanently_delete_account"`
+		}
+
+		var form deleteRequest
+		if err := json.Unmarshal(body, &form); err != nil {
+			log.Err(err).Msg("failed to parse form")
+			respondWithBadRequest(w, "form is not valid")
+			return
+		}
+
+		if !form.Confirm {
+			log.Warn().Msg("possible accidental account deletion caught")
+			respondWithBadRequest(w, "include a JSON body with permanently_delete_account = true")
+			return
+		}
+
+		db := api.UserDB()
+		tx, err := db.Begin()
+		if err != nil {
+			respondWithInternalError(w, err)
+			return
+		}
+		defer tx.Rollback()
+		query := models.New(db).WithTx(tx)
+
+		if err := query.DeleteUserData(req.Context(), user.User.ID); err != nil {
+			respondWithInternalError(w, err)
+			return
+		}
+
+		if err := query.DeleteUser(req.Context(), user.User.ID); err != nil {
+			respondWithInternalError(w, err)
+			return
+		}
+
+		if err := tx.Commit(); err != nil {
+			respondWithInternalError(w, err)
+			return
+		}
+
+		// On successful DELETE, return 204 no response
+		w.WriteHeader(204)
+	}
 }
