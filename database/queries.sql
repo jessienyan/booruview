@@ -10,6 +10,12 @@ INSERT INTO users
 VALUES (?, ?, ?)
 RETURNING *;
 
+-- name: DeleteUser :exec
+DELETE FROM users WHERE id = ?;
+
+-- name: DeleteUserData :exec
+DELETE FROM user_data WHERE user_id = ?;
+
 -- name: UserLoggedIn :exec
 UPDATE users
 SET last_login = ?

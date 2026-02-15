@@ -56,6 +56,24 @@ func (q *Queries) CreateUserData(ctx context.Context, arg CreateUserDataParams) 
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users WHERE id = ?
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
+const deleteUserData = `-- name: DeleteUserData :exec
+DELETE FROM user_data WHERE user_id = ?
+`
+
+func (q *Queries) DeleteUserData(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUserData, userID)
+	return err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, created_at, last_login, username, password, password_salt FROM users WHERE LOWER(username) = LOWER(?1)
 `
