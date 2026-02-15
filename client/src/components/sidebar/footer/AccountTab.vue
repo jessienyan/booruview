@@ -2,8 +2,10 @@
 import { computed, ref } from "vue";
 import Collapsable from "@/components/Collapsable.vue";
 import store from "@/store";
+import Login from "./Login.vue";
 import Register from "./Register.vue";
 
+const showRegisterForm = ref(false);
 const showDeleteConfirm = ref(false);
 const usernameConfirm = ref("");
 
@@ -84,8 +86,32 @@ function logout() {
                 </Collapsable>
             </Collapsable>
         </div>
+
         <template v-if="!store.account">
-            <Register />
+            <template v-if="showRegisterForm">
+                <h3>register</h3>
+                <Register />
+                <p>
+                    <a
+                        class="change-form"
+                        href="#"
+                        @click.prevent="showRegisterForm = false"
+                        >I already have an account</a
+                    >
+                </p>
+            </template>
+            <template v-else>
+                <h3>login</h3>
+                <Login />
+                <p>
+                    <a
+                        class="change-form"
+                        href="#"
+                        @click.prevent="showRegisterForm = true"
+                        >Create an account</a
+                    >
+                </p>
+            </template>
         </template>
         <template v-else>
             <p v-if="store.account">
@@ -163,6 +189,11 @@ function logout() {
 }
 
 .text-input {
+    text-align: center;
+}
+
+.change-form {
+    display: block;
     text-align: center;
 }
 </style>

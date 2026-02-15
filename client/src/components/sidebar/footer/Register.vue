@@ -87,58 +87,55 @@ async function onSubmit(e: Event) {
 </script>
 
 <template>
-    <div>
-        <form @submit="onSubmit">
-            <input
-                v-model="username"
-                class="text-input rounded"
-                :class="{ touched: username != null }"
-                type="text"
-                placeholder="username"
-                pattern="[a-zA-Z0-9_\-]+"
-                maxlength="16"
-                minlength="3"
-                required
-            />
-            <span class="tip"
-                >Between 3 and 16 characters. Your username is private and only
-                for logging in.</span
-            >
+    <form @submit="onSubmit">
+        <input
+            v-model="username"
+            class="text-input rounded"
+            :class="{ touched: username != null }"
+            type="text"
+            placeholder="username"
+            pattern="[a-zA-Z0-9_\-]+"
+            maxlength="16"
+            minlength="3"
+            required
+        />
+        <span class="tip"
+            >Between 3 and 16 characters. Your username is private and only for
+            logging in.</span
+        >
 
-            <input
-                v-model="password"
-                class="text-input rounded"
-                :class="{ touched: password != null }"
-                type="password"
-                placeholder="password"
-                minlength="8"
-                required
-            />
-            <span class="tip"
-                >At least 8 characters. YOU CANNOT RESET YOUR PASSWORD. Use
-                something that's easy to remember!</span
-            >
+        <input
+            v-model="password"
+            class="text-input rounded"
+            :class="{ touched: password != null }"
+            type="password"
+            placeholder="password"
+            minlength="8"
+            required
+        />
+        <span class="tip"
+            >At least 8 characters. YOU CANNOT RESET YOUR PASSWORD. Use
+            something that's easy to remember!</span
+        >
 
-            <input
-                v-model="passwordConfirm"
-                class="text-input rounded"
-                :class="{ touched: passwordConfirm != null }"
-                type="password"
-                placeholder="confirm password"
-                :minlength="8"
-                required
-            />
+        <input
+            v-model="passwordConfirm"
+            class="text-input rounded"
+            :class="{ touched: passwordConfirm != null }"
+            type="password"
+            placeholder="confirm password"
+            :minlength="8"
+            required
+        />
 
-            <button class="submit btn-primary btn-rounded" type="submit">
-                register
-            </button>
-        </form>
-    </div>
+        <button class="submit btn-primary btn-rounded" type="submit">
+            register
+        </button>
+    </form>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
-@import "@/assets/colors";
 @import "@/assets/form";
 
 form {
@@ -146,7 +143,6 @@ form {
 }
 
 .text-input {
-    text-align: center;
     width: 100%;
 }
 
