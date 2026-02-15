@@ -9,58 +9,64 @@ import store from "@/store";
 const router = useRouter();
 
 function doPostSearch() {
-	if (store.fetchingPosts) {
-		return;
-	}
+    if (store.fetchingPosts) {
+        return;
+    }
 
-	const searchDidntChange =
-		router.currentRoute.value.name === "search" && store.currentPage === 1 && store.lastQuery.equals(store.query);
+    const searchDidntChange =
+        router.currentRoute.value.name === "search" &&
+        store.currentPage === 1 &&
+        store.lastQuery.equals(store.query);
 
-	store.justClickedSearchButton = true;
+    store.justClickedSearchButton = true;
 
-	router.push({
-		name: "search",
-		params: { page: 1, query: store.query.asQueryParams() },
-		force: true,
-		// Searching while nothing has changed is the same as refreshing; don't store a new entry
-		replace: searchDidntChange,
-	});
+    router.push({
+        name: "search",
+        params: { page: 1, query: store.query.asQueryParams() },
+        force: true,
+        // Searching while nothing has changed is the same as refreshing; don't store a new entry
+        replace: searchDidntChange,
+    });
 }
 
 function onTagSelect(tag: Tag, negated: boolean) {
-	if (!negated) {
-		store.query.includeTag(tag);
-	} else {
-		store.query.excludeTag(tag);
-	}
+    if (!negated) {
+        store.query.includeTag(tag);
+    } else {
+        store.query.excludeTag(tag);
+    }
 
-	// Slight hack: try looking up unknown tags and replace it with the real version
-	if (tag.type === "unknown") {
-		store.loadTags([tag.name]).then(() => {
-			const real = store.cachedTags.get(tag.name);
+    // Slight hack: try looking up unknown tags and replace it with the real version
+    if (tag.type === "unknown") {
+        store.loadTags([tag.name]).then(() => {
+            const real = store.cachedTags.get(tag.name);
 
-			if (real === undefined) {
-				return;
-			}
+            if (real === undefined) {
+                return;
+            }
 
-			store.query.removeTag(tag);
+            store.query.removeTag(tag);
 
-			if (!negated) {
-				store.query.includeTag(real);
-			} else {
-				store.query.excludeTag(real);
-			}
-		});
-	}
+            if (!negated) {
+                store.query.includeTag(real);
+            } else {
+                store.query.excludeTag(real);
+            }
+        });
+    }
 }
 
 const styledTags = computed(() => {
-	let ret: TagChip[];
+    let ret: TagChip[];
 
-	ret = store.query.includedList().map(tag => ({ tag, style: "default" }));
-	ret = ret.concat(store.query.excludedList().map(tag => ({ tag, style: "strikethrough" })));
+    ret = store.query.includedList().map((tag) => ({ tag, style: "default" }));
+    ret = ret.concat(
+        store.query
+            .excludedList()
+            .map((tag) => ({ tag, style: "strikethrough" })),
+    );
 
-	return ret;
+    return ret;
 });
 </script>
 

@@ -1,33 +1,40 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
+import {
+    computed,
+    onMounted,
+    onUnmounted,
+    ref,
+    useTemplateRef,
+    watch,
+} from "vue";
 import { useDismiss } from "@/composable";
 import store from "@/store";
 import QuickTagsButton from "./QuickTagsButton.vue";
 import SearchSuggestions from "./Suggestions.vue";
 
 type MistakeSuggestion = {
-	pattern: RegExp;
-	suggestion: string;
+    pattern: RegExp;
+    suggestion: string;
 };
 
 const mistakeSuggestions: MistakeSuggestion[] = [
-	{ pattern: /^sort:favcount$/, suggestion: "sort:score" },
-	{ pattern: /^order:\w+$/, suggestion: "sort:" },
-	{ pattern: /^favcount:.+$/, suggestion: "score:" },
+    { pattern: /^sort:favcount$/, suggestion: "sort:score" },
+    { pattern: /^order:\w+$/, suggestion: "sort:" },
+    { pattern: /^favcount:.+$/, suggestion: "score:" },
 ];
 
 type SearchResponse = {
-	results: Tag[];
+    results: Tag[];
 };
 const debounceMs = 100;
 
 const emit = defineEmits<{
-	onSearch: [];
-	onTagSelect: [value: Tag, negated: boolean];
+    onSearch: [];
+    onTagSelect: [value: Tag, negated: boolean];
 }>();
 
 const { showSpinner = false } = defineProps<{
-	showSpinner?: boolean;
+    showSpinner?: boolean;
 }>();
 
 const containerRef = useTemplateRef("container");
@@ -40,56 +47,57 @@ const inputRef = useTemplateRef("input");
 const showSuggestions = ref(false);
 
 useDismiss([containerRef.value], () => {
-	showSuggestions.value = false;
+    showSuggestions.value = false;
 });
 
 function setSuggestions(tags: Tag[]) {
-	// Filter out blacklist/already in search
-	suggestions.value = tags.filter(
-		t =>
-			!store.query.isIncluded(t.name) &&
-			!store.query.isExcluded(t.name) &&
-			store.settings.blacklist.findIndex(bl => t.name === bl.name) === -1,
-	);
+    // Filter out blacklist/already in search
+    suggestions.value = tags.filter(
+        (t) =>
+            !store.query.isIncluded(t.name) &&
+            !store.query.isExcluded(t.name) &&
+            store.settings.blacklist.findIndex((bl) => t.name === bl.name) ===
+                -1,
+    );
 }
 
 function doTagSearch(query: string) {
-	if (smartSuggestionValue.value.length === 0) {
-		return;
-	}
+    if (smartSuggestionValue.value.length === 0) {
+        return;
+    }
 
-	const cached = store.cachedTagSearch.get(query);
-	if (cached != null) {
-		setSuggestions(cached);
-		return;
-	}
+    const cached = store.cachedTagSearch.get(query);
+    if (cached != null) {
+        setSuggestions(cached);
+        return;
+    }
 
-	// Encoding the query prevents trailing whitespace from being stripped
-	fetch(`/api/tagsearch?q=${encodeURIComponent(smartSuggestionValue.value)}`)
-		.then(resp => {
-			// Request took too long and results don't match the input, discard
-			if (query !== inputVal.value) {
-				return;
-			}
+    // Encoding the query prevents trailing whitespace from being stripped
+    fetch(`/api/tagsearch?q=${encodeURIComponent(smartSuggestionValue.value)}`)
+        .then((resp) => {
+            // Request took too long and results don't match the input, discard
+            if (query !== inputVal.value) {
+                return;
+            }
 
-			resp.json().then((json: SearchResponse) => {
-				store.cachedTagSearch.set(query, json.results);
-				setSuggestions(json.results);
-			});
-		})
-		.catch(err => console.error(err));
+            resp.json().then((json: SearchResponse) => {
+                store.cachedTagSearch.set(query, json.results);
+                setSuggestions(json.results);
+            });
+        })
+        .catch((err) => console.error(err));
 }
 
 function changeSelection(direction: number) {
-	direction += selectedIndex.value;
+    direction += selectedIndex.value;
 
-	if (direction < 0) {
-		direction = suggestions.value.length - 1;
-	} else if (direction >= suggestions.value.length) {
-		direction = 0;
-	}
+    if (direction < 0) {
+        direction = suggestions.value.length - 1;
+    } else if (direction >= suggestions.value.length) {
+        direction = 0;
+    }
 
-	selectedIndex.value = direction;
+    selectedIndex.value = direction;
 }
 
 // Computes the current word(s) under the cursor in the search. This allows the
@@ -97,172 +105,176 @@ function changeSelection(direction: number) {
 // For example if the query was `{blue sky ~ sunse`, then "sunse" would be the current word
 // boundary (assuming the cursor was at the end).
 const wordBoundary = computed(() => {
-	// Use the cursor position to find the word(s) that will be autocompleted
-	const end = inputRef.value?.selectionEnd ?? 0;
-	let start = end;
+    // Use the cursor position to find the word(s) that will be autocompleted
+    const end = inputRef.value?.selectionEnd ?? 0;
+    let start = end;
 
-	if (inputRef.value === null) {
-		return { start, end };
-	}
+    if (inputRef.value === null) {
+        return { start, end };
+    }
 
-	// Special operators that act as boundaries
-	const OPERATORS = ["{", "~ " /* note the space */];
+    // Special operators that act as boundaries
+    const OPERATORS = ["{", "~ " /* note the space */];
 
-	for (let i = start; i > 0; i--) {
-		let match = false;
+    for (let i = start; i > 0; i--) {
+        let match = false;
 
-		for (const op of OPERATORS) {
-			if (inputVal.value.slice(i - op.length, i) === op) {
-				match = true;
-				start = i;
-				break;
-			}
-		}
+        for (const op of OPERATORS) {
+            if (inputVal.value.slice(i - op.length, i) === op) {
+                match = true;
+                start = i;
+                break;
+            }
+        }
 
-		if (match) {
-			break;
-		}
+        if (match) {
+            break;
+        }
 
-		// If no match just decrement start
-		start--;
-	}
+        // If no match just decrement start
+        start--;
+    }
 
-	// Trim leading spaces/hyphens
-	while (start < end) {
-		const c = inputVal.value[start];
-		if (c === "-" || c === " ") {
-			start++;
-		} else {
-			break;
-		}
-	}
+    // Trim leading spaces/hyphens
+    while (start < end) {
+        const c = inputVal.value[start];
+        if (c === "-" || c === " ") {
+            start++;
+        } else {
+            break;
+        }
+    }
 
-	return { start, end };
+    return { start, end };
 });
 
 const smartSuggestionValue = computed(() => {
-	const { start, end } = wordBoundary.value;
-	return inputVal.value.slice(start, end);
+    const { start, end } = wordBoundary.value;
+    return inputVal.value.slice(start, end);
 });
 
 function autoComplete() {
-	if (suggestions.value.length === 0 || inputRef.value === null) {
-		return;
-	}
+    if (suggestions.value.length === 0 || inputRef.value === null) {
+        return;
+    }
 
-	const index = selectedIndex.value === -1 ? 0 : selectedIndex.value;
-	const suggestionVal = suggestions.value[index].name;
+    const index = selectedIndex.value === -1 ? 0 : selectedIndex.value;
+    const suggestionVal = suggestions.value[index].name;
 
-	const bounds = wordBoundary.value;
-	const before = inputVal.value.substring(0, bounds.start);
-	const after = inputVal.value.substring(bounds.end);
-	const spliced = before + suggestionVal + after;
+    const bounds = wordBoundary.value;
+    const before = inputVal.value.substring(0, bounds.start);
+    const after = inputVal.value.substring(bounds.end);
+    const spliced = before + suggestionVal + after;
 
-	inputVal.value = spliced;
+    inputVal.value = spliced;
 }
 
 function onSuggestionClick(index: number) {
-	selectedIndex.value = index;
-	autoComplete();
+    selectedIndex.value = index;
+    autoComplete();
 
-	const isOR = /^-?\{/.test(inputVal.value);
+    const isOR = /^-?\{/.test(inputVal.value);
 
-	// Don't submit when building an OR query since the user may want to select more tags
-	if (!isOR) {
-		onSubmit();
-	}
+    // Don't submit when building an OR query since the user may want to select more tags
+    if (!isOR) {
+        onSubmit();
+    }
 
-	inputRef.value?.focus();
+    inputRef.value?.focus();
 }
 
 function onInput(e: Event) {
-	if (e.target === null) {
-		return;
-	}
+    if (e.target === null) {
+        return;
+    }
 
-	// Prevent the user from entering any leading whitespace
-	const newVal = (e.target as HTMLInputElement).value.trimStart().toLowerCase();
-	const changed = inputVal.value !== newVal;
+    // Prevent the user from entering any leading whitespace
+    const newVal = (e.target as HTMLInputElement).value
+        .trimStart()
+        .toLowerCase();
+    const changed = inputVal.value !== newVal;
 
-	if (changed) {
-		inputVal.value = newVal;
-		showSuggestions.value = true;
-	} else {
-		// query.value didn't change but the DOM element still has the whitespace.
-		// Incrementing the key will force Vue to re-render with the cleaned value
-		forceRenderKey.value++;
-	}
+    if (changed) {
+        inputVal.value = newVal;
+        showSuggestions.value = true;
+    } else {
+        // query.value didn't change but the DOM element still has the whitespace.
+        // Incrementing the key will force Vue to re-render with the cleaned value
+        forceRenderKey.value++;
+    }
 }
 
 // Emits an event with a selected tag or to trigger a post search
 function onSubmit() {
-	if (inputVal.value.length === 0) {
-		emit("onSearch");
-		return;
-	}
+    if (inputVal.value.length === 0) {
+        emit("onSearch");
+        return;
+    }
 
-	let tag: Tag;
-	const negated = inputVal.value.startsWith("-");
+    let tag: Tag;
+    const negated = inputVal.value.startsWith("-");
 
-	if (selectedIndex.value !== -1) {
-		tag = suggestions.value[selectedIndex.value];
-	} else {
-		// Strip all leading hyphens
-		const value = inputVal.value.replace(/^-+/, "");
-		const match = suggestions.value.find(t => t.name.replace("_", " ") === value);
+    if (selectedIndex.value !== -1) {
+        tag = suggestions.value[selectedIndex.value];
+    } else {
+        // Strip all leading hyphens
+        const value = inputVal.value.replace(/^-+/, "");
+        const match = suggestions.value.find(
+            (t) => t.name.replace("_", " ") === value,
+        );
 
-		if (match) {
-			tag = match;
-		} else {
-			// User is submitting a raw tag that wasn't in the search suggestions
-			tag = {
-				count: 0,
-				name: value,
-				type: "unknown",
-			};
+        if (match) {
+            tag = match;
+        } else {
+            // User is submitting a raw tag that wasn't in the search suggestions
+            tag = {
+                count: 0,
+                name: value,
+                type: "unknown",
+            };
 
-			for (const mistake of mistakeSuggestions) {
-				if (mistake.pattern.test(value)) {
-					store.toast = {
-						msg: `"${value}" is probably a mistake. try "${mistake.suggestion}"`,
-						type: "info",
-					};
-					break;
-				}
-			}
-		}
-	}
+            for (const mistake of mistakeSuggestions) {
+                if (mistake.pattern.test(value)) {
+                    store.toast = {
+                        msg: `"${value}" is probably a mistake. try "${mistake.suggestion}"`,
+                        type: "info",
+                    };
+                    break;
+                }
+            }
+        }
+    }
 
-	inputVal.value = "";
-	selectedIndex.value = -1;
-	inputRef.value?.focus();
-	emit("onTagSelect", tag, negated);
+    inputVal.value = "";
+    selectedIndex.value = -1;
+    inputRef.value?.focus();
+    emit("onTagSelect", tag, negated);
 }
 
 // Setup a debounce to fetch search results shortly after the user stops typing
 watch(inputVal, (query, _, onCleanup) => {
-	onCleanup(() => clearTimeout(timer.value));
+    onCleanup(() => clearTimeout(timer.value));
 
-	selectedIndex.value = -1;
+    selectedIndex.value = -1;
 
-	if (query.length) {
-		timer.value = setTimeout(() => doTagSearch(query), debounceMs);
-	} else {
-		suggestions.value = [];
-	}
+    if (query.length) {
+        timer.value = setTimeout(() => doTagSearch(query), debounceMs);
+    } else {
+        suggestions.value = [];
+    }
 });
 
 function editTag(e: Event) {
-	const tag = (e as CustomEvent).detail as Tag;
+    const tag = (e as CustomEvent).detail as Tag;
 
-	if (store.query.isExcluded(tag.name)) {
-		inputVal.value = `-${tag.name}`;
-	} else {
-		inputVal.value = tag.name;
-	}
+    if (store.query.isExcluded(tag.name)) {
+        inputVal.value = `-${tag.name}`;
+    } else {
+        inputVal.value = tag.name;
+    }
 
-	store.query.removeTag(tag);
-	inputRef.value?.focus();
+    store.query.removeTag(tag);
+    inputRef.value?.focus();
 }
 
 onMounted(() => store.onEditTag.addEventListener("edit_tag", editTag));

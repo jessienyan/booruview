@@ -7,71 +7,76 @@ import DropdownMenu from "../DropdownMenu.vue";
 import ChipMenuOptions from "./ChipMenuOptions.vue";
 
 const {
-	tag,
-	actions = {},
-	jiggle = false,
-	showHeart = true,
+    tag,
+    actions = {},
+    jiggle = false,
+    showHeart = true,
 } = defineProps<{
-	jiggle?: boolean;
-	showHeart?: boolean;
-	tag: TagChip;
-	actions?: ChipActions;
+    jiggle?: boolean;
+    showHeart?: boolean;
+    tag: TagChip;
+    actions?: ChipActions;
 }>();
 
 const hasJiggled = ref(false);
 const chipRef = useTemplateRef("chip");
-const isFavorited = computed(() => store.settings.favoriteTags.findIndex(t => t.name === tag.tag.name) !== -1);
+const isFavorited = computed(
+    () =>
+        store.settings.favoriteTags.findIndex(
+            (t) => t.name === tag.tag.name,
+        ) !== -1,
+);
 const showOptions = ref(false);
 
 const cls = computed(() => ({
-	[`tag-${tag.tag.type}`]: true,
-	strikethrough: tag.style === "strikethrough" || tag.style === "blacklist",
-	jiggle: jiggle && !hasJiggled,
+    [`tag-${tag.tag.type}`]: true,
+    strikethrough: tag.style === "strikethrough" || tag.style === "blacklist",
+    jiggle: jiggle && !hasJiggled,
 }));
 
 const router = useRouter();
 const openInNewTabLink = computed(() => {
-	const negated = tag.style === "strikethrough";
-	let query = tag.tag.name;
-	if (negated) {
-		query = `-${query}`;
-	}
+    const negated = tag.style === "strikethrough";
+    let query = tag.tag.name;
+    if (negated) {
+        query = `-${query}`;
+    }
 
-	return router.resolve({
-		name: "search",
-		params: { page: 1, query },
-	}).path;
+    return router.resolve({
+        name: "search",
+        params: { page: 1, query },
+    }).path;
 });
 
 function onClick() {
-	if (actions.static) {
-		return;
-	}
+    if (actions.static) {
+        return;
+    }
 
-	showOptions.value = !showOptions.value;
+    showOptions.value = !showOptions.value;
 }
 
 function onClickLink(e: MouseEvent) {
-	if (actions.static) {
-		e.preventDefault();
-		return;
-	}
+    if (actions.static) {
+        e.preventDefault();
+        return;
+    }
 
-	// Prevent the link from triggering if the user is just clicking it normally.
-	// Control clicking or middle clicking will still trigger the link to open
-	if (!e.ctrlKey && e.button === 0) {
-		e.preventDefault();
-	}
+    // Prevent the link from triggering if the user is just clicking it normally.
+    // Control clicking or middle clicking will still trigger the link to open
+    if (!e.ctrlKey && e.button === 0) {
+        e.preventDefault();
+    }
 }
 
 onMounted(() => {
-	if (jiggle) {
-		// Prevents the jiggle animation from playing when the sidebar
-		// is opened (display:none triggers animations)
-		setTimeout(() => {
-			hasJiggled.value = true;
-		}, 1000);
-	}
+    if (jiggle) {
+        // Prevents the jiggle animation from playing when the sidebar
+        // is opened (display:none triggers animations)
+        setTimeout(() => {
+            hasJiggled.value = true;
+        }, 1000);
+    }
 });
 </script>
 

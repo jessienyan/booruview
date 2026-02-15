@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, provide, readonly, useTemplateRef, watch } from "vue";
+import {
+    computed,
+    nextTick,
+    provide,
+    readonly,
+    useTemplateRef,
+    watch,
+} from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import store from "@/store";
@@ -12,23 +19,23 @@ provide("mainContainer", readonly(mainContainer));
 
 // Focus scroll container when sidebar is closed
 watch(
-	() => store.sidebarClosed,
-	() => {
-		if (store.sidebarClosed) {
-			nextTick(() => mainContainer.value?.focus());
-		}
-	},
+    () => store.sidebarClosed,
+    () => {
+        if (store.sidebarClosed) {
+            nextTick(() => mainContainer.value?.focus());
+        }
+    },
 );
 
 const hasConsented = computed(() => {
-	if (store.settings.consented) {
-		return true;
-	}
+    if (store.settings.consented) {
+        return true;
+    }
 
-	// Don't show consent modal for search engine crawlers
-	const crawlers = /Googlebot|Bingbot|DuckDuckbot/;
-	const isCrawler = crawlers.exec(navigator.userAgent) !== null;
-	return isCrawler;
+    // Don't show consent modal for search engine crawlers
+    const crawlers = /Googlebot|Bingbot|DuckDuckbot/;
+    const isCrawler = crawlers.exec(navigator.userAgent) !== null;
+    return isCrawler;
 });
 </script>
 

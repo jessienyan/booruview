@@ -5,7 +5,7 @@ import { useMainContainer } from "@/composable";
 const top = ref("");
 const scrollContainer = useMainContainer();
 onMounted(() => {
-	top.value = `${scrollContainer.value.scrollTop}px`;
+    top.value = `${scrollContainer.value.scrollTop}px`;
 });
 </script>
 

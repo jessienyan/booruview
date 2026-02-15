@@ -6,44 +6,50 @@ import DropdownMenu from "../DropdownMenu.vue";
 import Chip from "../tag-chip/Chip.vue";
 
 const styledTag = (tag: Tag) =>
-	computed<TagChip>(() => {
-		let style: ChipStyle = "default";
+    computed<TagChip>(() => {
+        let style: ChipStyle = "default";
 
-		if (store.query.isIncluded(tag.name)) {
-			style = "checkmark";
-		} else if (store.query.isExcluded(tag.name)) {
-			style = "strikethrough";
-		} else {
-			const isBlacklisted = store.settings.blacklist.findIndex(t => t.name === tag.name) !== -1;
-			if (isBlacklisted) {
-				style = "strikethrough";
-			}
-		}
+        if (store.query.isIncluded(tag.name)) {
+            style = "checkmark";
+        } else if (store.query.isExcluded(tag.name)) {
+            style = "strikethrough";
+        } else {
+            const isBlacklisted =
+                store.settings.blacklist.findIndex(
+                    (t) => t.name === tag.name,
+                ) !== -1;
+            if (isBlacklisted) {
+                style = "strikethrough";
+            }
+        }
 
-		return { tag, style };
-	});
+        return { tag, style };
+    });
 
 interface Examples {
-	score: TagChip[];
-	sorting: TagChip[];
-	rating: TagChip[];
+    score: TagChip[];
+    sorting: TagChip[];
+    rating: TagChip[];
 }
 const examples = computed<Examples>(() => ({
-	score: [
-		styledTag({ count: 0, name: "score:>=100", type: "unknown" }).value,
-		styledTag({ count: 0, name: "score:>5", type: "unknown" }).value,
-		styledTag({ count: 0, name: "score:<20", type: "unknown" }).value,
-	],
-	sorting: [
-		styledTag({ count: 0, name: "sort:score", type: "unknown" }).value,
-		styledTag({ count: 0, name: "sort:random", type: "unknown" }).value,
-	],
-	rating: [
-		styledTag({ count: 0, name: "rating:general", type: "metadata" }).value,
-		styledTag({ count: 0, name: "rating:sensitive", type: "metadata" }).value,
-		styledTag({ count: 0, name: "rating:questionable", type: "metadata" }).value,
-		styledTag({ count: 0, name: "rating:explicit", type: "metadata" }).value,
-	],
+    score: [
+        styledTag({ count: 0, name: "score:>=100", type: "unknown" }).value,
+        styledTag({ count: 0, name: "score:>5", type: "unknown" }).value,
+        styledTag({ count: 0, name: "score:<20", type: "unknown" }).value,
+    ],
+    sorting: [
+        styledTag({ count: 0, name: "sort:score", type: "unknown" }).value,
+        styledTag({ count: 0, name: "sort:random", type: "unknown" }).value,
+    ],
+    rating: [
+        styledTag({ count: 0, name: "rating:general", type: "metadata" }).value,
+        styledTag({ count: 0, name: "rating:sensitive", type: "metadata" })
+            .value,
+        styledTag({ count: 0, name: "rating:questionable", type: "metadata" })
+            .value,
+        styledTag({ count: 0, name: "rating:explicit", type: "metadata" })
+            .value,
+    ],
 }));
 
 type Tab = "favs" | "sortfilter";
@@ -54,25 +60,25 @@ const btnRef = useTemplateRef("button");
 
 // Favorited tags sorted by category then by name
 const favTags = computed<TagChip[]>(() => {
-	const sorted = sortTags(store.settings.favoriteTags);
-	const styled: TagChip[] = [];
+    const sorted = sortTags(store.settings.favoriteTags);
+    const styled: TagChip[] = [];
 
-	for (const tag of sorted) {
-		let style: ChipStyle = "default";
+    for (const tag of sorted) {
+        let style: ChipStyle = "default";
 
-		if (store.query.isIncluded(tag.name)) {
-			style = "checkmark";
-		} else if (store.query.isExcluded(tag.name)) {
-			style = "strikethrough";
-		}
+        if (store.query.isIncluded(tag.name)) {
+            style = "checkmark";
+        } else if (store.query.isExcluded(tag.name)) {
+            style = "strikethrough";
+        }
 
-		styled.push({
-			tag,
-			style,
-		});
-	}
+        styled.push({
+            tag,
+            style,
+        });
+    }
 
-	return styled;
+    return styled;
 });
 </script>
 

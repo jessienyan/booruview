@@ -5,13 +5,13 @@ import SearchTab from "./SearchTab.vue";
 
 type Tab = "search" | "recent";
 const tabComponents: Record<Tab, Component> = {
-	search: SearchTab,
-	recent: RecentTab,
+    search: SearchTab,
+    recent: RecentTab,
 };
 const currentTab = ref<Tab>("search");
 
 function switchTab(tab: Tab) {
-	currentTab.value = tab;
+    currentTab.value = tab;
 }
 </script>
 

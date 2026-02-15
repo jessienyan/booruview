@@ -4,24 +4,24 @@ import { useTemplateRef, watchPostEffect } from "vue";
 defineEmits<{ click: [index: number] }>();
 
 const props = defineProps<{
-	selectedIndex: number;
-	tags: Tag[];
+    selectedIndex: number;
+    tags: Tag[];
 }>();
 
 const listRef = useTemplateRef("list");
 
 watchPostEffect(() => {
-	if (!listRef.value || props.tags.length === 0 || props.selectedIndex < 0) {
-		return;
-	}
+    if (!listRef.value || props.tags.length === 0 || props.selectedIndex < 0) {
+        return;
+    }
 
-	const item = listRef.value.children.item(props.selectedIndex);
+    const item = listRef.value.children.item(props.selectedIndex);
 
-	if (!item) {
-		console.error("shouldn't happen");
-	} else {
-		(item as HTMLLIElement).focus();
-	}
+    if (!item) {
+        console.error("shouldn't happen");
+    } else {
+        (item as HTMLLIElement).focus();
+    }
 });
 </script>
 
