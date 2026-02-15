@@ -14,8 +14,6 @@ function toastError(msg: string) {
 }
 
 async function onSubmit(e: Event) {
-    e.preventDefault();
-
     const $form = e.target as HTMLFormElement;
 
     if (!$form.reportValidity()) {
@@ -87,7 +85,7 @@ async function onSubmit(e: Event) {
 </script>
 
 <template>
-    <form @submit="onSubmit">
+    <form @submit.prevent="onSubmit">
         <input
             v-model="username"
             class="text-input rounded"

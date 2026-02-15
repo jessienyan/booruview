@@ -21,6 +21,7 @@ type LoginParams struct {
 
 type LoginResponse struct {
 	AuthToken string `json:"auth_token"`
+	Username string `json:"username"`
 }
 
 // Login to an account and receive an auth token
@@ -85,5 +86,5 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user logged in")
-	respondJson(w, 200, RegisterResponse{token})
+	respondJson(w, 200, LoginResponse{AuthToken: token, Username: u.Username})
 }

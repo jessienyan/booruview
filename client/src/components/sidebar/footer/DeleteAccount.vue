@@ -69,7 +69,9 @@ async function doDelete() {
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/buttons";
 @import "@/assets/colors";
+@import "@/assets/form";
 
 .confirm-delete {
     background-color: $color-darkgray;
