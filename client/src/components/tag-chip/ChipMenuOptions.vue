@@ -6,106 +6,106 @@ import type { ChipActions } from "@/types";
 
 const showBlacklistConfirm = ref(false);
 const {
-	onClick,
-	tag,
-	actions: actionProps = {},
+    onClick,
+    tag,
+    actions: actionProps = {},
 } = defineProps<{
-	onClick: () => void;
-	tag: Tag;
-	actions?: ChipActions;
+    onClick: () => void;
+    tag: Tag;
+    actions?: ChipActions;
 }>();
 
 const actions = computed(() => ({
-	edit: actionProps.edit ?? false,
-	blacklist: actionProps.blacklist ?? true,
-	includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
-	favorite: actionProps.favorite ?? true,
-	openInNewTab: actionProps.openInNewTab ?? true,
+    edit: actionProps.edit ?? false,
+    blacklist: actionProps.blacklist ?? true,
+    includeExcludeRemove: actionProps.includeExcludeRemove ?? true,
+    favorite: actionProps.favorite ?? true,
+    openInNewTab: actionProps.openInNewTab ?? true,
 }));
 
 const isBlacklisted = computed(() => {
-	const name = tag.name;
-	return store.settings.blacklist.findIndex(t => t.name === name) !== -1;
+    const name = tag.name;
+    return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
 });
 
 const isIncluded = computed(() => {
-	return store.query.isIncluded(tag.name);
+    return store.query.isIncluded(tag.name);
 });
 
 const isExcluded = computed(() => {
-	return store.query.isExcluded(tag.name);
+    return store.query.isExcluded(tag.name);
 });
 
 const favoriteIndex = computed(() => {
-	return store.settings.favoriteTags.findIndex(t => tag.name === t.name);
+    return store.settings.favoriteTags.findIndex((t) => tag.name === t.name);
 });
 
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 
 const openInNewTabUrl = computed(() => {
-	const router = useRouter();
-	const url = router.resolve({
-		name: "search",
-		params: { page: 1, query: tag.name },
-	});
-	return new URL(url.path, window.location.origin).href;
+    const router = useRouter();
+    const url = router.resolve({
+        name: "search",
+        params: { page: 1, query: tag.name },
+    });
+    return new URL(url.path, window.location.origin).href;
 });
 
 function onAdd() {
-	store.query.includeTag(tag);
-	onClick();
+    store.query.includeTag(tag);
+    onClick();
 }
 
 function onBlacklist() {
-	showBlacklistConfirm.value = true;
+    showBlacklistConfirm.value = true;
 }
 
 function onConfirmBlacklist() {
-	store.settings.blacklist = store.settings.blacklist.concat(tag);
-	store.saveSettings();
-	store.query.removeTag(tag);
-	onClick();
+    store.settings.blacklist = store.settings.blacklist.concat(tag);
+    store.saveSettings();
+    store.query.removeTag(tag);
+    onClick();
 }
 
 function onExclude() {
-	store.query.excludeTag(tag);
-	onClick();
+    store.query.excludeTag(tag);
+    onClick();
 }
 
 function onRemove() {
-	store.query.removeTag(tag);
-	onClick();
+    store.query.removeTag(tag);
+    onClick();
 }
 
 function onFavorite() {
-	store.settings.favoriteTags.push(tag);
-	store.saveSettings();
-	onClick();
+    store.settings.favoriteTags.push(tag);
+    store.saveSettings();
+    onClick();
 }
 
 function onEdit() {
-	store.editTag(tag);
-	onClick();
+    store.editTag(tag);
+    onClick();
 }
 
 function onUnfavorite() {
-	store.settings.favoriteTags.splice(favoriteIndex.value, 1);
-	store.saveSettings();
-	onClick();
+    store.settings.favoriteTags.splice(favoriteIndex.value, 1);
+    store.saveSettings();
+    onClick();
 }
 
 function onWhitelist() {
-	const name = tag.name;
-	const i = store.settings.blacklist.findIndex(t => t.name === name);
+    const name = tag.name;
+    const i = store.settings.blacklist.findIndex((t) => t.name === name);
 
-	// shouldn't happen
-	if (i === -1) {
-		return;
-	}
+    // shouldn't happen
+    if (i === -1) {
+        return;
+    }
 
-	store.settings.blacklist.splice(i, 1);
-	store.saveSettings();
-	onClick();
+    store.settings.blacklist.splice(i, 1);
+    store.saveSettings();
+    onClick();
 }
 </script>
 
@@ -149,8 +149,11 @@ function onWhitelist() {
     >
         <i class="bi bi-x-lg"></i> remove
     </button>
-    <a :href="openInNewTabUrl" target="_blank"
-    v-if="actions.openInNewTab && !isBlacklisted && !isExcluded">
+    <a
+        :href="openInNewTabUrl"
+        target="_blank"
+        v-if="actions.openInNewTab && !isBlacklisted && !isExcluded"
+    >
         <button class="dropdown-option btn-primary">
             <i class="bi bi-box-arrow-up-right"></i> open in new tab
         </button>

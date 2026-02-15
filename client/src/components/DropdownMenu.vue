@@ -8,44 +8,44 @@ const show = defineModel("show", { required: true });
 
 const viewport = useViewportSize();
 useDismiss(
-	() => [container, props.el],
-	() => {
-		show.value = false;
-	},
+    () => [container, props.el],
+    () => {
+        show.value = false;
+    },
 );
 
 const menuPosition = computed(() => {
-	const el = toValue(props.el);
+    const el = toValue(props.el);
 
-	if (!el || !container.value) {
-		return;
-	}
+    if (!el || !container.value) {
+        return;
+    }
 
-	const menuRect = container.value.getBoundingClientRect();
-	const elRect = el.getBoundingClientRect();
-	const pos = {
-		top: "",
-		left: "",
-		right: "",
-		bottom: "",
-	};
+    const menuRect = container.value.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const pos = {
+        top: "",
+        left: "",
+        right: "",
+        bottom: "",
+    };
 
-	const underneath = menuRect.height + elRect.bottom < viewport.value.height;
-	const leftAlign = menuRect.width + elRect.left < viewport.value.width;
+    const underneath = menuRect.height + elRect.bottom < viewport.value.height;
+    const leftAlign = menuRect.width + elRect.left < viewport.value.width;
 
-	if (underneath) {
-		pos.top = `${elRect.bottom}px`;
-	} else {
-		pos.bottom = `${viewport.value.height - elRect.top}px`;
-	}
+    if (underneath) {
+        pos.top = `${elRect.bottom}px`;
+    } else {
+        pos.bottom = `${viewport.value.height - elRect.top}px`;
+    }
 
-	if (leftAlign) {
-		pos.left = `${elRect.left}px`;
-	} else {
-		pos.right = `${viewport.value.width - elRect.right}px`;
-	}
+    if (leftAlign) {
+        pos.left = `${elRect.left}px`;
+    } else {
+        pos.right = `${viewport.value.width - elRect.right}px`;
+    }
 
-	return pos;
+    return pos;
 });
 </script>
 

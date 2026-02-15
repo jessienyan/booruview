@@ -12,44 +12,48 @@ const router = useRouter();
 const route = useRoute();
 
 onMounted(() => {
-	const timer = setInterval(() => {
-		timeRemaining.value--;
-		if (timeRemaining.value === 0) {
-			clearInterval(timer);
-		}
-	}, 1000);
+    const timer = setInterval(() => {
+        timeRemaining.value--;
+        if (timeRemaining.value === 0) {
+            clearInterval(timer);
+        }
+    }, 1000);
 });
 
 function consent() {
-	store.settings.consented = true;
-	store.saveSettings();
+    store.settings.consented = true;
+    store.saveSettings();
 
-	// Auto search doesn't trigger on page load if the user hasn't consented.
-	// Trigger it once they consent
-	let params: RouteParamsRawGeneric;
+    // Auto search doesn't trigger on page load if the user hasn't consented.
+    // Trigger it once they consent
+    let params: RouteParamsRawGeneric;
 
-	if (route.name === "search") {
-		params = route.params;
-	} else {
-		params = { page: 1, query: "" };
-	}
+    if (route.name === "search") {
+        params = route.params;
+    } else {
+        params = { page: 1, query: "" };
+    }
 
-	router.push({
-		name: "search",
-		params,
-		force: true,
-		replace: true,
-	});
+    router.push({
+        name: "search",
+        params,
+        force: true,
+        replace: true,
+    });
 }
 
 function consentSFW() {
-	store.settings.blacklist = store.settings.blacklist.concat(defaultSFWBlacklist());
-	consent();
+    store.settings.blacklist = store.settings.blacklist.concat(
+        defaultSFWBlacklist(),
+    );
+    consent();
 }
 
 function consentNSFWWithBlacklist() {
-	store.settings.blacklist = store.settings.blacklist.concat(defaultNSFWBlacklist());
-	consent();
+    store.settings.blacklist = store.settings.blacklist.concat(
+        defaultNSFWBlacklist(),
+    );
+    consent();
 }
 </script>
 

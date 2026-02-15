@@ -8,45 +8,55 @@ import store from "@/store";
 import { sortTags } from "@/tag";
 
 const styledTags = computed<TagChip[]>(() => {
-	const sorted = sortTags(store.settings.blacklist);
-	const styled = sorted.map<TagChip>(tag => ({ tag, style: "default" }));
-	return styled;
+    const sorted = sortTags(store.settings.blacklist);
+    const styled = sorted.map<TagChip>((tag) => ({ tag, style: "default" }));
+    return styled;
 });
 
 const defaultBlacklistVisibility = useDontShowAgain("hide-default-blacklist");
 
 // Consider NSFW enabled if the user hasn't blacklisted rating:explicit
-const nsfwEnabled = computed(() => store.settings.blacklist.findIndex(t => t.name === "rating:explicit") === -1);
+const nsfwEnabled = computed(
+    () =>
+        store.settings.blacklist.findIndex(
+            (t) => t.name === "rating:explicit",
+        ) === -1,
+);
 
 const defaultBlacklistTags = computed(() =>
-	defaultNSFWBlacklist().map<TagChip>(tag => {
-		const isBlacklisted = store.settings.blacklist.findIndex(t => t.name === tag.name) !== -1;
+    defaultNSFWBlacklist().map<TagChip>((tag) => {
+        const isBlacklisted =
+            store.settings.blacklist.findIndex((t) => t.name === tag.name) !==
+            -1;
 
-		return {
-			tag,
-			style: isBlacklisted ? "strikethrough" : "default",
-		};
-	}),
+        return {
+            tag,
+            style: isBlacklisted ? "strikethrough" : "default",
+        };
+    }),
 );
 
 function addAllFromDefaultBlacklist() {
-	const list: Tag[] = [];
+    const list: Tag[] = [];
 
-	for (const tag of defaultNSFWBlacklist()) {
-		if (store.settings.blacklist.findIndex(t => t.name === tag.name) === -1) {
-			list.push(tag);
-		}
-	}
+    for (const tag of defaultNSFWBlacklist()) {
+        if (
+            store.settings.blacklist.findIndex((t) => t.name === tag.name) ===
+            -1
+        ) {
+            list.push(tag);
+        }
+    }
 
-	if (list.length) {
-		store.settings.blacklist = store.settings.blacklist.concat(list);
-		store.saveSettings();
+    if (list.length) {
+        store.settings.blacklist = store.settings.blacklist.concat(list);
+        store.saveSettings();
 
-		store.toast = {
-			msg: `added ${list.length} tags to blacklist`,
-			type: "info",
-		};
-	}
+        store.toast = {
+            msg: `added ${list.length} tags to blacklist`,
+            type: "info",
+        };
+    }
 }
 </script>
 

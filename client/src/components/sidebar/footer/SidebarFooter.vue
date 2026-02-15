@@ -7,21 +7,21 @@ import SettingsTab from "./SettingsTab.vue";
 
 type Tab = "about" | "help" | "settings";
 const tabComponents: Record<Tab, Component> = {
-	about: AboutTab,
-	help: HelpTab,
-	settings: SettingsTab,
+    about: AboutTab,
+    help: HelpTab,
+    settings: SettingsTab,
 };
 const currentTab = ref<Tab>("about");
 
 function switchTab(tab: Tab) {
-	currentTab.value = tab;
-	store.settings.sidebarTabsHidden = false;
-	store.saveSettings();
+    currentTab.value = tab;
+    store.settings.sidebarTabsHidden = false;
+    store.saveSettings();
 }
 
 function toggleClose() {
-	store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
-	store.saveSettings();
+    store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
+    store.saveSettings();
 }
 </script>
 

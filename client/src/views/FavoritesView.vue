@@ -9,8 +9,8 @@ const mainContainer = useMainContainer();
 onMounted(() => mainContainer.value.focus());
 
 function onChangeFavOrder(posts: Post[]) {
-	store.settings.favorites = posts;
-	store.saveSettings();
+    store.settings.favorites = posts;
+    store.saveSettings();
 }
 </script>
 

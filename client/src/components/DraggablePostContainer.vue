@@ -3,12 +3,12 @@ import { computed, ref } from "vue";
 import PostContainer from "./PostContainer.vue";
 
 const { scrollContainer, posts } = defineProps<{
-	scrollContainer: HTMLElement;
-	posts: Post[];
+    scrollContainer: HTMLElement;
+    posts: Post[];
 }>();
 
 const emit = defineEmits<{
-	change: [posts: Post[]];
+    change: [posts: Post[]];
 }>();
 
 const draggingPostIndex = ref<number | null>(null);
@@ -16,67 +16,67 @@ const dropTargetIndex = ref<number | null>(null);
 
 // "Working" view when dragging posts around
 const postsWithDragOrder = computed(() => {
-	if (draggingPostIndex.value == null || dropTargetIndex.value == null) {
-		return posts;
-	}
+    if (draggingPostIndex.value == null || dropTargetIndex.value == null) {
+        return posts;
+    }
 
-	const dragIndex = draggingPostIndex.value;
-	const dropIndex = dropTargetIndex.value;
+    const dragIndex = draggingPostIndex.value;
+    const dropIndex = dropTargetIndex.value;
 
-	const ordered = [...posts];
+    const ordered = [...posts];
 
-	if (dragIndex < dropIndex) {
-		// Shift right
-		for (let i = dragIndex; i < dropIndex; i++) {
-			ordered[i] = ordered[i + 1];
-		}
-	} else {
-		// Shift left
-		for (let i = dragIndex; i > dropIndex; i--) {
-			ordered[i] = ordered[i - 1];
-		}
-	}
+    if (dragIndex < dropIndex) {
+        // Shift right
+        for (let i = dragIndex; i < dropIndex; i++) {
+            ordered[i] = ordered[i + 1];
+        }
+    } else {
+        // Shift left
+        for (let i = dragIndex; i > dropIndex; i--) {
+            ordered[i] = ordered[i - 1];
+        }
+    }
 
-	// Update drop target
-	ordered[dropIndex] = posts[draggingPostIndex.value];
+    // Update drop target
+    ordered[dropIndex] = posts[draggingPostIndex.value];
 
-	return ordered;
+    return ordered;
 });
 
 function onDragStart(e: DragEvent, index: number) {
-	e.dataTransfer!.effectAllowed = "move";
-	draggingPostIndex.value = index;
+    e.dataTransfer!.effectAllowed = "move";
+    draggingPostIndex.value = index;
 }
 
 function onDragEnter(e: DragEvent, index: number) {
-	if (draggingPostIndex.value == null) {
-		return;
-	}
+    if (draggingPostIndex.value == null) {
+        return;
+    }
 
-	dropTargetIndex.value = index;
+    dropTargetIndex.value = index;
 }
 
 function onDragEnd(e: DragEvent) {
-	if (draggingPostIndex.value == null) {
-		return;
-	}
+    if (draggingPostIndex.value == null) {
+        return;
+    }
 
-	if (dropTargetIndex.value != null) {
-		e.preventDefault();
-		// Emit the current working state as a way to commit the change
-		emit("change", [...postsWithDragOrder.value]);
-	}
+    if (dropTargetIndex.value != null) {
+        e.preventDefault();
+        // Emit the current working state as a way to commit the change
+        emit("change", [...postsWithDragOrder.value]);
+    }
 
-	draggingPostIndex.value = null;
-	dropTargetIndex.value = null;
+    draggingPostIndex.value = null;
+    dropTargetIndex.value = null;
 }
 
 const postDragId = computed(() => {
-	if (draggingPostIndex.value == null) {
-		return undefined;
-	}
+    if (draggingPostIndex.value == null) {
+        return undefined;
+    }
 
-	return posts[draggingPostIndex.value].id;
+    return posts[draggingPostIndex.value].id;
 });
 </script>
 

@@ -11,76 +11,76 @@ const maxAngleForSwipe = 30; // degrees
 let swipe: VanillaSwipe;
 
 function isHorizontalSwipe({ absY, absX }: EventData): boolean {
-	const angle = Math.atan2(absY, absX) * (180 / Math.PI);
-	return angle < maxAngleForSwipe;
+    const angle = Math.atan2(absY, absX) * (180 / Math.PI);
+    return angle < maxAngleForSwipe;
 }
 
 watch(swipeDirection, () => {
-	store.userIsSwipingToChangePage = swipeDirection.value !== null;
+    store.userIsSwipingToChangePage = swipeDirection.value !== null;
 });
 
 onMounted(() => {
-	swipe = new VanillaSwipe({
-		element: props.scrollContainer,
-		delta: minDistanceForSwipe,
-		directionDelta: 10,
+    swipe = new VanillaSwipe({
+        element: props.scrollContainer,
+        delta: minDistanceForSwipe,
+        directionDelta: 10,
 
-		// Swap the swipe direction (flick left means right)
-		rotationAngle: 180,
+        // Swap the swipe direction (flick left means right)
+        rotationAngle: 180,
 
-		onSwipeStart(_, data) {
-			if (store.fullscreenPost !== null || !isHorizontalSwipe(data)) {
-				swipeDirection.value = null;
-				return;
-			}
+        onSwipeStart(_, data) {
+            if (store.fullscreenPost !== null || !isHorizontalSwipe(data)) {
+                swipeDirection.value = null;
+                return;
+            }
 
-			switch (data.directionX) {
-				case "LEFT":
-					if (store.currentPage === 1) {
-						return;
-					}
+            switch (data.directionX) {
+                case "LEFT":
+                    if (store.currentPage === 1) {
+                        return;
+                    }
 
-					swipeDirection.value = "LEFT";
-					break;
+                    swipeDirection.value = "LEFT";
+                    break;
 
-				case "RIGHT":
-					if (store.currentPage === store.maxPage()) {
-						return;
-					}
+                case "RIGHT":
+                    if (store.currentPage === store.maxPage()) {
+                        return;
+                    }
 
-					swipeDirection.value = "RIGHT";
-					break;
-			}
-		},
+                    swipeDirection.value = "RIGHT";
+                    break;
+            }
+        },
 
-		onSwiping(_, data) {
-			if (swipeDirection.value === null) {
-				return;
-			}
+        onSwiping(_, data) {
+            if (swipeDirection.value === null) {
+                return;
+            }
 
-			// Cancel the swipe if the user changed direction
-			if (swipeDirection.value !== data.directionX) {
-				swipeDirection.value = null;
-				return;
-			}
-		},
+            // Cancel the swipe if the user changed direction
+            if (swipeDirection.value !== data.directionX) {
+                swipeDirection.value = null;
+                return;
+            }
+        },
 
-		onSwiped() {
-			switch (swipeDirection.value) {
-				case "LEFT":
-					store.prevPage().finally(() => {
-						swipeDirection.value = null;
-					});
-					break;
-				case "RIGHT":
-					store.nextPage().finally(() => {
-						swipeDirection.value = null;
-					});
-					break;
-			}
-		},
-	});
-	swipe.init();
+        onSwiped() {
+            switch (swipeDirection.value) {
+                case "LEFT":
+                    store.prevPage().finally(() => {
+                        swipeDirection.value = null;
+                    });
+                    break;
+                case "RIGHT":
+                    store.nextPage().finally(() => {
+                        swipeDirection.value = null;
+                    });
+                    break;
+            }
+        },
+    });
+    swipe.init();
 });
 
 onUnmounted(() => swipe.destroy());

@@ -1,86 +1,104 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from "vue";
-import store, { type ColumnSizing, type FullscreenViewMenuAnchorPoint } from "@/store";
+import store, {
+    type ColumnSizing,
+    type FullscreenViewMenuAnchorPoint,
+} from "@/store";
 import Blacklist from "./Blacklist.vue";
 
 const columnSizingOptions: Record<ColumnSizing, string> = {
-	dynamic: "dynamic",
-	fixed: "fixed",
+    dynamic: "dynamic",
+    fixed: "fixed",
 };
 
-const fullscreenViewMenuAnchorOptions: Record<FullscreenViewMenuAnchorPoint, string> = {
-	topleft: "top left",
-	topcenter: "top center",
-	topright: "top right",
-	right: "right",
-	bottomright: "bottom right",
-	bottomcenter: "bottom center",
-	bottomleft: "bottom left",
-	left: "left",
+const fullscreenViewMenuAnchorOptions: Record<
+    FullscreenViewMenuAnchorPoint,
+    string
+> = {
+    topleft: "top left",
+    topcenter: "top center",
+    topright: "top right",
+    right: "right",
+    bottomright: "bottom right",
+    bottomcenter: "bottom center",
+    bottomleft: "bottom left",
+    left: "left",
 };
 
 function onChangeColCount(e: Event) {
-	store.settings.columnCount = parseInt((e.target as HTMLInputElement).value, 10);
-	store.saveSettings();
+    store.settings.columnCount = parseInt(
+        (e.target as HTMLInputElement).value,
+        10,
+    );
+    store.saveSettings();
 }
 
 function onChangeColSizing(e: Event) {
-	store.settings.columnSizing = (e.target as HTMLInputElement).value as ColumnSizing;
-	store.saveSettings();
+    store.settings.columnSizing = (e.target as HTMLInputElement)
+        .value as ColumnSizing;
+    store.saveSettings();
 }
 
 function onChangeColWidth(e: Event) {
-	store.settings.columnWidth = parseInt((e.target as HTMLInputElement).value, 10);
-	store.saveSettings();
+    store.settings.columnWidth = parseInt(
+        (e.target as HTMLInputElement).value,
+        10,
+    );
+    store.saveSettings();
 }
 
 const MAX_POST_HEIGHT = 1500;
 
 function onChangePostHeight(e: Event) {
-	const $el = e.target as HTMLInputElement;
+    const $el = e.target as HTMLInputElement;
 
-	if ($el.value === $el.max) {
-		store.settings.maxPostHeight = null;
-	} else {
-		store.settings.maxPostHeight = parseInt($el.value, 10);
-	}
+    if ($el.value === $el.max) {
+        store.settings.maxPostHeight = null;
+    } else {
+        store.settings.maxPostHeight = parseInt($el.value, 10);
+    }
 
-	store.saveSettings();
+    store.saveSettings();
 }
 
 function onChangeFullscreenViewMenuAnchor(e: Event) {
-	store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement).value as FullscreenViewMenuAnchorPoint;
-	store.saveSettings();
+    store.settings.fullscreenViewMenuAnchor = (e.target as HTMLInputElement)
+        .value as FullscreenViewMenuAnchorPoint;
+    store.saveSettings();
 }
 
 function onChangeFullscreenViewMenuRotate(e: Event) {
-	store.settings.fullscreenViewMenuRotate = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.fullscreenViewMenuRotate = (
+        e.target as HTMLInputElement
+    ).checked;
+    store.saveSettings();
 }
 
 function onChangeCloseSidebarOnSearch(e: Event) {
-	store.settings.closeSidebarOnSearch = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.closeSidebarOnSearch = (
+        e.target as HTMLInputElement
+    ).checked;
+    store.saveSettings();
 }
 
 function onChangeHighResImages(e: Event) {
-	store.settings.highResImages = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.highResImages = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
 }
 
 function onChangeAutoplayVideos(e: Event) {
-	store.settings.autoplayVideo = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.autoplayVideo = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
 }
 
 function onChangeMuteVideos(e: Event) {
-	store.settings.muteVideo = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.muteVideo = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
 }
 
 function onChangeCheckForUpdates(e: Event) {
-	store.settings.checkForUpdates = (e.target as HTMLInputElement).checked;
-	store.saveSettings();
+    store.settings.checkForUpdates = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
 }
 
 const exportCode = ref("");
@@ -90,106 +108,128 @@ const generatingCode = ref(false);
 
 // Re-enable code generation once a change is made
 watch(
-	() => store.settings,
-	() => {
-		canGenerate.value = true;
-	},
+    () => store.settings,
+    () => {
+        canGenerate.value = true;
+    },
 );
 
-const ignoredSettingsForImportExport: Array<Partial<keyof typeof store.settings>> = ["consented", "queryHistory"];
+const ignoredSettingsForImportExport: Array<
+    Partial<keyof typeof store.settings>
+> = ["consented", "queryHistory"];
 
 function generateExportCode() {
-	generatingCode.value = true;
+    generatingCode.value = true;
 
-	const data: Partial<typeof store.settings> = Object.assign({}, store.settings);
+    const data: Partial<typeof store.settings> = Object.assign(
+        {},
+        store.settings,
+    );
 
-	for (const k of ignoredSettingsForImportExport) {
-		delete data[k];
-	}
+    for (const k of ignoredSettingsForImportExport) {
+        delete data[k];
+    }
 
-	fetch("/api/settings/export", {
-		method: "POST",
-		body: JSON.stringify(data),
-	})
-		.then(resp => {
-			resp.json().then(({ code }) => {
-				exportCode.value = code;
-			});
-			canGenerate.value = false;
-		})
-		.catch(e => console.error(e))
-		.finally(() => {
-			generatingCode.value = false;
-		});
+    fetch("/api/settings/export", {
+        method: "POST",
+        body: JSON.stringify(data),
+    })
+        .then((resp) => {
+            resp.json().then(({ code }) => {
+                exportCode.value = code;
+            });
+            canGenerate.value = false;
+        })
+        .catch((e) => console.error(e))
+        .finally(() => {
+            generatingCode.value = false;
+        });
 }
 
 const importCode = ref("");
 const importingData = ref(false);
 
 function mergeSettings(data: Record<string, any>) {
-	Object.entries(data).forEach(([_k, v]) => {
-		const k = _k as Exclude<keyof typeof store.settings, typeof ignoredSettingsForImportExport>;
+    Object.entries(data).forEach(([_k, v]) => {
+        const k = _k as Exclude<
+            keyof typeof store.settings,
+            typeof ignoredSettingsForImportExport
+        >;
 
-		// Remove any duplicates
-		if (k === "blacklist") {
-			v = (v as Tag[]).filter(a => store.settings.blacklist.findIndex(b => a.name === b.name) === -1);
-			v = v.concat(store.settings.blacklist);
-		} else if (k === "favorites") {
-			v = (v as Post[]).filter(a => store.settings.favorites.findIndex(b => a.id === b.id) === -1);
-			v = v.concat(store.settings.favorites);
-		} else if (k === "favoriteTags") {
-			v = (v as Tag[]).filter(a => store.settings.favoriteTags.findIndex(b => a.name === b.name) === -1);
-			v = v.concat(store.settings.favoriteTags);
-		}
+        // Remove any duplicates
+        if (k === "blacklist") {
+            v = (v as Tag[]).filter(
+                (a) =>
+                    store.settings.blacklist.findIndex(
+                        (b) => a.name === b.name,
+                    ) === -1,
+            );
+            v = v.concat(store.settings.blacklist);
+        } else if (k === "favorites") {
+            v = (v as Post[]).filter(
+                (a) =>
+                    store.settings.favorites.findIndex((b) => a.id === b.id) ===
+                    -1,
+            );
+            v = v.concat(store.settings.favorites);
+        } else if (k === "favoriteTags") {
+            v = (v as Tag[]).filter(
+                (a) =>
+                    store.settings.favoriteTags.findIndex(
+                        (b) => a.name === b.name,
+                    ) === -1,
+            );
+            v = v.concat(store.settings.favoriteTags);
+        }
 
-		(store.settings as any)[k] = v;
-	});
+        (store.settings as any)[k] = v;
+    });
 
-	store.saveSettings();
+    store.saveSettings();
 }
 
 function importData() {
-	importingData.value = true;
+    importingData.value = true;
 
-	fetch("/api/settings/import", {
-		method: "POST",
-		body: JSON.stringify({ code: importCode.value }),
-	})
-		.then(resp => {
-			if (resp.status >= 400) {
-				resp.json()
-					.then(val => {
-						let msg = "Something went wrong";
+    fetch("/api/settings/import", {
+        method: "POST",
+        body: JSON.stringify({ code: importCode.value }),
+    })
+        .then((resp) => {
+            if (resp.status >= 400) {
+                resp.json()
+                    .then((val) => {
+                        let msg = "Something went wrong";
 
-						if ("error" in val) {
-							msg = val.error;
-						}
+                        if ("error" in val) {
+                            msg = val.error;
+                        }
 
-						store.toast = {
-							msg,
-							type: "error",
-						};
-					})
-					.catch(() => {
-						store.toast = {
-							msg: "Something went wrong",
-							type: "error",
-						};
-					});
-				return;
-			}
+                        store.toast = {
+                            msg,
+                            type: "error",
+                        };
+                    })
+                    .catch(() => {
+                        store.toast = {
+                            msg: "Something went wrong",
+                            type: "error",
+                        };
+                    });
+                return;
+            }
 
-			resp.json().then(data => mergeSettings(data));
-			store.toast = {
-				msg: "data imported successfully",
-				type: "info",
-			};
-			importCode.value = "";
-		})
-		.catch(e => console.error(e))
-		.finally(() => {
-			importingData.value = false;
-		});
+            resp.json().then((data) => mergeSettings(data));
+            store.toast = {
+                msg: "data imported successfully",
+                type: "info",
+            };
+            importCode.value = "";
+        })
+        .catch((e) => console.error(e))
+        .finally(() => {
+            importingData.value = false;
+        });
 }
 </script>
 
