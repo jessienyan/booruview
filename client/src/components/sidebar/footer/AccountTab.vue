@@ -1,33 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import Collapsable from "@/components/Collapsable.vue";
 import store from "@/store";
+import DeleteAccount from "./DeleteAccount.vue";
 import Login from "./Login.vue";
 import Register from "./Register.vue";
 
 const showRegisterForm = ref(false);
-const showDeleteConfirm = ref(false);
-const usernameConfirm = ref("");
-
-const canDelete = computed(
-    () => store.account && store.account.username === usernameConfirm.value,
-);
-
-async function doDelete() {
-    store.toast = {
-        msg: "TODO",
-        type: "error",
-    };
-    return;
-
-    // try {
-    // 	const resp = await fetch("/api/account", {
-    // 		method: "DELETE",
-    // 	});
-    // } catch (e) {
-    // 	console.log(e);
-    // }
-}
 
 function logout() {
     store.account = null;
@@ -70,48 +49,10 @@ function logout() {
         <p v-if="store.account">
             <strong>You are signed in as {{ store.account.username }}.</strong>
         </p>
-        <p>
-            <button class="btn-primary btn-rounded btn-block" @click="logout">
-                Logout
-            </button>
-            <button
-                class="btn-danger btn-rounded btn-block"
-                @click="showDeleteConfirm = true"
-                :disabled="showDeleteConfirm"
-            >
-                Delete Account
-            </button>
-        </p>
-        <div v-if="showDeleteConfirm" class="confirm-delete">
-            <p>Deleting your account is PERMANENT.</p>
-            <p>
-                You'll keep your current favorites and settings, but you won't
-                be able to login and access them on other devices.
-            </p>
-            <p>
-                To continue, enter your username:
-                {{ store.account.username }}
-            </p>
-            <p>
-                <input
-                    v-model="usernameConfirm"
-                    class="text-input input-block rounded"
-                    type="text"
-                    placeholder="confirm username"
-                /><button
-                    class="btn-danger btn-rounded btn-block"
-                    @click="doDelete"
-                    :disabled="!canDelete"
-                >
-                    I understand, delete it</button
-                ><button
-                    class="btn-gray btn-rounded btn-block"
-                    @click="showDeleteConfirm = false"
-                >
-                    Nevermind
-                </button>
-            </p>
-        </div>
+        <button class="btn-primary btn-rounded btn-block" @click="logout">
+            Logout
+        </button>
+        <DeleteAccount />
     </template>
     <div class="faq">
         <Collapsable text="Do I have to register an account?" :button="false">
@@ -166,11 +107,6 @@ function logout() {
 .collapsable {
     background-color: $color-primary-darker;
     color: $color-primary-light;
-    padding: 0.1px 1em;
-}
-
-.confirm-delete {
-    background-color: $color-darkgray;
     padding: 0.1px 1em;
 }
 
