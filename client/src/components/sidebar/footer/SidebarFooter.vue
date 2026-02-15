@@ -8,10 +8,10 @@ import SettingsTab from "./SettingsTab.vue";
 
 type Tab = "about" | "help" | "settings" | "account";
 const tabComponents: Record<Tab, Component> = {
-	about: AboutTab,
-	help: HelpTab,
-	settings: SettingsTab,
-	account: AccountTab,
+    about: AboutTab,
+    help: HelpTab,
+    settings: SettingsTab,
+    account: AccountTab,
 };
 const currentTab = ref<Tab>("about");
 

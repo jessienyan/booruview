@@ -2,13 +2,13 @@
 import { ref } from "vue";
 
 const {
-	text,
-	button = true,
-	defaultOpen = false,
+    text,
+    button = true,
+    defaultOpen = false,
 } = defineProps<{
-	text: string;
-	button?: boolean;
-	defaultOpen?: boolean;
+    text: string;
+    button?: boolean;
+    defaultOpen?: boolean;
 }>();
 const show = ref(defaultOpen);
 </script>
@@ -25,7 +25,6 @@ const show = ref(defaultOpen);
         ></i>
     </button>
     <button v-else class="btn-unstyled" @click="show = !show">
-
         <i
             class="bi"
             :class="{
@@ -33,7 +32,7 @@ const show = ref(defaultOpen);
                 'bi-caret-down-fill': show,
             }"
         ></i>
-    
+
         {{ text }}
     </button>
     <slot v-if="show"></slot>
