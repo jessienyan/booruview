@@ -252,10 +252,6 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		// Video URL host is video-cdn3.gelbooru.com but that seems to be broken. Viewing the post
 		// on Gelbooru uses video-cdn4.gelbooru.com instead
 		data.ImageUrl = strings.Replace(data.ImageUrl, "video-cdn3.gelbooru.com", "video-cdn4.gelbooru.com", 1)
-		
-		// 2026-02-16: GB requires double slashes
-		data.ImageUrl = strings.Replace(data.ImageUrl, ".com/", ".com//", 1)
-		data.LowResUrl = strings.Replace(data.LowResUrl, ".com/", ".com//", 1)
 
 		posts = append(posts, data)
 	}

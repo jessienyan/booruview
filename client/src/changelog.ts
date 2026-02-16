@@ -5,10 +5,6 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
-		date: "2026-02-16",
-		changes: ["add gelbooru hotlink workaround"]
-	},
-	{
 		date: "2026-01-20",
 		changes: ["fixed another case of API returning 500 instead of 503"],
 	},
