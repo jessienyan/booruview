@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"sync"
 
+	api "codeberg.org/jessienyan/booruview"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,6 +26,10 @@ func GetCDNHosts() GelbooruCDN {
 }
 
 func UpdateCDNHosts() error {
+	if api.UseMediaProxy {
+		return nil
+	}
+
 	images, err := NewClient().ListPosts("-video", 1)
 	if err != nil {
 		return err

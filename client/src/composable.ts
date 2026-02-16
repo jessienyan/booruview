@@ -179,6 +179,17 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 			return url;
 		}
 
+		if(store.cdnHosts.mediaProxy) {
+			if(!url.includes(store.cdnHosts.image)) {
+				// If it's missing the media proxy host, add it. Useful for favorites that are saved
+				// with a static URL
+				return store.cdnHosts.image + url;
+			} else {
+				// The API rewrites URLs to use the proxy, so there's nothing needed here
+				return url;
+			}
+		}
+
 		const newURL = new URL(url);
 		newURL.host = store.cdnHosts.image;
 
@@ -193,6 +204,17 @@ export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<stri
 
 		if (store.cdnHosts === null) {
 			return url;
+		}
+
+		if(store.cdnHosts.mediaProxy) {
+			if(!url.includes(store.cdnHosts.video)) {
+				// If it's missing the media proxy host, add it. Useful for favorites that are saved
+				// with a static URL
+				return store.cdnHosts.video + url;
+			} else {
+				// The API rewrites URLs to use the proxy, so there's nothing needed here
+				return url;
+			}
 		}
 
 		const newURL = new URL(url);

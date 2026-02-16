@@ -21,7 +21,7 @@ var (
 )
 
 var (
-	reProxy = regexp.MustCompile(`^https?:\/\/.+[^\/]$`)
+	reProxy = regexp.MustCompile(`^https?:\/\/.+/?$`)
 )
 
 func init() {
@@ -42,6 +42,10 @@ func init() {
 		MediaProxyHost = os.Getenv("MEDIA_PROXY_HOST")
 		if MediaProxyHost != "" && !reProxy.MatchString(MediaProxyHost) {
 			log.Fatal().Msg("MEDIA_PROXY_HOST must either be blank, or a http/https origin, e.g. 'https://example.com'")
+		}
+
+		if !strings.HasSuffix(MediaProxyHost, "/") {
+			MediaProxyHost += "/"
 		}
 	}
 

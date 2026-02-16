@@ -48,6 +48,9 @@ Open `.env` in your editor. Update these three vars:
 
 Use the API key and user ID from the previous step here.
 
+### Step 2. 
+TODO
+
 ### Running locally
 
 Start the dev server
