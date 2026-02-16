@@ -16,8 +16,8 @@ type CDNHostResponse struct {
 func CDNHostHandler(w http.ResponseWriter, req *http.Request) {
 	if api.UseMediaProxy {
 		respondJson(w, 200, CDNHostResponse{
-			Image: api.MediaProxyHost + "?to=",
-			Video: api.MediaProxyHost + "?to=",
+			Image: api.MediaProxyHost + "/?to=",
+			Video: api.MediaProxyHost + "/?to=",
 			MediaProxy: true,
 		})
 		return
