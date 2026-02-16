@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -e
+# Builds the images for running booruview in production mode.
+# If TAG_AND_PUSH=1 then the images will be pushed to codeberg and
+# a new release is created
+
+set -euo pipefail
 cd ${0%/*}
 
 IMG_PREFIX=codeberg.org/jessienyan/booruview
@@ -52,23 +56,27 @@ docker run --rm \
 echo ">>> building caddy image"
 docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile .
 
-echo ">>> pushing API image"
-docker tag $API_IMG $API_IMG:$RELEASE_TAG
-docker tag $API_IMG $API_IMG:latest
-docker push --quiet $API_IMG:$RELEASE_TAG
-docker push --quiet $API_IMG:latest
+if [[ ${TAG_AND_PUSH:-0} = 1 ]]; then
+    echo ">>> pushing API image"
+    docker tag $API_IMG $API_IMG:$RELEASE_TAG
+    docker tag $API_IMG $API_IMG:latest
+    docker push --quiet $API_IMG:$RELEASE_TAG
+    docker push --quiet $API_IMG:latest
 
-echo ">>> pushing caddy image"
-docker tag $CADDY_IMG $CADDY_IMG:$RELEASE_TAG
-docker tag $CADDY_IMG $CADDY_IMG:latest
-docker push --quiet $CADDY_IMG:$RELEASE_TAG
-docker push --quiet $CADDY_IMG:latest
+    echo ">>> pushing caddy image"
+    docker tag $CADDY_IMG $CADDY_IMG:$RELEASE_TAG
+    docker tag $CADDY_IMG $CADDY_IMG:latest
+    docker push --quiet $CADDY_IMG:$RELEASE_TAG
+    docker push --quiet $CADDY_IMG:latest
 
-echo ">>> pushing valkey image"
-docker tag $VALKEY_IMG $VALKEY_IMG:$RELEASE_TAG
-docker tag $VALKEY_IMG $VALKEY_IMG:latest
-docker push --quiet $VALKEY_IMG:$RELEASE_TAG
-docker push --quiet $VALKEY_IMG:latest
+    echo ">>> pushing valkey image"
+    docker tag $VALKEY_IMG $VALKEY_IMG:$RELEASE_TAG
+    docker tag $VALKEY_IMG $VALKEY_IMG:latest
+    docker push --quiet $VALKEY_IMG:$RELEASE_TAG
+    docker push --quiet $VALKEY_IMG:latest
 
-git tag "$RELEASE_TAG" && git push --tags
-echo ">>> release tagged as $RELEASE_TAG"
+    git tag "$RELEASE_TAG" && git push --tags
+    echo ">>> release tagged as $RELEASE_TAG"
+fi
+
+echo ">>> done"
