@@ -200,7 +200,11 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 // Rewrites a video URL to use the current CDN host
 export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
-		const url = toValue(url_);
+		let url = toValue(url_);
+
+		// Fix incorrect cdn host. This logic is also in the API but it also needs to be
+		// in the frontend to handle favorites
+		url = url.replace("video-cdn3", "video-cdn4");
 
 		if (store.cdnHosts === null) {
 			return url;
