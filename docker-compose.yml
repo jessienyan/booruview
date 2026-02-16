@@ -21,6 +21,7 @@ services:
     build:
       context: .
       dockerfile: caddy/Dockerfile
+    init: true
     env_file:
       - .env
     environment:

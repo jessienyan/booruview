@@ -18,6 +18,7 @@ services:
   caddy:
     image: codeberg.org/jessienyan/booruview/caddy:latest
     restart: unless-stopped
+    init: true
     env_file:
       - ".env"
     environment:
