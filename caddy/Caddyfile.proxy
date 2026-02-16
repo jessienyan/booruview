@@ -20,8 +20,9 @@
 	reverse_proxy {
 		to 		{proxy_upstream}:443
 		rewrite {proxy_path}
-		header_up -Referer
-		header_up Host {proxy_upstream}
+
+		header_up Referer	https://gelbooru.com
+		header_up Host		{proxy_upstream}
 
 		transport http {
 			tls
