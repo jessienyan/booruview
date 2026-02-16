@@ -10,7 +10,7 @@ ENV USE_GRAFANA=0
 ENV USE_MEDIA_PROXY=0
 
 COPY caddy/generate_caddyfile.sh caddy/start.sh /etc/caddy
-RUN mkdir -p /etc/caddy/components/
+RUN mkdir -p /etc/caddy/components/ && chmod +x /etc/caddy/start.sh
 COPY caddy/Caddyfile* /etc/caddy/components/
 
 COPY client/dist/ /srv
@@ -18,4 +18,4 @@ COPY client/dist/ /srv
 # This is intentionally at the end to prevent caching
 RUN wget -O /etc/caddy/GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb
 
-CMD ["/bin/ash", "/etc/caddy/start.sh"]
+CMD ["/etc/caddy/start.sh"]
