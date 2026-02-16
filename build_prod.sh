@@ -14,8 +14,8 @@ CADDY_IMG=$IMG_PREFIX/caddy
 CLIENT_IMG=$IMG_PREFIX/client
 VALKEY_IMG=$IMG_PREFIX/valkey
 
-COMMIT=$(git rev-parse --short master)
-DATE=$(git show -s --format=%cs master)
+COMMIT=$(git rev-parse --short)
+DATE=$(git show -s --format=%cs)
 
 # returns the git release tag as "YYYY-MM-DD". If a tag with that name already exists
 # a revision is appended, e.g. "YYYY-MM-DD--rev1"
