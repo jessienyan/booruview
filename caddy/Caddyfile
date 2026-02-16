@@ -34,7 +34,7 @@
     # Global headers
     # https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
     header {
-        Referrer-Policy                 "no-referrer"
+        Referrer-Policy                 "same-origin"
         X-Frame-Options                 "DENY"
         X-Content-Type-Options          "nosniff"
         Strict-Transport-Security       "max-age=2592000; includeSubDomains"

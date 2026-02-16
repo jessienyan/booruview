@@ -118,7 +118,7 @@ onActivated(() => pz?.resume());
     <img
         v-else
         ref="imgRef"
-        referrerpolicy="no-referrer"
+        referrerpolicy="same-origin"
         :src="imageURL"
         :width="content.width"
         :height="content.height"
