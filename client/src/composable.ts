@@ -93,23 +93,6 @@ export function useDontShowAgain(id: string) {
 	return { show, onHide, ack };
 }
 
-interface FeatureIndicator {
-	expired: boolean;
-	show: Ref<boolean>;
-	onSeen: () => void;
-}
-
-export function useNewFeatureIndicator(id: string, until?: Date): FeatureIndicator {
-	// Feature indicator is no longer needed and will never be shown for new visitors
-	if (until && new Date() > until) {
-		const show = ref(false);
-		return { expired: true, show, onSeen: () => {} };
-	}
-
-	const { show, onHide: onSeen } = useDontShowAgain(`feat-${id}`);
-	return { expired: false, show, onSeen };
-}
-
 const now = ref(new Date());
 setInterval(() => {
 	now.value = new Date();
