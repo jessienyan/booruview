@@ -49,10 +49,10 @@ const bannerDate = new Date("2026-02-16").toLocaleDateString();
             v-if="hasConsented && mediaProxyBanner.show.value"
         >
             As of {{ bannerDate }}, Gelbooru blocked direct linking, so all
-            media is now proxied through <code>proxy.booruview.com</code>. HD
-            images are temporarily disabled to save on bandwidth. Report any
-            issues in the "about" tab, and consider donating to help with
-            hosting costs. Thank you ❤️
+            media is now proxied through <code>proxy2.booruview.com</code>. HD
+            images are temporarily disabled to save on bandwidth. Load times may
+            be slower than usual. Report any issues in the "about" tab, and
+            consider donating to help with hosting costs. Thank you ❤️
             <a
                 href="#"
                 class="banner-close"
