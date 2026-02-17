@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-02-16",
+		changes: ["enabled experimental media proxy to workaround gelbooru requiring referrer"]
+	},
+	{
 		date: "2026-01-20",
 		changes: ["fixed another case of API returning 500 instead of 503"],
 	},
