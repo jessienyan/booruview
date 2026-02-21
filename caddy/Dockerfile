@@ -1,6 +1,5 @@
 FROM caddy:2-builder-alpine AS builder
 RUN xcaddy build \
-    --with github.com/lum8rjack/caddy-ja4h \
     --with github.com/shift72/caddy-geo-ip
 
 FROM caddy:2-alpine

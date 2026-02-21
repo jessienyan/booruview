@@ -1,5 +1,4 @@
 {
-    order ja4h_header first
     order geo_ip first
 }
 
