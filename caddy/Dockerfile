@@ -5,7 +5,6 @@ RUN xcaddy build \
 FROM caddy:2-alpine
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 
-ENV USE_GRAFANA=0
 ENV USE_MEDIA_PROXY=0
 
 COPY caddy/generate_caddyfile.sh caddy/start.sh /etc/caddy

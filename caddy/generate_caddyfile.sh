@@ -12,7 +12,6 @@ cd ${0%/*}
 COMPONENT_FILES=components/
 
 cp $COMPONENT_FILES/Caddyfile .
-[[ $USE_GRAFANA = 1 ]] && cat < $COMPONENT_FILES/Caddyfile.grafana >> Caddyfile
 [[ $USE_MEDIA_PROXY = 1 ]] && cat < $COMPONENT_FILES/Caddyfile.proxy >> Caddyfile
 
 exit 0

@@ -11,7 +11,7 @@ services:
     logging: &logging
       driver: loki
       options:
-        loki-retries: 5
+        loki-retries: 2
         loki-batch-size: 400
         loki-url: http://localhost:3100/loki/api/v1/push
 
@@ -20,8 +20,6 @@ services:
     restart: unless-stopped
     env_file:
       - ".env"
-    environment:
-      - USE_GRAFANA=1
     ports:
       - "80:80"
       - "443:443"
