@@ -21,7 +21,7 @@ async function doDelete() {
 
         if (resp.ok) {
             store.account = null;
-            store.saveAccount();
+            store.saveAccountCredentials();
             store.toast = {
                 msg: "Account deleted successfully",
                 type: "info",

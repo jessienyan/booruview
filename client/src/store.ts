@@ -33,8 +33,10 @@ type Store = {
 	account: {
 		authToken: string;
 		username: string;
+		data: AccountData;
 	} | null;
-	saveAccount(): void;
+	saveAccountCredentials(): void;
+    saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void>;
 
 	currentPage: number;
 	totalPostCount: number;
@@ -107,391 +109,527 @@ type Store = {
 	addQueryToHistory(): void;
 	clearPosts(): void;
 	getTag(name: string): Tag | undefined;
+
+	favoritePosts(): Post[];
+	setFavoritePosts(posts: Post[]): Promise<void>;
+
+	favoriteTags(): Tag[];
+	setFavoriteTags(tags: Tag[]): Promise<void>;
+
+	blacklist(): Tag[];
+	setBlacklist(tags: Tag[]): Promise<void>;
+
+	searchHistory(): SearchHistory[];
+	setSearchhistory(history: SearchHistory[]): Promise<void>;
 };
 
 const store = reactive<Store>({
-	account: JSON.parse(localStorage.getItem("account") || "null"),
-	saveAccount() {
-		localStorage.setItem("account", JSON.stringify(this.account));
+    account: JSON.parse(localStorage.getItem("account") || "null"),
+
+    saveAccountCredentials() {
+        localStorage.setItem("account", JSON.stringify(this.account));
+    },
+
+    saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
+        if(this.account === null) {
+            console.log("saveAccountData: not logged in, skipping");
+            return Promise.resolve();
+        }
+
+        const { authToken, data } = this.account;
+        const payload: Partial<AccountData> = {};
+        let empty = true;
+
+        if(which.blacklist) {
+            payload.blacklist = data.blacklist;
+            empty = false;
+        }
+        if(which.favorite_posts) {
+            payload.favorite_posts = data.favorite_posts;
+            empty = false;
+        }
+        if(which.favorite_tags) {
+            payload.favorite_tags = data.favorite_tags;
+            empty = false;
+        }
+        if(which.search_history) {
+            payload.search_history = data.search_history;
+            empty = false;
+        }
+
+        if(empty) {
+            console.log("saveAccountData: no fields selected to save, skipping");
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            fetch("/api/account", {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    "Content-Type": "application/json"
+                } 
+            }).then(resp => {
+                if(!resp.ok) {
+                    console.error("error saving data", resp);
+                    reject();
+                    return;
+                }
+                resolve();
+            }).catch(reject);
+        });
+    },
+
+    currentPage: 1,
+    totalPostCount: 0,
+    resultsPerPage: 0,
+    hasSearched: false,
+    fetchingPosts: false,
+    justClickedSearchButton: false,
+
+    cdnHosts: null,
+
+    updateCDNHosts() {
+        fetch("/api/hosts").then(resp => {
+            resp.json().then(data => {
+                this.cdnHosts = {
+                    image: data.image,
+                    video: data.video,
+                };
+            });
+        });
+    },
+
+    toast: {
+        msg: "",
+        type: "info",
+    },
+
+    fullscreenPost: null,
+    sidebarClosed: false,
+
+    userIsSwipingToChangePage: false,
+
+    settings: {
+        autoplayVideo: true,
+        blacklist: [],
+        checkForUpdates: true,
+        closeSidebarOnSearch: true,
+        columnCount: 3,
+        columnSizing: "dynamic",
+        columnWidth: 400,
+        consented: false,
+        favorites: [],
+        favoriteTags: [],
+        fullscreenViewMenuAnchor: "bottomcenter",
+        fullscreenViewMenuRotate: false,
+        highResImages: true,
+        muteVideo: true,
+        queryHistory: [],
+        sidebarTabsHidden: false,
+        maxPostHeight: 600,
+    },
+
+    loadSettings() {
+        for (const _k in this.settings) {
+            const k = _k as keyof typeof store.settings;
+
+            let raw = localStorage.getItem(k);
+            if (raw == null) {
+                continue;
+            }
+
+            // The old settings code didn't stringify columnSizing, fix it
+            if (k === "columnSizing" && raw.length > 0 && raw[0] !== '"') {
+                raw = JSON.stringify(raw);
+                localStorage.setItem(k, raw);
+            }
+
+            let val: any;
+
+            // Ignore bad values and just use the default
+            try {
+                val = JSON.parse(raw);
+            } catch (e) {
+                console.warn("bad setting value", { k, val, e });
+                continue;
+            }
+
+            if (k === "queryHistory") {
+                type serializedHistory = {
+                    date: string;
+                    query: SerializedSearchQuery;
+                };
+
+                // Transform query history JSON
+                val = (val as serializedHistory[]).map(({ date, query }) => {
+                    const entry = {
+                        date: new Date(date),
+                        query: new SearchQuery(),
+                    };
+
+                    query.include.forEach(tag => {
+                        entry.query.includeTag(tag);
+                    });
+                    query.exclude.forEach(tag => {
+                        entry.query.excludeTag(tag);
+                    });
+
+                    return entry;
+                });
+
+                val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+            }
+
+            (this.settings as any)[k] = val;
+        }
+    },
+
+    saveSettings() {
+        Object.entries(this.settings).forEach(([k, v]) => {
+            localStorage.setItem(k, JSON.stringify(v));
+        });
+    },
+
+    query: new SearchQuery(),
+    lastQuery: new SearchQuery(),
+    lastSearchRoute: null,
+    posts: new Map<number, Post[]>(),
+    cachedTags: new Map<string, Tag>(),
+    cachedTagSearch: new Map<string, Tag[]>(),
+
+    onEditTag: new EventTarget(),
+    onPostsCleared: new EventTarget(),
+
+    editTag(tag: Tag) {
+        this.onEditTag.dispatchEvent(new CustomEvent("edit_tag", { detail: tag }));
+    },
+
+    tagsForPost(post: Post): Promise<Tag[]> {
+        return new Promise<Tag[]>((resolve, reject) => {
+            store
+                .loadTags(post.tags)
+                .then(() => resolve(post.tags.map(t => store.cachedTags.get(t)).filter(t => t != null)))
+                .catch(reject);
+        });
+    },
+
+    searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise<void> {
+        type PostListResponse = {
+            count_per_page: number;
+            total_count: number;
+            results: Post[];
+        };
+
+        return new Promise((resolve, reject) => {
+            page = page ?? this.currentPage;
+            const sameQuery = this.query.equals(this.lastQuery);
+
+            // Don't refetch posts we already have
+            if (!force && sameQuery && this.posts.has(page)) {
+                this.fetchingPosts = false;
+                this.currentPage = page;
+                resolve();
+                return;
+            }
+
+            const searchTags = this.query.asList().concat(this.settings.blacklist.map(t => `-${t.name}`));
+
+            const queryParams = new URLSearchParams();
+            queryParams.append("page", page.toString());
+
+            for (const t of searchTags) {
+                queryParams.append("q", t);
+            }
+
+            this.fetchingPosts = true;
+
+            fetch(`/api/posts?${queryParams.toString()}`)
+                .then(resp => {
+                    if (resp.status >= 400) {
+                        resp.json()
+                            .then(val => {
+                                let msg = "Something went wrong";
+
+                                if ("error" in val) {
+                                    msg = val.error;
+                                }
+
+                                store.toast = {
+                                    msg,
+                                    type: "error",
+                                };
+
+                                reject();
+                            })
+                            .catch(() => {
+                                store.toast = {
+                                    msg: "Something went wrong",
+                                    type: "error",
+                                };
+                                reject();
+                            })
+                            .finally(() => {
+                                store.hasSearched = true;
+                            });
+                        return;
+                    }
+
+                    resp.json().then((json: PostListResponse) => {
+                        if (!sameQuery) {
+                            this.posts.clear();
+                        }
+
+                        this.posts.set(page!, json.results);
+                        this.resultsPerPage = json.count_per_page;
+                        this.totalPostCount = json.total_count;
+                        this.currentPage = page!;
+
+                        if (this.settings.closeSidebarOnSearch) {
+                            this.sidebarClosed = true;
+                        }
+
+                        this.addQueryToHistory();
+                        this.lastQuery = this.query.copy();
+
+                        resolve();
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    store.toast = {
+                        msg: "Something went wrong",
+                        type: "error",
+                    };
+                    reject(err);
+                })
+                .finally(() => {
+                    this.fetchingPosts = false;
+                    store.hasSearched = true;
+                });
+        });
+    },
+
+    maxPage(): number {
+        return Math.ceil(this.totalPostCount / this.resultsPerPage);
+    },
+
+    loadTags(tags: string[]): Promise<void> {
+        type TagResponse = {
+            results: Tag[];
+        };
+
+        const maxTagsPerRequest = 100;
+
+        // Fetch tags in parallel if there are too many for one request
+        if (tags.length > maxTagsPerRequest) {
+            let requests: Promise<void>[] = [];
+
+            for (let i = 0; i < tags.length; i += maxTagsPerRequest) {
+                const start = i;
+                const end = i + maxTagsPerRequest;
+                requests = requests.concat(this.loadTags(tags.slice(start, end)));
+            }
+
+            return new Promise((resolve, reject) => Promise.all(requests)
+                .then(() => resolve())
+                .catch(() => reject())
+            );
+        }
+
+        return new Promise((resolve, reject) => {
+            const missing = tags.filter(t => !this.cachedTags.has(t));
+
+            if (missing.length === 0) {
+                resolve();
+                return;
+            }
+
+            const queryParams = new URLSearchParams();
+
+            for (const t of missing) {
+                queryParams.append("t", t);
+            }
+
+            fetch(`/api/tags?${queryParams.toString()}`)
+                .then(resp => {
+                    resp.json().then((json: TagResponse) => {
+                        json.results.forEach(t => {
+                            this.cachedTags.set(t.name, t);
+                        });
+                        resolve();
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    reject();
+                });
+        });
+    },
+
+    postsForCurrentPage(): Post[] | undefined {
+        return this.posts.get(this.currentPage);
+    },
+
+    nextPage(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this.currentPage >= this.maxPage()) {
+                return reject();
+            }
+
+            router
+                .push({
+                    name: "search",
+                    params: {
+                        page: store.currentPage + 1,
+                        query: store.query.asQueryParams(),
+                    },
+                })
+                .then(() => resolve())
+                .catch(() => reject());
+        });
+    },
+
+    prevPage(): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            if (this.currentPage <= 1) {
+                return reject();
+            }
+
+            router
+                .push({
+                    name: "search",
+                    params: {
+                        page: store.currentPage - 1,
+                        query: store.query.asQueryParams(),
+                    },
+                })
+                .then(() => resolve())
+                .catch(() => reject());
+        });
+    },
+
+    addQueryToHistory() {
+        if (this.query.isEmpty() || this.query.equals(this.lastQuery)) {
+            return;
+        }
+
+        let entry: SearchHistory | null = null;
+
+        // To avoid cluttering the search history, reuse an existing entry
+        // if it exists with the same query
+        for (let i = 0; i < this.settings.queryHistory.length; i++) {
+            const ithEntry = this.settings.queryHistory[i];
+
+            if (!this.query.equals(ithEntry.query)) {
+                continue;
+            }
+
+            entry = ithEntry;
+            entry.date = new Date();
+
+            // Remove the entry from the list, it will be re-added to the front
+            this.settings.queryHistory.splice(i, 1);
+            break;
+        }
+
+        if (entry === null) {
+            entry = reactive({
+                date: new Date(),
+                query: this.query.copy(),
+            });
+        }
+
+        // Newest entries are added to the front of the list
+        this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
+        this.saveSettings();
+    },
+
+    clearPosts() {
+        this.posts.clear();
+        this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
+    },
+
+    getTag(name: string): Tag | undefined {
+        if (name.startsWith("-")) {
+            name = name.slice(1);
+        }
+        return this.cachedTags.get(name);
 	},
 
-	currentPage: 1,
-	totalPostCount: 0,
-	resultsPerPage: 0,
-	hasSearched: false,
-	fetchingPosts: false,
-	justClickedSearchButton: false,
-
-	cdnHosts: null,
-
-	updateCDNHosts() {
-		fetch("/api/hosts").then(resp => {
-			resp.json().then(data => {
-				this.cdnHosts = {
-					image: data.image,
-					video: data.video,
-				};
-			});
-		});
-	},
-
-	toast: {
-		msg: "",
-		type: "info",
-	},
-
-	fullscreenPost: null,
-	sidebarClosed: false,
-
-	userIsSwipingToChangePage: false,
-
-	settings: {
-		autoplayVideo: true,
-		blacklist: [],
-		checkForUpdates: true,
-		closeSidebarOnSearch: true,
-		columnCount: 3,
-		columnSizing: "dynamic",
-		columnWidth: 400,
-		consented: false,
-		favorites: [],
-		favoriteTags: [],
-		fullscreenViewMenuAnchor: "bottomcenter",
-		fullscreenViewMenuRotate: false,
-		highResImages: true,
-		muteVideo: true,
-		queryHistory: [],
-		sidebarTabsHidden: false,
-		maxPostHeight: 600,
-	},
-
-	loadSettings() {
-		for (const _k in this.settings) {
-			const k = _k as keyof typeof store.settings;
-
-			let raw = localStorage.getItem(k);
-			if (raw == null) {
-				continue;
-			}
-
-			// The old settings code didn't stringify columnSizing, fix it
-			if (k === "columnSizing" && raw.length > 0 && raw[0] !== '"') {
-				raw = JSON.stringify(raw);
-				localStorage.setItem(k, raw);
-			}
-
-			let val: any;
-
-			// Ignore bad values and just use the default
-			try {
-				val = JSON.parse(raw);
-			} catch (e) {
-				console.warn("bad setting value", { k, val, e });
-				continue;
-			}
-
-			if (k === "queryHistory") {
-				type serializedHistory = {
-					date: string;
-					query: SerializedSearchQuery;
-				};
-
-				// Transform query history JSON
-				val = (val as serializedHistory[]).map(({ date, query }) => {
-					const entry = {
-						date: new Date(date),
-						query: new SearchQuery(),
-					};
-
-					query.include.forEach(tag => {
-						entry.query.includeTag(tag);
-					});
-					query.exclude.forEach(tag => {
-						entry.query.excludeTag(tag);
-					});
-
-					return entry;
-				});
-
-				val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
-			}
-
-			(this.settings as any)[k] = val;
+	favoritePosts(): Post[] {
+		if (this.account !== null) {
+			return this.account.data.favorite_posts;
 		}
+		return this.settings.favorites;
 	},
 
-	saveSettings() {
-		Object.entries(this.settings).forEach(([k, v]) => {
-			localStorage.setItem(k, JSON.stringify(v));
-		});
-	},
+    setFavoritePosts(posts: Post[]): Promise<void> {
+        if(this.account !== null) {
+            this.account.data.favorite_posts = posts;
+            return this.saveAccountData({favorite_posts: true});
+        } 
 
-	query: new SearchQuery(),
-	lastQuery: new SearchQuery(),
-	lastSearchRoute: null,
-	posts: new Map<number, Post[]>(),
-	cachedTags: new Map<string, Tag>(),
-	cachedTagSearch: new Map<string, Tag[]>(),
+        this.settings.favorites = posts;
+        this.saveSettings();
+        return Promise.resolve();
+    },
 
-	onEditTag: new EventTarget(),
-	onPostsCleared: new EventTarget(),
+    favoriteTags(): Tag[] {
+        if (this.account !== null) {
+            return this.account.data.favorite_tags;
+        }
+        return this.settings.favoriteTags;
 
-	editTag(tag: Tag) {
-		this.onEditTag.dispatchEvent(new CustomEvent("edit_tag", { detail: tag }));
-	},
+    },
 
-	tagsForPost(post: Post): Promise<Tag[]> {
-		return new Promise<Tag[]>((resolve, reject) => {
-			store
-				.loadTags(post.tags)
-				.then(() => resolve(post.tags.map(t => store.cachedTags.get(t)).filter(t => t != null)))
-				.catch(reject);
-		});
-	},
+    setFavoriteTags(tags: Tag[]): Promise<void> {
+        if(this.account !== null) {
+            this.account.data.favorite_tags = tags;
+            return this.saveAccountData({favorite_tags: true});
+        } 
 
-	searchPosts({ page, force }: { page?: number; force?: boolean }): Promise<void> {
-		type PostListResponse = {
-			count_per_page: number;
-			total_count: number;
-			results: Post[];
-		};
+        this.settings.favoriteTags = tags;
+        this.saveSettings();
+        return Promise.resolve();
+    },
 
-		return new Promise((resolve, reject) => {
-			page = page ?? this.currentPage;
-			const sameQuery = this.query.equals(this.lastQuery);
+    blacklist(): Tag[] {
+        if (this.account !== null) {
+            return this.account.data.blacklist;
+        }
+        return this.settings.blacklist;
+    },
 
-			// Don't refetch posts we already have
-			if (!force && sameQuery && this.posts.has(page)) {
-				this.fetchingPosts = false;
-				this.currentPage = page;
-				resolve();
-				return;
-			}
+    setBlacklist(tags: Tag[]): Promise<void> {
+        if(this.account !== null) {
+            this.account.data.blacklist = tags;
+            return this.saveAccountData({blacklist: true});
+        }
 
-			const searchTags = this.query.asList().concat(this.settings.blacklist.map(t => `-${t.name}`));
+        this.settings.blacklist = tags;
+        this.saveSettings();
+        return Promise.resolve();
+    },
 
-			const queryParams = new URLSearchParams();
-			queryParams.append("page", page.toString());
+    searchHistory(): SearchHistory[] {
+        if (this.account !== null) {
+            return this.account.data.search_history;
+        }
+        return this.settings.queryHistory;
 
-			for (const t of searchTags) {
-				queryParams.append("q", t);
-			}
+    },
 
-			this.fetchingPosts = true;
+    setSearchhistory(history: SearchHistory[]): Promise<void> {
+        if(this.account !== null) {
+            this.account.data.search_history = history;
+            return this.saveAccountData({search_history: true});
+        }
 
-			fetch(`/api/posts?${queryParams.toString()}`)
-				.then(resp => {
-					if (resp.status >= 400) {
-						resp.json()
-							.then(val => {
-								let msg = "Something went wrong";
-
-								if ("error" in val) {
-									msg = val.error;
-								}
-
-								store.toast = {
-									msg,
-									type: "error",
-								};
-
-								reject();
-							})
-							.catch(() => {
-								store.toast = {
-									msg: "Something went wrong",
-									type: "error",
-								};
-								reject();
-							})
-							.finally(() => {
-								store.hasSearched = true;
-							});
-						return;
-					}
-
-					resp.json().then((json: PostListResponse) => {
-						if (!sameQuery) {
-							this.posts.clear();
-						}
-
-						this.posts.set(page!, json.results);
-						this.resultsPerPage = json.count_per_page;
-						this.totalPostCount = json.total_count;
-						this.currentPage = page!;
-
-						if (this.settings.closeSidebarOnSearch) {
-							this.sidebarClosed = true;
-						}
-
-						this.addQueryToHistory();
-						this.lastQuery = this.query.copy();
-
-						resolve();
-					});
-				})
-				.catch(err => {
-					console.error(err);
-					store.toast = {
-						msg: "Something went wrong",
-						type: "error",
-					};
-					reject(err);
-				})
-				.finally(() => {
-					this.fetchingPosts = false;
-					store.hasSearched = true;
-				});
-		});
-	},
-
-	maxPage(): number {
-		return Math.ceil(this.totalPostCount / this.resultsPerPage);
-	},
-
-	loadTags(tags: string[]): Promise<void> {
-		type TagResponse = {
-			results: Tag[];
-		};
-
-		const maxTagsPerRequest = 100;
-
-		// Fetch tags in parallel if there are too many for one request
-		if (tags.length > maxTagsPerRequest) {
-			let requests: Promise<void>[] = [];
-
-			for (let i = 0; i < tags.length; i += maxTagsPerRequest) {
-				const start = i;
-				const end = i + maxTagsPerRequest;
-				requests = requests.concat(this.loadTags(tags.slice(start, end)));
-			}
-
-			return new Promise((resolve, reject) =>
-				Promise.all(requests)
-					.then(() => resolve())
-					.catch(() => reject()),
-			);
-		}
-
-		return new Promise((resolve, reject) => {
-			const missing = tags.filter(t => !this.cachedTags.has(t));
-
-			if (missing.length === 0) {
-				resolve();
-				return;
-			}
-
-			const queryParams = new URLSearchParams();
-
-			for (const t of missing) {
-				queryParams.append("t", t);
-			}
-
-			fetch(`/api/tags?${queryParams.toString()}`)
-				.then(resp => {
-					resp.json().then((json: TagResponse) => {
-						json.results.forEach(t => {
-							this.cachedTags.set(t.name, t);
-						});
-						resolve();
-					});
-				})
-				.catch(err => {
-					console.error(err);
-					reject();
-				});
-		});
-	},
-
-	postsForCurrentPage(): Post[] | undefined {
-		return this.posts.get(this.currentPage);
-	},
-
-	nextPage(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			if (this.currentPage >= this.maxPage()) {
-				return reject();
-			}
-
-			router
-				.push({
-					name: "search",
-					params: {
-						page: store.currentPage + 1,
-						query: store.query.asQueryParams(),
-					},
-				})
-				.then(() => resolve())
-				.catch(() => reject());
-		});
-	},
-
-	prevPage(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			if (this.currentPage <= 1) {
-				return reject();
-			}
-
-			router
-				.push({
-					name: "search",
-					params: {
-						page: store.currentPage - 1,
-						query: store.query.asQueryParams(),
-					},
-				})
-				.then(() => resolve())
-				.catch(() => reject());
-		});
-	},
-
-	addQueryToHistory() {
-		if (this.query.isEmpty() || this.query.equals(this.lastQuery)) {
-			return;
-		}
-
-		let entry: SearchHistory | null = null;
-
-		// To avoid cluttering the search history, reuse an existing entry
-		// if it exists with the same query
-		for (let i = 0; i < this.settings.queryHistory.length; i++) {
-			const ithEntry = this.settings.queryHistory[i];
-
-			if (!this.query.equals(ithEntry.query)) {
-				continue;
-			}
-
-			entry = ithEntry;
-			entry.date = new Date();
-
-			// Remove the entry from the list, it will be re-added to the front
-			this.settings.queryHistory.splice(i, 1);
-			break;
-		}
-
-		if (entry === null) {
-			entry = reactive({
-				date: new Date(),
-				query: this.query.copy(),
-			});
-		}
-
-		// Newest entries are added to the front of the list
-		this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
-		this.saveSettings();
-	},
-
-	clearPosts() {
-		this.posts.clear();
-		this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
-	},
-
-	getTag(name: string): Tag | undefined {
-		if (name.startsWith("-")) {
-			name = name.slice(1);
-		}
-		return this.cachedTags.get(name);
-	},
+        this.settings.queryHistory = history;
+        this.saveSettings();
+        return Promise.resolve();
+    }
 });
 
 export default store;

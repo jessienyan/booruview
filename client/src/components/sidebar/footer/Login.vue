@@ -29,7 +29,7 @@ async function onSubmit() {
             authToken: data.auth_token,
             username: data.username,
         };
-        store.saveAccount();
+        store.saveAccountCredentials();
         store.toast = {
             msg: "Logged in successfully",
             type: "info",

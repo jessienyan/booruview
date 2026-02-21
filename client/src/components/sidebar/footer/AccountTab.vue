@@ -10,7 +10,7 @@ const showRegisterForm = ref(false);
 
 function logout() {
     store.account = null;
-    store.saveAccount();
+    store.saveAccountCredentials();
     store.toast = {
         msg: "You have been logged out",
         type: "info",
