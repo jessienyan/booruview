@@ -340,6 +340,7 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 
     .text-input {
         flex: 1;
+        background-color: #252525 !important;
     }
 
     .remove-border {
