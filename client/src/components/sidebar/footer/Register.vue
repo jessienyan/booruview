@@ -49,6 +49,12 @@ async function onSubmit(e: Event) {
         store.account = {
             username: username.value!,
             authToken: data.auth_token,
+            data: {
+                favorite_posts: [...store.settings.favorites],
+                favorite_tags: [...store.settings.favoriteTags],
+                blacklist: [...store.settings.blacklist],
+                search_history: [...store.settings.queryHistory],
+            },
         };
     } catch (e) {
         console.error(e);
@@ -62,25 +68,13 @@ async function onSubmit(e: Event) {
         type: "info",
     };
 
-    const saveData: AccountData = {
-        favorite_posts: store.settings.favorites,
-        favorite_tags: store.settings.favoriteTags,
-        blacklist: store.settings.blacklist,
-        search_history: store.settings.queryHistory,
-    };
-
-    try {
-        await fetch("/api/account", {
-            method: "PATCH",
-            body: JSON.stringify(saveData),
-            headers: {
-                Authorization: `Bearer ${store.account.authToken}`,
-                "Content-Type": "application/json",
-            },
-        });
-    } catch (e) {
-        console.error(e);
-    }
+    // Upload existing data
+    store.saveAccountData({
+        blacklist: true,
+        favorite_posts: true,
+        favorite_tags: true,
+        search_history: true,
+    });
 }
 </script>
 

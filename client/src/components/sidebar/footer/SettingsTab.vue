@@ -150,36 +150,34 @@ const importCode = ref("");
 const importingData = ref(false);
 
 function mergeSettings(data: Record<string, any>) {
-    Object.entries(data).forEach(([_k, v]) => {
+    const blacklist = store.blacklist().value;
+    const favPosts = store.favoritePosts().value;
+    const favTags = store.favoriteTags().value;
+
+    Object.entries(data).forEach(([_k, _v]) => {
         const k = _k as Exclude<
             keyof typeof store.settings,
             typeof ignoredSettingsForImportExport
         >;
+        let v = _v;
 
         // Remove any duplicates
         if (k === "blacklist") {
-            v = (v as Tag[]).filter(
-                (a) =>
-                    store.settings.blacklist.findIndex(
-                        (b) => a.name === b.name,
-                    ) === -1,
-            );
-            v = v.concat(store.settings.blacklist);
+            v = (v as Tag[])
+                .filter(
+                    (a) => blacklist.findIndex((b) => a.name === b.name) === -1,
+                )
+                .concat(blacklist);
         } else if (k === "favorites") {
-            v = (v as Post[]).filter(
-                (a) =>
-                    store.settings.favorites.findIndex((b) => a.id === b.id) ===
-                    -1,
-            );
-            v = v.concat(store.settings.favorites);
+            v = (v as Post[])
+                .filter((a) => favPosts.findIndex((b) => a.id === b.id) === -1)
+                .concat(favPosts);
         } else if (k === "favoriteTags") {
-            v = (v as Tag[]).filter(
-                (a) =>
-                    store.settings.favoriteTags.findIndex(
-                        (b) => a.name === b.name,
-                    ) === -1,
-            );
-            v = v.concat(store.settings.favoriteTags);
+            v = (v as Tag[])
+                .filter(
+                    (a) => favTags.findIndex((b) => a.name === b.name) === -1,
+                )
+                .concat(favTags);
         }
 
         (store.settings as any)[k] = v;

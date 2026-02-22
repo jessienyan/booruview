@@ -20,8 +20,9 @@ const {
 }>();
 
 const isVideo = useIsVideo(() => post);
+const favPosts = store.favoritePosts();
 const favorited = computed(
-    () => store.settings.favorites.findIndex((p) => p.id === post.id) !== -1,
+    () => favPosts.value.findIndex((p) => p.id === post.id) !== -1,
 );
 
 const content = computed<{ url: string; width: number; height: number }>(() => {

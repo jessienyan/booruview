@@ -382,7 +382,7 @@ const store = reactive<Store>({
                 return;
             }
 
-            const searchTags = this.query.asList().concat(this.settings.blacklist.map(t => `-${t.name}`));
+            const searchTags = this.query.asList().concat(this.blacklist().value.map(t => `-${t.name}`));
 
             const queryParams = new URLSearchParams();
             queryParams.append("page", page.toString());
@@ -563,35 +563,21 @@ const store = reactive<Store>({
             return;
         }
 
-        let entry: SearchHistory | null = null;
+        const history = [...this.searchHistory().value];
+        const existing = history.findIndex(h => h.query.equals(this.query));
 
-        // To avoid cluttering the search history, reuse an existing entry
-        // if it exists with the same query
-        for (let i = 0; i < this.settings.queryHistory.length; i++) {
-            const ithEntry = this.settings.queryHistory[i];
-
-            if (!this.query.equals(ithEntry.query)) {
-                continue;
-            }
-
-            entry = ithEntry;
-            entry.date = new Date();
-
-            // Remove the entry from the list, it will be re-added to the front
-            this.settings.queryHistory.splice(i, 1);
-            break;
+        // If there is an existing entry with the same query, delete it. This will appear as though
+        // the entry was reused and moved
+        if(existing !== -1) {
+            history.splice(existing, 1)[0];
         }
 
-        if (entry === null) {
-            entry = reactive({
-                date: new Date(),
-                query: this.query.copy(),
-            });
+        const entry = {
+            date: new Date(),
+            query: this.query.copy(),
         }
 
-        // Newest entries are added to the front of the list
-        this.settings.queryHistory = [entry].concat(this.settings.queryHistory);
-        this.saveSettings();
+        this.setSearchhistory([entry].concat(history));
     },
 
     clearPosts() {

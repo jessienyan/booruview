@@ -50,14 +50,14 @@ useDismiss([containerRef.value], () => {
     showSuggestions.value = false;
 });
 
+const blacklist = store.blacklist();
 function setSuggestions(tags: Tag[]) {
     // Filter out blacklist/already in search
     suggestions.value = tags.filter(
         (t) =>
             !store.query.isIncluded(t.name) &&
             !store.query.isExcluded(t.name) &&
-            store.settings.blacklist.findIndex((bl) => t.name === bl.name) ===
-                -1,
+            blacklist.value.findIndex((bl) => t.name === bl.name) === -1,
     );
 }
 
