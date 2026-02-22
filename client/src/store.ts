@@ -35,6 +35,7 @@ type Store = {
 		username: string;
 		data: AccountData;
 	} | null;
+    login(username: string, password: string): Promise<void>;
 	saveAccountCredentials(): void;
     saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void>;
 
@@ -125,6 +126,54 @@ type Store = {
 
 const store = reactive<Store>({
     account: JSON.parse(localStorage.getItem("account") || "null"),
+
+    login(username: string, password: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            fetch("/api/login", {
+                method: "POST",
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+                headers: { "Content-Type": "application/json" },
+            }).then(resp => {
+                return resp.json();
+            }).then(data => {
+                if (data.error) {
+                    store.toast = {
+                        msg: data.error,
+                        type: "error",
+                    };
+                    resolve();
+                    return;
+                }
+
+                store.account = {
+                    authToken: data.auth_token,
+                    username: data.username,
+                    data: {
+                        blacklist: [],
+                        favorite_posts: [],
+                        search_history: [],
+                        favorite_tags: [],
+                    }
+                };
+                store.saveAccountCredentials();
+                store.toast = {
+                    msg: "Logged in successfully",
+                    type: "info",
+                };
+                resolve();
+            }).catch(err => {
+                console.error(err);
+                store.toast = {
+                    msg: "Something went wrong :(",
+                    type: "error",
+                };
+                reject(err);
+            });
+        });
+    },
 
     saveAccountCredentials() {
         localStorage.setItem("account", JSON.stringify(this.account));

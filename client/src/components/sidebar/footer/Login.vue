@@ -5,42 +5,8 @@ import store from "@/store";
 const username = ref("");
 const password = ref("");
 
-async function onSubmit() {
-    try {
-        const resp = await fetch("/api/login", {
-            method: "POST",
-            body: JSON.stringify({
-                username: username.value,
-                password: password.value,
-            }),
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await resp.json();
-        if (data.error) {
-            store.toast = {
-                msg: data.error,
-                type: "error",
-            };
-            return;
-        }
-
-        store.account = {
-            authToken: data.auth_token,
-            username: data.username,
-        };
-        store.saveAccountCredentials();
-        store.toast = {
-            msg: "Logged in successfully",
-            type: "info",
-        };
-    } catch (e) {
-        console.error(e);
-        store.toast = {
-            msg: "Something went wrong :(",
-            type: "error",
-        };
-    }
+function onSubmit() {
+    store.login(username.value, password.value);
 }
 </script>
 
