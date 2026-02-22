@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import store from "@/store";
 
 const showDeleteConfirm = ref(false);
 const usernameConfirm = ref("");
+const shouldBackupData = ref<"yes" | "no" | "">("");
+
+// Reset form when it's closed
+watch([showDeleteConfirm], () => {
+    if (!showDeleteConfirm.value) {
+        usernameConfirm.value = "";
+        shouldBackupData.value = "";
+    }
+});
 
 const canDelete = computed(
     () => store.account && store.account.username === usernameConfirm.value,
@@ -56,22 +65,29 @@ async function doDelete() {
             Delete Account
         </button>
         <div v-if="showDeleteConfirm" class="confirm-delete">
-            <p>Deleting your account is PERMANENT.</p>
+            <h3>Deleting your account is PERMANENT</h3>
             <p>
-                You'll keep your current favorites and settings, but you won't
-                be able to login and access them on other devices.
+                Do you want to download your data and save it locally in your
+                browser?
+                <select class="input-block" v-model="shouldBackupData">
+                    <option value="yes">
+                        Yes, save a copy of my data (recommended)
+                    </option>
+                    <option value="no">No, I don't want to keep my data</option>
+                </select>
             </p>
             <p>
                 To continue, enter your username:
-                {{ store.account.username }}
-            </p>
-            <p>
+                <code>{{ store.account.username }}</code>
                 <input
                     v-model="usernameConfirm"
                     class="text-input input-block rounded"
                     type="text"
                     placeholder="confirm username"
-                /><button
+                />
+            </p>
+            <p>
+                <button
                     class="btn-danger btn-rounded btn-block"
                     @click="doDelete"
                     :disabled="!canDelete"
@@ -96,5 +112,19 @@ async function doDelete() {
 .confirm-delete {
     background-color: $color-darkgray;
     padding: 0.1px 1em;
+
+    p {
+        margin: 1.5em 0;
+
+        &:last-child {
+            margin-bottom: inherit;
+        }
+    }
+}
+
+h3 {
+    text-align: center;
+    margin: 1em 0;
+    color: #c00;
 }
 </style>
