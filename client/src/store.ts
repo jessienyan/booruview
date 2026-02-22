@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { type ComputedRef, computed, reactive } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
 import { SearchQuery, type SerializedSearchQuery } from "./search";
@@ -168,7 +168,7 @@ const store = reactive<Store>({
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                     "Content-Type": "application/json"
-                } 
+                }
             }).then(resp => {
                 if(!resp.ok) {
                     console.error("error saving data", resp);
@@ -557,48 +557,53 @@ const store = reactive<Store>({
         return this.cachedTags.get(name);
 	},
 
-	favoritePosts(): Post[] {
+	favoritePosts(): ComputedRef<Post[]> {
+        return computed(() => {
 		if (this.account !== null) {
 			return this.account.data.favorite_posts;
 		}
 		return this.settings.favorites;
+        })
 	},
 
     setFavoritePosts(posts: Post[]): Promise<void> {
         if(this.account !== null) {
             this.account.data.favorite_posts = posts;
             return this.saveAccountData({favorite_posts: true});
-        } 
+        }
 
         this.settings.favorites = posts;
         this.saveSettings();
         return Promise.resolve();
     },
 
-    favoriteTags(): Tag[] {
+    favoriteTags(): ComputedRef<Tag[]> {
+        return computed(() => {
         if (this.account !== null) {
             return this.account.data.favorite_tags;
         }
         return this.settings.favoriteTags;
-
+        });
     },
 
     setFavoriteTags(tags: Tag[]): Promise<void> {
         if(this.account !== null) {
             this.account.data.favorite_tags = tags;
             return this.saveAccountData({favorite_tags: true});
-        } 
+        }
 
         this.settings.favoriteTags = tags;
         this.saveSettings();
         return Promise.resolve();
     },
 
-    blacklist(): Tag[] {
+    blacklist(): ComputedRef<Tag[]> {
+        return computed(() => {
         if (this.account !== null) {
             return this.account.data.blacklist;
         }
         return this.settings.blacklist;
+        });
     },
 
     setBlacklist(tags: Tag[]): Promise<void> {
@@ -612,12 +617,13 @@ const store = reactive<Store>({
         return Promise.resolve();
     },
 
-    searchHistory(): SearchHistory[] {
+    searchHistory(): ComputedRef<SearchHistory[]> {
+        return computed(() => {
         if (this.account !== null) {
             return this.account.data.search_history;
         }
         return this.settings.queryHistory;
-
+        });
     },
 
     setSearchhistory(history: SearchHistory[]): Promise<void> {
