@@ -110,16 +110,16 @@ type Store = {
 	clearPosts(): void;
 	getTag(name: string): Tag | undefined;
 
-	favoritePosts(): Post[];
+	favoritePosts(): ComputedRef<Post[]>;
 	setFavoritePosts(posts: Post[]): Promise<void>;
 
-	favoriteTags(): Tag[];
+	favoriteTags(): ComputedRef<Tag[]>;
 	setFavoriteTags(tags: Tag[]): Promise<void>;
 
-	blacklist(): Tag[];
+	blacklist(): ComputedRef<Tag[]>;
 	setBlacklist(tags: Tag[]): Promise<void>;
 
-	searchHistory(): SearchHistory[];
+	searchHistory(): ComputedRef<SearchHistory[]>;
 	setSearchhistory(history: SearchHistory[]): Promise<void>;
 };
 
