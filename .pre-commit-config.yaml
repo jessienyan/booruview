@@ -5,5 +5,5 @@ repos:
             name: yarn format
             language: system
             pass_filenames: false
-            entry: sh -c "cd client && yarn format"
+            entry: sh -c "cd client && yarn format && git add -A"
             files: ^client/
