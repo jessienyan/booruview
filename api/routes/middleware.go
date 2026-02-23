@@ -80,9 +80,12 @@ func LoadUserMiddleware(next http.Handler) http.Handler {
 			db := models.New(api.UserDB())
 			user, err := db.GetUserByID(req.Context(), userID)
 			if err != nil {
-				if err != sql.ErrNoRows {
-					respondWithInternalError(w, err)
+				if err == sql.ErrNoRows {
+					log.Info().Int64("userid", userID).Msg("user tried to login but account doesn't exist, probably deleted")
+					respondWithUnauthorized(w)
+					return
 				}
+				respondWithInternalError(w, err)
 				return
 			}
 
