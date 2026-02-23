@@ -21,7 +21,7 @@ type LoginParams struct {
 
 type LoginResponse struct {
 	AuthToken string `json:"auth_token"`
-	Username string `json:"username"`
+	Username  string `json:"username"`
 }
 
 // Login to an account and receive an auth token

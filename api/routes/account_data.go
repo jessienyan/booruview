@@ -131,7 +131,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		var form deleteRequest
 		if err := json.Unmarshal(body, &form); err != nil {
 			log.Err(err).Msg("failed to parse form")
-			respondWithBadRequest(w, "failed to parse json: " + err.Error())
+			respondWithBadRequest(w, "failed to parse json: "+err.Error())
 			return
 		}
 
