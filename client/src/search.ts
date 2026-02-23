@@ -99,11 +99,7 @@ export class SearchQuery {
 	}
 }
 
-export function tagsToSearchQuery(tagNames: string | string[]): Promise<SearchQuery> {
-	if (typeof tagNames === "string") {
-		tagNames = tagNames.split(",");
-	}
-
+export function tagsToSearchQuery(tagNames: string[]): Promise<SearchQuery> {
 	return new Promise<SearchQuery>((resolve, reject) => {
 		store
 			.loadTags(tagNames)
