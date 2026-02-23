@@ -99,6 +99,10 @@ func httpGetJson[T any](params url.Values, dst T) error {
 		return transformTimeoutError(err)
 	}
 
+	if len(body) == 0 {
+		return errors.Wrap(GelbooruError{Code: resp.StatusCode}, "empty response body, expected JSON")
+	}
+
 	if err := json.Unmarshal(body, &dst); err != nil {
 		err = errors.Wrap(err, "failed to parse json")
 		log.Err(err).Msg("")
