@@ -38,6 +38,7 @@ type Store = {
     login(username: string, password: string): Promise<void>;
 	saveAccountCredentials(): void;
     saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void>;
+    fetchAccountData(): Promise<void>;
 
 	currentPage: number;
 	totalPostCount: number;
@@ -226,6 +227,73 @@ const store = reactive<Store>({
                 }
                 resolve();
             }).catch(reject);
+        });
+    },
+
+    fetchAccountData(): Promise<void> {
+        if(!this.account) {
+            return Promise.reject();
+        }
+
+        const { authToken } = this.account;
+
+        return new Promise((resolve, reject) => {
+            fetch("/api/account", {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authToken}`
+                }
+            }).then(resp => {
+                // Token may have expired or account was deleted.
+                if(resp.status === 401) {
+                    this.account = null;
+                    this.toast = {
+                        msg: "Please login again",
+                        type: "error"
+                    }
+                    reject();
+                    return;
+                }
+
+                if(!resp.ok) {
+                    console.error("error fetching account data", resp);
+                    reject();
+                    return;
+                }
+
+                type accountResponse = {
+                    username: string;
+                    data: {
+                        favorite_posts: Post[];
+                        favorite_tags: Tag[];
+                        blacklist: Tag[];
+                        search_history: {
+                            created_at: string;
+                            tags: string[];
+                        }[]
+                    };
+                }
+
+                resp.json().then(({ username, data }: accountResponse) => {
+                    // Shouldn't happen
+                    if(!this.account) {
+                        return;
+                    }
+
+                    this.account.username = username;
+                    this.account.data = {
+                        favorite_posts: data.favorite_posts,
+                        favorite_tags: data.favorite_tags,
+                        blacklist: data.blacklist,
+                        search_history: data.search_history.map(entry => {
+// TODO
+                        })
+                    };
+                });
+            }).catch(err => {
+                console.error(err);
+                reject();
+            });
         });
     },
 
