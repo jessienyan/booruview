@@ -19,12 +19,12 @@ repos:
         name: Tidy go.mod
         language: system
         pass_filenames: false
-        entry: sh -c "cd api && go mod tidy"
+        entry: sh -c "cd api && go mod tidy && git add -A"
         files: go\.(mod|sum)$
 
       - id: sqlc-generate
         name: Generate go models from sql
-        entry: sh -c "cd api && sqlc generate"
+        entry: sh -c "cd api && sqlc generate && git add -A"
         language: system
         pass_filenames: false
         files: \.sql$
