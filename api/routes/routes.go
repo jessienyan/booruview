@@ -9,7 +9,7 @@ import (
 
 func NewRouter() *mux.Router {
 	r := mux.NewRouter()
-	r.Use(RecoverMiddleware, LoadUserMiddleware)
+	r.Use(RecoverMiddleware)
 	r.HandleFunc("/tags", TagsHandler)
 	r.HandleFunc("/tagsearch", TagSearchHandler)
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
@@ -25,7 +25,7 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 
 	authRouter := r.NewRoute().Subrouter()
-	authRouter.Use(LoadUserMiddleware)
+	authRouter.Use(MaybeAuthMiddleware)
 	authRouter.HandleFunc("/account", AccountHandler).Methods("GET", "PATCH", "DELETE")
 	authRouter.HandleFunc("/posts", PostsHandler)
 
