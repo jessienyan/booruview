@@ -57,66 +57,65 @@ func getUser(req *http.Request) *userContextValue {
 	return user.(*userContextValue)
 }
 
-// If the auth token is valid, fetches the user and adds it to the request context.
-// If the token isn't valid, it does nothing.
-func LoadUserMiddleware(next http.Handler) http.Handler {
+// If ok, fetches a user and adds them to the request context if they exist.
+// Otherwise, an error response is written.
+func loadUserIntoContext(w http.ResponseWriter, req *http.Request, userID int64) (newReq *http.Request, ok bool) {
+	db := models.New(api.UserDB())
+	user, err := db.GetUserByID(req.Context(), userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Info().Int64("userid", userID).Msg("user tried to login but account doesn't exist, probably deleted")
+			respondWithUnauthorized(w)
+			return nil, false
+		}
+		respondWithInternalError(w, err)
+		return nil, false
+	}
+
+	data, err := db.GetUserData(req.Context(), userID)
+	if err == sql.ErrNoRows {
+		var userData models.UserData
+		userData.Set(models.UserDataJSON{})
+
+		// Create user data if it's missing
+		data, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{
+			Data:   userData.Data,
+			UserID: user.ID,
+		})
+		if err != nil {
+			respondWithInternalError(w, err)
+			return nil, false
+		}
+
+		log.Info().Int64("userid", user.ID).Msg("created missing user data")
+	} else if err != nil {
+		return nil, false
+	}
+
+	req = req.WithContext(context.WithValue(req.Context(), userKey, &userContextValue{
+		User: user,
+		Data: data,
+	}))
+
+	return req, true
+}
+
+// Adds a user to the request context if a valid auth token was sent.
+// If the token is invalid, returns 401.
+// If there's no token, it skips the auth check.
+func MaybeAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		userIDFromToken := func() (int64, bool) {
-			token := req.Header.Get("Authorization")
-			token = strings.TrimPrefix(token, "Bearer ")
-			if token == "" {
-				return 0, false
-			}
-
-			userID, err := api.ParseAuthToken(token)
-			if err != nil {
-				return 0, false
-			}
-
-			return int64(userID), true
-		}
-
-		loadUserIntoContext := func(userID int64) {
-			db := models.New(api.UserDB())
-			user, err := db.GetUserByID(req.Context(), userID)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					log.Info().Int64("userid", userID).Msg("user tried to login but account doesn't exist, probably deleted")
-					respondWithUnauthorized(w)
+		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+		if token != "" {
+			if userID, err := api.ParseAuthToken(token); err != nil {
+				var ok bool
+				if req, ok = loadUserIntoContext(w, req, userID); !ok {
 					return
 				}
-				respondWithInternalError(w, err)
+			} else {
+				respondWithUnauthorized(w)
 				return
 			}
-
-			data, err := db.GetUserData(req.Context(), userID)
-			if err == sql.ErrNoRows {
-				var userData models.UserData
-				userData.Set(models.UserDataJSON{})
-
-				// Create user data if it's missing
-				data, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{
-					Data:   userData.Data,
-					UserID: user.ID,
-				})
-				if err != nil {
-					respondWithInternalError(w, err)
-					return
-				}
-
-				log.Info().Int64("userid", user.ID).Msg("created missing user data")
-			} else if err != nil {
-				return
-			}
-
-			req = req.WithContext(context.WithValue(req.Context(), userKey, &userContextValue{
-				User: user,
-				Data: data,
-			}))
-		}
-
-		if id, ok := userIDFromToken(); ok {
-			loadUserIntoContext(id)
 		}
 
 		next.ServeHTTP(w, req)
