@@ -15,10 +15,21 @@ watch([showDeleteConfirm], () => {
 });
 
 const canDelete = computed(
-    () => store.account && store.account.username === usernameConfirm.value,
+    () =>
+        store.account &&
+        store.account.username === usernameConfirm.value &&
+        shouldBackupData.value !== "",
 );
 
 async function doDelete() {
+    if (!canDelete.value) {
+        return;
+    }
+
+    if (shouldBackupData.value === "yes") {
+        // TODO
+    }
+
     try {
         const resp = await fetch("/api/account", {
             method: "DELETE",
@@ -69,7 +80,8 @@ async function doDelete() {
             <p>
                 Do you want to download your data and save it locally in your
                 browser?
-                <select class="input-block" v-model="shouldBackupData">
+                <select class="input-block" v-model="shouldBackupData" required>
+                    <option value="" disabled>Select an option</option>
                     <option value="yes">
                         Yes, save a copy of my data (recommended)
                     </option>
