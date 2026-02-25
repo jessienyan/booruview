@@ -101,21 +101,24 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, userID int64)
 }
 
 // Adds a user to the request context if a valid auth token was sent.
-// If the token is invalid, returns 401.
-// If there's no token, it skips the auth check.
-func MaybeAuthMiddleware(next http.Handler) http.Handler {
+// If the token is invalid or missing, returns 401.
+func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
-		if token != "" {
-			if userID, err := api.ParseAuthToken(token); err == nil {
-				var ok bool
-				if req, ok = loadUserIntoContext(w, req, userID); !ok {
-					return
-				}
-			} else {
-				respondWithUnauthorized(w)
+		if token == "" {
+			respondWithUnauthorized(w)
+			return
+		}
+
+		if userID, err := api.ParseAuthToken(token); err == nil {
+			var ok bool
+			if req, ok = loadUserIntoContext(w, req, userID); !ok {
+				// loadUserIntoContext sent a response already, nothing to do here
 				return
 			}
+		} else {
+			respondWithUnauthorized(w)
+			return
 		}
 
 		next.ServeHTTP(w, req)

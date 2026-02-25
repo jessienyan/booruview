@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import store, { type AccountData } from "@/store";
+import store from "@/store";
 
 const username = ref<string | null>(null);
 const password = ref<string | null>(null);

@@ -14,6 +14,7 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/tagsearch", TagSearchHandler)
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
 	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
+	r.HandleFunc("/posts", PostsHandler)
 	r.HandleFunc("/hosts", CDNHostHandler)
 	r.HandleFunc("/version", func(w http.ResponseWriter, req *http.Request) {
 		type versionResponse struct {
@@ -25,9 +26,8 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 
 	authRouter := r.NewRoute().Subrouter()
-	authRouter.Use(MaybeAuthMiddleware)
+	authRouter.Use(AuthMiddleware)
 	authRouter.HandleFunc("/account", AccountHandler).Methods("GET", "PATCH", "DELETE")
-	authRouter.HandleFunc("/posts", PostsHandler)
 
 	return r
 }

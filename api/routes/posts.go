@@ -5,13 +5,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
-	"codeberg.org/jessienyan/booruview/models"
 	"github.com/valkey-io/valkey-go"
 )
 
@@ -55,39 +53,6 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
-	}
-
-	// Update post history
-	if len(tags) > 0 {
-		user := getUser(req)
-		if user != nil {
-			data, err := user.Data.ParseJSON()
-			if err != nil {
-				respondWithInternalError(w, err)
-				return
-			}
-
-			data.SearchHistory.Add(models.SearchHistoryEntry{
-				CreatedAt: time.Now(),
-				Tags:      tags,
-			})
-
-			if err := user.Data.Set(data); err != nil {
-				respondWithInternalError(w, err)
-				return
-			}
-
-			db := models.New(api.UserDB())
-			err = db.UpdateUserData(req.Context(),
-				models.UpdateUserDataParams{
-					Data:   user.Data.Data,
-					UserID: user.User.ID,
-				})
-			if err != nil {
-				respondWithInternalError(w, err)
-				return
-			}
-		}
 	}
 
 	// Cache hit
