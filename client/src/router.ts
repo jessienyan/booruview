@@ -49,7 +49,9 @@ router.beforeEach(to => {
 		const page = parseInt(to.params.page as string, 10);
 		let query: string[];
 
-		if(!Array.isArray(to.params.query)) {
+		if(!to.params.query || to.params.query.length === 0) {
+			query = [];
+		} else if(!Array.isArray(to.params.query)) {
 			query = [to.params.query];
 		} else {
 			query = to.params.query;
