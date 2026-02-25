@@ -9,9 +9,9 @@ export class SearchQuery {
 	_include: Map<string, Tag>;
 	_exclude: Map<string, Tag>;
 
-	constructor() {
-		this._include = new Map();
-		this._exclude = new Map();
+	constructor({ include = [], exclude = [] }: { include?: Tag[], exclude?: Tag[] } = {}) {
+		this._include = new Map(include.map(t => [t.name, t]));
+		this._exclude = new Map(exclude.map(t => [t.name, t]));
 	}
 
 	includedList(): Tag[] {

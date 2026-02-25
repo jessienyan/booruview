@@ -271,28 +271,27 @@ const store = reactive<Store>({
                     blacklist: Tag[];
                     search_history: {
                         created_at: string;
-                        tags: string[];
+                        query: {
+                            include: Tag[];
+                            exclude: Tag[];
+                        }
                     }[]
                 };
             }
 
             const {username,data} = await resp.json() as accountResponse;
 
-            // Bulk fetch history tags
-            const historyTags = data.search_history.flatMap(hist => hist.tags);
-            await this.loadTags(historyTags);
-
             this.account.username = username;
             this.account.data = {
                 favorite_posts: data.favorite_posts,
                 favorite_tags: data.favorite_tags,
                 blacklist: data.blacklist,
-                search_history: await Promise.all(data.search_history.map(async hist => {
+                search_history: data.search_history.map(hist => {
                     return {
                         date: new Date(hist.created_at),
-                        query: await tagsToSearchQuery(hist.tags),
+                        query: new SearchQuery({ include: hist.query.include, exclude: hist.query.exclude })
                     }
-                }))
+                })
             };
         } catch(e) {
             console.error(e);
