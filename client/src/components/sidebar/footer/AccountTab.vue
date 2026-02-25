@@ -2,19 +2,15 @@
 import { ref } from "vue";
 import Collapsable from "@/components/Collapsable.vue";
 import store from "@/store";
-import DeleteAccount from "./DeleteAccount.vue";
-import Login from "./Login.vue";
-import Register from "./Register.vue";
+import DeleteAccount from "./account/DeleteAccount.vue";
+import Login from "./account/Login.vue";
+import Register from "./account/Register.vue";
 
 const showRegisterForm = ref(false);
 
 function logout() {
     store.account = null;
     store.saveAccountCredentials();
-    store.toast = {
-        msg: "You have been logged out",
-        type: "info",
-    };
 }
 </script>
 

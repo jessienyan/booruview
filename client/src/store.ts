@@ -161,15 +161,11 @@ const store = reactive<Store>({
                 };
                 store.saveAccountCredentials();
                 store.fetchAccountData();
-                store.toast = {
-                    msg: "Logged in successfully",
-                    type: "info",
-                };
                 resolve();
             }).catch(err => {
                 console.error(err);
                 store.toast = {
-                    msg: "Something went wrong :(",
+                    msg: "Failed to login, is there a connection problem?",
                     type: "error",
                 };
                 reject(err);
@@ -183,7 +179,6 @@ const store = reactive<Store>({
 
     saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
         if(this.account === null) {
-            console.log("saveAccountData: not logged in, skipping");
             return Promise.resolve();
         }
 
@@ -209,7 +204,6 @@ const store = reactive<Store>({
         }
 
         if(empty) {
-            console.log("saveAccountData: no fields selected to save, skipping");
             return Promise.resolve();
         }
 

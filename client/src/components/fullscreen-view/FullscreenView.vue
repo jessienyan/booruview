@@ -102,7 +102,7 @@ const tabClasses = computed(() => {
 });
 
 const tabHandler = useStationaryClick(close);
-const route = useRoute(); // TODO: refactor
+const route = useRoute();
 
 const favPosts = store.favoritePosts();
 const currentPostIndex = computed(() => {
