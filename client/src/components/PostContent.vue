@@ -53,11 +53,12 @@ const imageURL = useGelbooruImageURL(() => content.value.url);
 
 const showImage = ref(false);
 const containerRef = useTemplateRef("container");
+
+// Load images that are close to being visible
+const preloadImageViewportDistance = "1200px";
 const scrollObserver = new IntersectionObserver(onIntersectionChange, {
     root: scrollContainer,
-
-    // Preload images when they are within this distance from the bottom of the viewport
-    rootMargin: "600px 0px 600px 0px",
+    rootMargin: `${preloadImageViewportDistance} 0px ${preloadImageViewportDistance} 0px`,
 });
 
 function onIntersectionChange(entries: IntersectionObserverEntry[]) {
