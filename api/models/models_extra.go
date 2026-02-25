@@ -19,7 +19,7 @@ func (ud UserData) ParseJSON() (UserDataJSON, error) {
 }
 
 func (ud *UserData) Set(udJSON UserDataJSON) error {
-	udJSON.SearchHistory = udJSON.SearchHistory[:SearchHistoryLimit]
+	udJSON.SearchHistory = udJSON.SearchHistory[:min(len(udJSON.SearchHistory), SearchHistoryLimit)]
 	slices.SortFunc(udJSON.SearchHistory, func(a, b SearchHistoryEntry) int {
 		// Sort in descending order (newest first)
 		return b.Date.Compare(a.Date)

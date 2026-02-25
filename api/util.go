@@ -22,7 +22,7 @@ func CleanTag(tag string) string {
 
 	tag = strings.TrimSpace(tag)
 
-	if tag == "-" {
+	if tag == "" || tag == "-" {
 		return ""
 	}
 

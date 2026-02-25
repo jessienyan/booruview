@@ -12,9 +12,11 @@ const (
 )
 
 type SearchHistoryEntry struct {
-	Date    time.Time         `json:"date" validate:"required"`
-	Include []api.TagResponse `json:"include"`
-	Exclude []api.TagResponse `json:"exclude"`
+	Date  time.Time `json:"date" validate:"required"`
+	Query struct {
+		Include []api.TagResponse `json:"include" validate:"required"`
+		Exclude []api.TagResponse `json:"exclude" validate:"required"`
+	} `json:"query"`
 }
 
 type UserDataJSON struct {
