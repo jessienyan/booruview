@@ -88,6 +88,10 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 			changed = true
 			data.FavoriteTags = form.FavoriteTags
 		}
+		if form.SearchHistory != nil {
+			changed = true
+			data.SearchHistory = form.SearchHistory
+		}
 
 		if changed {
 			if err := user.Data.Set(data); err != nil {
