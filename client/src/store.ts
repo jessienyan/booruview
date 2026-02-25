@@ -215,6 +215,7 @@ const store = reactive<Store>({
 
         return new Promise((resolve, reject) => {
             fetch("/api/account", {
+                body: JSON.stringify(payload),
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${authToken}`,
