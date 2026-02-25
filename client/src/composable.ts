@@ -93,23 +93,6 @@ export function useDontShowAgain(id: string) {
 	return { show, onHide, ack };
 }
 
-interface FeatureIndicator {
-	expired: boolean;
-	show: Ref<boolean>;
-	onSeen: () => void;
-}
-
-export function useNewFeatureIndicator(id: string, until?: Date): FeatureIndicator {
-	// Feature indicator is no longer needed and will never be shown for new visitors
-	if (until && new Date() > until) {
-		const show = ref(false);
-		return { expired: true, show, onSeen: () => {} };
-	}
-
-	const { show, onHide: onSeen } = useDontShowAgain(`feat-${id}`);
-	return { expired: false, show, onSeen };
-}
-
 const now = ref(new Date());
 setInterval(() => {
 	now.value = new Date();
@@ -179,6 +162,17 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 			return url;
 		}
 
+		if(store.cdnHosts.mediaProxy) {
+			if(!url.includes(store.cdnHosts.image)) {
+				// If it's missing the media proxy host, add it. Useful for favorites that are saved
+				// with a static URL
+				return store.cdnHosts.image + url;
+			} else {
+				// The API rewrites URLs to use the proxy, so there's nothing needed here
+				return url;
+			}
+		}
+
 		const newURL = new URL(url);
 		newURL.host = store.cdnHosts.image;
 
@@ -189,10 +183,25 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 // Rewrites a video URL to use the current CDN host
 export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
-		const url = toValue(url_);
+		let url = toValue(url_);
+
+		// Fix incorrect cdn host. This logic is also in the API but it also needs to be
+		// in the frontend to handle favorites
+		url = url.replace("video-cdn3", "video-cdn4");
 
 		if (store.cdnHosts === null) {
 			return url;
+		}
+
+		if(store.cdnHosts.mediaProxy) {
+			if(!url.includes(store.cdnHosts.video)) {
+				// If it's missing the media proxy host, add it. Useful for favorites that are saved
+				// with a static URL
+				return store.cdnHosts.video + url;
+			} else {
+				// The API rewrites URLs to use the proxy, so there's nothing needed here
+				return url;
+			}
 		}
 
 		const newURL = new URL(url);

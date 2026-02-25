@@ -27,7 +27,14 @@ const content = computed(() => {
     const hasHighRes = post.image_url.length > 0;
     const hasLowRes = post.lowres_url.length > 0;
 
-    if (!hasLowRes || (hasHighRes && store.settings.highResImages)) {
+    // Avoid using high res images if the media proxy is enabled
+    const useHighRes =
+        !hasLowRes ||
+        (!store.cdnHosts?.mediaProxy &&
+            hasHighRes &&
+            store.settings.highResImages);
+
+    if (useHighRes) {
         return {
             url: post.image_url,
             height: post.height,
@@ -111,7 +118,7 @@ onActivated(() => pz?.resume());
     <img
         v-else
         ref="imgRef"
-        referrerpolicy="no-referrer"
+        referrerpolicy="same-origin"
         :src="imageURL"
         :width="content.width"
         :height="content.height"

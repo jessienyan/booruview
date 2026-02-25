@@ -100,7 +100,7 @@ onUnmounted(() => {
         <img
             v-if="showImage"
             class="content"
-            referrerpolicy="no-referrer"
+            referrerpolicy="same-origin"
             :src="imageURL"
             :width="content.width"
             :height="content.height"

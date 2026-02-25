@@ -253,6 +253,20 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		// on Gelbooru uses video-cdn4.gelbooru.com instead
 		data.ImageUrl = strings.Replace(data.ImageUrl, "video-cdn3.gelbooru.com", "video-cdn4.gelbooru.com", 1)
 
+		// Rewrite media URLs to use a proxy
+		if api.UseMediaProxy {
+			toProxyUrl := func(rawUrl string) string {
+				if rawUrl == "" {
+					return ""
+				}
+				return fmt.Sprintf("%s/?to=%s", api.MediaProxyHost, url.PathEscape(rawUrl))
+			}
+
+			data.ImageUrl = toProxyUrl(data.ImageUrl)
+			data.ThumbnailUrl = toProxyUrl(data.ThumbnailUrl)
+			data.LowResUrl = toProxyUrl(data.LowResUrl)
+		}
+
 		posts = append(posts, data)
 	}
 

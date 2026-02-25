@@ -9,6 +9,7 @@ import {
 } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
+import { mediaProxyBanner } from "@/indicators";
 import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
@@ -37,45 +38,66 @@ const hasConsented = computed(() => {
     const isCrawler = crawlers.exec(navigator.userAgent) !== null;
     return isCrawler;
 });
+
+const bannerDate = new Date("2026-02-16").toLocaleDateString();
 </script>
 
 <template>
-    <div
-        class="app"
-        :class="{
-            'sidebar-closed': store.sidebarClosed,
-            'sidebar-open': !store.sidebarClosed,
-        }"
-    >
-        <Transition>
-            <Toast
-                v-if="store.toast.msg.length > 0"
-                :kind="store.toast.type"
-                @dismiss="store.toast.msg = ''"
-                >{{ store.toast.msg }}</Toast
-            >
-        </Transition>
-        <ContentWarning v-if="!hasConsented" />
-
-        <FullscreenView
-            v-if="store.fullscreenPost !== null"
-            :post="store.fullscreenPost"
-        />
-        <Sidebar />
-        <main
-            id="scroll-container"
-            ref="main"
-            tabindex="-1"
-            :class="{
-                'prevent-pull-to-refresh': store.userIsSwipingToChangePage,
-                'hide-overflow':
-                    store.fetchingPosts || store.userIsSwipingToChangePage,
-            }"
-            @keydown.left="$route.name === 'search' && store.prevPage()"
-            @keydown.right="$route.name === 'search' && store.nextPage()"
+    <div class="app-outer">
+        <div
+            class="banner-warning"
+            v-if="hasConsented && mediaProxyBanner.show.value"
         >
-            <RouterView />
-        </main>
+            As of {{ bannerDate }}, Gelbooru blocked direct linking, so all
+            media is now proxied through <code>proxy2.booruview.com</code>. HD
+            images are temporarily disabled to save on bandwidth. Load times may
+            be slower than usual. Report any issues in the "about" tab, and
+            consider donating to help with hosting costs. Thank you ❤️
+            <a
+                href="#"
+                class="banner-close"
+                @click.prevent="mediaProxyBanner.onHide()"
+                >close</a
+            >
+        </div>
+
+        <div
+            class="app"
+            :class="{
+                'sidebar-closed': store.sidebarClosed,
+                'sidebar-open': !store.sidebarClosed,
+            }"
+        >
+            <Transition>
+                <Toast
+                    v-if="store.toast.msg.length > 0"
+                    :kind="store.toast.type"
+                    @dismiss="store.toast.msg = ''"
+                    >{{ store.toast.msg }}</Toast
+                >
+            </Transition>
+            <ContentWarning v-if="!hasConsented" />
+
+            <FullscreenView
+                v-if="store.fullscreenPost !== null"
+                :post="store.fullscreenPost"
+            />
+            <Sidebar />
+            <main
+                id="scroll-container"
+                ref="main"
+                tabindex="-1"
+                :class="{
+                    'prevent-pull-to-refresh': store.userIsSwipingToChangePage,
+                    'hide-overflow':
+                        store.fetchingPosts || store.userIsSwipingToChangePage,
+                }"
+                @keydown.left="$route.name === 'search' && store.prevPage()"
+                @keydown.right="$route.name === 'search' && store.nextPage()"
+            >
+                <RouterView />
+            </main>
+        </div>
     </div>
 </template>
 
@@ -83,11 +105,32 @@ const hasConsented = computed(() => {
 @import "@/assets/breakpoints";
 @import "@/assets/colors";
 
+.app-outer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.banner-warning {
+    background-color: #ccd666;
+    color: #111;
+    padding: 1em;
+    font-size: 1.1em;
+    line-height: 1.5em;
+
+    .banner-close {
+        font-weight: bold;
+        text-decoration: underline;
+        color: inherit;
+    }
+}
+
 .app {
     display: flex;
     flex-direction: row;
-    width: 100%;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
 
     @media (max-width: $mobile-width) {
         &.sidebar-closed {

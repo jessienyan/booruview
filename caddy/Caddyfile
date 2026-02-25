@@ -1,11 +1,5 @@
 {
-    order ja4h_header first
     order geo_ip first
-
-    servers {
-        # eu.booruview.com
-        trusted_proxies static 91.98.44.44 2a01:4f8:c012:b465::1/64
-    }
 }
 
 {$CADDY_HOST} {
@@ -39,13 +33,13 @@
     # Global headers
     # https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
     header {
-        Referrer-Policy                 "no-referrer"
+        Referrer-Policy                 "same-origin"
         X-Frame-Options                 "DENY"
         X-Content-Type-Options          "nosniff"
         Strict-Transport-Security       "max-age=2592000; includeSubDomains"
         Cross-Origin-Opener-Policy      "same-origin"
         Cross-Origin-Resource-Policy    "same-site"
-        Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' gelbooru.com *.gelbooru.com; media-src 'self' gelbooru.com *.gelbooru.com; object-src 'none'; frame-src 'none'; base-uri 'none'"
+        Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; media-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; object-src 'none'; frame-src 'none'; base-uri 'none'"
     }
 
     # Bots running on workers.dev are scanning URLs

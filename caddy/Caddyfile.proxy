@@ -1,0 +1,32 @@
+{$MEDIA_PROXY_HOST} {
+	encode
+
+	log stderr-log {
+        level ERROR
+        output stderr
+    }
+
+	map {query.to}															{proxy_upstream}	{proxy_path} {
+		~^https:\/\/(img[0-9]\.gelbooru\.com)(\/(?:images|samples)\/.+)$	"${1}"					"${2}"
+		~^https:\/\/(video-cdn[0-9]\.gelbooru\.com)(\/images\/.+)$			"${1}"					"${2}"
+		~^https:\/\/(gelbooru\.com)(\/thumbnails\/.+)$						"${1}"					"${2}"
+
+		default																""						""
+	}
+
+	@invalid_url `{proxy_upstream} == ""`
+	respond @invalid_url "Invalid URL" 400
+
+	reverse_proxy {
+		to 		{proxy_upstream}:443
+		# Adding a ? causes the querystring to be reset (so we don't pass the ?to=...)
+		rewrite {proxy_path}?
+
+		header_up Referer	https://gelbooru.com
+		header_up Host		{proxy_upstream}
+
+		transport http {
+			tls
+		}
+	}
+}

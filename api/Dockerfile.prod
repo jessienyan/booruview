@@ -12,6 +12,7 @@ COPY . .
 ARG COMMIT_HASH
 RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" -o /dist/server ./cmd/main.go
 
+
 FROM scratch
 
 COPY --from=build /dist/server .

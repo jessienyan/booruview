@@ -50,6 +50,7 @@ type Store = {
 	cdnHosts: {
 		image: string;
 		video: string;
+		mediaProxy: boolean;
 	} | null;
 
 	updateCDNHosts(): void;
@@ -311,6 +312,7 @@ const store = reactive<Store>({
                 this.cdnHosts = {
                     image: data.image,
                     video: data.video,
+					mediaProxy: data.media_proxy,
                 };
             });
         });

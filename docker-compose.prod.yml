@@ -11,7 +11,7 @@ services:
     logging: &logging
       driver: loki
       options:
-        loki-retries: 5
+        loki-retries: 2
         loki-batch-size: 400
         loki-url: http://localhost:3100/loki/api/v1/push
 
@@ -25,7 +25,6 @@ services:
       - "443:443"
     logging: *logging
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
 
