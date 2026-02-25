@@ -135,30 +135,28 @@ async function uploadData() {
         <p>
             <strong>You are signed in as {{ store.account.username }}.</strong>
         </p>
-        <button class="btn-primary btn-rounded btn-block" @click="logout">
-            Logout
-        </button>
 
-        <h3>backup data to browser</h3>
-        <p>Download your favorites/blacklist and store them in your browser.</p>
-        <button class="btn-primary btn-rounded btn-block" @click="downloadData">
-            Download Data
-        </button>
-
-        <h3>upload data to account</h3>
-        <p>
-            Upload any favorites/blacklist from your browser and add them to
-            your account.
-        </p>
         <button
             class="btn-primary btn-rounded btn-block"
             @click="uploadData"
             :disabled="isUploading"
         >
-            Upload Data
+            Upload Data <span class="bi bi-cloud-upload"></span>
         </button>
+        <p class="hint">
+            Upload data from your device and add it to your account.
+        </p>
 
-        <h3>danger zone</h3>
+        <button class="btn-primary btn-rounded btn-block" @click="downloadData">
+            Download Data <span class="bi bi-cloud-download"></span>
+        </button>
+        <p class="hint">
+            Download data from your account and add it to your device.
+        </p>
+
+        <button class="btn-primary btn-rounded btn-block" @click="logout">
+            Logout
+        </button>
         <DeleteAccount />
     </template>
 </template>
@@ -175,5 +173,9 @@ async function uploadData() {
 .change-form {
     display: block;
     text-align: center;
+}
+
+.hint {
+    color: #888;
 }
 </style>
