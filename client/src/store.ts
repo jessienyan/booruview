@@ -1,7 +1,7 @@
 import { type ComputedRef, computed, reactive } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
-import { SearchQuery, type SerializedSearchQuery, tagsToSearchQuery } from "./search";
+import { SearchQuery, type SerializedSearchQuery } from "./search";
 
 export type SearchHistory = {
 	date: Date;
