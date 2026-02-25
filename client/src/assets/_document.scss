@@ -45,12 +45,8 @@ h5 {
     }
 }
 
-p,
-ul,
-label,
-input,
-select {
-    color: #aaa;
+p {
+    line-height: 1.5em;
 }
 
 p,
@@ -67,10 +63,11 @@ li {
 }
 
 select {
-    background-color: #222;
+    background-color: #333;
     border: 1px solid #555;
-    padding: 0.4rem;
+    padding: 0.6rem;
     border-radius: 0.4rem;
+    color: #aaa;
 }
 
 .prevent-overscroll {

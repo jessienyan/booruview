@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	api "codeberg.org/jessienyan/booruview"
-	"github.com/valkey-io/valkey-go"
 	"github.com/pkg/errors"
+	"github.com/valkey-io/valkey-go"
 )
 
 const (

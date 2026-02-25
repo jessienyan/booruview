@@ -50,14 +50,14 @@ useDismiss([containerRef.value], () => {
     showSuggestions.value = false;
 });
 
+const blacklist = store.blacklist();
 function setSuggestions(tags: Tag[]) {
     // Filter out blacklist/already in search
     suggestions.value = tags.filter(
         (t) =>
             !store.query.isIncluded(t.name) &&
             !store.query.isExcluded(t.name) &&
-            store.settings.blacklist.findIndex((bl) => t.name === bl.name) ===
-                -1,
+            blacklist.value.findIndex((bl) => t.name === bl.name) === -1,
     );
 }
 
@@ -292,11 +292,11 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
         ref="container"
     >
         <!-- forceRenderKey triggers a re-render when changed -->
-        <template :key="forceRenderKey" />
+        <template :key="forceRenderKey"></template>
 
         <div class="input-container">
             <input
-                class="input remove-border"
+                class="text-input remove-border rounded-start"
                 type="text"
                 ref="input"
                 placeholder="e.g: blue sky"
@@ -333,22 +333,18 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
+@import "@/assets/form";
 
 .input-container {
     display: flex;
 
-    .input {
-        background-color: #252525;
-        border: 1px solid #555;
-        color: #ddd;
-        display: block;
-        padding-left: 0.5rem;
-        height: 40px;
+    .text-input {
         flex: 1;
+        background-color: #252525 !important;
+    }
 
-        &.remove-border {
-            border-right: 0;
-        }
+    .remove-border {
+        border-right: 0;
     }
 }
 
@@ -389,6 +385,9 @@ onUnmounted(() => store.onEditTag.removeEventListener("edit_tag", editTag));
             from {
                 rotate: 0;
             }
+
+            $spinner-size: 20px;
+
             to {
                 rotate: 360deg;
             }

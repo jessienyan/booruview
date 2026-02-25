@@ -102,8 +102,9 @@ const tabClasses = computed(() => {
 });
 
 const tabHandler = useStationaryClick(close);
-const route = useRoute(); // TODO: refactor
+const route = useRoute();
 
+const favPosts = store.favoritePosts();
 const currentPostIndex = computed(() => {
     let index = -1;
 
@@ -112,7 +113,7 @@ const currentPostIndex = computed(() => {
             .get(store.currentPage)!
             .findIndex((p) => p.id === post.id);
     } else if (route.name === "favorites") {
-        index = store.settings.favorites.findIndex((p) => p.id === post.id);
+        index = favPosts.value.findIndex((p) => p.id === post.id);
     }
 
     return index === -1 ? null : index;
@@ -123,7 +124,7 @@ const nextPost = computed<PostNavInfo>(() => {
     }
 
     if (route.name === "favorites") {
-        if (currentPostIndex.value === store.settings.favorites.length - 1) {
+        if (currentPostIndex.value === favPosts.value.length - 1) {
             return null;
         }
 
@@ -195,7 +196,7 @@ function showNextPost() {
     if (nav === null) {
         return;
     } else if (route.name === "favorites") {
-        store.fullscreenPost = store.settings.favorites[nav.index];
+        store.fullscreenPost = favPosts.value[nav.index];
         return;
     }
 
@@ -215,7 +216,7 @@ function showPrevPost() {
     if (nav === null) {
         return;
     } else if (route.name === "favorites") {
-        store.fullscreenPost = store.settings.favorites[nav.index];
+        store.fullscreenPost = favPosts.value[nav.index];
         return;
     }
 
@@ -231,20 +232,20 @@ function showPrevPost() {
 
 function toggleFavorite() {
     if (isFavorited.value) {
-        store.settings.favorites.splice(favoriteIndex.value, 1);
+        const newFavPosts = [...favPosts.value];
+        newFavPosts.splice(favoriteIndex.value, 1);
+        store.setFavoritePosts(newFavPosts);
     } else {
-        store.settings.favorites = [post].concat(store.settings.favorites);
+        store.setFavoritePosts([post].concat(favPosts.value));
         favAnimation.value = true;
         setTimeout(() => {
             favAnimation.value = false;
         }, 300);
     }
-
-    store.saveSettings();
 }
 
 const favoriteIndex = computed(() =>
-    store.settings.favorites.findIndex((p) => p.id === post.id),
+    favPosts.value.findIndex((p) => p.id === post.id),
 );
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 const mainContainer = useMainContainer();

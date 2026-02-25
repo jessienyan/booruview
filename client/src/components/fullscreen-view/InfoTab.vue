@@ -41,6 +41,8 @@ const containerStyle = computed<CSSProperties>(() => {
     return {};
 });
 
+const blacklist = store.blacklist();
+
 const styledTags = computed(() =>
     tags.value.map((t) => {
         const ret: TagChip = {
@@ -53,8 +55,7 @@ const styledTags = computed(() =>
         } else if (store.query.isExcluded(t.name)) {
             ret.style = "strikethrough";
         } else if (
-            store.settings.blacklist.findIndex((bl) => bl.name === t.name) !==
-            -1
+            blacklist.value.findIndex((bl) => bl.name === t.name) !== -1
         ) {
             ret.style = "blacklist";
         }

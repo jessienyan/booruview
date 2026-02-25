@@ -11,11 +11,12 @@ services:
       - "8000:8000"
       - "12345:12345"
     environment:
-      - "VALKEY_ADDR=db:6379"
+      - "VALKEY_ADDR=valkey:6379"
     env_file:
       - ".env"
     volumes:
       - ./api:/app
+      - ./database/sqlite.db:/database/sqlite.db
 
   caddy:
     build:
@@ -43,7 +44,7 @@ services:
     volumes:
       - ./client:/app
 
-  db:
+  valkey:
     build:
       context: valkey
     volumes:

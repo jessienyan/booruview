@@ -2,14 +2,16 @@
 import { type Component, ref } from "vue";
 import store from "@/store";
 import AboutTab from "./AboutTab.vue";
+import AccountTab from "./AccountTab.vue";
 import HelpTab from "./HelpTab.vue";
 import SettingsTab from "./SettingsTab.vue";
 
-type Tab = "about" | "help" | "settings";
+type Tab = "about" | "help" | "settings" | "account";
 const tabComponents: Record<Tab, Component> = {
     about: AboutTab,
     help: HelpTab,
     settings: SettingsTab,
+    account: AccountTab,
 };
 const currentTab = ref<Tab>("about");
 
@@ -63,6 +65,18 @@ function toggleClose() {
                 @click="switchTab('settings')"
             >
                 settings
+            </button>
+
+            <button
+                class="tab-btn"
+                :class="{
+                    active:
+                        currentTab === 'account' &&
+                        !store.settings.sidebarTabsHidden,
+                }"
+                @click="switchTab('account')"
+            >
+                account
             </button>
 
             <button

@@ -6,3 +6,4 @@ logs
 node_modules
 grafana.sh
 deploy.sh
+database/sqlite.db

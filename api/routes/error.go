@@ -81,3 +81,7 @@ func respondWithInternalError(w http.ResponseWriter, err error) {
 
 	respondWithError(w, http.StatusInternalServerError, "An unexpected error occurred :(", "")
 }
+
+func respondWithUnauthorized(w http.ResponseWriter) {
+	respondWithError(w, http.StatusUnauthorized, "Auth token is missing or invalid.", "Want header 'Authorization: Bearer <token>'")
+}

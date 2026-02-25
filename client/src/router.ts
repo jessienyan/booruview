@@ -47,9 +47,18 @@ router.beforeEach(to => {
 		}
 
 		const page = parseInt(to.params.page as string, 10);
+		let query: string[];
+
+		if(!to.params.query || to.params.query.length === 0) {
+			query = [];
+		} else if(!Array.isArray(to.params.query)) {
+			query = [to.params.query];
+		} else {
+			query = to.params.query;
+		}
 
 		return new Promise<void>((resolve, reject) => {
-			tagsToSearchQuery(to.params.query || []).then(q => {
+			tagsToSearchQuery(query || []).then(q => {
 				store.query = q;
 				store
 					.searchPosts({ page, force: store.justClickedSearchButton })
