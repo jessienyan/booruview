@@ -107,7 +107,7 @@ func MaybeAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
 		if token != "" {
-			if userID, err := api.ParseAuthToken(token); err != nil {
+			if userID, err := api.ParseAuthToken(token); err == nil {
 				var ok bool
 				if req, ok = loadUserIntoContext(w, req, userID); !ok {
 					return
