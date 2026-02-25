@@ -46,7 +46,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	resp := PostsResponse{
 		Results: []api.PostResponse{},
 	}
-	tags := cleanTagList(req.Form["q"])
+	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
 	cached, err := getCachedPosts(query, page)

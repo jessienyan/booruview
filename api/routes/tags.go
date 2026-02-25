@@ -33,7 +33,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	query := cleanTagList(req.Form["t"])
+	query := api.CleanTagList(req.Form["t"])
 
 	// Strip leading hyphen
 	for i := range query {

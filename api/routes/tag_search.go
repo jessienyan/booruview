@@ -25,7 +25,7 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		Results: []api.TagResponse{},
 	}
 
-	query := cleanTag(req.FormValue("q"))
+	query := api.CleanTag(req.FormValue("q"))
 	query = strings.ReplaceAll(query, " ", "_")
 
 	if query == "" {
