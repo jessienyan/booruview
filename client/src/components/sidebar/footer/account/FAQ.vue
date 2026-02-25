@@ -4,41 +4,51 @@ import Collapsable from "@/components/Collapsable.vue";
 
 <template>
     <div class="faq">
-        <Collapsable text="Do I have to register an account?" :button="false">
-            <div class="collapsable">
-                <p>No, accounts are entirely optional.</p>
-            </div>
-        </Collapsable>
-
-        <Collapsable text="What data is stored?" :button="false">
+        <Collapsable text="What does having an account do?" :button="false">
             <div class="collapsable">
                 <p>
-                    Accounts store your favorite tags and posts, blacklist, and
-                    search history on Booruview.
-                </p>
-            </div>
-        </Collapsable>
-        <Collapsable text="How do accounts work?" :button="false">
-            <div class="collapsable">
-                <p>
-                    It lets you access your data from multiple devices and keeps
-                    those devices in sync.
-                </p>
-                <p>
-                    Without an account, your data is only saved in your browser.
-                    You're at risk of losing your data if your device breaks or
-                    you accidentally clear your browser data.
+                    Accounts lets you easily sync your data across your devices.
+                    They're free, entirely optional, and no email required.
                 </p>
             </div>
         </Collapsable>
 
-        <Collapsable text="How is my data synced?" :button="false">
+        <Collapsable text="What if I don't use an account?" :button="false">
             <div class="collapsable">
                 <p>
-                    While logged in, your data is loaded when you open Booruview
-                    or refresh the page. Any changes you make are sent back to
-                    Booruview.
+                    Booruview will look and feel the exact same. However, your
+                    data is only stored on your device. You can't share it
+                    across other devices and it's at a greater risk of being
+                    lost.
                 </p>
+            </div>
+        </Collapsable>
+
+        <Collapsable text="I forgot my password." :button="false">
+            <div class="collapsable">
+                <p>
+                    While you can't reset your password, I can try and help you
+                    directly.
+                </p>
+                <p>
+                    Send me an
+                    <a href="mailto:feline8768@proton.me">email</a> and include:
+                </p>
+                <ul>
+                    <li>your username</li>
+                    <li>roughly how old your account is</li>
+                    <li>when you last remember logging in</li>
+                    <li>
+                        a couple notable tags from your favs, blacklist, or
+                        search history
+                    </li>
+                </ul>
+            </div>
+        </Collapsable>
+
+        <Collapsable text="Will accounts ever be required?" :button="false">
+            <div class="collapsable">
+                <p>No.</p>
             </div>
         </Collapsable>
     </div>
