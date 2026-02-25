@@ -1,7 +1,7 @@
 import { type ComputedRef, computed, reactive } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
-import { SearchQuery, type SerializedSearchQuery } from "./search";
+import { SearchQuery, type SerializedSearchQuery, tagsToSearchQuery } from "./search";
 
 export type SearchHistory = {
 	date: Date;
@@ -230,71 +230,75 @@ const store = reactive<Store>({
         });
     },
 
-    fetchAccountData(): Promise<void> {
+    async fetchAccountData()  {
         if(!this.account) {
-            return Promise.reject();
+            return;
         }
 
         const { authToken } = this.account;
 
-        return new Promise((resolve, reject) => {
-            fetch("/api/account", {
+        try {
+            const resp = await fetch("/api/account", {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${authToken}`
                 }
-            }).then(resp => {
-                // Token may have expired or account was deleted.
-                if(resp.status === 401) {
-                    this.account = null;
-                    this.toast = {
-                        msg: "Please login again",
-                        type: "error"
-                    }
-                    reject();
-                    return;
-                }
-
-                if(!resp.ok) {
-                    console.error("error fetching account data", resp);
-                    reject();
-                    return;
-                }
-
-                type accountResponse = {
-                    username: string;
-                    data: {
-                        favorite_posts: Post[];
-                        favorite_tags: Tag[];
-                        blacklist: Tag[];
-                        search_history: {
-                            created_at: string;
-                            tags: string[];
-                        }[]
-                    };
-                }
-
-                resp.json().then(({ username, data }: accountResponse) => {
-                    // Shouldn't happen
-                    if(!this.account) {
-                        return;
-                    }
-
-                    this.account.username = username;
-                    this.account.data = {
-                        favorite_posts: data.favorite_posts,
-                        favorite_tags: data.favorite_tags,
-                        blacklist: data.blacklist,
-                        search_history: data.search_history.map(entry => {
-// TODO
-                        })
-                    };
-                });
-            }).catch(err => {
-                console.error(err);
-                reject();
             });
-        });
+
+            // Token may have expired or account was deleted.
+            if(resp.status === 401) {
+                this.account = null;
+                this.saveAccountCredentials();
+                this.toast = {
+                    msg: "Please login again",
+                    type: "error"
+                }
+                return;
+            }
+
+            if(!resp.ok) {
+                console.error("error fetching account data", resp);
+                return;
+            }
+
+            type accountResponse = {
+                username: string;
+                data: {
+                    favorite_posts: Post[];
+                    favorite_tags: Tag[];
+                    blacklist: Tag[];
+                    search_history: {
+                        created_at: string;
+                        tags: string[];
+                    }[]
+                };
+            }
+
+            const {username,data} = await resp.json() as accountResponse;
+
+            // Bulk fetch history tags
+            const historyTags = data.search_history.flatMap(hist => hist.tags);
+            await this.loadTags(historyTags);
+
+            this.account.username = username;
+            this.account.data = {
+                favorite_posts: data.favorite_posts,
+                favorite_tags: data.favorite_tags,
+                blacklist: data.blacklist,
+                search_history: await Promise.all(data.search_history.map(async hist => {
+                    return {
+                        date: new Date(hist.created_at),
+                        query: await tagsToSearchQuery(hist.tags),
+                    }
+                }))
+            };
+        } catch(e) {
+            console.error(e);
+            this.toast = {
+                msg: "Failed to fetch account data",
+                type: "error"
+            }
+        }
     },
 
     currentPage: 1,
