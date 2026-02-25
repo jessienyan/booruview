@@ -4,30 +4,21 @@ import store from "@/store";
 
 const showDeleteConfirm = ref(false);
 const usernameConfirm = ref("");
-const shouldBackupData = ref<"yes" | "no" | "">("");
 
 // Reset form when it's closed
 watch([showDeleteConfirm], () => {
     if (!showDeleteConfirm.value) {
         usernameConfirm.value = "";
-        shouldBackupData.value = "";
     }
 });
 
 const canDelete = computed(
-    () =>
-        store.account &&
-        store.account.username === usernameConfirm.value &&
-        shouldBackupData.value !== "",
+    () => store.account && store.account.username === usernameConfirm.value,
 );
 
 async function doDelete() {
     if (!canDelete.value) {
         return;
-    }
-
-    if (shouldBackupData.value === "yes") {
-        // TODO
     }
 
     try {
@@ -78,15 +69,9 @@ async function doDelete() {
         <div v-if="showDeleteConfirm" class="confirm-delete">
             <h3>Deleting your account is PERMANENT</h3>
             <p>
-                Do you want to download your data and save it locally in your
-                browser?
-                <select class="input-block" v-model="shouldBackupData" required>
-                    <option value="" disabled>Select an option</option>
-                    <option value="yes">
-                        Yes, save a copy of my data (recommended)
-                    </option>
-                    <option value="no">No, I don't want to keep my data</option>
-                </select>
+                All your data and account info will be erased. This cannot be
+                undone.
+                <strong>Backup your data now or it's gone forever.</strong>
             </p>
             <p>
                 To continue, enter your username:
