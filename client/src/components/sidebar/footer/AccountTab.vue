@@ -59,12 +59,6 @@ function logout() {
 @import "@/assets/colors";
 @import "@/assets/form";
 
-.collapsable {
-    background-color: $color-primary-darker;
-    color: $color-primary-light;
-    padding: 0.1px 1em;
-}
-
 .text-input {
     text-align: center;
 }

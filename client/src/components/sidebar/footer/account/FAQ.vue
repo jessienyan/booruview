@@ -45,7 +45,15 @@ import Collapsable from "@/components/Collapsable.vue";
 </template>
 
 <style lang="scss" scoped>
+@import "@/assets/colors";
+
 .faq {
     margin-top: 2em;
+}
+
+.collapsable {
+    background-color: $color-primary-darker;
+    color: $color-primary-light;
+    padding: 0.1px 1em;
 }
 </style>
