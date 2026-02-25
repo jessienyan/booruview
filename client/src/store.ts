@@ -537,6 +537,10 @@ const store = reactive<Store>({
     },
 
     loadTags(tags: string[]): Promise<void> {
+        if(tags.length === 0) {
+            return Promise.resolve();
+        }
+
         type TagResponse = {
             results: Tag[];
         };
