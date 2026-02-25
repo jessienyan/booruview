@@ -160,6 +160,7 @@ const store = reactive<Store>({
                     }
                 };
                 store.saveAccountCredentials();
+                store.fetchAccountData();
                 store.toast = {
                     msg: "Logged in successfully",
                     type: "info",

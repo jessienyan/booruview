@@ -56,6 +56,7 @@ async function onSubmit(e: Event) {
                 search_history: [...store.settings.queryHistory],
             },
         };
+        store.saveAccountCredentials();
     } catch (e) {
         console.error(e);
         toastError("Something went wrong :(");
