@@ -27,6 +27,7 @@ setInterval(() => {
 
 store.loadSettings();
 store.updateCDNHosts();
+store.fetchAccountData();
 
 const app = createApp(App);
 app.use(router);

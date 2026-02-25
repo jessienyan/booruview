@@ -8,6 +8,7 @@ import store from "@/store";
 
 const router = useRouter();
 const relativeTime = useRelativeTime();
+const history = store.searchHistory();
 
 function styledTags(query: SearchQuery) {
     return computed(() => {
@@ -25,8 +26,9 @@ function styledTags(query: SearchQuery) {
 }
 
 function onDelete(index: number) {
-    store.settings.queryHistory.splice(index, 1);
-    store.saveSettings();
+    const newHistory = [...history.value];
+    newHistory.splice(index, 1);
+    store.setSearchhistory(newHistory);
 }
 </script>
 
@@ -34,7 +36,7 @@ function onDelete(index: number) {
     <div class="recent-list" ref="list">
         <div
             class="history-entry"
-            v-for="(entry, i) of store.settings.queryHistory"
+            v-for="(entry, i) of history"
             :key="entry.date.getTime()"
         >
             <div class="tag-list">

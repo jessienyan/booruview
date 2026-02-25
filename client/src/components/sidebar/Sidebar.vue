@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { useDontShowAgain } from "@/composable";
-import { ORGANIZE_FAVS_SURVEY_LINK } from "@/config";
 import store from "@/store";
 import SidebarFooter from "./footer/SidebarFooter.vue";
 import SidebarMain from "./main/SidebarMain.vue";
-
-const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
 </script>
 
 <template>
@@ -66,22 +62,6 @@ const favOrganizeSurvey = useDontShowAgain("hide-fav-organize-survey");
         </div>
 
         <div class="content" v-show="!store.sidebarClosed">
-            <div class="survey" v-if="favOrganizeSurvey.show.value">
-                <p>How should favorites be improved? 100% anonymous:</p>
-                <p>
-                    <a :href="ORGANIZE_FAVS_SURVEY_LINK" target="_blank">{{
-                        ORGANIZE_FAVS_SURVEY_LINK
-                    }}</a>
-                </p>
-                <p>
-                    <button
-                        class="btn-primary btn-rounded"
-                        @click="favOrganizeSurvey.onHide"
-                    >
-                        don't show again
-                    </button>
-                </p>
-            </div>
             <SidebarMain />
             <SidebarFooter />
         </div>

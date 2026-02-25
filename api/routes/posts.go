@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"context"
 	"net/http"
 	"strconv"
@@ -47,7 +46,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	resp := PostsResponse{
 		Results: []api.PostResponse{},
 	}
-	tags := cleanTagList(req.Form["q"])
+	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
 	cached, err := getCachedPosts(query, page)
@@ -119,8 +118,8 @@ func getCachedPosts(tags string, page int) ([]byte, error) {
 
 func writePostsToCache(query string, afterId int, data []byte) error {
 	vk := api.Valkey()
-	buf := bytes.Buffer{}
-	if err := api.CompressData(&buf, data); err != nil {
+	compressed, err := api.CompressData(data)
+	if err != nil {
 		return err
 	}
 
@@ -129,7 +128,7 @@ func writePostsToCache(query string, afterId int, data []byte) error {
 			Setex().
 			Key(gelbooru.PostCacheKey(query, afterId)).
 			Seconds(api.PostTtl).
-			Value(buf.String()).
+			Value(string(compressed)).
 			Build(),
 	).Error()
 }

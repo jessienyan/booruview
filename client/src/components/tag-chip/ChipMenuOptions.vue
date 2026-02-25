@@ -23,23 +23,18 @@ const actions = computed(() => ({
     openInNewTab: actionProps.openInNewTab ?? true,
 }));
 
-const isBlacklisted = computed(() => {
-    const name = tag.name;
-    return store.settings.blacklist.findIndex((t) => t.name === name) !== -1;
-});
+const blacklist = store.blacklist();
+const favTags = store.favoriteTags();
 
-const isIncluded = computed(() => {
-    return store.query.isIncluded(tag.name);
-});
-
-const isExcluded = computed(() => {
-    return store.query.isExcluded(tag.name);
-});
-
-const favoriteIndex = computed(() => {
-    return store.settings.favoriteTags.findIndex((t) => tag.name === t.name);
-});
-
+const isIncluded = computed(() => store.query.isIncluded(tag.name));
+const isExcluded = computed(() => store.query.isExcluded(tag.name));
+const blacklistIndex = computed(() =>
+    blacklist.value.findIndex((t) => tag.name === t.name),
+);
+const isBlacklisted = computed(() => blacklistIndex.value !== -1);
+const favoriteIndex = computed(() =>
+    favTags.value.findIndex((t) => tag.name === t.name),
+);
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 
 const openInNewTabUrl = computed(() => {
@@ -61,8 +56,7 @@ function onBlacklist() {
 }
 
 function onConfirmBlacklist() {
-    store.settings.blacklist = store.settings.blacklist.concat(tag);
-    store.saveSettings();
+    store.setBlacklist(blacklist.value.concat(tag));
     store.query.removeTag(tag);
     onClick();
 }
@@ -78,8 +72,7 @@ function onRemove() {
 }
 
 function onFavorite() {
-    store.settings.favoriteTags.push(tag);
-    store.saveSettings();
+    store.setFavoriteTags(favTags.value.concat(tag));
     onClick();
 }
 
@@ -89,22 +82,16 @@ function onEdit() {
 }
 
 function onUnfavorite() {
-    store.settings.favoriteTags.splice(favoriteIndex.value, 1);
-    store.saveSettings();
+    const newFavTags = [...favTags.value];
+    newFavTags.splice(favoriteIndex.value, 1);
+    store.setFavoriteTags(newFavTags);
     onClick();
 }
 
 function onWhitelist() {
-    const name = tag.name;
-    const i = store.settings.blacklist.findIndex((t) => t.name === name);
-
-    // shouldn't happen
-    if (i === -1) {
-        return;
-    }
-
-    store.settings.blacklist.splice(i, 1);
-    store.saveSettings();
+    const newBlacklist = [...blacklist.value];
+    newBlacklist.splice(blacklistIndex.value, 1);
+    store.setBlacklist(newBlacklist);
     onClick();
 }
 </script>
@@ -204,7 +191,7 @@ function onWhitelist() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
-// Styles are defined in client/src/components/DropdownMenu.vue
+/* Styles are defined in client/src/components/DropdownMenu.vue */
 
 .blacklist {
     color: #ff5d5d;

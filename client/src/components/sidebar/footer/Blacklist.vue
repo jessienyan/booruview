@@ -7,8 +7,9 @@ import { useDontShowAgain } from "@/composable";
 import store from "@/store";
 import { sortTags } from "@/tag";
 
+const blacklist = store.blacklist();
 const styledTags = computed<TagChip[]>(() => {
-    const sorted = sortTags(store.settings.blacklist);
+    const sorted = sortTags(blacklist.value);
     const styled = sorted.map<TagChip>((tag) => ({ tag, style: "default" }));
     return styled;
 });
@@ -17,17 +18,13 @@ const defaultBlacklistVisibility = useDontShowAgain("hide-default-blacklist");
 
 // Consider NSFW enabled if the user hasn't blacklisted rating:explicit
 const nsfwEnabled = computed(
-    () =>
-        store.settings.blacklist.findIndex(
-            (t) => t.name === "rating:explicit",
-        ) === -1,
+    () => blacklist.value.findIndex((t) => t.name === "rating:explicit") === -1,
 );
 
 const defaultBlacklistTags = computed(() =>
     defaultNSFWBlacklist().map<TagChip>((tag) => {
         const isBlacklisted =
-            store.settings.blacklist.findIndex((t) => t.name === tag.name) !==
-            -1;
+            blacklist.value.findIndex((t) => t.name === tag.name) !== -1;
 
         return {
             tag,
@@ -40,18 +37,13 @@ function addAllFromDefaultBlacklist() {
     const list: Tag[] = [];
 
     for (const tag of defaultNSFWBlacklist()) {
-        if (
-            store.settings.blacklist.findIndex((t) => t.name === tag.name) ===
-            -1
-        ) {
+        if (blacklist.value.findIndex((t) => t.name === tag.name) === -1) {
             list.push(tag);
         }
     }
 
     if (list.length) {
-        store.settings.blacklist = store.settings.blacklist.concat(list);
-        store.saveSettings();
-
+        store.setBlacklist(blacklist.value.concat(list));
         store.toast = {
             msg: `added ${list.length} tags to blacklist`,
             type: "info",

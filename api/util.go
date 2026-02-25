@@ -1,12 +1,12 @@
-package routes
+package api
 
 import (
 	"slices"
 	"strings"
 )
 
-// Returns a normalized version of the tag with
-func cleanTag(tag string) string {
+// Returns a normalized version of the tag
+func CleanTag(tag string) string {
 	hyphens := 0
 	for _, c := range tag {
 		if c != '-' {
@@ -22,12 +22,13 @@ func cleanTag(tag string) string {
 
 	tag = strings.TrimSpace(tag)
 
-	if len(tag) == 0 || tag == "-" {
+	if tag == "" || tag == "-" {
 		return ""
 	}
 
 	tag = strings.ToLower(tag)
 
+	// Not an OR tag
 	if tag[0] != '{' {
 		tag = strings.ReplaceAll(tag, " ", "_")
 	}
@@ -36,11 +37,11 @@ func cleanTag(tag string) string {
 }
 
 // Returns a new []string of normalized and sorted tags
-func cleanTagList(tags []string) []string {
+func CleanTagList(tags []string) []string {
 	cleaned := make([]string, 0, len(tags))
 
 	for _, t := range tags {
-		t = cleanTag(t)
+		t = CleanTag(t)
 
 		if t != "" {
 			cleaned = append(cleaned, t)
@@ -49,4 +50,15 @@ func cleanTagList(tags []string) []string {
 
 	slices.Sort(cleaned)
 	return slices.Compact(cleaned)
+}
+
+// Sorts and dedupes the tag list, returning the new slice
+func CleanTagResponseList(tags []TagResponse) []TagResponse {
+	slices.SortFunc(tags, func(a, b TagResponse) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+	tags = slices.CompactFunc(tags, func(a, b TagResponse) bool {
+		return a.Name == b.Name
+	})
+	return tags
 }

@@ -5,23 +5,19 @@ import NoResults from "@/components/NoResults.vue";
 import { useMainContainer } from "@/composable";
 import store from "@/store";
 
+const favPosts = store.favoritePosts();
 const mainContainer = useMainContainer();
 onMounted(() => mainContainer.value.focus());
-
-function onChangeFavOrder(posts: Post[]) {
-    store.settings.favorites = posts;
-    store.saveSettings();
-}
 </script>
 
 <template>
-    <NoResults v-if="store.settings.favorites.length === 0">
+    <NoResults v-if="favPosts.length === 0">
         you don't have any favorites yet
     </NoResults>
     <DraggablePostContainer
         v-else
-        :posts="store.settings.favorites"
+        :posts="favPosts"
         :scroll-container="mainContainer"
-        @change="onChangeFavOrder"
+        @change="(posts) => store.setFavoritePosts(posts)"
     />
 </template>

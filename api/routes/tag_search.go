@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"bytes"
 	"context"
 	"net/http"
 	"strings"
@@ -26,7 +25,7 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		Results: []api.TagResponse{},
 	}
 
-	query := cleanTag(req.FormValue("q"))
+	query := api.CleanTag(req.FormValue("q"))
 	query = strings.ReplaceAll(query, " ", "_")
 
 	if query == "" {
@@ -89,8 +88,8 @@ func getCachedTagSearch(query string) ([]byte, error) {
 
 func writeTagSearchToCache(query string, data []byte) error {
 	vk := api.Valkey()
-	buf := bytes.Buffer{}
-	if err := api.CompressData(&buf, data); err != nil {
+	compressed, err := api.CompressData(data)
+	if err != nil {
 		return err
 	}
 
@@ -99,7 +98,7 @@ func writeTagSearchToCache(query string, data []byte) error {
 			Setex().
 			Key(gelbooru.TagSearchCacheKey(query)).
 			Seconds(api.TagSearchTtl).
-			Value(buf.String()).
+			Value(string(compressed)).
 			Build(),
 	).Error()
 }

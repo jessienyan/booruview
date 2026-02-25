@@ -5,6 +5,7 @@ import { sortTags } from "@/tag";
 import DropdownMenu from "../DropdownMenu.vue";
 import Chip from "../tag-chip/Chip.vue";
 
+const blacklist = store.blacklist();
 const styledTag = (tag: Tag) =>
     computed<TagChip>(() => {
         let style: ChipStyle = "default";
@@ -15,9 +16,7 @@ const styledTag = (tag: Tag) =>
             style = "strikethrough";
         } else {
             const isBlacklisted =
-                store.settings.blacklist.findIndex(
-                    (t) => t.name === tag.name,
-                ) !== -1;
+                blacklist.value.findIndex((t) => t.name === tag.name) !== -1;
             if (isBlacklisted) {
                 style = "strikethrough";
             }
@@ -58,9 +57,11 @@ const currentTab = ref<Tab>("favs");
 const open = ref(false);
 const btnRef = useTemplateRef("button");
 
+const favTags = store.favoriteTags();
+
 // Favorited tags sorted by category then by name
-const favTags = computed<TagChip[]>(() => {
-    const sorted = sortTags(store.settings.favoriteTags);
+const sortedFavTags = computed<TagChip[]>(() => {
+    const sorted = sortTags(favTags.value);
     const styled: TagChip[] = [];
 
     for (const tag of sorted) {
@@ -118,10 +119,14 @@ const favTags = computed<TagChip[]>(() => {
         <div class="content-container">
             <template v-if="currentTab === 'favs'">
                 <div
-                    v-if="favTags.length > 0"
+                    v-if="sortedFavTags.length > 0"
                     class="chip-list chip-list-vertical"
                 >
-                    <Chip v-for="t of favTags" :tag="t" :show-heart="false" />
+                    <Chip
+                        v-for="t of sortedFavTags"
+                        :tag="t"
+                        :show-heart="false"
+                    />
                 </div>
                 <p v-else>You don't have any favorited tags.</p>
             </template>

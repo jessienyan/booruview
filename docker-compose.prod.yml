@@ -3,7 +3,7 @@ services:
     image: codeberg.org/jessienyan/booruview/api:latest
     restart: unless-stopped
     environment:
-      - "VALKEY_ADDR=db:6379"
+      - "VALKEY_ADDR=valkey:6379"
     env_file:
       - ".env"
     # Requires loki plugin:
@@ -28,7 +28,7 @@ services:
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
 
-  db:
+  valkey:
     image: codeberg.org/jessienyan/booruview/valkey:latest
     restart: unless-stopped
     volumes:

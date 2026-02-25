@@ -1,8 +1,13 @@
 package routes
 
 import (
+	"context"
+	"database/sql"
 	"net/http"
+	"strings"
 
+	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/models"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -35,24 +40,87 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-type wrappedResponseWriter struct {
-	http.ResponseWriter
-	bodyLen int
+type contextKey struct{}
+
+var userKey contextKey
+
+type userContextValue struct {
+	User models.Users
+	Data models.UserData
 }
 
-func (w *wrappedResponseWriter) Write(data []byte) (int, error) {
-	w.bodyLen = len(data)
-	return w.ResponseWriter.Write(data)
+func getUser(req *http.Request) *userContextValue {
+	user := req.Context().Value(userKey)
+	if user == nil {
+		return nil
+	}
+	return user.(*userContextValue)
 }
 
-// Checks for an empty response body and logs it
-func EmptyResponseMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		wrapped := &wrappedResponseWriter{ResponseWriter: w}
-		next.ServeHTTP(wrapped, req)
-
-		if wrapped.bodyLen == 0 {
-			log.Warn().Str("url", req.URL.String()).Msg("empty response body")
+// If ok, fetches a user and adds them to the request context if they exist.
+// Otherwise, an error response is written.
+func loadUserIntoContext(w http.ResponseWriter, req *http.Request, userID int64) (newReq *http.Request, ok bool) {
+	db := models.New(api.UserDB())
+	user, err := db.GetUserByID(req.Context(), userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Info().Int64("userid", userID).Msg("user tried to login but account doesn't exist, probably deleted")
+			respondWithUnauthorized(w)
+			return nil, false
 		}
+		respondWithInternalError(w, err)
+		return nil, false
+	}
+
+	data, err := db.GetUserData(req.Context(), userID)
+	if err == sql.ErrNoRows {
+		var userData models.UserData
+		userData.Set(models.UserDataJSON{})
+
+		// Create user data if it's missing
+		data, err = db.CreateUserData(req.Context(), models.CreateUserDataParams{
+			Data:   userData.Data,
+			UserID: user.ID,
+		})
+		if err != nil {
+			respondWithInternalError(w, err)
+			return nil, false
+		}
+
+		log.Info().Int64("userid", user.ID).Msg("created missing user data")
+	} else if err != nil {
+		return nil, false
+	}
+
+	req = req.WithContext(context.WithValue(req.Context(), userKey, &userContextValue{
+		User: user,
+		Data: data,
+	}))
+
+	return req, true
+}
+
+// Adds a user to the request context if a valid auth token was sent.
+// If the token is invalid or missing, returns 401.
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+		if token == "" {
+			respondWithUnauthorized(w)
+			return
+		}
+
+		if userID, err := api.ParseAuthToken(token); err == nil {
+			var ok bool
+			if req, ok = loadUserIntoContext(w, req, userID); !ok {
+				// loadUserIntoContext sent a response already, nothing to do here
+				return
+			}
+		} else {
+			respondWithUnauthorized(w)
+			return
+		}
+
+		next.ServeHTTP(w, req)
 	})
 }

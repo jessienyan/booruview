@@ -1,9 +1,30 @@
 repos:
-    - repo: local
-      hooks:
-          - id: yarn format
-            name: yarn format
-            language: system
-            pass_filenames: false
-            entry: sh -c "cd client && yarn format"
-            files: ^client/
+  - repo: local
+    hooks:
+      - id: yarn-format
+        name: Run yarn format
+        language: system
+        pass_filenames: false
+        entry: sh -c "cd client && yarn format && git add -A"
+        files: ^client/
+
+      - id: gofmt
+        name: Run gofmt
+        language: system
+        pass_filenames: false
+        entry: sh -c "cd api && gofmt -s -w . && git add -A"
+        types: [go]
+
+      - id: go-mod-tidy
+        name: Tidy go.mod
+        language: system
+        pass_filenames: false
+        entry: sh -c "cd api && go mod tidy && git add -A"
+        files: go\.(mod|sum)$
+
+      - id: sqlc-generate
+        name: Generate go models from sql
+        entry: sh -c "cd api && sqlc generate && git add -A"
+        language: system
+        pass_filenames: false
+        files: \.sql$
