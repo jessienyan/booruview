@@ -22,6 +22,20 @@ type AccountResponse struct {
 }
 
 func AccountHandler(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		if isRateLimited(w, req, accountFetchCost) {
+			return
+		}
+	} else if req.Method == "PATCH" {
+		if isRateLimited(w, req, accountPatchCost) {
+			return
+		}
+	} else if req.Method == "DELETE" {
+		if isRateLimited(w, req, accountDeleteCost) {
+			return
+		}
+	}
+
 	user := getUser(req)
 	if user == nil {
 		respondWithUnauthorized(w)

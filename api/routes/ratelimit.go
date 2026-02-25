@@ -15,6 +15,11 @@ const (
 	settingImportApiCost   = 1
 	tagSearchApiCost       = 1
 	tagApiCost             = 2
+	accountFetchCost       = 5
+	accountPatchCost       = 10
+	accountDeleteCost      = 10
+	loginCost              = 10
+	registerCost           = 20
 )
 
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) bool {

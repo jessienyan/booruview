@@ -26,6 +26,10 @@ type LoginResponse struct {
 
 // Login to an account and receive an auth token
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, loginCost) {
+		return
+	}
+
 	if req.Header.Get("Content-Type") != "application/json" {
 		respondWithBadRequest(w, "expected Content-Type header to be application/json")
 		return

@@ -34,6 +34,10 @@ type RegisterResponse struct {
 
 // Creates a new user account
 func RegisterHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, registerCost) {
+		return
+	}
+
 	if req.Header.Get("Content-Type") != "application/json" {
 		respondWithBadRequest(w, "expected Content-Type header to be application/json")
 		return
