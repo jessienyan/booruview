@@ -41,9 +41,10 @@ function logout() {
                 >
             </p>
         </template>
+        <FAQ />
     </template>
     <template v-else>
-        <p v-if="store.account">
+        <p>
             <strong>You are signed in as {{ store.account.username }}.</strong>
         </p>
         <button class="btn-primary btn-rounded btn-block" @click="logout">
@@ -51,7 +52,6 @@ function logout() {
         </button>
         <DeleteAccount />
     </template>
-    <FAQ />
 </template>
 
 <style lang="scss" scoped>
