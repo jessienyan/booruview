@@ -9,7 +9,7 @@ import {
 } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
-import { mediaProxyBanner } from "@/indicators";
+import { accountAnnouncementBanner } from "@/indicators";
 import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
@@ -38,25 +38,21 @@ const hasConsented = computed(() => {
     const isCrawler = crawlers.exec(navigator.userAgent) !== null;
     return isCrawler;
 });
-
-const bannerDate = new Date("2026-02-16").toLocaleDateString();
 </script>
 
 <template>
     <div class="app-outer">
         <div
-            class="banner-warning"
-            v-if="hasConsented && mediaProxyBanner.show.value"
+            class="banner banner-announcement"
+            v-if="hasConsented && accountAnnouncementBanner.show.value"
         >
-            As of {{ bannerDate }}, Gelbooru blocked direct linking, so all
-            media is now proxied through <code>proxy.booruview.com</code>. HD
-            images are temporarily disabled to save on bandwidth. Load times may
-            be slower than usual. Report any issues in the "about" tab, and
-            consider donating to help with hosting costs. Thank you ❤️
+            Accounts are finally here! Check the 'account' tab in the sidebar. I
+            also recommend reading the account FAQ. Have fun, and report any
+            bugs! :)
             <a
                 href="#"
                 class="banner-close"
-                @click.prevent="mediaProxyBanner.onHide()"
+                @click.prevent="accountAnnouncementBanner.onHide()"
                 >close</a
             >
         </div>
@@ -112,18 +108,28 @@ const bannerDate = new Date("2026-02-16").toLocaleDateString();
     height: 100%;
 }
 
-.banner-warning {
-    background-color: #ccd666;
-    color: #111;
+.banner {
     padding: 1em;
     font-size: 1.1em;
     line-height: 1.5em;
+}
 
-    .banner-close {
-        font-weight: bold;
-        text-decoration: underline;
-        color: inherit;
-    }
+.banner-warning {
+    background-color: #ccd666;
+    color: #111;
+}
+
+.banner-announcement {
+    background-color: $color-primary-light;
+    color: #111;
+}
+
+.banner-close {
+    display: inline-block;
+    padding: 4px;
+    font-weight: bold;
+    text-decoration: underline;
+    color: inherit;
 }
 
 .app {
