@@ -1,3 +1,8 @@
+-- WARNING: this file is ran every time the server starts
+-- You MUST append changes to the end of the file
+-- Do NOT make changes to the existing schema
+-- Your changes MUST be idempotent
+
 CREATE TABLE IF NOT EXISTS users (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
