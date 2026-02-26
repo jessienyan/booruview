@@ -43,7 +43,7 @@ function downloadData() {
 
     store.saveSettings();
     store.toast = {
-        msg: "Backup OK!",
+        msg: "Download OK!",
         type: "info",
     };
 }
