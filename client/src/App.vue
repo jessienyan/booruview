@@ -46,9 +46,8 @@ const hasConsented = computed(() => {
             class="banner banner-announcement"
             v-if="hasConsented && accountAnnouncementBanner.show.value"
         >
-            Accounts are finally here! Check the 'account' tab in the sidebar. I
-            also recommend reading the account FAQ. Have fun, and report any
-            bugs! :)
+            Accounts are finally here! Check the 'account' tab in the sidebar.
+            Please report any bugs! :)
             <a
                 href="#"
                 class="banner-close"
