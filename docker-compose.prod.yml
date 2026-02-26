@@ -42,17 +42,24 @@ services:
     restart: unless-stopped
     environment:
       - "GF_SERVER_ROOT_URL=https://grafana.localhost/"
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: 3
     volumes:
       - grafana-data:/var/lib/grafana
 
   loki:
     image: grafana/loki:3.5.0
     restart: unless-stopped
+    ports:
+      - "3100:3100"
     configs:
       - source: loki_config
         target: /etc/loki/local-config.yaml
-    ports:
-      - "3100:3100"
+    logging:
+      driver: none
     volumes:
       - loki-data:/loki
 
