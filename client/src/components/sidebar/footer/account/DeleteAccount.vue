@@ -88,6 +88,7 @@ async function doDelete() {
             <p>
                 <button
                     class="btn-danger btn-rounded btn-block"
+                    type="submit"
                     @click="doDelete"
                     :disabled="!canDelete"
                 >

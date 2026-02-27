@@ -110,6 +110,7 @@ async function submit() {
             <p>
                 <button
                     class="btn-primary btn-rounded btn-block"
+                    type="submit"
                     :disabled="!canSubmit"
                     @click="submit"
                 >
