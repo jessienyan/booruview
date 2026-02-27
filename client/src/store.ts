@@ -265,7 +265,7 @@ const store = reactive<Store>({
                     favorite_tags: Tag[];
                     blacklist: Tag[];
                     search_history: {
-                        created_at: string;
+                        date: string;
                         query: {
                             include: Tag[];
                             exclude: Tag[];
@@ -274,7 +274,7 @@ const store = reactive<Store>({
                 };
             }
 
-            const {username,data} = await resp.json() as accountResponse;
+            const { username, data } = await resp.json() as accountResponse;
 
             this.account.username = username;
             this.account.data = {
@@ -283,7 +283,7 @@ const store = reactive<Store>({
                 blacklist: data.blacklist,
                 search_history: data.search_history.map(hist => {
                     return {
-                        date: new Date(hist.created_at),
+                        date: new Date(hist.date),
                         query: new SearchQuery({ include: hist.query.include, exclude: hist.query.exclude })
                     }
                 })
