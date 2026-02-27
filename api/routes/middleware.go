@@ -59,12 +59,12 @@ func getUser(req *http.Request) *userContextValue {
 
 // If ok, fetches a user and adds them to the request context if they exist.
 // Otherwise, an error response is written.
-func loadUserIntoContext(w http.ResponseWriter, req *http.Request, userID int64) (newReq *http.Request, ok bool) {
+func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken api.ParsedAuthToken) (newReq *http.Request, ok bool) {
 	db := models.New(api.UserDB())
-	user, err := db.GetUserByID(req.Context(), userID)
+	user, err := db.GetUserByID(req.Context(), parsedToken.UserID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Info().Int64("userid", userID).Msg("user tried to login but account doesn't exist, probably deleted")
+			log.Info().Int64("userid", parsedToken.UserID).Msg("user tried to login but account doesn't exist, probably deleted")
 			respondWithUnauthorized(w)
 			return nil, false
 		}
@@ -72,7 +72,14 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, userID int64)
 		return nil, false
 	}
 
-	data, err := db.GetUserData(req.Context(), userID)
+	// Reject the token if the user changed their password since the token was created.
+	if user.PasswordChangedAt.Valid && user.PasswordChangedAt.Time.After(parsedToken.CreatedAt) {
+		log.Info().Int64("userid", parsedToken.UserID).Time("issued", parsedToken.CreatedAt).Time("password_changed_at", user.PasswordChangedAt.Time).Msg("rejected token created before last password change")
+		respondWithUnauthorized(w)
+		return nil, false
+	}
+
+	data, err := db.GetUserData(req.Context(), parsedToken.UserID)
 	if err == sql.ErrNoRows {
 		var userData models.UserData
 		userData.Set(models.UserDataJSON{})
@@ -110,7 +117,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if userID, err := api.ParseAuthToken(token); err == nil {
+		if parsedToken, err := api.ParseAuthToken(token); err == nil {
 			var ok bool
 			if req, ok = loadUserIntoContext(w, req, userID); !ok {
 				// loadUserIntoContext sent a response already, nothing to do here
