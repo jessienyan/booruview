@@ -32,7 +32,7 @@ async function submit() {
     try {
         const body = {
             current_password: currentPassword.value,
-            new_password: currentPassword.value,
+            new_password: newPassword.value,
         };
 
         const resp = await fetch("/api/account/password", {
@@ -54,6 +54,7 @@ async function submit() {
         }
 
         store.account!.authToken = data.auth_token;
+        store.saveAccountCredentials();
         store.toast = {
             msg: "Password changed",
             type: "info",
