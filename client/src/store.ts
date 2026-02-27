@@ -142,7 +142,7 @@ const store = reactive<Store>({
                 return resp.json();
             }).then(data => {
                 if (data.error) {
-                    store.toast = {
+                    this.toast = {
                         msg: data.error,
                         type: "error",
                     };
@@ -150,7 +150,8 @@ const store = reactive<Store>({
                     return;
                 }
 
-                store.account = {
+
+                this.account = {
                     authToken: data.auth_token,
                     username: data.username,
                     data: {
@@ -160,12 +161,12 @@ const store = reactive<Store>({
                         favorite_tags: [],
                     }
                 };
-                store.saveAccountCredentials();
-                store.fetchAccountData();
+                this.saveAccountCredentials();
+                this.fetchAccountData();
                 resolve();
             }).catch(err => {
                 console.error(err);
-                store.toast = {
+                this.toast = {
                     msg: "Failed to login, is there a connection problem?",
                     type: "error",
                 };
@@ -350,7 +351,7 @@ const store = reactive<Store>({
 
     loadSettings() {
         for (const _k in this.settings) {
-            const k = _k as keyof typeof store.settings;
+            const k = _k as keyof typeof this.settings;
 
             let raw = localStorage.getItem(k);
             if (raw == null) {
@@ -427,7 +428,7 @@ const store = reactive<Store>({
         return new Promise<Tag[]>((resolve, reject) => {
             store
                 .loadTags(post.tags)
-                .then(() => resolve(post.tags.map(t => store.cachedTags.get(t)).filter(t => t != null)))
+                .then(() => resolve(post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null)))
                 .catch(reject);
         });
     },
@@ -473,7 +474,7 @@ const store = reactive<Store>({
                                     msg = val.error;
                                 }
 
-                                store.toast = {
+                                this.toast = {
                                     msg,
                                     type: "error",
                                 };
@@ -481,14 +482,14 @@ const store = reactive<Store>({
                                 reject();
                             })
                             .catch(() => {
-                                store.toast = {
+                                this.toast = {
                                     msg: "Something went wrong",
                                     type: "error",
                                 };
                                 reject();
                             })
                             .finally(() => {
-                                store.hasSearched = true;
+                                this.hasSearched = true;
                             });
                         return;
                     }
@@ -515,7 +516,7 @@ const store = reactive<Store>({
                 })
                 .catch(err => {
                     console.error(err);
-                    store.toast = {
+                    this.toast = {
                         msg: "Something went wrong",
                         type: "error",
                     };
@@ -523,7 +524,7 @@ const store = reactive<Store>({
                 })
                 .finally(() => {
                     this.fetchingPosts = false;
-                    store.hasSearched = true;
+                    this.hasSearched = true;
                 });
         });
     },
@@ -603,8 +604,8 @@ const store = reactive<Store>({
                 .push({
                     name: "search",
                     params: {
-                        page: store.currentPage + 1,
-                        query: store.query.asQueryParams(),
+                        page: this.currentPage + 1,
+                        query: this.query.asQueryParams(),
                     },
                 })
                 .then(() => resolve())
@@ -622,8 +623,8 @@ const store = reactive<Store>({
                 .push({
                     name: "search",
                     params: {
-                        page: store.currentPage - 1,
-                        query: store.query.asQueryParams(),
+                        page: this.currentPage - 1,
+                        query: this.query.asQueryParams(),
                     },
                 })
                 .then(() => resolve())
