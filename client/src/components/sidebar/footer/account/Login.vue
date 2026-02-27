@@ -29,7 +29,11 @@ function onSubmit() {
             required
         />
 
-        <button class="submit btn-primary btn-rounded" type="submit">
+        <button
+            class="submit btn-primary btn-rounded"
+            type="submit"
+            @click="onSubmit"
+        >
             login
         </button>
     </form>

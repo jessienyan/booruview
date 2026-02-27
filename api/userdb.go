@@ -11,7 +11,7 @@ var (
 )
 
 func InitUserDatabase() (err error) {
-	userDB, err = sql.Open("sqlite", "/sqlite.db")
+	userDB, err = sql.Open("sqlite", DatabasePath)
 	return err
 }
 

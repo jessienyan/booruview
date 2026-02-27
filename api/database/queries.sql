@@ -21,6 +21,11 @@ UPDATE users
 SET last_login = ?
 WHERE id = ?;
 
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = ?, password_changed_at = CURRENT_TIMESTAMP
+WHERE id = ?;
+
 -- name: GetUserData :one
 SELECT * FROM user_data
 WHERE user_id = ?;

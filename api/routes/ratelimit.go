@@ -20,6 +20,7 @@ const (
 	accountDeleteCost      = 10
 	loginCost              = 10
 	registerCost           = 20
+	resetPasswordCost      = 10
 )
 
 func isRateLimited(w http.ResponseWriter, req *http.Request, cost int) bool {

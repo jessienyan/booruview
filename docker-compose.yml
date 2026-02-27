@@ -4,7 +4,7 @@ services:
       context: ./api/
       args:
         - COMMIT_HASH=$VITE_COMMIT_SHA
-    #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/main.go
+    #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/server/main.go
     # security_opt: # IMPORTANT: only use when debugging
     #   - seccomp:unconfined
     ports:
@@ -16,7 +16,6 @@ services:
       - ".env"
     volumes:
       - ./api:/app
-      - ./database/sqlite.db:/sqlite.db
 
   caddy:
     build:
