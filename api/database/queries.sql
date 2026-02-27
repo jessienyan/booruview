@@ -23,7 +23,7 @@ WHERE id = ?;
 
 -- name: UpdateUserPassword :exec
 UPDATE users
-SET password = ?
+SET password = ?, password_changed_at = CURRENT_TIMESTAMP
 WHERE id = ?;
 
 -- name: GetUserData :one

@@ -16,11 +16,11 @@ type UserData struct {
 }
 
 type Users struct {
-	ID           int64        `db:"id"`
-	CreatedAt    time.Time    `db:"created_at"`
-	LastLogin    sql.NullTime `db:"last_login"`
-	Username     string       `db:"username"`
-	Password     []byte       `db:"password"`
-	PasswordSalt []byte       `db:"password_salt"`
-	IF           interface{}  `db:"IF"`
+	ID                int64        `db:"id"`
+	CreatedAt         time.Time    `db:"created_at"`
+	LastLogin         sql.NullTime `db:"last_login"`
+	Username          string       `db:"username"`
+	Password          []byte       `db:"password"`
+	PasswordSalt      []byte       `db:"password_salt"`
+	PasswordChangedAt sql.NullTime `db:"password_changed_at"`
 }
