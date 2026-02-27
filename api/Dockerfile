@@ -19,4 +19,4 @@ COPY . .
 ARG COMMIT_HASH
 ENV COMMIT_HASH=$COMMIT_HASH
 
-CMD goose up && gow run -ldflags="-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/main.go
+CMD go run cmd/createdb/main.go && goose up && gow run -ldflags="-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/server/main.go

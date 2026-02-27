@@ -15,16 +15,16 @@ RUN go mod download
 COPY . .
 
 ARG COMMIT_HASH
-RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" -o /dist/server ./cmd/main.go
+RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" -o /dist/ ./cmd/...
 
 
 FROM alpine
 
 COPY --from=build /app/database /database
 COPY --from=build /go/bin/goose /goose
-COPY --from=build /dist/server /server
+COPY --from=build /dist/* /
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-RUN echo "#!/bin/sh\ngoose up && exec server" > start.sh && chmod +x start.sh
+RUN echo "#!/bin/sh\n/createdb && /goose up && exec /server" > start.sh && chmod +x start.sh
 
 ENTRYPOINT ["/start.sh"]
