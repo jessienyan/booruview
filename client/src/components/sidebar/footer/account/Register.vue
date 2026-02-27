@@ -63,7 +63,6 @@ async function onSubmit(e: Event) {
         return;
     }
 
-    store.saveAccountCredentials();
     store.toast = {
         msg: "You are now logged in.",
         type: "info",
