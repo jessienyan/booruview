@@ -708,10 +708,10 @@ const store = reactive<Store>({
 
     blacklist(): ComputedRef<Tag[]> {
         return computed(() => {
-        if (this.account !== null) {
-            return this.account.data.blacklist;
-        }
-        return this.settings.blacklist;
+            if (this.account !== null) {
+                return this.account.data.blacklist;
+            }
+            return this.settings.blacklist;
         });
     },
 
