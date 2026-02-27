@@ -119,7 +119,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		if parsedToken, err := api.ParseAuthToken(token); err == nil {
 			var ok bool
-			if req, ok = loadUserIntoContext(w, req, userID); !ok {
+			if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
 				// loadUserIntoContext sent a response already, nothing to do here
 				return
 			}

@@ -26,6 +26,7 @@ async function doDelete() {
             method: "DELETE",
             body: JSON.stringify({ permanently_delete_account: true }),
             headers: {
+                Authorization: `Bearer ${store.account!.authToken}`,
                 "Content-Type": "application/json",
             },
         });
@@ -81,6 +82,7 @@ async function doDelete() {
                     class="text-input input-block rounded"
                     type="text"
                     placeholder="confirm username"
+                    required
                 />
             </p>
             <p>

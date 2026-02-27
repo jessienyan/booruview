@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import store from "@/store";
+import ChangePassword from "./account/ChangePassword.vue";
 import DeleteAccount from "./account/DeleteAccount.vue";
 import FAQ from "./account/FAQ.vue";
 import Login from "./account/Login.vue";
 import Register from "./account/Register.vue";
 
 const showRegisterForm = ref(false);
+const showChangePasswordForm = ref(false);
 
 function logout() {
     store.account = null;
@@ -157,6 +159,7 @@ async function uploadData() {
         <button class="btn-primary btn-rounded btn-block" @click="logout">
             Logout
         </button>
+        <ChangePassword />
         <DeleteAccount />
     </template>
 </template>

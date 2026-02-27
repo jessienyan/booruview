@@ -16,6 +16,10 @@ type ChangePasswordParams struct {
 	NewPassword     string `json:"new_password"`
 }
 
+type ChangePasswordResponse struct {
+	AuthToken string `json:"auth_token"`
+}
+
 func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, resetPasswordCost) {
 		return
@@ -67,5 +71,13 @@ func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	// Generate a new token for the user so they aren't immediately logged out
+	token, err := api.NewAuthToken(int(user.User.ID), api.AuthTokenTTL)
+	if err != nil {
+		err = fmt.Errorf("failed to create new auth token: %w", err)
+		respondWithInternalError(w, err)
+		return
+	}
+
+	respondJson(w, 200, ChangePasswordResponse{AuthToken: token})
 }
