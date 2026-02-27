@@ -14,7 +14,7 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users
 (username, password, password_salt)
 VALUES (?, ?, ?)
-RETURNING id, created_at, last_login, username, password, password_salt
+RETURNING id, created_at, last_login, username, password, password_salt, "IF"
 `
 
 type CreateUserParams struct {
@@ -33,6 +33,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (Users, 
 		&i.Username,
 		&i.Password,
 		&i.PasswordSalt,
+		&i.IF,
 	)
 	return i, err
 }
@@ -75,7 +76,7 @@ func (q *Queries) DeleteUserData(ctx context.Context, userID int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, created_at, last_login, username, password, password_salt FROM users WHERE LOWER(username) = LOWER(?1)
+SELECT id, created_at, last_login, username, password, password_salt, "IF" FROM users WHERE LOWER(username) = LOWER(?1)
 `
 
 func (q *Queries) GetUser(ctx context.Context, username string) (Users, error) {
@@ -88,12 +89,13 @@ func (q *Queries) GetUser(ctx context.Context, username string) (Users, error) {
 		&i.Username,
 		&i.Password,
 		&i.PasswordSalt,
+		&i.IF,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, last_login, username, password, password_salt FROM users WHERE id = ?
+SELECT id, created_at, last_login, username, password, password_salt, "IF" FROM users WHERE id = ?
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (Users, error) {
@@ -106,6 +108,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (Users, error) {
 		&i.Username,
 		&i.Password,
 		&i.PasswordSalt,
+		&i.IF,
 	)
 	return i, err
 }

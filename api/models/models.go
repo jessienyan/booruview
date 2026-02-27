@@ -22,4 +22,5 @@ type Users struct {
 	Username     string       `db:"username"`
 	Password     []byte       `db:"password"`
 	PasswordSalt []byte       `db:"password_salt"`
+	IF           interface{}  `db:"IF"`
 }
