@@ -28,6 +28,7 @@ func NewRouter() *mux.Router {
 	authRouter := r.NewRoute().Subrouter()
 	authRouter.Use(AuthMiddleware)
 	authRouter.HandleFunc("/account", AccountHandler).Methods("GET", "PATCH", "DELETE")
+	authRouter.HandleFunc("/account/password", ChangePasswordHandler).Methods("POST")
 
 	return r
 }
