@@ -59,6 +59,7 @@ async function submit() {
             msg: "Password changed",
             type: "info",
         };
+        showForm.value = false;
     } catch (e) {
         console.log(e);
         store.toast = {
