@@ -6,7 +6,7 @@ RUN apk update \
 	&& apk add ca-certificates git \
 	&& update-ca-certificates
 
-COPY get_goose.sh
+COPY get_goose.sh .
 RUN ./get_goose.sh
 
 COPY go.mod go.sum ./

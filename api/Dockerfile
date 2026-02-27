@@ -8,7 +8,7 @@ RUN go install github.com/mitranim/gow@latest
 # Debugging
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
-COPY get_goose.sh
+COPY get_goose.sh .
 RUN ./get_goose.sh
 
 COPY go.mod go.sum ./
