@@ -8,7 +8,7 @@ migrate_db() {
     docker run \
         --rm \
         -it \
-        -v "$(pwd)/database:/workspace" \
+        -v "$(pwd)/api/database:/workspace" \
         -w /workspace \
         -u "$(id -u):$(id -g)" \
         keinos/sqlite3 \
