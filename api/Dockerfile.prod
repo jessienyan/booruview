@@ -20,6 +20,7 @@ RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_H
 
 FROM alpine
 
+COPY --from=build /app/database /database
 COPY --from=build /go/bin/goose /goose
 COPY --from=build /dist/server /server
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
