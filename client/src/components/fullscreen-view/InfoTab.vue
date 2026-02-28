@@ -69,6 +69,10 @@ const styledTags = computed(() =>
     <div class="tag-list" :style="containerStyle">
         <TagList :jiggle="false" :tags="styledTags" />
         <p>
+            <a :href="post.image_url || post.lowres_url" target="_blank"
+                >download<i class="bi bi-download"></i
+            ></a>
+            -
             <a
                 :href="`https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`"
                 target="_blank"
@@ -97,8 +101,12 @@ p {
     text-align: right;
 }
 
-.external-link {
-    margin-left: 6px;
-    vertical-align: baseline;
+a {
+    font-weight: bold;
+
+    .bi {
+        margin-left: 6px;
+        vertical-align: baseline;
+    }
 }
 </style>

@@ -143,14 +143,14 @@ async function uploadData() {
             @click="uploadData"
             :disabled="isUploading"
         >
-            Upload Data <span class="bi bi-cloud-upload"></span>
+            Upload Data <i class="bi bi-cloud-upload"></i>
         </button>
         <p class="hint">
             Upload data from your device and add it to your account.
         </p>
 
         <button class="btn-primary btn-rounded btn-block" @click="downloadData">
-            Download Data <span class="bi bi-cloud-download"></span>
+            Download Data <i class="bi bi-cloud-download"></i>
         </button>
         <p class="hint">
             Download data from your account and add it to your device.
