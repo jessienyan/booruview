@@ -8,7 +8,7 @@ services:
       - ".env"
     volumes:
       # NOTE: if you change this, make sure to also update prod.sh
-      - ./database/sqlite.db:/database/sqlite.db
+      - ./database/sqlite.db:/app/database/sqlite.db
     # Requires loki plugin:
     # docker plugin install grafana/loki-docker-driver:3.3.2-amd64 --alias loki --grant-all-permissions
     logging: &logging
