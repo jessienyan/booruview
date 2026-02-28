@@ -50,11 +50,8 @@ func main() {
 	listenAddr := ":8000"
 	router := routes.NewRouter()
 	srv := &http.Server{
-		Addr:         listenAddr,
-		WriteTimeout: time.Second * 10,
-		ReadTimeout:  time.Second * 10,
-		IdleTimeout:  time.Second * 10,
-		Handler:      router,
+		Addr:    listenAddr,
+		Handler: router,
 	}
 
 	shuttingDown := false

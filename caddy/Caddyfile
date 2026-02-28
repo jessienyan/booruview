@@ -1,5 +1,13 @@
 {
     order geo_ip first
+
+    servers {
+        timeouts {
+            read_body   20s
+            read_header 10s
+            write       20s
+        }
+    }
 }
 
 {$CADDY_HOST} {
