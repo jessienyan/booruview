@@ -258,9 +258,14 @@ function importData() {
                     type="checkbox"
                     :checked="store.settings.highResImages"
                     @change="onChangeHighResImages"
+                    disabled
                 />
                 high resolution images (uncheck if slow connection)</label
             >
+            <p class="text-pink">
+                hi-res images are temporarily disabled while we improve load
+                times
+            </p>
         </div>
 
         <div class="input-group">
