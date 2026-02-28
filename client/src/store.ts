@@ -644,21 +644,10 @@ const store = reactive<Store>({
             return;
         }
 
-        const history = [...this.searchHistory().value];
-        const existing = history.findIndex(h => h.query.equals(this.query));
-
-        // If there is an existing entry with the same query, delete it. This will appear as though
-        // the entry was reused and moved
-        if(existing !== -1) {
-            history.splice(existing, 1)[0];
-        }
-
-        const entry = {
+        this.addToSearchHistory({
             date: new Date(),
             query: this.query.copy(),
-        }
-
-        this.setSearchHistory([entry].concat(history));
+        });
     },
 
     clearPosts() {
@@ -833,11 +822,20 @@ const store = reactive<Store>({
         if(this.account !== null) {
             // HACK: https://codeberg.org/jessienyan/booruview/issues/7
             await this.fetchAccountData();
-            this.account.data.search_history = this.account.data.search_history.concat(hist);
+
+            const i = this.account.data.search_history.findIndex(h => h.query.equals(hist.query));
+            if(i !== -1) {
+                this.account.data.search_history.splice(i, 1);
+            }
+            this.account.data.search_history = [hist].concat(this.account.data.search_history);
             return this.saveAccountData({search_history: true});
         }
 
-        this.settings.queryHistory = this.settings.queryHistory.concat(hist);
+        const i = this.settings.queryHistory.findIndex(h => h.query.equals(hist.query));
+        if(i !== -1) {
+            this.settings.queryHistory.splice(i, 1);
+        }
+        this.settings.queryHistory = [hist].concat(this.settings.queryHistory);
         this.saveSettings();
     },
 
