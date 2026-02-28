@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRouter } from "vue-router";
 import TagList from "@/components/TagList.vue";
 import { useRelativeTime } from "@/composable";
 import type { SearchQuery } from "@/search";
 import store from "@/store";
 
-const router = useRouter();
 const relativeTime = useRelativeTime();
 const history = store.searchHistory();
 
@@ -26,9 +24,7 @@ function styledTags(query: SearchQuery) {
 }
 
 function onDelete(index: number) {
-    const newHistory = [...history.value];
-    newHistory.splice(index, 1);
-    store.setSearchHistory(newHistory);
+    store.removeFromSearchHistory(history.value[index]);
 }
 </script>
 

@@ -714,8 +714,6 @@ const store = reactive<Store>({
 
     async setFavoritePosts(posts: Post[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
             this.account.data.favorite_posts = posts;
             return this.saveAccountData({favorite_posts: true});
         }
@@ -765,8 +763,6 @@ const store = reactive<Store>({
 
     async setFavoriteTags(tags: Tag[])  {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
             this.account.data.favorite_tags = tags;
             return this.saveAccountData({favorite_tags: true});
         }
@@ -816,8 +812,6 @@ const store = reactive<Store>({
 
     async setBlacklist(tags: Tag[])  {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
             this.account.data.blacklist = tags;
             return this.saveAccountData({blacklist: true});
         }
@@ -867,8 +861,6 @@ const store = reactive<Store>({
 
     async setSearchHistory(hist: SearchHistory[])  {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
             this.account.data.search_history = hist;
             return this.saveAccountData({search_history: true});
         }

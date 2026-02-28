@@ -33,7 +33,7 @@ const defaultBlacklistTags = computed(() =>
     }),
 );
 
-function addAllFromDefaultBlacklist() {
+async function addAllFromDefaultBlacklist() {
     const list: Tag[] = [];
 
     for (const tag of defaultNSFWBlacklist()) {
@@ -43,6 +43,8 @@ function addAllFromDefaultBlacklist() {
     }
 
     if (list.length) {
+        // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+        await store.fetchAccountData();
         store.setBlacklist(blacklist.value.concat(list));
         store.toast = {
             msg: `added ${list.length} tags to blacklist`,

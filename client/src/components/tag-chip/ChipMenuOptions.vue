@@ -56,7 +56,7 @@ function onBlacklist() {
 }
 
 function onConfirmBlacklist() {
-    store.setBlacklist(blacklist.value.concat(tag));
+    store.addToBlacklist(tag);
     store.query.removeTag(tag);
     onClick();
 }
@@ -72,7 +72,7 @@ function onRemove() {
 }
 
 function onFavorite() {
-    store.setFavoriteTags(favTags.value.concat(tag));
+    store.addFavoriteTag(tag);
     onClick();
 }
 
@@ -82,16 +82,12 @@ function onEdit() {
 }
 
 function onUnfavorite() {
-    const newFavTags = [...favTags.value];
-    newFavTags.splice(favoriteIndex.value, 1);
-    store.setFavoriteTags(newFavTags);
+    store.removeFavoriteTag(favTags.value[favoriteIndex.value]);
     onClick();
 }
 
 function onWhitelist() {
-    const newBlacklist = [...blacklist.value];
-    newBlacklist.splice(blacklistIndex.value, 1);
-    store.setBlacklist(newBlacklist);
+    store.removeFromBlacklist(blacklist.value[blacklistIndex.value]);
     onClick();
 }
 </script>
