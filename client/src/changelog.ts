@@ -9,6 +9,7 @@ export const changeLog: ChangeLogEntry[] = [
 		changes: [
 			"fixed not being able to search multiple tags (#5)",
 			"added a form for changing your password",
+			"added a download link in the info tab when viewing posts in fullscreen",
 		],
 	},
 	{
