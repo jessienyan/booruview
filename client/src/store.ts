@@ -123,7 +123,7 @@ type Store = {
 	setBlacklist(tags: Tag[]): Promise<void>;
 
 	searchHistory(): ComputedRef<SearchHistory[]>;
-	setSearchhistory(history: SearchHistory[]): Promise<void>;
+	setSearchHistory(history: SearchHistory[]): Promise<void>;
 };
 
 const store = reactive<Store>({
@@ -651,7 +651,7 @@ const store = reactive<Store>({
             query: this.query.copy(),
         }
 
-        this.setSearchhistory([entry].concat(history));
+        this.setSearchHistory([entry].concat(history));
     },
 
     clearPosts() {
@@ -750,7 +750,7 @@ const store = reactive<Store>({
         });
     },
 
-    setSearchhistory(history: SearchHistory[]): Promise<void> {
+    setSearchHistory(history: SearchHistory[]): Promise<void> {
         if(this.account !== null) {
             return new Promise((resolve, reject) => {
                 // HACK: https://codeberg.org/jessienyan/booruview/issues/7

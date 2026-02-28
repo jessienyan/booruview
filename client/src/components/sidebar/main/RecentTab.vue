@@ -28,7 +28,7 @@ function styledTags(query: SearchQuery) {
 function onDelete(index: number) {
     const newHistory = [...history.value];
     newHistory.splice(index, 1);
-    store.setSearchhistory(newHistory);
+    store.setSearchHistory(newHistory);
 }
 </script>
 
