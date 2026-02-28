@@ -5,6 +5,7 @@ import store from "@/store";
 const username = ref<string | null>(null);
 const password = ref<string | null>(null);
 const passwordConfirm = ref<string | null>(null);
+const submitting = ref(false);
 
 function toastError(msg: string) {
     store.toast = {
@@ -14,6 +15,10 @@ function toastError(msg: string) {
 }
 
 async function onSubmit(e: Event) {
+    if (submitting.value) {
+        return;
+    }
+
     const $form = e.target as HTMLFormElement;
 
     if (!$form.reportValidity()) {
@@ -24,6 +29,8 @@ async function onSubmit(e: Event) {
     }
 
     try {
+        submitting.value = true;
+
         const resp = await fetch("/api/register", {
             method: "POST",
             body: JSON.stringify({
@@ -34,6 +41,8 @@ async function onSubmit(e: Event) {
                 "Content-Type": "application/json",
             },
         });
+
+        submitting.value = false;
 
         const data = await resp.json();
         if (data.error) {
@@ -60,7 +69,10 @@ async function onSubmit(e: Event) {
     } catch (e) {
         console.error(e);
         toastError("Something went wrong :(");
+        submitting.value = false;
         return;
+    } finally {
+        submitting.value = false;
     }
 
     store.toast = {
@@ -120,7 +132,12 @@ async function onSubmit(e: Event) {
             required
         />
 
-        <button class="submit btn-primary btn-rounded" type="submit">
+        <button
+            class="submit btn-primary btn-rounded"
+            type="submit"
+            @click="onSubmit"
+            :disabled="submitting"
+        >
             register
         </button>
     </form>

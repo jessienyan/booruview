@@ -5,7 +5,6 @@ import {
 	type MaybeRefOrGetter,
 	onMounted,
 	onUnmounted,
-	type Ref,
 	readonly,
 	ref,
 	type ShallowRef,

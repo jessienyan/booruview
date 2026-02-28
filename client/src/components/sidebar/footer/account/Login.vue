@@ -4,9 +4,17 @@ import store from "@/store";
 
 const username = ref("");
 const password = ref("");
+const submitting = ref(false);
 
 function onSubmit() {
-    store.login(username.value, password.value);
+    if (submitting.value) {
+        return;
+    }
+
+    submitting.value = true;
+    store.login(username.value, password.value).finally(() => {
+        submitting.value = false;
+    });
 }
 </script>
 
@@ -32,6 +40,7 @@ function onSubmit() {
         <button
             class="submit btn-primary btn-rounded"
             type="submit"
+            :disabled="submitting"
             @click="onSubmit"
         >
             login
