@@ -20,11 +20,13 @@ RUN go build -ldflags "-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_H
 
 FROM alpine
 
-COPY --from=build /app/database /database
-COPY --from=build /go/bin/goose /goose
-COPY --from=build /dist/* /
+WORKDIR /app
+
+COPY --from=build /app/database ./database
+COPY --from=build /go/bin/goose ./
+COPY --from=build /dist/createdb /dist/server ./
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-RUN echo "#!/bin/sh\n/createdb && /goose up && exec /server" > start.sh && chmod +x start.sh
+RUN echo -e '#!/bin/sh\ncd /app && ./createdb && ./goose up && exec ./server' > start.sh && chmod +x start.sh
 
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/app/start.sh"]
