@@ -10,6 +10,7 @@ export const changeLog: ChangeLogEntry[] = [
 			"fixed not being able to search multiple tags (#5)",
 			"added a form for changing your password",
 			"added a download link in the info tab when viewing posts in fullscreen",
+			"patched a stale data issue that could cause data loss when using multiple tabs (#7)",
 		],
 	},
 	{
