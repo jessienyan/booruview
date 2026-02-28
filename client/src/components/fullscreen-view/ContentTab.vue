@@ -29,10 +29,7 @@ const content = computed(() => {
 
     // Avoid using high res images if the media proxy is enabled
     const useHighRes =
-        !hasLowRes ||
-        (!store.cdnHosts?.mediaProxy &&
-            hasHighRes &&
-            store.settings.highResImages);
+        !hasLowRes || (hasHighRes && store.settings.highResImages);
 
     if (useHighRes) {
         return {
