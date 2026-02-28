@@ -114,15 +114,23 @@ type Store = {
 	getTag(name: string): Tag | undefined;
 
 	favoritePosts(): ComputedRef<Post[]>;
+	addFavoritePost(post: Post): Promise<void>;
+	removeFavoritePost(post: Post): Promise<void>;
 	setFavoritePosts(posts: Post[]): Promise<void>;
 
 	favoriteTags(): ComputedRef<Tag[]>;
+    addFavoriteTag(tag: Tag): Promise<void>;
+    removeFavoriteTag(tag: Tag): Promise<void>;
 	setFavoriteTags(tags: Tag[]): Promise<void>;
 
 	blacklist(): ComputedRef<Tag[]>;
+    addToBlacklist(tag: Tag): Promise<void>;
+    removeFromBlacklist(tag: Tag): Promise<void>;
 	setBlacklist(tags: Tag[]): Promise<void>;
 
 	searchHistory(): ComputedRef<SearchHistory[]>;
+    addToSearchHistory(hist: SearchHistory): Promise<void>;
+    removeFromSearchHistory(hist: SearchHistory): Promise<void>;
 	setSearchHistory(history: SearchHistory[]): Promise<void>;
 };
 
@@ -275,9 +283,8 @@ const store = reactive<Store>({
                 };
             }
 
-            const { username, data } = await resp.json() as accountResponse;
+            const { data } = await resp.json() as accountResponse;
 
-            this.account.username = username;
             this.account.data = {
                 favorite_posts: data.favorite_posts,
                 favorite_tags: data.favorite_tags,
@@ -675,20 +682,46 @@ const store = reactive<Store>({
         })
 	},
 
-    setFavoritePosts(posts: Post[]): Promise<void> {
+    async addFavoritePost(post: Post) {
         if(this.account !== null) {
-            return new Promise((resolve, reject) => {
-                // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-                this.fetchAccountData().then(() => {
-                    this.account!.data.favorite_posts = posts;
-                    this.saveAccountData({favorite_posts: true}).then(resolve).catch(reject);
-                }).catch(reject);
-            });
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.favorite_posts = this.account.data.favorite_posts.concat(post);
+            return this.saveAccountData({favorite_posts: true});
+        }
+
+        this.settings.favorites = this.settings.favorites.concat(post);
+        this.saveSettings();
+    },
+
+    async removeFavoritePost(post: Post) {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            const i = this.account.data.favorite_posts.findIndex(p => p.id === post.id);
+            if(i !== -1) {
+                this.account.data.favorite_posts.splice(i, 1);
+            }
+            return this.saveAccountData({favorite_posts: true});
+        }
+
+        const i = this.settings.favorites.findIndex(p => p.id === post.id);
+        if(i !== -1) {
+            this.settings.favorites.splice(i, 1);
+        }
+        this.saveSettings();
+    },
+
+    async setFavoritePosts(posts: Post[]) {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.favorite_posts = posts;
+            return this.saveAccountData({favorite_posts: true});
         }
 
         this.settings.favorites = posts;
         this.saveSettings();
-        return Promise.resolve();
     },
 
     favoriteTags(): ComputedRef<Tag[]> {
@@ -700,20 +733,46 @@ const store = reactive<Store>({
         });
     },
 
-    setFavoriteTags(tags: Tag[]): Promise<void> {
+    async addFavoriteTag(tag: Tag) {
         if(this.account !== null) {
-            return new Promise((resolve, reject) => {
-                // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-                this.fetchAccountData().then(() => {
-                    this.account!.data.favorite_tags = tags;
-                    return this.saveAccountData({favorite_tags: true}).then(resolve).catch(reject);
-                }).catch(reject);
-            });
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.favorite_tags = this.account.data.favorite_tags.concat(tag);
+            return this.saveAccountData({favorite_tags: true});
+        }
+
+        this.settings.favoriteTags = this.settings.favoriteTags.concat(tag);
+        this.saveSettings();
+    },
+
+    async removeFavoriteTag(tag: Tag) {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            const i = this.account.data.favorite_tags.findIndex(t => t.name === tag.name);
+            if(i !== -1) {
+                this.account.data.favorite_tags.splice(i, 1);
+            }
+            return this.saveAccountData({favorite_tags: true});
+        }
+
+        const i = this.settings.favoriteTags.findIndex(t => t.name === tag.name);
+        if(i !== -1) {
+            this.settings.favoriteTags.splice(i, 1);
+        }
+        this.saveSettings();
+    },
+
+    async setFavoriteTags(tags: Tag[])  {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.favorite_tags = tags;
+            return this.saveAccountData({favorite_tags: true});
         }
 
         this.settings.favoriteTags = tags;
         this.saveSettings();
-        return Promise.resolve();
     },
 
     blacklist(): ComputedRef<Tag[]> {
@@ -725,20 +784,46 @@ const store = reactive<Store>({
         });
     },
 
-    setBlacklist(tags: Tag[]): Promise<void> {
+    async addToBlacklist(tag: Tag) {
         if(this.account !== null) {
-            return new Promise((resolve, reject) => {
-                // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-                this.fetchAccountData().then(() => {
-                    this.account!.data.blacklist = tags;
-                    return this.saveAccountData({blacklist: true}).then(resolve).catch(reject);
-                }).catch(reject);
-            });
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.blacklist = this.account.data.blacklist.concat(tag);
+            return this.saveAccountData({blacklist: true});
+        }
+
+        this.settings.blacklist = this.settings.blacklist.concat(tag);
+        this.saveSettings();
+    },
+
+    async removeFromBlacklist(tag: Tag) {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            const i = this.account.data.blacklist.findIndex(t => t.name === tag.name);
+            if(i !== -1) {
+                this.account.data.blacklist.splice(i, 1);
+            }
+            return this.saveAccountData({blacklist: true});
+        }
+
+        const i = this.settings.blacklist.findIndex(t => t.name === tag.name);
+        if(i !== -1) {
+            this.settings.blacklist.splice(i, 1);
+        }
+        this.saveSettings();
+    },
+
+    async setBlacklist(tags: Tag[])  {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.blacklist = tags;
+            return this.saveAccountData({blacklist: true});
         }
 
         this.settings.blacklist = tags;
         this.saveSettings();
-        return Promise.resolve();
     },
 
     searchHistory(): ComputedRef<SearchHistory[]> {
@@ -750,21 +835,47 @@ const store = reactive<Store>({
         });
     },
 
-    setSearchHistory(history: SearchHistory[]): Promise<void> {
+    async addToSearchHistory(hist: SearchHistory) {
         if(this.account !== null) {
-            return new Promise((resolve, reject) => {
-                // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-                this.fetchAccountData().then(() => {
-                    this.account!.data.search_history = history;
-                    return this.saveAccountData({search_history: true}).then(resolve).catch(reject);
-                }).catch(reject);
-            });
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.search_history = this.account.data.search_history.concat(hist);
+            return this.saveAccountData({search_history: true});
         }
 
-        this.settings.queryHistory = history;
+        this.settings.queryHistory = this.settings.queryHistory.concat(hist);
         this.saveSettings();
-        return Promise.resolve();
-    }
+    },
+
+    async removeFromSearchHistory(hist: SearchHistory) {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            const i = this.account.data.search_history.findIndex(h => h.query.equals(hist.query));
+            if(i !== -1) {
+                this.account.data.search_history.splice(i, 1);
+            }
+            return this.saveAccountData({search_history: true});
+        }
+
+        const i = this.settings.queryHistory.findIndex(h => h.query.equals(hist.query));
+        if(i !== -1) {
+            this.settings.queryHistory.splice(i, 1);
+        }
+        this.saveSettings();
+    },
+
+    async setSearchHistory(hist: SearchHistory[])  {
+        if(this.account !== null) {
+            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
+            await this.fetchAccountData();
+            this.account.data.search_history = hist;
+            return this.saveAccountData({search_history: true});
+        }
+
+        this.settings.queryHistory = hist;
+        this.saveSettings();
+    },
 });
 
 export default store;
