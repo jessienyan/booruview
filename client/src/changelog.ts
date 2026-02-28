@@ -10,6 +10,7 @@ export const changeLog: ChangeLogEntry[] = [
 			"fixed not being able to search multiple tags (#5)",
 			"added a form for changing your password",
 			"added a download link in the info tab when viewing posts in fullscreen",
+			"re-enable highres images (they were disabled while I was checking how the bandwidth looked)",
 		],
 	},
 	{
