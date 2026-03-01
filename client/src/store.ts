@@ -184,7 +184,12 @@ const store = reactive<Store>({
     },
 
     saveAccountCredentials() {
-        localStorage.setItem("account", JSON.stringify(this.account));
+        let payload = null;
+        if(this.account) {
+            const { authToken, username } = this.account;
+            payload = { authToken, username }
+        }
+        localStorage.setItem("account", JSON.stringify(payload));
     },
 
     saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
