@@ -17,8 +17,7 @@ const (
 )
 
 type AccountResponse struct {
-	Data     models.UserDataJSON `json:"data"`
-	Username string              `json:"username"`
+	Data models.UserDataJSON `json:"data"`
 }
 
 func AccountHandler(w http.ResponseWriter, req *http.Request) {
@@ -50,8 +49,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method == "GET" {
 		respondJson(w, 200, AccountResponse{
-			Data:     data,
-			Username: user.User.Username,
+			Data: data,
 		})
 	} else if req.Method == "PATCH" {
 		if req.Header.Get("Content-Type") != "application/json" {
