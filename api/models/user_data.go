@@ -16,8 +16,8 @@ const (
 type SearchHistoryEntry struct {
 	Date  time.Time `json:"date" validate:"required"`
 	Query struct {
-		Include []api.TagResponse `json:"include" validate:"required"`
-		Exclude []api.TagResponse `json:"exclude" validate:"required"`
+		Include api.TagList `json:"include" validate:"required"`
+		Exclude api.TagList `json:"exclude" validate:"required"`
 	} `json:"query"`
 }
 
@@ -41,20 +41,20 @@ func (entry SearchHistoryEntry) Tags() string {
 
 type UserDataJSON struct {
 	FavoritePosts []api.PostResponse   `json:"favorite_posts" validate:"dive"`
-	FavoriteTags  []api.TagResponse    `json:"favorite_tags" validate:"dive"`
-	Blacklist     []api.TagResponse    `json:"blacklist" validate:"dive"`
+	FavoriteTags  api.TagList          `json:"favorite_tags" validate:"dive"`
+	Blacklist     api.TagList          `json:"blacklist" validate:"dive"`
 	SearchHistory []SearchHistoryEntry `json:"search_history" validate:"dive"`
 }
 
 func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
 	if ud.Blacklist == nil {
-		ud.Blacklist = []api.TagResponse{}
+		ud.Blacklist = api.TagList{}
 	}
 	if ud.FavoritePosts == nil {
 		ud.FavoritePosts = []api.PostResponse{}
 	}
 	if ud.FavoriteTags == nil {
-		ud.FavoriteTags = []api.TagResponse{}
+		ud.FavoriteTags = api.TagList{}
 	}
 	if ud.SearchHistory == nil {
 		ud.SearchHistory = []SearchHistoryEntry{}

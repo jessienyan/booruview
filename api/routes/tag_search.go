@@ -13,7 +13,7 @@ import (
 )
 
 type TagSearchResponse struct {
-	Results []api.TagResponse `json:"results"`
+	Results api.TagList `json:"results"`
 }
 
 func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
@@ -22,7 +22,7 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := TagSearchResponse{
-		Results: []api.TagResponse{},
+		Results: api.TagList{},
 	}
 
 	query := api.CleanTag(req.FormValue("q"))

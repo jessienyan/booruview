@@ -20,7 +20,7 @@ const (
 )
 
 type TagsResponse struct {
-	Results []api.TagResponse `json:"results"`
+	Results api.TagList `json:"results"`
 }
 
 func TagsHandler(w http.ResponseWriter, req *http.Request) {
@@ -44,7 +44,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 
 	// write empty response
 	if len(query) == 0 {
-		resp := TagsResponse{Results: []api.TagResponse{}}
+		resp := TagsResponse{Results: api.TagList{}}
 		respondJson(w, http.StatusOK, resp)
 		return
 	}
@@ -67,7 +67,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	var tags []api.TagResponse
+	var tags api.TagList
 	if len(missing) > 0 {
 		tags, err = gelbooru.NewClient().ListTags(strings.Join(missing, " "))
 		if err != nil {
@@ -89,7 +89,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func writeCachedTags(tags []api.TagResponse) {
+func writeCachedTags(tags api.TagList) {
 	vk := api.Valkey()
 	cmds := make(valkey.Commands, 0, len(tags))
 
@@ -107,7 +107,7 @@ func writeCachedTags(tags []api.TagResponse) {
 	vk.DoMulti(context.Background(), cmds...)
 }
 
-func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagResponse, error) {
+func getCachedTags(query []string) (api.TagList, map[string]api.TagResponse, error) {
 	keys := make([]string, len(query))
 	for i, query := range query {
 		keys[i] = gelbooru.TagCacheKey(query)
@@ -134,7 +134,7 @@ func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagRespons
 		return nil, nil, err
 	}
 
-	resp := make([]api.TagResponse, 0, len(entries))
+	resp := make(api.TagList, 0, len(entries))
 	respMap := make(map[string]api.TagResponse, len(entries))
 	for i, entry := range entries {
 		if entry == "" {

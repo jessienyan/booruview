@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ratingTags = []api.TagResponse{
+	ratingTags = api.TagList{
 		{Name: "rating:general", Type: api.Metadata},
 		{Name: "rating:sensitive", Type: api.Metadata},
 		{Name: "rating:questionable", Type: api.Metadata},
