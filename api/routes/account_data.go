@@ -16,20 +16,12 @@ const (
 	maxDataSize = 2 * 1024 * 1024 // MB
 )
 
-type AccountResponse struct {
-	Data models.UserDataJSON `json:"data"`
+type AccountDataResponse struct {
+	models.UserDataJSON
 }
 
-func AccountHandler(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
-		AccountGetHandler(w, req)
-	} else if req.Method == "PATCH" {
-		AccountPatchHandler(w, req)
-	}
-}
-
-func AccountGetHandler(w http.ResponseWriter, req *http.Request) {
-	if isRateLimited(w, req, accountFetchCost) {
+func AccountDataGetHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, accountDataGetCost) {
 		return
 	}
 
@@ -40,13 +32,15 @@ func AccountGetHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	respondJson(w, 200, AccountResponse{
-		Data:     data,
-	})
+	respondJson(w, 200, AccountDataResponse{data})
 }
 
-func AccountPatchHandler(w http.ResponseWriter, req *http.Request) {
-	if isRateLimited(w, req, accountPatchCost) {
+type AccountDataPutParams struct {
+	models.UserDataJSON
+}
+
+func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
+	if isRateLimited(w, req, accountDataPutCost) {
 		return
 	}
 
@@ -74,7 +68,7 @@ func AccountPatchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var form models.UserDataJSON
+	var form AccountDataPutParams
 	if err := json.Unmarshal(body, &form); err != nil {
 		log.Err(err).Msg("failed to parse form")
 		respondWithBadRequest(w, "form is not valid")
@@ -130,5 +124,5 @@ func AccountPatchHandler(w http.ResponseWriter, req *http.Request) {
 		log.Info().Int64("userid", user.User.ID).Msg("updated user data")
 	}
 
-	respondJson(w, 200, data)
+	respondJson(w, 200, AccountDataResponse{data})
 }
