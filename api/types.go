@@ -79,3 +79,28 @@ type PostResponse struct {
 	Width              int      `json:"width"`
 	Height             int      `json:"height"`
 }
+
+// Clean sorts and removes dupes from the post's tag list
+func (p PostResponse) Clean() PostResponse {
+	slices.Sort(p.Tags)
+	p.Tags = slices.Compact(p.Tags)
+	return p
+}
+
+type PostList []PostResponse
+
+// Clean removes duplicate posts
+func (lst PostList) Clean() PostList {
+	// Keep track of what post IDs we've seen as we go through the list. If we encounter a post ID
+	// that was seen previously, drop it from the list
+	idsSeen := make(map[int]struct{}, len(lst))
+	lst = slices.DeleteFunc(lst, func(p PostResponse) bool {
+		_, alreadySeen := idsSeen[p.Id]
+		if alreadySeen {
+			return true
+		}
+		idsSeen[p.Id] = struct{}{}
+		return false
+	})
+	return lst
+}

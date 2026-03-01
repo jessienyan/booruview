@@ -186,7 +186,7 @@ type FullPostResponse struct {
 
 type PostList struct {
 	TotalCount int
-	Posts      []api.PostResponse
+	Posts      api.PostList
 }
 
 const (
@@ -213,7 +213,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		return nil, err
 	}
 
-	posts := make([]api.PostResponse, 0, len(resp.Post))
+	posts := make(api.PostList, 0, len(resp.Post))
 	for _, p := range resp.Post {
 		data := api.PostResponse{
 			Id:    p.Id,
