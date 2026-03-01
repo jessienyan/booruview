@@ -1,5 +1,10 @@
 package api
 
+import (
+	"slices"
+	"strings"
+)
+
 type TagType string
 
 const (
@@ -35,6 +40,24 @@ type TagResponse struct {
 	Name  string  `json:"name" validate:"required"`
 	Type  TagType `json:"type" validate:"required"`
 	Count int     `json:"count"`
+}
+
+type TagList []TagResponse
+
+// Sort sorts the TagList in-place.
+func (lst TagList) Sort() {
+	slices.SortFunc(lst, func(a, b TagResponse) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+}
+
+// Clean sorts and removes duplicates, and returns the updated slice
+func (lst TagList) Clean() TagList {
+	lst.Sort()
+	cleaned := slices.CompactFunc(lst, func(a, b TagResponse) bool {
+		return a.Name == b.Name
+	})
+	return cleaned
 }
 
 type PostResponse struct {
