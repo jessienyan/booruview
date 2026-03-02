@@ -306,7 +306,6 @@ const store = reactive<Store>({
                     }
                 })
             };
-            this.fetchingAccountData = true;
         } catch(e) {
             console.error(e);
             this.toast = {
