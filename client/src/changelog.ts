@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-02",
+		changes: ["fixed post searches not using blacklist sometimes"]
+	},
+	{
 		date: "2026-02-27",
 		changes: [
 			"fixed not being able to search multiple tags (#5)",
