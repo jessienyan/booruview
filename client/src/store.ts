@@ -1,4 +1,4 @@
-import { type ComputedRef, computed, reactive } from "vue";
+import { type ComputedRef, computed, reactive, watch } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
 import { SearchQuery, type SerializedSearchQuery } from "./search";
@@ -35,6 +35,8 @@ type Store = {
 		username: string;
 		data: AccountData;
 	} | null;
+    fetchingAccountData: boolean;
+
     login(username: string, password: string): Promise<void>;
 	saveAccountCredentials(): void;
     saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void>;
@@ -136,6 +138,7 @@ type Store = {
 
 const store = reactive<Store>({
     account: JSON.parse(localStorage.getItem("account") || "null"),
+    fetchingAccountData: false,
 
     login(username: string, password: string): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -249,6 +252,8 @@ const store = reactive<Store>({
         const { authToken } = this.account;
 
         try {
+            this.fetchingAccountData = true;
+
             const resp = await fetch("/api/account", {
                 method: "GET",
                 headers: {
@@ -301,12 +306,15 @@ const store = reactive<Store>({
                     }
                 })
             };
+            this.fetchingAccountData = true;
         } catch(e) {
             console.error(e);
             this.toast = {
                 msg: "Failed to fetch account data",
                 type: "error"
             }
+        } finally {
+            this.fetchingAccountData = false;
         }
     },
 
@@ -452,6 +460,8 @@ const store = reactive<Store>({
             results: Post[];
         };
 
+        this.fetchingPosts = true;
+
         return new Promise((resolve, reject) => {
             page = page ?? this.currentPage;
             const sameQuery = this.query.equals(this.lastQuery);
@@ -473,9 +483,8 @@ const store = reactive<Store>({
                 queryParams.append("q", t);
             }
 
-            this.fetchingPosts = true;
-
-            fetch(`/api/posts?${queryParams.toString()}`)
+            const doSearch = () => {
+                fetch(`/api/posts?${queryParams.toString()}`)
                 .then(resp => {
                     if (resp.status >= 400) {
                         resp.json()
@@ -538,6 +547,14 @@ const store = reactive<Store>({
                     this.fetchingPosts = false;
                     this.hasSearched = true;
                 });
+            }
+
+            if(!this.fetchingAccountData) {
+                doSearch();
+            } else {
+                // Wait to search until we're done fetching account data since we need the blacklist
+                watch(() => this.fetchingAccountData, doSearch, { once: true });
+            }
         });
     },
 
