@@ -11,6 +11,8 @@
 }
 
 {$CADDY_HOST} {
+    vars apiUpstream http://api:8000
+
     encode
     request_body {
         max_size 10MB
@@ -28,9 +30,6 @@
             mode 644
         }
     }
-
-    # Clients must always check if index.html changed
-    header / Cache-Control "public, no-cache"
 
     # Assets are hashed and never change so are safe to cache
     header /assets/* Cache-Control "max-age=31536000, immutable"
@@ -66,20 +65,24 @@
             db_path /etc/caddy/GeoLite2-Country.mmdb
         }
         log_append country {geoip.country_code}
-        reverse_proxy http://api:8000
+        reverse_proxy {vars.apiUpstream}
     }
 
-    # Including some common file extensions here will prevent the server from
-    # falling back to index.html
+    # Handle common file extensions without an index.html fallback
     @static path /assets/* *.html *.css *.js *.png *.jpg *.ico *.txt
     handle @static {
         file_server
     }
 
-    # index.html fallback to handle SPA routing
     handle {
         file_server
-        try_files {path} /index.html
+        try_files {path} =404
+
+        @fallback status 404
+        reverse_proxy @fallback {vars.apiUpstream} {
+            rewrite /index.html
+            header_down Cache-Control no-store
+        }
     }
 }
 

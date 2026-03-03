@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./api/
+      context: api
       args:
         - COMMIT_HASH=$VITE_COMMIT_SHA
     #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/server/main.go
@@ -16,6 +16,7 @@ services:
       - ".env"
     volumes:
       - ./api:/app
+      - ./client/dist/index.html /app/index.html
 
   caddy:
     build:

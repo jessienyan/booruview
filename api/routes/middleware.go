@@ -8,6 +8,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -108,26 +109,30 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 }
 
 // Adds a user to the request context if a valid auth token was sent.
-// If the token is invalid or missing, returns 401.
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
-		if token == "" {
-			respondWithUnauthorized(w)
-			return
-		}
-
-		if parsedToken, err := api.ParseAuthToken(token); err == nil {
-			var ok bool
-			if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
-				// loadUserIntoContext sent a response already, nothing to do here
+// If requireAuth is true, returns 401 unless the user is authenticated.
+// If requireAuth is false, unahtneitcated requests are allowed
+func NewAuthMiddleware(requireAuth bool) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+			if requireAuth && token == "" {
+				respondWithUnauthorized(w)
 				return
 			}
-		} else {
-			respondWithUnauthorized(w)
-			return
-		}
 
-		next.ServeHTTP(w, req)
-	})
+			if parsedToken, err := api.ParseAuthToken(token); err == nil {
+				// Make sure we don't clobber `req`
+				var ok bool
+				if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
+					// loadUserIntoContext sent a response already, nothing to do here
+					return
+				}
+			} else {
+				respondWithUnauthorized(w)
+				return
+			}
+
+			next.ServeHTTP(w, req)
+		})
+	}
 }

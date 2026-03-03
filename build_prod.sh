@@ -38,13 +38,8 @@ get_release_tag() {
 
 RELEASE_TAG=$(get_release_tag)
 
-echo ">>> building API image"
-docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
-echo ">>> building valkey image"
-docker build --quiet -t $VALKEY_IMG valkey/
 echo ">>> building client image"
 docker build --quiet -t $CLIENT_IMG client/
-
 echo ">>> bundling assets"
 mkdir -p client/dist
 docker run --rm \
@@ -52,6 +47,10 @@ docker run --rm \
     -e VITE_LAST_COMMIT_DATE=$DATE \
     -v ./client/dist:/app/dist \
     $CLIENT_IMG yarn build
+echo ">>> building API image"
+docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod .
+echo ">>> building valkey image"
+docker build --quiet -t $VALKEY_IMG valkey/
 
 echo ">>> building caddy image"
 docker build --quiet -t $CADDY_IMG -f caddy/Dockerfile .

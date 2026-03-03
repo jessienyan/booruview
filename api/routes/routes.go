@@ -25,8 +25,12 @@ func NewRouter() *mux.Router {
 	r.HandleFunc("/login", LoginHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 
+	maybeAuthRouter := r.NewRoute().Subrouter()
+	maybeAuthRouter.Use(NewAuthMiddleware(false))
+	maybeAuthRouter.HandleFunc("/index.html", IndexHandler)
+
 	authRouter := r.NewRoute().Subrouter()
-	authRouter.Use(AuthMiddleware)
+	authRouter.Use(NewAuthMiddleware(true))
 	authRouter.HandleFunc("/account", AccountHandler).Methods("GET", "PATCH", "DELETE")
 	authRouter.HandleFunc("/account/password", ChangePasswordHandler).Methods("POST")
 
