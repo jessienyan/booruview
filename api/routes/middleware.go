@@ -109,12 +109,23 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 }
 
 // Adds a user to the request context if a valid auth token was sent.
+// Looks for the token in the Authorization header, then as a cookie.
 // If requireAuth is true, returns 401 unless the user is authenticated.
-// If requireAuth is false, unahtneitcated requests are allowed
+// If requireAuth is false, unauthenticated requests are allowed
 func NewAuthMiddleware(requireAuth bool) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+			var token string
+
+			token = strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+
+			if token == "" {
+				cookie, _ := req.Cookie(api.AuthCookieName)
+				if cookie != nil {
+					token = cookie.Value
+				}
+			}
+
 			if requireAuth && token == "" {
 				respondWithUnauthorized(w)
 				return
