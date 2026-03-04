@@ -11,8 +11,6 @@
 }
 
 {$CADDY_HOST} {
-    vars apiUpstream http://api:8000
-
     encode
     request_body {
         max_size 10MB
@@ -65,21 +63,25 @@
             db_path /etc/caddy/GeoLite2-Country.mmdb
         }
         log_append country {geoip.country_code}
-        reverse_proxy {vars.apiUpstream}
+        reverse_proxy http://api:8000
     }
 
-    # Handle common file extensions without an index.html fallback
+    # Handle these explicitly so we don't fallback to index.html and incorrectly serve a 200
     @static path /assets/* *.html *.css *.js *.png *.jpg *.ico *.txt
     handle @static {
         file_server
     }
 
-    handle {
-        file_server
-        try_files {path} =404
+    route {
+        file_server {
+            # Ensure API handles index.html
+            hide index.html
 
-        @fallback status 404
-        reverse_proxy @fallback {vars.apiUpstream} {
+            # If the file isn't found, continue to the reverse_proxy handler instead of 404
+            pass_thru
+        }
+
+        reverse_proxy http://api:8000 {
             rewrite /index.html
             header_down Cache-Control no-store
         }

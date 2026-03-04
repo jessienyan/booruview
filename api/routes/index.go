@@ -8,11 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	indexTemplatePath = "/index.html"
+)
+
 var indexTemplate *template.Template
 
 func IndexHandler(w http.ResponseWriter, req *http.Request) {
 	if indexTemplate == nil {
-		f, err := os.ReadFile("../index.html")
+		f, err := os.ReadFile(indexTemplatePath)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed to read index.html")
 		}

@@ -120,16 +120,18 @@ func NewAuthMiddleware(requireAuth bool) mux.MiddlewareFunc {
 				return
 			}
 
-			if parsedToken, err := api.ParseAuthToken(token); err == nil {
-				// Make sure we don't clobber `req`
-				var ok bool
-				if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
-					// loadUserIntoContext sent a response already, nothing to do here
+			if token != "" {
+				if parsedToken, err := api.ParseAuthToken(token); err == nil {
+					// Make sure we don't clobber `req`
+					var ok bool
+					if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
+						// loadUserIntoContext sent a response already, nothing to do here
+						return
+					}
+				} else {
+					respondWithUnauthorized(w)
 					return
 				}
-			} else {
-				respondWithUnauthorized(w)
-				return
 			}
 
 			next.ServeHTTP(w, req)

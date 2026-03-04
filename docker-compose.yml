@@ -16,7 +16,10 @@ services:
       - ".env"
     volumes:
       - ./api:/app
-      - ./client/dist/index.html /app/index.html
+      - ./client/dist/index.html:/index.html:ro
+    depends_on:
+      - client
+      - valkey
 
   caddy:
     build:
@@ -33,6 +36,9 @@ services:
       - ./client/dist:/srv:ro   # Live client updates
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
+    depends_on:
+      - api
+      - client
 
   client:
     build:

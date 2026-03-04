@@ -12,8 +12,6 @@ RUN mkdir -p /etc/caddy/components/ && chmod +x /etc/caddy/start.sh
 COPY caddy/Caddyfile* /etc/caddy/components/
 
 COPY client/dist/ /srv
-# This is served from the API. Delete it to prevent Caddy from accidentally serving it
-RUN rm /srv/index.html
 
 # This is intentionally at the end to prevent caching
 RUN wget -O /etc/caddy/GeoLite2-Country.mmdb https://git.io/GeoLite2-Country.mmdb

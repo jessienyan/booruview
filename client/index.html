@@ -1,7 +1,7 @@
-{{-
+{{/*
     !! NOTE !!
     This file is served through the API so we can inject data into it.
--}}
+*/}}
 
 <!doctype html>
 <html lang="en-US">
@@ -44,7 +44,7 @@
             </div></noscript
         >
         <script type="text/javascript">
-            {{- Inject account data so the user's browser doesn't have to make an extra request -}}
+            {{/* Inject account data so the user's browser doesn't have to make an extra request */}}
             var _accountdata = {{.}};
         </script>
         <script type="module" src="/src/main.ts"></script>
