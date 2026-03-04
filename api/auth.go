@@ -20,6 +20,8 @@ const (
 
 	// How long users stay logged in for
 	AuthTokenTTL = time.Hour * 24 * 90
+
+	AuthCookieName = "booruviewauth"
 )
 
 func HashPassword(password string, salt []byte) []byte {
