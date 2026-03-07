@@ -696,7 +696,7 @@ const store = reactive<Store>({
         if(this.account !== null) {
             // HACK: https://codeberg.org/jessienyan/booruview/issues/7
             await this.fetchAccountData();
-            this.account.data.favorite_posts = this.account.data.favorite_posts.concat(post);
+            this.account.data.favorite_posts = [post].concat(this.account.data.favorite_posts);
             return this.saveAccountData({favorite_posts: true});
         }
 
