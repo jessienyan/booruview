@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
@@ -128,8 +129,8 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 type AccountDataPatchParams struct {
-	Add    models.UserDataJSON `json:"add"`
-	Remove models.UserDataJSON `json:"remove"`
+	Add    *models.UserDataJSON `json:"add"`
+	Remove *models.UserDataJSON `json:"remove"`
 }
 
 func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
@@ -179,6 +180,68 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	changed := false
+
+	if form.Add != nil {
+		if len(form.Add.Blacklist) > 0 {
+			data.Blacklist = append(data.Blacklist, form.Add.Blacklist...)
+			changed = true
+		}
+
+		if len(form.Add.FavoritePosts) > 0 {
+			// NOTE: for compatibility, new posts are added to the beginning of the list
+			data.FavoritePosts = append(form.Add.FavoritePosts, data.FavoritePosts...)
+			changed = true
+		}
+
+		if len(form.Add.FavoriteTags) > 0 {
+			data.FavoriteTags = append(data.FavoriteTags, form.Add.FavoriteTags...)
+			changed = true
+		}
+
+		if len(form.Add.SearchHistory) > 0 {
+			data.SearchHistory = append(data.SearchHistory, form.Add.SearchHistory...)
+			changed = true
+		}
+	}
+
+	if form.Remove != nil {
+		if len(form.Remove.Blacklist) > 0 {
+			tagNames := make(map[string]struct{}, len(form.Remove.Blacklist))
+			for _, t := range form.Remove.Blacklist {
+				tagNames[t.Name] = struct{}{}
+			}
+
+			data.Blacklist = slices.DeleteFunc(data.Blacklist, func(t api.TagResponse) bool {
+				_, shouldDelete := tagNames[t.Name]
+				return shouldDelete
+			})
+
+			changed = true
+		}
+
+		if len(form.Remove.FavoritePosts) > 0 {
+			postIds := make(map[int]struct{}, len(form.Remove.FavoritePosts))
+			for _, p := range form.Remove.FavoritePosts {
+				postIds[p.Id] = struct{}{}
+			}
+
+			data.FavoritePosts = slices.DeleteFunc(data.FavoritePosts, func(p api.PostResponse) bool {
+				_, shouldDelete := postIds[p.Id]
+				return shouldDelete
+			})
+			changed = true
+		}
+
+		if len(form.Remove.FavoriteTags) > 0 {
+			// TODO
+			changed = true
+		}
+
+		if len(form.Remove.SearchHistory) > 0 {
+			// TODO
+			changed = true
+		}
+	}
 
 	// if form.Blacklist != nil {
 	// 	changed = true
