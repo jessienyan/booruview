@@ -1,0 +1,20 @@
+name: booruview-test
+
+services:
+  api:
+    build:
+      context: ./api/
+      args:
+        - COMMIT_HASH=$VITE_COMMIT_SHA
+    #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/server/main.go
+    # security_opt: # IMPORTANT: only use when debugging
+    #   - seccomp:unconfined
+    environment:
+      - "VALKEY_ADDR=valkey:6379"
+    volumes:
+      - ./api:/app
+
+  valkey:
+    build:
+      context: valkey
+

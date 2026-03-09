@@ -1,3 +1,5 @@
+name: booruview-prod
+
 services:
   api:
     image: codeberg.org/jessienyan/booruview/api:latest
