@@ -16,7 +16,11 @@ type TagSearchResponse struct {
 	Results []api.TagResponse `json:"results"`
 }
 
-func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
+type TagSearchHandler struct {
+	Client gelbooru.GelbooruClient
+}
+
+func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, tagSearchApiCost) {
 		return
 	}
@@ -45,7 +49,7 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	results, err := gelbooru.NewClient().SearchTags(query)
+	results, err := h.Client.SearchTags(query)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
 			respondWithGelbooruUnavailable(w)

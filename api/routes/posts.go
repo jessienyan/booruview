@@ -19,7 +19,11 @@ type PostsResponse struct {
 	Results      []api.PostResponse `json:"results"`
 }
 
-func PostsHandler(w http.ResponseWriter, req *http.Request) {
+type PostsHandler struct {
+	Client gelbooru.GelbooruClient
+}
+
+func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// NOTE: post rate limiting happens after checking the cache. The cost increases
 	// if there's a cache miss
 	if err := req.ParseForm(); err != nil {
@@ -70,9 +74,7 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := gelbooru.NewClient()
-
-	results, err := client.ListPosts(query, page)
+	results, err := h.Client.ListPosts(query, page)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
 			respondWithGelbooruUnavailable(w)

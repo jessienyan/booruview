@@ -23,7 +23,11 @@ type TagsResponse struct {
 	Results []api.TagResponse `json:"results"`
 }
 
-func TagsHandler(w http.ResponseWriter, req *http.Request) {
+type TagsHandler struct {
+	Client gelbooru.GelbooruClient
+}
+
+func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, tagApiCost) {
 		return
 	}
@@ -69,7 +73,7 @@ func TagsHandler(w http.ResponseWriter, req *http.Request) {
 
 	var tags []api.TagResponse
 	if len(missing) > 0 {
-		tags, err = gelbooru.NewClient().ListTags(strings.Join(missing, " "))
+		tags, err = h.Client.ListTags(strings.Join(missing, " "))
 		if err != nil {
 			if errors.As(err, &gelbooru.GelbooruError{}) {
 				respondWithGelbooruUnavailable(w)

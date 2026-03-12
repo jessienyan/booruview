@@ -14,20 +14,28 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 )
 
-var (
+const (
 	ApiUrl = "https://gelbooru.com/index.php"
+)
 
+var (
 	// Selects which userid/apikey pair to use
 	authPairIndex      = 0
 	authPairIndexMutex sync.Mutex
 )
+
+type GelbooruClient interface {
+	SearchTags(query string) ([]api.TagResponse, error)
+	ListPosts(tags string, page int) (*PostList, error)
+	ListTags(tags string) ([]api.TagResponse, error)
+}
 
 type Client struct {
 	UserId string
 	ApiKey string
 }
 
-func NewClient() Client {
+func NewClient() GelbooruClient {
 	if api.GelbooruApiKeys == nil {
 		return Client{}
 	}
