@@ -32,14 +32,20 @@ type GelbooruClient interface {
 }
 
 type Client struct {
-	UserId string
-	ApiKey string
-	http   *http.Client
+	http *http.Client
 }
 
 func NewClient(httpClient *http.Client) GelbooruClient {
+	if httpClient == nil {
+		httpClient = defaultHTTPClient
+	}
+
+	return Client{http: httpClient}
+}
+
+func (c Client) withAuth(params url.Values) {
 	if api.GelbooruApiKeys == nil {
-		return Client{http: httpClient}
+		return
 	}
 
 	authPairIndexMutex.Lock()
@@ -49,20 +55,8 @@ func NewClient(httpClient *http.Client) GelbooruClient {
 	uid, apiKey := api.GelbooruUserIds[authPairIndex], api.GelbooruApiKeys[authPairIndex]
 	authPairIndex = (authPairIndex + 1) % len(api.GelbooruApiKeys)
 
-	if httpClient == nil {
-		httpClient = defaultHTTPClient
-	}
-
-	return Client{UserId: uid, ApiKey: apiKey, http: httpClient}
-}
-
-func (c Client) withAuth(params url.Values) {
-	if c.UserId == "" || c.ApiKey == "" {
-		return
-	}
-
-	params.Add("user_id", c.UserId)
-	params.Add("api_key", c.ApiKey)
+	params.Add("user_id", uid)
+	params.Add("api_key", apiKey)
 }
 
 type TagSearchResponse struct {
