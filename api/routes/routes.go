@@ -8,8 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() *mux.Router {
-	client := gelbooru.NewClient()
+func NewRouter(client gelbooru.GelbooruClient) *mux.Router {
 	r := mux.NewRouter()
 
 	r.Use(RecoverMiddleware)

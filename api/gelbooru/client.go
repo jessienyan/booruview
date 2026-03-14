@@ -3,6 +3,7 @@ package gelbooru
 import (
 	"fmt"
 	"html"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -33,11 +34,12 @@ type GelbooruClient interface {
 type Client struct {
 	UserId string
 	ApiKey string
+	http   *http.Client
 }
 
-func NewClient() GelbooruClient {
+func NewClient(httpClient *http.Client) GelbooruClient {
 	if api.GelbooruApiKeys == nil {
-		return Client{}
+		return Client{http: httpClient}
 	}
 
 	authPairIndexMutex.Lock()
@@ -47,7 +49,11 @@ func NewClient() GelbooruClient {
 	uid, apiKey := api.GelbooruUserIds[authPairIndex], api.GelbooruApiKeys[authPairIndex]
 	authPairIndex = (authPairIndex + 1) % len(api.GelbooruApiKeys)
 
-	return Client{UserId: uid, ApiKey: apiKey}
+	if httpClient == nil {
+		httpClient = defaultHTTPClient
+	}
+
+	return Client{UserId: uid, ApiKey: apiKey, http: httpClient}
 }
 
 func (c Client) withAuth(params url.Values) {
@@ -108,7 +114,7 @@ func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	params.Add("term", query)
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.http, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -217,7 +223,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 	params.Add("pid", strconv.Itoa(page-1))     // Pages are 0-indexed
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.http, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -314,7 +320,7 @@ func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
 	params.Add("names", tags)
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.http, params, &resp); err != nil {
 		return nil, err
 	}
 
