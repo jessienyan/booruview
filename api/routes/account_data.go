@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"slices"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
@@ -128,9 +127,23 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 	respondJson(w, 200, AccountDataResponse{data})
 }
 
+type AddAccountData struct {
+	FavoritePosts api.PostList         `json:"favorite_posts"`
+	FavoriteTags  api.TagList          `json:"favorite_tags"`
+	Blacklist     api.TagList          `json:"blacklist"`
+	SearchHistory []models.SearchQuery `json:"search_history" validate:"dive"`
+}
+
+type RemoveAccountData struct {
+	FavoritePostIDs  []int                `json:"favorite_post_ids"`
+	FavoriteTagNames []string             `json:"favorite_tag_names"`
+	BlacklistNames   []string             `json:"blacklist_names"`
+	SearchHistory    []models.SearchQuery `json:"search_history" validate:"dive"`
+}
+
 type AccountDataPatchParams struct {
-	Add    *models.UserDataJSON `json:"add"`
-	Remove *models.UserDataJSON `json:"remove"`
+	Add    *AddAccountData    `json:"add"`
+	Remove *RemoveAccountData `json:"remove"`
 }
 
 func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
@@ -206,59 +219,27 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 
 	if form.Remove != nil {
 		if len(form.Remove.Blacklist) > 0 {
-			tagNames := make(map[string]struct{}, len(form.Remove.Blacklist))
-			for _, t := range form.Remove.Blacklist {
-				tagNames[t.Name] = struct{}{}
-			}
-
-			data.Blacklist = slices.DeleteFunc(data.Blacklist, func(t api.TagResponse) bool {
-				_, shouldDelete := tagNames[t.Name]
-				return shouldDelete
-			})
-
+			data.Blacklist.Remove(form.Remove.Blacklist)
 			changed = true
 		}
 
 		if len(form.Remove.FavoritePosts) > 0 {
-			postIds := make(map[int]struct{}, len(form.Remove.FavoritePosts))
-			for _, p := range form.Remove.FavoritePosts {
-				postIds[p.Id] = struct{}{}
-			}
-
-			data.FavoritePosts = slices.DeleteFunc(data.FavoritePosts, func(p api.PostResponse) bool {
-				_, shouldDelete := postIds[p.Id]
-				return shouldDelete
-			})
+			data.FavoritePosts.Remove(form.Remove.FavoritePosts)
 			changed = true
 		}
 
 		if len(form.Remove.FavoriteTags) > 0 {
-			// TODO
+			data.FavoriteTags.Remove(form.Remove.FavoriteTags)
 			changed = true
 		}
 
 		if len(form.Remove.SearchHistory) > 0 {
-			// TODO
+			data.SearchHistory.Remove()
 			changed = true
 		}
 	}
 
-	// if form.Blacklist != nil {
-	// 	changed = true
-	// 	data.Blacklist = form.Blacklist
-	// }
-	// if form.FavoritePosts != nil {
-	// 	changed = true
-	// 	data.FavoritePosts = form.FavoritePosts
-	// }
-	// if form.FavoriteTags != nil {
-	// 	changed = true
-	// 	data.FavoriteTags = form.FavoriteTags
-	// }
-	// if form.SearchHistory != nil {
-	// 	changed = true
-	// 	data.SearchHistory = form.SearchHistory
-	// }
+	// TODO: call Clean()
 
 	if changed {
 		if err := user.Data.Set(data); err != nil {

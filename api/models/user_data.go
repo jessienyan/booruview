@@ -13,29 +13,32 @@ const (
 	SearchHistoryLimit = 100
 )
 
-type SearchHistoryEntry struct {
-	Date  time.Time `json:"date" validate:"required"`
-	Query struct {
-		Include api.TagList `json:"include" validate:"required"`
-		Exclude api.TagList `json:"exclude" validate:"required"`
-	} `json:"query"`
+type SearchQuery struct {
+	Include api.TagList `json:"include" validate:"required"`
+	Exclude api.TagList `json:"exclude" validate:"required"`
 }
 
 // Clean normalizes the query tags to be sorted and de-duped
-func (entry *SearchHistoryEntry) Clean() {
-	entry.Query.Include = entry.Query.Include.Clean()
-	entry.Query.Exclude = entry.Query.Exclude.Clean()
+func (query *SearchQuery) Clean() {
+	query.Include = query.Include.Clean()
+	query.Exclude = query.Exclude.Clean()
+}
+
+// Equal returns whether the two queries are identical.
+// Both queries should be cleaned before calling Equal
+func (query SearchQuery) Equal(other SearchQuery) bool {
+	return query.Include.Equal(other.Include) && query.Exclude.Equal(other.Exclude)
 }
 
 // Tags return a normalized list of comma-separated tags.
-// The entry should be Cleaned before calling Tags
-func (entry SearchHistoryEntry) Tags() string {
+// The query should be cleaned before calling Tags
+func (query SearchQuery) Tags() string {
 	tags := strings.Builder{}
-	for _, t := range entry.Query.Include {
+	for _, t := range query.Include {
 		tags.WriteString(t.Name)
 		tags.WriteByte(',')
 	}
-	for _, t := range entry.Query.Exclude {
+	for _, t := range query.Exclude {
 		tags.WriteByte('-')
 		tags.WriteString(t.Name)
 		tags.WriteByte(',')
@@ -43,11 +46,38 @@ func (entry SearchHistoryEntry) Tags() string {
 	return tags.String()
 }
 
+type SearchHistoryEntry struct {
+	Date  time.Time   `json:"date" validate:"required"`
+	Query SearchQuery `json:"query"`
+}
+
+// Clean normalizes the query tags to be sorted and de-duped
+func (entry *SearchHistoryEntry) Clean() {
+	entry.Query.Clean()
+}
+
+type SearchHistoryList []SearchHistoryEntry
+
+func (lst *SearchHistoryList) Remove(queries []string) {
+	if len(queries) == 0 {
+		return
+	}
+
+	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
+		for _, q := range queries {
+			if entry.Query.Tags() == q {
+				return true
+			}
+		}
+		return false
+	})
+}
+
 type UserDataJSON struct {
-	FavoritePosts api.PostList         `json:"favorite_posts" validate:"dive"`
-	FavoriteTags  api.TagList          `json:"favorite_tags" validate:"dive"`
-	Blacklist     api.TagList          `json:"blacklist" validate:"dive"`
-	SearchHistory []SearchHistoryEntry `json:"search_history" validate:"dive"`
+	FavoritePosts api.PostList      `json:"favorite_posts" validate:"dive"`
+	FavoriteTags  api.TagList       `json:"favorite_tags" validate:"dive"`
+	Blacklist     api.TagList       `json:"blacklist" validate:"dive"`
+	SearchHistory SearchHistoryList `json:"search_history" validate:"dive"`
 }
 
 func (ud UserDataJSON) MarshalJSON() ([]byte, error) {

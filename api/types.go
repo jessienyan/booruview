@@ -44,13 +44,6 @@ type TagResponse struct {
 
 type TagList []TagResponse
 
-// Sort sorts the TagList in-place.
-func (lst TagList) Sort() {
-	slices.SortFunc(lst, func(a, b TagResponse) int {
-		return strings.Compare(a.Name, b.Name)
-	})
-}
-
 // Clean sorts and removes duplicates, and returns the updated slice
 func (lst TagList) Clean() TagList {
 	lst.Sort()
@@ -60,19 +53,34 @@ func (lst TagList) Clean() TagList {
 	return cleaned
 }
 
-// Remove filters out any tags that are included in `tags` (by name), and returns the updated slice
-func (lst TagList) Remove(tags []TagResponse) TagList {
+func (lst TagList) Equal(other TagList) bool {
+	return slices.EqualFunc(lst, other, func(a, b TagResponse) bool {
+		return a.Name == b.Name
+	})
+}
+
+// Sort sorts the TagList in-place.
+func (lst TagList) Sort() {
+	slices.SortFunc(lst, func(a, b TagResponse) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+}
+
+// Remove modifies the TagList by removing tags that match by name
+func (lst *TagList) Remove(tags []TagResponse) {
+	if len(tags) == 0 {
+		return
+	}
+
 	tagNames := make(map[string]struct{}, len(tags))
 	for _, t := range tags {
 		tagNames[t.Name] = struct{}{}
 	}
 
-	lst = slices.DeleteFunc(lst, func(t TagResponse) bool {
+	*lst = slices.DeleteFunc(*lst, func(t TagResponse) bool {
 		_, shouldDelete := tagNames[t.Name]
 		return shouldDelete
 	})
-
-	return lst
 }
 
 type PostResponse struct {
@@ -120,17 +128,19 @@ func (lst PostList) Clean() PostList {
 	return lst
 }
 
-// Remove filters out any posts that are included in `posts` (by id), and returns the updated slice
-func (lst PostList) Remove(posts []PostResponse) PostList {
+// Remove modifies the PostList by removing posts that match by id
+func (lst *PostList) Remove(posts []PostResponse) {
+	if len(posts) == 0 {
+		return
+	}
+
 	postIDs := make(map[int]struct{}, len(posts))
 	for _, p := range posts {
 		postIDs[p.Id] = struct{}{}
 	}
 
-	lst = slices.DeleteFunc(lst, func(t PostResponse) bool {
+	*lst = slices.DeleteFunc(*lst, func(t PostResponse) bool {
 		_, shouldDelete := postIDs[t.Id]
 		return shouldDelete
 	})
-
-	return lst
 }
