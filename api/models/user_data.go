@@ -21,11 +21,14 @@ type SearchHistoryEntry struct {
 	} `json:"query"`
 }
 
-// Clean normalizes the query tags: removing duplicates and sorting them
+// Clean normalizes the query tags to be sorted and de-duped
 func (entry *SearchHistoryEntry) Clean() {
+	entry.Query.Include = entry.Query.Include.Clean()
+	entry.Query.Exclude = entry.Query.Exclude.Clean()
 }
 
-// Tags returns
+// Tags return a normalized list of comma-separated tags.
+// The entry should be Cleaned before calling Tags
 func (entry SearchHistoryEntry) Tags() string {
 	tags := strings.Builder{}
 	for _, t := range entry.Query.Include {
@@ -33,6 +36,7 @@ func (entry SearchHistoryEntry) Tags() string {
 		tags.WriteByte(',')
 	}
 	for _, t := range entry.Query.Exclude {
+		tags.WriteByte('-')
 		tags.WriteString(t.Name)
 		tags.WriteByte(',')
 	}

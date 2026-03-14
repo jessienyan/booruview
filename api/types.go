@@ -60,6 +60,21 @@ func (lst TagList) Clean() TagList {
 	return cleaned
 }
 
+// Remove filters out any tags that are included in `tags` (by name), and returns the updated slice
+func (lst TagList) Remove(tags []TagResponse) TagList {
+	tagNames := make(map[string]struct{}, len(tags))
+	for _, t := range tags {
+		tagNames[t.Name] = struct{}{}
+	}
+
+	lst = slices.DeleteFunc(lst, func(t TagResponse) bool {
+		_, shouldDelete := tagNames[t.Name]
+		return shouldDelete
+	})
+
+	return lst
+}
+
 type PostResponse struct {
 	Id                 int      `json:"id"`
 	CreatedAtTimestamp int64    `json:"created_at"`
@@ -102,5 +117,20 @@ func (lst PostList) Clean() PostList {
 		idsSeen[p.Id] = struct{}{}
 		return false
 	})
+	return lst
+}
+
+// Remove filters out any posts that are included in `posts` (by id), and returns the updated slice
+func (lst PostList) Remove(posts []PostResponse) PostList {
+	postIDs := make(map[int]struct{}, len(posts))
+	for _, p := range posts {
+		postIDs[p.Id] = struct{}{}
+	}
+
+	lst = slices.DeleteFunc(lst, func(t PostResponse) bool {
+		_, shouldDelete := postIDs[t.Id]
+		return shouldDelete
+	})
+
 	return lst
 }
