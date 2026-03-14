@@ -67,18 +67,18 @@ func (lst TagList) Sort() {
 }
 
 // Remove modifies the TagList by removing tags that match by name
-func (lst *TagList) Remove(tags []TagResponse) {
-	if len(tags) == 0 {
+func (lst *TagList) Remove(tagNames []string) {
+	if len(tagNames) == 0 {
 		return
 	}
 
-	tagNames := make(map[string]struct{}, len(tags))
-	for _, t := range tags {
-		tagNames[t.Name] = struct{}{}
+	lookup := make(map[string]struct{}, len(tagNames))
+	for _, t := range tagNames {
+		lookup[t] = struct{}{}
 	}
 
 	*lst = slices.DeleteFunc(*lst, func(t TagResponse) bool {
-		_, shouldDelete := tagNames[t.Name]
+		_, shouldDelete := lookup[t.Name]
 		return shouldDelete
 	})
 }
@@ -129,18 +129,18 @@ func (lst PostList) Clean() PostList {
 }
 
 // Remove modifies the PostList by removing posts that match by id
-func (lst *PostList) Remove(posts []PostResponse) {
-	if len(posts) == 0 {
+func (lst *PostList) Remove(ids []int) {
+	if len(ids) == 0 {
 		return
 	}
 
-	postIDs := make(map[int]struct{}, len(posts))
-	for _, p := range posts {
-		postIDs[p.Id] = struct{}{}
+	lookup := make(map[int]struct{}, len(ids))
+	for _, id := range ids {
+		lookup[id] = struct{}{}
 	}
 
 	*lst = slices.DeleteFunc(*lst, func(t PostResponse) bool {
-		_, shouldDelete := postIDs[t.Id]
+		_, shouldDelete := lookup[t.Id]
 		return shouldDelete
 	})
 }

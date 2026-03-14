@@ -58,18 +58,22 @@ func (entry *SearchHistoryEntry) Clean() {
 
 type SearchHistoryList []SearchHistoryEntry
 
-func (lst *SearchHistoryList) Remove(queries []string) {
+func (lst *SearchHistoryList) Clean() {
+	// TODO
+}
+
+func (lst *SearchHistoryList) Remove(queries []SearchQuery) {
 	if len(queries) == 0 {
 		return
 	}
 
+	removeTags := make([]string, 0, len(queries))
+	for _, q := range queries {
+		removeTags = append(removeTags, q.Tags())
+	}
+
 	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
-		for _, q := range queries {
-			if entry.Query.Tags() == q {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(removeTags, entry.Query.Tags())
 	})
 }
 
@@ -99,46 +103,9 @@ func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
 	return json.Marshal(marshalType(ud))
 }
 
-// Removes duplicate entries
 func (ud *UserDataJSON) Clean() {
-	postIds := make(map[int]struct{}, len(ud.FavoritePosts))
-	ud.FavoritePosts = slices.DeleteFunc(ud.FavoritePosts, func(p api.PostResponse) bool {
-		_, dupe := postIds[p.Id]
-		if dupe {
-			return true
-		}
-		postIds[p.Id] = struct{}{}
-		return false
-	})
-
-	tagNames := make(map[string]struct{}, len(ud.FavoriteTags))
-	ud.FavoriteTags = slices.DeleteFunc(ud.FavoriteTags, func(p api.TagResponse) bool {
-		_, dupe := tagNames[p.Name]
-		if dupe {
-			return true
-		}
-		tagNames[p.Name] = struct{}{}
-		return false
-	})
-
-	tagNames = make(map[string]struct{}, len(ud.Blacklist))
-	ud.Blacklist = slices.DeleteFunc(ud.Blacklist, func(p api.TagResponse) bool {
-		_, dupe := tagNames[p.Name]
-		if dupe {
-			return true
-		}
-		tagNames[p.Name] = struct{}{}
-		return false
-	})
-
-	searchTags := make(map[string]struct{}, len(ud.SearchHistory))
-	ud.SearchHistory = slices.DeleteFunc(ud.SearchHistory, func(h SearchHistoryEntry) bool {
-		tags := h.Tags()
-		_, dupe := searchTags[tags]
-		if dupe {
-			return true
-		}
-		searchTags[tags] = struct{}{}
-		return false
-	})
+	ud.FavoritePosts.Clean()
+	ud.FavoriteTags.Clean()
+	ud.Blacklist.Clean()
+	ud.SearchHistory.Clean()
 }

@@ -128,17 +128,17 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 type AddAccountData struct {
-	FavoritePosts api.PostList         `json:"favorite_posts"`
-	FavoriteTags  api.TagList          `json:"favorite_tags"`
-	Blacklist     api.TagList          `json:"blacklist"`
-	SearchHistory []models.SearchQuery `json:"search_history" validate:"dive"`
+	FavoritePosts api.PostList             `json:"favorite_posts"`
+	FavoriteTags  api.TagList              `json:"favorite_tags"`
+	Blacklist     api.TagList              `json:"blacklist"`
+	SearchHistory models.SearchHistoryList `json:"search_history" validate:"dive"`
 }
 
 type RemoveAccountData struct {
-	FavoritePostIDs  []int                `json:"favorite_post_ids"`
-	FavoriteTagNames []string             `json:"favorite_tag_names"`
-	BlacklistNames   []string             `json:"blacklist_names"`
-	SearchHistory    []models.SearchQuery `json:"search_history" validate:"dive"`
+	FavoritePosts []int                `json:"favorite_post_ids"`
+	FavoriteTags  []string             `json:"favorite_tag_names"`
+	Blacklist     []string             `json:"blacklist_names"`
+	SearchHistory []models.SearchQuery `json:"search_history" validate:"dive"`
 }
 
 type AccountDataPatchParams struct {
@@ -234,14 +234,14 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if len(form.Remove.SearchHistory) > 0 {
-			data.SearchHistory.Remove()
+			data.SearchHistory.Remove(form.Remove.SearchHistory)
 			changed = true
 		}
 	}
 
-	// TODO: call Clean()
-
 	if changed {
+		data.Clean()
+
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
 			return
