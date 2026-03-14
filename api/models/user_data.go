@@ -20,8 +20,8 @@ type SearchQuery struct {
 
 // Clean normalizes the query tags to be sorted and de-duped
 func (query *SearchQuery) Clean() {
-	query.Include = query.Include.Clean()
-	query.Exclude = query.Exclude.Clean()
+	query.Include.Clean()
+	query.Exclude.Clean()
 }
 
 // Equal returns whether the two queries are identical.
@@ -58,8 +58,31 @@ func (entry *SearchHistoryEntry) Clean() {
 
 type SearchHistoryList []SearchHistoryEntry
 
+// Clean sorts and de-dupes the search history
 func (lst *SearchHistoryList) Clean() {
-	// TODO
+	for _, entry := range *lst {
+		entry.Clean()
+	}
+
+	// Sort by newest first
+	slices.SortFunc(*lst, func(a, b SearchHistoryEntry) int {
+		return b.Date.Compare(a.Date)
+	})
+
+	// Remove entries that have duplicate queries, leaving only the most
+	// recent entry
+	queries := make(map[string]struct{}, len(*lst))
+	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
+		tags := entry.Query.Tags()
+		_, seen := queries[tags]
+
+		if seen {
+			return true
+		}
+
+		queries[tags] = struct{}{}
+		return false
+	})
 }
 
 func (lst *SearchHistoryList) Remove(queries []SearchQuery) {

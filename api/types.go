@@ -44,13 +44,12 @@ type TagResponse struct {
 
 type TagList []TagResponse
 
-// Clean sorts and removes duplicates, and returns the updated slice
-func (lst TagList) Clean() TagList {
+// Clean modifies the TagList by sorting and removing duplicates
+func (lst *TagList) Clean() {
 	lst.Sort()
-	cleaned := slices.CompactFunc(lst, func(a, b TagResponse) bool {
+	*lst = slices.CompactFunc(*lst, func(a, b TagResponse) bool {
 		return a.Name == b.Name
 	})
-	return cleaned
 }
 
 func (lst TagList) Equal(other TagList) bool {
