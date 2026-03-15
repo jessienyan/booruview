@@ -1,3 +1,11 @@
+// `goose` CLI but with the application migrations embedded.
+// This allows us to use .go migration files for complex changes.
+//
+// Docs:
+// - https://github.com/pressly/goose?tab=readme-ov-file#embedded-sql-migrations
+// - https://github.com/pressly/goose/tree/main/examples/go-migrations
+// - https://github.com/pressly/goose/blob/main/examples/go-migrations/main.go
+
 package main
 
 import (
