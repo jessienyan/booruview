@@ -10,15 +10,12 @@ services:
     # security_opt: # IMPORTANT: only use when debugging
     #   - seccomp:unconfined
     environment:
-      - "DATABASE_PATH=database/test.db"
+      - "DATABASE_PATH=./database/test.db"
       - "SECRET_KEY=test"
       - "VALKEY_ADDR=valkey:6379"
-      - "GOOSE_DRIVER=sqlite3"
-      - "GOOSE_DBSTRING=./database/sqlite.db"
-      - "GOOSE_MIGRATION_DIR=./database/migrations"
     volumes:
       - ./api:/app
-      - ./.gotestcache:/root/.cache/go-build
+      - ./.gotestcache:/home/nyaa/.cache
     depends_on:
       - valkey
 

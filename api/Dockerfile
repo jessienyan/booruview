@@ -1,5 +1,8 @@
 FROM golang:1.25-alpine AS build
 
+RUN adduser -D -u 1000 nyaa
+USER nyaa:nyaa
+
 WORKDIR /app
 
 # Restart on *.go change
@@ -12,8 +15,9 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+RUN go install ./cmd/goose
 
 ARG COMMIT_HASH
 ENV COMMIT_HASH=$COMMIT_HASH
 
-CMD go run cmd/goose/main.go up && gow run -ldflags="-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/server/main.go
+CMD goose up && gow run -ldflags="-X codeberg.org/jessienyan/booruview.AppVersion=$COMMIT_HASH" cmd/server/main.go
