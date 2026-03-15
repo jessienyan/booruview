@@ -45,7 +45,7 @@ func TestTagSearchHandler_NoResults(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("SearchTags", "test").Return(expected, nil)
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
@@ -61,7 +61,7 @@ func TestTagSearchHandler_SomeResults(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("SearchTags", "test").Return(results, nil)
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
@@ -82,7 +82,7 @@ func TestTagSearchHandler_GelbooruDown(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("SearchTags", "test").Return([]api.TagResponse{}, gelbooru.GelbooruError{})
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 

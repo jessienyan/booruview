@@ -25,12 +25,14 @@ func Setup() {
 	}
 }
 
-func FlushCache() {
+func Flush() {
 	vk := api.Valkey()
 	err := vk.Do(context.Background(), vk.B().Flushall().Build()).Error()
 	if err != nil {
-		panic(err)
+		log.Fatal().Msgf("error flushing valkey: %v", err)
 	}
+
+	api.FlushRateLimits()
 }
 
 type MockGelbooruClient struct {
@@ -41,7 +43,11 @@ var _ gb.GelbooruClient = (*MockGelbooruClient)(nil)
 
 func (m *MockGelbooruClient) ListPosts(tags string, page int) (*gb.PostList, error) {
 	args := m.Called(tags, page)
-	return args.Get(0).(*gb.PostList), args.Error(1)
+	result := args.Get(0)
+	if result == nil {
+		return nil, args.Error(1)
+	}
+	return result.(*gb.PostList), args.Error(1)
 }
 
 func (m *MockGelbooruClient) ListTags(tags string) ([]api.TagResponse, error) {

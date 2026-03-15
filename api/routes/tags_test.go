@@ -63,7 +63,7 @@ func TestTagsHandler_CacheMiss(t *testing.T) {
 	expected := []api.TagResponse{{Name: "test", Type: api.Tag}}
 	client := &testutil.MockGelbooruClient{}
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("ListTags", "test").Return(expected, nil)
 
 	req := httptest.NewRequest("GET", "/tags?t=test", nil)
@@ -81,7 +81,7 @@ func TestTagsHandler_PartialCacheHit(t *testing.T) {
 	cachedTag := api.TagResponse{Name: "cached", Count: 1, Type: api.Tag}
 	newTag := api.TagResponse{Name: "new", Count: 2, Type: api.Artist}
 
-	testutil.FlushCache()
+	testutil.Flush()
 	writeCachedTags([]api.TagResponse{cachedTag})
 	client.On("ListTags", "new").Return([]api.TagResponse{newTag}, nil)
 
@@ -98,7 +98,7 @@ func TestTagsHandler_PartialCacheHit(t *testing.T) {
 func TestTagsHandler_GelbooruUnavailable(t *testing.T) {
 	client := &testutil.MockGelbooruClient{}
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("ListTags", "test").Return([]api.TagResponse{}, gelbooru.GelbooruError{})
 
 	req := httptest.NewRequest("GET", "/tags?t=test", nil)
@@ -113,7 +113,7 @@ func TestTagsHandler_StripsHyphen(t *testing.T) {
 	expected := []api.TagResponse{{Name: "stripme", Type: api.Tag}}
 	client := &testutil.MockGelbooruClient{}
 
-	testutil.FlushCache()
+	testutil.Flush()
 	client.On("ListTags", "stripme").Return(expected, nil)
 
 	req := httptest.NewRequest("GET", "/tags?t=-stripme", nil)
