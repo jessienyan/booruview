@@ -69,11 +69,10 @@ func TestPostsHandler_MultipleQueries(t *testing.T) {
 }
 
 func TestPostsHandler_DefaultPage(t *testing.T) {
+	testutil.Flush()
 
 	expected := gelbooru.PostList{}
 	client := &testutil.MockGelbooruClient{}
-
-	testutil.Flush()
 	client.On("ListPosts", "", 1).Return(&expected, nil)
 
 	req := httptest.NewRequest("POST", "/posts", nil)

@@ -40,13 +40,15 @@ func TestTagSearchHandler_CacheHit(t *testing.T) {
 }
 
 func TestTagSearchHandler_NoResults(t *testing.T) {
+	testutil.Flush()
+
 	expected := []api.TagResponse{}
 	client := &testutil.MockGelbooruClient{}
+	client.On("SearchTags", "test").Return(expected, nil)
+
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.Flush()
-	client.On("SearchTags", "test").Return(expected, nil)
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusOK)
@@ -56,13 +58,15 @@ func TestTagSearchHandler_NoResults(t *testing.T) {
 }
 
 func TestTagSearchHandler_SomeResults(t *testing.T) {
+	testutil.Flush()
+
 	results := []api.TagResponse{{Name: "test", Count: 0, Type: api.Tag}}
 	client := &testutil.MockGelbooruClient{}
+	client.On("SearchTags", "test").Return(results, nil)
+
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.Flush()
-	client.On("SearchTags", "test").Return(results, nil)
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusOK)
@@ -70,7 +74,6 @@ func TestTagSearchHandler_SomeResults(t *testing.T) {
 	require.JSONEq(t, rec.Body.String(), `{"results": [{"name": "test", "count": 0, "type": "tag"}]}`)
 	client.AssertExpectations(t)
 
-	// Check it was cached
 	vk := api.Valkey()
 	key := gelbooru.TagSearchCacheKey("test")
 	exists, _ := vk.Do(context.Background(), vk.B().Exists().Key(key).Build()).AsBool()
@@ -78,12 +81,14 @@ func TestTagSearchHandler_SomeResults(t *testing.T) {
 }
 
 func TestTagSearchHandler_GelbooruDown(t *testing.T) {
+	testutil.Flush()
+
 	client := &testutil.MockGelbooruClient{}
+	client.On("SearchTags", "test").Return([]api.TagResponse{}, gelbooru.GelbooruError{})
+
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	testutil.Flush()
-	client.On("SearchTags", "test").Return([]api.TagResponse{}, gelbooru.GelbooruError{})
 	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusServiceUnavailable)
