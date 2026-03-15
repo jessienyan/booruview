@@ -28,7 +28,7 @@ func main() {
 	flags.Parse(os.Args[1:])
 
 	args := flags.Args()
-	if len(args) < 1 {
+	if len(args) == 0 {
 		log.Fatal().Msg("usage: goose <command> [arguments]")
 	}
 
@@ -38,10 +38,10 @@ func main() {
 		log.Fatal().Msgf("failed to create path %s: %v", dirPath, err)
 	}
 
-	if err := api.InitUserDatabase(); err != nil {
-		log.Fatal().Msgf("failed to open db: %v", err)
+	db, err := goose.OpenDBWithDriver("sqlite", api.DatabasePath)
+	if err != nil {
+		log.Fatal().Msgf("goose: failed to open DB: %v", err)
 	}
-	db := api.UserDB()
 
 	// Use the embedded filesystem for the migrations
 	goose.SetBaseFS(migrations.FS)
