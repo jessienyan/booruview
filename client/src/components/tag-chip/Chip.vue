@@ -88,8 +88,9 @@ onMounted(() => {
                 ><i
                     class="fav-heart bi bi-heart-fill"
                     v-if="showHeart && isFavorited"
-                ></i></span
-            >{{ tag.tag.name
+                ></i
+            ></span>
+            {{ tag.tag.name
             }}<span class="warning" v-if="tag.tag.type === 'deprecated'">
                 (deprecated)</span
             >
@@ -133,8 +134,6 @@ onMounted(() => {
     align-items: center;
     gap: 4px;
     position: relative;
-    top: 1px;
-    margin-right: 4px;
 }
 
 .chip-options {
@@ -173,7 +172,7 @@ onMounted(() => {
 }
 
 .fav-heart {
-    font-size: 0.9em;
+    font-size: 0.8em;
 }
 
 .tag-deprecated,
