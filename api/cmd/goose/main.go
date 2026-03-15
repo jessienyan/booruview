@@ -48,7 +48,7 @@ func main() {
 
 	command := args[0]
 	args = args[1:]
-	if err := goose.RunContext(context.Background(), command, db, "", args...); err != nil {
+	if err := goose.RunContext(context.Background(), command, db, ".", args...); err != nil {
 		log.Fatal().Msgf("goose %v: %v", command, err)
 	}
 }
