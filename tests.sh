@@ -2,10 +2,13 @@
 
 set -euo pipefail
 IFS=$'\n\t'
+cd ${0%/*}
 
 dcc() {
 	docker compose -f docker-compose.test.yml $@
 }
+
+mkdir -p .gotestcache
 
 dcc build
 dcc up -d --renew-anon-volumes valkey

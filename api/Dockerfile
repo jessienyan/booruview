@@ -1,7 +1,7 @@
 FROM golang:1.25-alpine AS build
 
 RUN adduser -D -u 1000 nyaa
-USER nyaa:nyaa
+USER nyaa
 
 WORKDIR /app
 
