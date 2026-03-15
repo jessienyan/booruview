@@ -14,16 +14,14 @@ import (
 	"os"
 	"path"
 
-	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/database/migrations"
 	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog/log"
+
+	_ "modernc.org/sqlite"
 )
 
 func main() {
-	api.InitLogging()
-	api.LoadDatabaseEnv()
-
 	flags := flag.NewFlagSet("goose", flag.ExitOnError)
 	flags.Parse(os.Args[1:])
 
@@ -32,13 +30,18 @@ func main() {
 		log.Fatal().Msg("usage: goose <command> [arguments]")
 	}
 
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		log.Fatal().Msg("DATABASE_PATH must be set")
+	}
+
 	// Ensure the path to the database file exists
-	dirPath := path.Dir(api.DatabasePath)
+	dirPath := path.Dir(dbPath)
 	if err := os.MkdirAll(dirPath, 0644); err != nil {
 		log.Fatal().Msgf("failed to create path %s: %v", dirPath, err)
 	}
 
-	db, err := goose.OpenDBWithDriver("sqlite", api.DatabasePath)
+	db, err := goose.OpenDBWithDriver("sqlite", dbPath)
 	if err != nil {
 		log.Fatal().Msgf("goose: failed to open DB: %v", err)
 	}
