@@ -22,6 +22,12 @@ const (
 	AuthTokenTTL = time.Hour * 24 * 90
 )
 
+var (
+	// For easy stubbing in tests
+	// source: https://ekm.id.au/posts/golang-mock-time/
+	now = time.Now
+)
+
 func HashPassword(password string, salt []byte) []byte {
 	return argon2.IDKey([]byte(password), salt, hashTime, hashMemory, hashThreads, hashKeyLength)
 }
@@ -40,8 +46,8 @@ var (
 func NewAuthToken(userID int, ttl time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": strconv.Itoa(userID),
-		"iat": jwt.NewNumericDate(time.Now()),
-		"exp": jwt.NewNumericDate(time.Now().Add(ttl)),
+		"iat": jwt.NewNumericDate(now()),
+		"exp": jwt.NewNumericDate(now().Add(ttl)),
 	})
 	return token.SignedString(SecretKey)
 }
@@ -58,7 +64,7 @@ func ParseAuthToken(tokenString string) (ParsedAuthToken, error) {
 		return SecretKey, nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithExpirationRequired())
 	if err != nil {
-		if err == jwt.ErrTokenExpired {
+		if errors.Is(err, jwt.ErrTokenExpired) {
 			return ParsedAuthToken{}, AuthTokenExpired
 		}
 		log.Err(err).Str("token", tokenString).Msg("error parsing token")
