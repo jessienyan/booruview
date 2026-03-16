@@ -185,14 +185,15 @@ type PostResponse struct {
 	SampleHeight  int    `json:"sample_height"`
 }
 
-type FullPostResponse struct {
-	Attributes struct {
-		Limit  int
-		Offset int
-		Count  int
-	} `json:"@attributes"`
+type ResultListInfo struct {
+	Limit  int
+	Offset int
+	Count  int
+}
 
-	Post []PostResponse
+type FullPostResponse struct {
+	Attributes ResultListInfo `json:"@attributes"`
+	Post       []PostResponse
 }
 
 type PostList struct {
@@ -296,13 +297,8 @@ type TagInfo struct {
 }
 
 type FullTagInfoResponse struct {
-	Attributes struct {
-		Limit  int
-		Offset int
-		Count  int
-	} `json:"@attributes"`
-
-	Tag []TagInfo
+	Attributes ResultListInfo `json:"@attributes"`
+	Tag        []TagInfo
 }
 
 // ListTags returns a list of info found on the given tags (e.g. count, type).

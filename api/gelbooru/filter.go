@@ -8,7 +8,7 @@ var (
 	// Special search filters that are not actual tags and shouldn't be used for lookups.
 	// Some filters have preset values that can be recommended.
 	// https://gelbooru.com/index.php?page=wiki&s=&s=view&id=26263
-	searchFilters = map[string][]string{
+	SearchFilters = map[string][]string{
 		"fav":     nil,
 		"height":  nil,
 		"id":      nil,
@@ -28,7 +28,7 @@ func IsSearchFilter(tag string) bool {
 	if len(parts) == 1 {
 		return false
 	}
-	_, ok := searchFilters[parts[0]]
+	_, ok := SearchFilters[parts[0]]
 	return ok
 }
 
@@ -42,7 +42,7 @@ func SuggestedSearchFilters(tag string) (isFilter bool, resp []string) {
 		return
 	}
 
-	suffixes, ok := searchFilters[parts[0]]
+	suffixes, ok := SearchFilters[parts[0]]
 	if !ok || len(suffixes) == 0 {
 		return
 	}
