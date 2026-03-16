@@ -16,42 +16,49 @@ func init() {
 	testutil.Setup()
 }
 
+func newTestServer(handler http.HandlerFunc) (gelbooru.GelbooruClient, *httptest.Server) {
+	server := httptest.NewServer(handler)
+	client := gelbooru.NewClient(server.Client())
+	client.ApiUrl = server.URL
+	return client, server
+}
+
+func writeJSON(w http.ResponseWriter, data any, code int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(data)
+}
+
+//--------------------------------------------------------
+
 func TestSearchTags_MakesExpectedAPICall(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	called := false
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		require.Equal(t, "autocomplete2", query.Get("page"))
 		require.Equal(t, "foo", query.Get("term"))
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode([]gelbooru.TagSearchResponse{})
-	}))
+		called = true
+	})
 	defer server.Close()
 
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
-
-	_, err := client.SearchTags("foo")
-	require.NoError(t, err)
+	client.SearchTags("foo")
+	require.True(t, called)
 }
 
 func TestSearchTags_ParsesResponse(t *testing.T) {
-	mockResponse := []gelbooru.TagSearchResponse{
-		{Type: "tag", Label: "foo", Value: "foo", Count: "1", Category: "tag"},
-		{Type: "tag", Label: "foobar", Value: "foobar", Count: "2", Category: "tag"},
-	}
 	expected := []api.TagResponse{
 		{Name: "foo", Type: api.Tag, Count: 1},
 		{Name: "foobar", Type: api.Tag, Count: 2},
 	}
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		mockResponse := []gelbooru.TagSearchResponse{
+			{Type: "tag", Label: "foo", Value: "foo", Count: "1", Category: "tag"},
+			{Type: "tag", Label: "foobar", Value: "foobar", Count: "2", Category: "tag"},
+		}
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
-
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
 
 	actual, err := client.SearchTags("foo")
 	require.NoError(t, err)
@@ -65,11 +72,10 @@ func TestSearchTags_ReturnsRatingSuggestions(t *testing.T) {
 		{Name: "rating:sensitive", Type: api.Metadata},
 		{Name: "rating:explicit", Type: api.Metadata},
 	}
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.Fail(t, "api shouldn't be called")
-	}))
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		require.Fail(t, "should not be called")
+	})
+	defer server.Close()
 
 	actual, err := client.SearchTags("rating:")
 	require.NoError(t, err)
@@ -88,24 +94,33 @@ func TestSearchTags_ReturnsSortSuggestions(t *testing.T) {
 		{Name: "sort:source", Type: api.Unknown},
 		{Name: "sort:updated", Type: api.Unknown},
 	}
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.Fail(t, "api shouldn't be called")
-	}))
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		require.Fail(t, "should not be called")
+	})
+	defer server.Close()
 
 	actual, err := client.SearchTags("sort:")
 	require.NoError(t, err)
 	require.ElementsMatch(t, expected, actual)
 }
 
+func TestSearchTags_OverridesFilterSearches(t *testing.T) {
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		require.Fail(t, "should not be called")
+	})
+	defer server.Close()
+
+	for key := range gelbooru.SearchFilters {
+		_, err := client.SearchTags("rating:" + key)
+		require.NoError(t, err)
+	}
+}
+
+//--------------------------------------------------------
+
 func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
 	mockResponse := gelbooru.FullPostResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
+		Attributes: gelbooru.ResultListInfo{
 			Limit:  100,
 			Offset: 0,
 			Count:  500,
@@ -116,7 +131,7 @@ func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
 				CreatedAt:     "2024-01-01",
 				Score:         100,
 				Rating:        "general",
-				SourceUrl:     "https://example.com/image1",
+				SourceUrl:     "https://example.com/sauce",
 				Uploader:      "user1",
 				UploaderId:    123,
 				Tags:          "tag1 tag2",
@@ -297,6 +312,8 @@ func TestListPosts_RewritesVideoCDN3(t *testing.T) {
 	expectedURL := "https://video-cdn4.gelbooru.com/video.mp4"
 	require.Equal(t, expectedURL, postList.Posts[0].ImageUrl)
 }
+
+//--------------------------------------------------------
 
 func TestListTags_ReturnsCorrectTagInfo(t *testing.T) {
 	mockResponse := gelbooru.FullTagInfoResponse{
