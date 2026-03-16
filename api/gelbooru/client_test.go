@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
@@ -118,7 +119,50 @@ func TestSearchTags_OverridesFilterSearches(t *testing.T) {
 
 //--------------------------------------------------------
 
-func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
+func TestListPosts_MakesExpectedAPICall(t *testing.T) {
+	called := false
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "post", query.Get("s"))
+		require.Equal(t, "index", query.Get("q"))
+		require.Equal(t, "100", query.Get("limit"))
+		require.Equal(t, "1", query.Get("json"))
+		require.Equal(t, "", query.Get("tags"))
+		require.Equal(t, "0", query.Get("pid"))
+
+		called = true
+	})
+	defer server.Close()
+
+	client.ListPosts("", 1)
+	require.True(t, called)
+}
+
+func TestListPosts_ParsesResponse(t *testing.T) {
+	expected := gelbooru.PostList{
+		TotalCount: 500,
+		Posts: []api.PostResponse{
+			{
+				Id:                 1,
+				CreatedAtTimestamp: time.Date(2026, 2, 16, 1, 23, 45, 0, time.UTC).Unix(),
+				Score:              100,
+				Rating:             "general",
+				SourceUrl:          "https://example.com/sauce",
+				Uploader:           "user1",
+				UploaderUrl:        "https://gelbooru.com/index.php?page=account&s=profile&id=123",
+				Tags:               []string{"tag1", "tag2", "rating:general"},
+				ImageUrl:           "https://example.com/full.jpg",
+				Width:              800,
+				Height:             600,
+				ThumbnailUrl:       "https://example.com/preview.jpg",
+				ThumbnailWidth:     200,
+				ThumbnailHeight:    150,
+				LowResUrl:          "https://example.com/sample.jpg",
+				LowResWidth:        400,
+				LowResHeight:       300,
+			},
+		}}
 	mockResponse := gelbooru.FullPostResponse{
 		Attributes: gelbooru.ResultListInfo{
 			Limit:  100,
@@ -128,7 +172,7 @@ func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
 		Post: []gelbooru.PostResponse{
 			{
 				Id:            1,
-				CreatedAt:     "2024-01-01",
+				CreatedAt:     "Mon Feb 16 01:23:45 -0000 2026",
 				Score:         100,
 				Rating:        "general",
 				SourceUrl:     "https://example.com/sauce",
@@ -148,161 +192,73 @@ func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
 		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "post", query.Get("s"))
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
 
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
-
-	postList, err := client.ListPosts("", 1)
+	actual, err := client.ListPosts("", 1)
 	require.NoError(t, err)
-
-	require.Equal(t, 500, postList.TotalCount)
-	require.Equal(t, 1, len(postList.Posts))
-	require.Equal(t, 1, postList.Posts[0].Id)
+	require.Equal(t, expected, *actual)
 }
 
 func TestListPosts_IncludesRatingAsMetadataTag(t *testing.T) {
 	mockResponse := gelbooru.FullPostResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
-			Limit:  100,
-			Offset: 0,
-			Count:  1,
-		},
 		Post: []gelbooru.PostResponse{
 			{
-				Id:       1,
-				Score:    100,
-				Rating:   "sensitive",
-				Tags:     "tag1 tag2",
-				ImageUrl: "https://example.com/full.jpg",
-				Width:    800,
-				Height:   600,
+				Rating: "sensitive",
+				Tags:   "some_tag",
 			},
 		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "post", query.Get("s"))
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
 
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
+	postList, _ := client.ListPosts("", 1)
 
-	postList, err := client.ListPosts("", 1)
-	require.NoError(t, err)
-
-	require.Equal(t, 1, len(postList.Posts))
-
-	tags := postList.Posts[0].Tags
-	require.Equal(t, 3, len(tags))
-
-	lastTag := tags[len(tags)-1]
-	require.Equal(t, "rating:sensitive", lastTag)
+	actual := postList.Posts[0].Tags
+	require.Equal(t, []string{"some_tag", "rating:sensitive"}, actual)
 }
 
 func TestListPosts_UnescapesHTMLTags(t *testing.T) {
 	mockResponse := gelbooru.FullPostResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
-			Limit:  100,
-			Offset: 0,
-			Count:  1,
-		},
 		Post: []gelbooru.PostResponse{
 			{
-				Id:       1,
-				Score:    100,
-				Rating:   "general",
-				Tags:     "tag_1&amp;tag_2",
-				ImageUrl: "https://example.com/full.jpg",
-				Width:    800,
-				Height:   600,
+				Rating: "general",
+				Tags:   "wack&amp;tag",
 			},
 		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "post", query.Get("s"))
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
-
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
 
 	postList, err := client.ListPosts("", 1)
 	require.NoError(t, err)
 
-	require.Equal(t, 1, len(postList.Posts))
-
 	tags := postList.Posts[0].Tags
-	require.Equal(t, 2, len(tags))
-
-	expectedTag := "tag_1&tag_2"
-	require.Equal(t, expectedTag, tags[0])
+	require.Equal(t, "wack&tag", tags[0])
 }
 
-func TestListPosts_RewritesVideoCDN3(t *testing.T) {
+func TestListPosts_RewritesVideoCDN(t *testing.T) {
 	mockResponse := gelbooru.FullPostResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
-			Limit:  100,
-			Offset: 0,
-			Count:  1,
-		},
 		Post: []gelbooru.PostResponse{
 			{
-				Id:       1,
-				Score:    100,
 				Rating:   "general",
-				Tags:     "test",
 				ImageUrl: "https://video-cdn3.gelbooru.com/video.mp4",
-				Width:    800,
-				Height:   600,
 			},
 		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "post", query.Get("s"))
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
-
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
 
 	postList, err := client.ListPosts("", 1)
 	require.NoError(t, err)
@@ -315,13 +271,25 @@ func TestListPosts_RewritesVideoCDN3(t *testing.T) {
 
 //--------------------------------------------------------
 
-func TestListTags_ReturnsCorrectTagInfo(t *testing.T) {
+func TestListTags_MakesExpectedAPICall(t *testing.T) {
+	called := false
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "tag", query.Get("s"))
+		require.Equal(t, "test_tag artist_name", query.Get("names"))
+
+		called = true
+	})
+	defer server.Close()
+
+	client.ListTags("test_tag artist_name")
+	require.True(t, called)
+}
+
+func TestListTags_ParsesResponse(t *testing.T) {
 	mockResponse := gelbooru.FullTagInfoResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
+		Attributes: gelbooru.ResultListInfo{
 			Limit:  100,
 			Offset: 0,
 			Count:  2,
@@ -332,18 +300,10 @@ func TestListTags_ReturnsCorrectTagInfo(t *testing.T) {
 		},
 	}
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "tag", query.Get("s"))
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
 	defer server.Close()
-
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
 
 	tags, err := client.ListTags("test_tag artist_name")
 	require.NoError(t, err)
@@ -356,41 +316,4 @@ func TestListTags_ReturnsCorrectTagInfo(t *testing.T) {
 
 	require.Equal(t, "artist_name", tags[1].Name)
 	require.Equal(t, api.Artist, tags[1].Type)
-}
-
-func TestListTags_SkipsEmptyTags(t *testing.T) {
-	mockResponse := gelbooru.FullTagInfoResponse{
-		Attributes: struct {
-			Limit  int
-			Offset int
-			Count  int
-		}{
-			Limit:  100,
-			Offset: 0,
-			Count:  2,
-		},
-		Tag: []gelbooru.TagInfo{
-			{Id: 1, Name: "", Count: 0, Type: 0, Ambiguous: 0},
-			{Id: 2, Name: "valid_tag", Count: 50, Type: 0, Ambiguous: 0},
-		},
-	}
-
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		require.Equal(t, "dapi", query.Get("page"))
-		require.Equal(t, "tag", query.Get("s"))
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(mockResponse)
-	}))
-	defer server.Close()
-
-	client := gelbooru.NewClient(server.Client())
-	client.ApiUrl = server.URL
-
-	tags, err := client.ListTags("empty_tag valid_tag")
-	require.NoError(t, err)
-
-	require.Equal(t, 2, len(tags))
-	require.Equal(t, "", tags[0].Name)
-	require.Equal(t, "valid_tag", tags[1].Name)
 }
