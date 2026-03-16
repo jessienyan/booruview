@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -128,14 +129,14 @@ func TestListPosts_MakesExpectedAPICall(t *testing.T) {
 		require.Equal(t, "index", query.Get("q"))
 		require.Equal(t, "100", query.Get("limit"))
 		require.Equal(t, "1", query.Get("json"))
-		require.Equal(t, "", query.Get("tags"))
+		require.Equal(t, "a&amp;b -c sort:score", query.Get("tags"))
 		require.Equal(t, "0", query.Get("pid"))
 
 		called = true
 	})
 	defer server.Close()
 
-	client.ListPosts("", 1)
+	client.ListPosts("a&b -c sort:score", 1)
 	require.True(t, called)
 }
 
@@ -228,7 +229,7 @@ func TestListPosts_UnescapesHTMLTags(t *testing.T) {
 		Post: []gelbooru.PostResponse{
 			{
 				Rating: "general",
-				Tags:   "wack&amp;tag",
+				Tags:   "escaped&amp;tag",
 			},
 		},
 	}
@@ -238,11 +239,10 @@ func TestListPosts_UnescapesHTMLTags(t *testing.T) {
 	})
 	defer server.Close()
 
-	postList, err := client.ListPosts("", 1)
-	require.NoError(t, err)
+	postList, _ := client.ListPosts("", 1)
 
 	tags := postList.Posts[0].Tags
-	require.Equal(t, "wack&tag", tags[0])
+	require.Equal(t, "escaped&tag", tags[0])
 }
 
 func TestListPosts_RewritesVideoCDN(t *testing.T) {
@@ -260,13 +260,51 @@ func TestListPosts_RewritesVideoCDN(t *testing.T) {
 	})
 	defer server.Close()
 
-	postList, err := client.ListPosts("", 1)
-	require.NoError(t, err)
+	postList, _ := client.ListPosts("", 1)
 
 	require.Equal(t, 1, len(postList.Posts))
-
 	expectedURL := "https://video-cdn4.gelbooru.com/video.mp4"
 	require.Equal(t, expectedURL, postList.Posts[0].ImageUrl)
+}
+
+func TestListPosts_RewritesProxyURL(t *testing.T) {
+	api.UseMediaProxy = true
+	api.MediaProxyHost = "https://media.proxy"
+	defer func() { api.UseMediaProxy = false }()
+
+	mockResponse := gelbooru.FullPostResponse{
+		Post: []gelbooru.PostResponse{
+			{
+				ImageUrl:   "https://example.com/full.jpg",
+				PreviewUrl: "https://example.com/preview.jpg",
+				SampleUrl:  "https://example.com/sample.jpg",
+			},
+		},
+	}
+
+	client, server := newTestServer(func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, mockResponse, 200)
+	})
+	defer server.Close()
+
+	postList, _ := client.ListPosts("", 1)
+	post := postList.Posts[0]
+
+	require.Equal(
+		t,
+		"https://media.proxy/?to="+url.PathEscape("https://example.com/full.jpg"),
+		post.ImageUrl,
+	)
+	require.Equal(
+		t,
+		"https://media.proxy/?to="+url.PathEscape("https://example.com/preview.jpg"),
+		post.ThumbnailUrl,
+	)
+	require.Equal(
+		t,
+		"https://media.proxy/?to="+url.PathEscape("https://example.com/sample.jpg"),
+		post.LowResUrl,
+	)
 }
 
 //--------------------------------------------------------
@@ -288,6 +326,10 @@ func TestListTags_MakesExpectedAPICall(t *testing.T) {
 }
 
 func TestListTags_ParsesResponse(t *testing.T) {
+	expected := []api.TagResponse{
+		{Name: "test_tag", Count: 100, Type: api.Tag},
+		{Name: "artist_name", Count: 50, Type: api.Artist},
+	}
 	mockResponse := gelbooru.FullTagInfoResponse{
 		Attributes: gelbooru.ResultListInfo{
 			Limit:  100,
@@ -305,15 +347,7 @@ func TestListTags_ParsesResponse(t *testing.T) {
 	})
 	defer server.Close()
 
-	tags, err := client.ListTags("test_tag artist_name")
+	actual, err := client.ListTags("test_tag artist_name")
 	require.NoError(t, err)
-
-	require.Equal(t, 2, len(tags))
-
-	require.Equal(t, "test_tag", tags[0].Name)
-	require.Equal(t, 100, tags[0].Count)
-	require.Equal(t, api.Tag, tags[0].Type)
-
-	require.Equal(t, "artist_name", tags[1].Name)
-	require.Equal(t, api.Artist, tags[1].Type)
+	require.Equal(t, expected, actual)
 }
