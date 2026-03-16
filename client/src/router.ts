@@ -40,7 +40,7 @@ export const router = createRouter({
 	],
 });
 
-router.beforeEach(to => {
+router.beforeEach(async to => {
 	if (to.name === "search") {
 		if (!store.settings.consented) {
 			return;
@@ -57,20 +57,13 @@ router.beforeEach(to => {
 			query = to.params.query;
 		}
 
-		return new Promise<void>((resolve, reject) => {
-			tagsToSearchQuery(query || []).then(q => {
-				store.query = q;
-				store
-					.searchPosts({ page, force: store.justClickedSearchButton })
-					.then(() => {
-						store.lastSearchRoute = to;
-						resolve();
-					})
-					.catch(reject)
-					.finally(() => {
-						store.justClickedSearchButton = false;
-					});
-			});
-		});
+		try {
+			const q = await tagsToSearchQuery(query || []);
+			store.query = q;
+			await store.searchPosts({ page, force: store.justClickedSearchButton });
+			store.lastSearchRoute = to;
+		} finally {
+			store.justClickedSearchButton = false;
+		}
 	}
 });
