@@ -100,27 +100,27 @@ export class SearchQuery {
 }
 
 export async function tagsToSearchQuery(tagNames: string[]): Promise<SearchQuery> {
-		await store.loadTags(tagNames);
-		const query = new SearchQuery();
+	await store.loadTags(tagNames);
+	const query = new SearchQuery();
 
-		for (const name of tagNames) {
-			let tag = store.getTag(name);
+	for (const name of tagNames) {
+		let tag = store.getTag(name);
 
-			// Handle raw tags
-			if (tag === undefined) {
-				tag = {
-					count: 0,
-					name: name.replace(/^-+/, ""),
-					type: "unknown",
-				};
-			}
-
-			if (name.startsWith("-")) {
-				query.excludeTag(tag);
-			} else {
-				query.includeTag(tag);
-			}
+		// Handle raw tags
+		if (tag === undefined) {
+			tag = {
+				count: 0,
+				name: name.replace(/^-+/, ""),
+				type: "unknown",
+			};
 		}
 
-		return query;
+		if (name.startsWith("-")) {
+			query.excludeTag(tag);
+		} else {
+			query.includeTag(tag);
+		}
 	}
+
+	return query;
+}

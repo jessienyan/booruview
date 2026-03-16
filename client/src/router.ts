@@ -41,29 +41,29 @@ export const router = createRouter({
 });
 
 router.beforeEach(async to => {
-		if (to.name === "search") {
-			if (!store.settings.consented) {
-				return;
-			}
-
-			const page = parseInt(to.params.page as string, 10);
-			let query: string[];
-
-			if(!to.params.query || to.params.query.length === 0) {
-				query = [];
-			} else if(!Array.isArray(to.params.query)) {
-				query = to.params.query.split(",");
-			} else {
-				query = to.params.query;
-			}
-
-			try {
-				const q = await tagsToSearchQuery(query || []);
-				store.query = q;
-				await store.searchPosts({ page, force: store.justClickedSearchButton });
-				store.lastSearchRoute = to;
-			} finally {
-				store.justClickedSearchButton = false;
-			}
+	if (to.name === "search") {
+		if (!store.settings.consented) {
+			return;
 		}
-	});
+
+		const page = parseInt(to.params.page as string, 10);
+		let query: string[];
+
+		if(!to.params.query || to.params.query.length === 0) {
+			query = [];
+		} else if(!Array.isArray(to.params.query)) {
+			query = to.params.query.split(",");
+		} else {
+			query = to.params.query;
+		}
+
+		try {
+			const q = await tagsToSearchQuery(query || []);
+			store.query = q;
+			await store.searchPosts({ page, force: store.justClickedSearchButton });
+			store.lastSearchRoute = to;
+		} finally {
+			store.justClickedSearchButton = false;
+		}
+	}
+});

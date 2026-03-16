@@ -140,14 +140,11 @@ const store = reactive<Store>({
     account: JSON.parse(localStorage.getItem("account") || "null"),
     fetchingAccountData: false,
 
-async login(username: string, password: string): Promise<void> {
+	async login(username: string, password: string): Promise<void> {
 		try {
 			const resp = await fetch("/api/login", {
 				method: "POST",
-				body: JSON.stringify({
-					username: username,
-					password: password,
-				}),
+				body: JSON.stringify({ username, password }),
 				headers: { "Content-Type": "application/json" },
 			});
 			const data = await resp.json();
@@ -191,7 +188,7 @@ async login(username: string, password: string): Promise<void> {
         localStorage.setItem("account", JSON.stringify(payload));
     },
 
-async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
+	async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
 		if(this.account === null) {
 			return;
 		}
@@ -316,7 +313,7 @@ async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Pr
 
     cdnHosts: null,
 
-async updateCDNHosts() {
+	async updateCDNHosts() {
 		try {
 			const resp = await fetch("/api/hosts");
 			const data = await resp.json();
@@ -435,12 +432,12 @@ async updateCDNHosts() {
         this.onEditTag.dispatchEvent(new CustomEvent("edit_tag", { detail: tag }));
     },
 
-async tagsForPost(post: Post): Promise<Tag[]> {
-			await store.loadTags(post.tags);
-			return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
+	async tagsForPost(post: Post): Promise<Tag[]> {
+		await store.loadTags(post.tags);
+		return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
 	},
 
-async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise<void> {
+	async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise<void> {
 		type PostListResponse = {
 			count_per_page: number;
 			total_count: number;
@@ -534,7 +531,7 @@ async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise
         return Math.ceil(this.totalPostCount / this.resultsPerPage);
     },
 
-async loadTags(tags: string[]): Promise<void> {
+	async loadTags(tags: string[]): Promise<void> {
 		if(tags.length === 0) {
 			return;
 		}
@@ -587,7 +584,7 @@ async loadTags(tags: string[]): Promise<void> {
         return this.posts.get(this.currentPage);
     },
 
-async nextPage(): Promise<void> {
+	async nextPage(): Promise<void> {
 		if (this.currentPage >= this.maxPage()) {
 			throw new Error("already at max page");
 		}
@@ -601,7 +598,7 @@ async nextPage(): Promise<void> {
 		});
 	},
 
-async prevPage(): Promise<void> {
+	async prevPage(): Promise<void> {
 		if (this.currentPage <= 1) {
 			throw new Error("already at first page");
 		}
