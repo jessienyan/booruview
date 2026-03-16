@@ -1,4 +1,4 @@
-package routes
+package routes_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
+	"codeberg.org/jessienyan/booruview/routes"
 	"codeberg.org/jessienyan/booruview/testutil"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +21,7 @@ func TestTagSearchHandler_EmptyQuery(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=", nil)
 	rec := httptest.NewRecorder()
 
-	TagSearchHandler{}.ServeHTTP(rec, req)
+	routes.TagSearchHandler{}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusBadRequest)
 }
@@ -30,8 +31,8 @@ func TestTagSearchHandler_CacheHit(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=sky", nil)
 	rec := httptest.NewRecorder()
 
-	writeTagSearchToCache("sky", []byte("foo"))
-	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
+	routes.WriteTagSearchToCache("sky", []byte("foo"))
+	routes.TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Body.Bytes(), []byte("foo"))
 	require.Equal(t, rec.Code, http.StatusOK)
@@ -49,7 +50,7 @@ func TestTagSearchHandler_NoResults(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusOK)
 	require.Equal(t, rec.Header().Get("Content-Type"), "application/json")
@@ -67,7 +68,7 @@ func TestTagSearchHandler_SomeResults(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusOK)
 	require.Equal(t, rec.Header().Get("Content-Type"), "application/json")
@@ -89,7 +90,7 @@ func TestTagSearchHandler_GelbooruDown(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagSearchHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagSearchHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, rec.Code, http.StatusServiceUnavailable)
 }

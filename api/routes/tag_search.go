@@ -37,7 +37,7 @@ func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cached, err := getCachedTagSearch(query)
+	cached, err := GetCachedTagSearch(query)
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
@@ -62,10 +62,10 @@ func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	resp.Results = results
 	respData := respondJson(w, http.StatusOK, resp)
-	writeTagSearchToCache(query, respData)
+	WriteTagSearchToCache(query, respData)
 }
 
-func getCachedTagSearch(query string) ([]byte, error) {
+func GetCachedTagSearch(query string) ([]byte, error) {
 	vk := api.Valkey()
 	cached := vk.Do(context.Background(),
 		vk.B().
@@ -90,7 +90,7 @@ func getCachedTagSearch(query string) ([]byte, error) {
 	return data, nil
 }
 
-func writeTagSearchToCache(query string, data []byte) error {
+func WriteTagSearchToCache(query string, data []byte) error {
 	vk := api.Valkey()
 	compressed, err := api.CompressData(data)
 	if err != nil {

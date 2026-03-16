@@ -1,4 +1,4 @@
-package routes
+package routes_test
 
 import (
 	"net/http"
@@ -7,6 +7,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
+	"codeberg.org/jessienyan/booruview/routes"
 	"codeberg.org/jessienyan/booruview/testutil"
 	"github.com/stretchr/testify/require"
 )
@@ -16,7 +17,7 @@ func init() {
 }
 
 func requirePostResponseEqual(t *testing.T, expected gelbooru.PostList, actual string) {
-	fullExpected := PostsResponse{
+	fullExpected := routes.PostsResponse{
 		CountPerPage: gelbooru.PostsPerPage,
 		TotalCount:   expected.TotalCount,
 		Results:      expected.Posts,
@@ -38,7 +39,7 @@ func TestPostsHandler_EmptyQuery(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -61,7 +62,7 @@ func TestPostsHandler_MultipleQueries(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?q=test1&q=test2", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -78,7 +79,7 @@ func TestPostsHandler_DefaultPage(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -102,7 +103,7 @@ func TestPostsHandler_ValidQuery(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?q=test&page=1", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -113,7 +114,7 @@ func TestPostsHandler_InvalidPage(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?page=invalid", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{}.ServeHTTP(rec, req)
+	routes.PostsHandler{}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusBadRequest, rec.Code)
 	require.Contains(t, rec.Body.String(), "invalid page")
@@ -123,7 +124,7 @@ func TestPostsHandler_PageExceedsLimit(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?page=201", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{}.ServeHTTP(rec, req)
+	routes.PostsHandler{}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusBadRequest, rec.Code)
 	require.Contains(t, rec.Body.String(), "page 200")
@@ -144,7 +145,7 @@ func TestPostsHandler_CacheMiss(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?q=test&page=1", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -159,7 +160,7 @@ func TestPostsHandler_CacheHit(t *testing.T) {
 		TotalCount: 1,
 		Posts:      []api.PostResponse{{Id: 1, Tags: []string{"test"}}},
 	}
-	cacheData := testutil.MustMarshalJSON(PostsResponse{
+	cacheData := testutil.MustMarshalJSON(routes.PostsResponse{
 		CountPerPage: gelbooru.PostsPerPage,
 		TotalCount:   expected.TotalCount,
 		Results:      expected.Posts,
@@ -168,8 +169,8 @@ func TestPostsHandler_CacheHit(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts?q=test&page=1", nil)
 	rec := httptest.NewRecorder()
 
-	writePostsToCache("test", 1, cacheData)
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.WritePostsToCache("test", 1, cacheData)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	requirePostResponseEqual(t, expected, rec.Body.String())
@@ -185,7 +186,7 @@ func TestPostsHandler_GelbooruUnavailable(t *testing.T) {
 	req := httptest.NewRequest("POST", "/posts", nil)
 	rec := httptest.NewRecorder()
 
-	PostsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.PostsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusServiceUnavailable, rec.Code)
 }

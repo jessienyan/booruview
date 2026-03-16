@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	tagLimit = 100
+	TagLimit = 100
 )
 
 type TagsResponse struct {
@@ -53,12 +53,12 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if len(query) > tagLimit {
-		respondWithBadRequest(w, fmt.Sprintf("limit of %d tags", tagLimit))
+	if len(query) > TagLimit {
+		respondWithBadRequest(w, fmt.Sprintf("limit of %d tags", TagLimit))
 		return
 	}
 
-	cached, cachedMap, err := getCachedTags(query)
+	cached, cachedMap, err := GetCachedTags(query)
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
@@ -89,11 +89,11 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	respondJson(w, http.StatusOK, resp)
 
 	if len(tags) > 0 {
-		writeCachedTags(tags)
+		WriteCachedTags(tags)
 	}
 }
 
-func writeCachedTags(tags []api.TagResponse) {
+func WriteCachedTags(tags []api.TagResponse) {
 	vk := api.Valkey()
 	cmds := make(valkey.Commands, 0, len(tags))
 
@@ -111,7 +111,7 @@ func writeCachedTags(tags []api.TagResponse) {
 	vk.DoMulti(context.Background(), cmds...)
 }
 
-func getCachedTags(query []string) ([]api.TagResponse, map[string]api.TagResponse, error) {
+func GetCachedTags(query []string) ([]api.TagResponse, map[string]api.TagResponse, error) {
 	keys := make([]string, len(query))
 	for i, query := range query {
 		keys[i] = gelbooru.TagCacheKey(query)

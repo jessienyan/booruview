@@ -1,4 +1,4 @@
-package routes
+package routes_test
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/gelbooru"
+	"codeberg.org/jessienyan/booruview/routes"
 	"codeberg.org/jessienyan/booruview/testutil"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +21,7 @@ func TestTagsHandler_EmptyQuery(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tags?t=", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{}.ServeHTTP(rec, req)
+	routes.TagsHandler{}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.JSONEq(t, `{"results": []}`, rec.Body.String())
@@ -28,7 +29,7 @@ func TestTagsHandler_EmptyQuery(t *testing.T) {
 
 func TestTagsHandler_TooManyTags(t *testing.T) {
 	query := ""
-	for i := range tagLimit + 1 {
+	for i := range routes.TagLimit + 1 {
 		query += "t=" + fmt.Sprintf("tag%d", i) + "&"
 	}
 	// Strip trailing &
@@ -37,7 +38,7 @@ func TestTagsHandler_TooManyTags(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tags?"+query, nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{}.ServeHTTP(rec, req)
+	routes.TagsHandler{}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusBadRequest, rec.Code)
 	require.Contains(t, rec.Body.String(), "limit of 100 tags")
@@ -47,12 +48,12 @@ func TestTagsHandler_CacheHit(t *testing.T) {
 	client := &testutil.MockGelbooruClient{}
 	tag := api.TagResponse{Name: "test", Type: api.Tag}
 
-	writeCachedTags([]api.TagResponse{tag})
+	routes.WriteCachedTags([]api.TagResponse{tag})
 
 	req := httptest.NewRequest("GET", "/tags?t=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.JSONEq(t, `{"results": [{"name": "test", "count": 0, "type": "tag"}]}`, rec.Body.String())
@@ -69,7 +70,7 @@ func TestTagsHandler_CacheMiss(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tags?t=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.JSONEq(t, `{"results": [{"name": "test", "count": 0, "type": "tag"}]}`, rec.Body.String())
@@ -82,13 +83,13 @@ func TestTagsHandler_PartialCacheHit(t *testing.T) {
 	newTag := api.TagResponse{Name: "new", Count: 2, Type: api.Artist}
 
 	testutil.Flush()
-	writeCachedTags([]api.TagResponse{cachedTag})
+	routes.WriteCachedTags([]api.TagResponse{cachedTag})
 	client.On("ListTags", "new").Return([]api.TagResponse{newTag}, nil)
 
 	req := httptest.NewRequest("GET", "/tags?t=cached&t=new", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.JSONEq(t, `{"results": [{"name": "cached", "count": 1, "type": "tag"}, {"name": "new", "count": 2, "type": "artist"}]}`, rec.Body.String())
@@ -104,7 +105,7 @@ func TestTagsHandler_GelbooruUnavailable(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tags?t=test", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusServiceUnavailable, rec.Code)
 }
@@ -119,7 +120,7 @@ func TestTagsHandler_StripsHyphen(t *testing.T) {
 	req := httptest.NewRequest("GET", "/tags?t=-stripme", nil)
 	rec := httptest.NewRecorder()
 
-	TagsHandler{Client: client}.ServeHTTP(rec, req)
+	routes.TagsHandler{Client: client}.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
 	require.JSONEq(t, `{"results": [{"name": "stripme", "count": 0, "type": "tag"}]}`, rec.Body.String())

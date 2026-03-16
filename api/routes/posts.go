@@ -53,7 +53,7 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
-	cached, err := getCachedPosts(query, page)
+	cached, err := GetCachedPosts(query, page)
 	if err != nil {
 		respondWithInternalError(w, err)
 		return
@@ -90,10 +90,10 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	resp.Results = results.Posts
 
 	respData := respondJson(w, http.StatusOK, resp)
-	writePostsToCache(query, page, respData)
+	WritePostsToCache(query, page, respData)
 }
 
-func getCachedPosts(tags string, page int) ([]byte, error) {
+func GetCachedPosts(tags string, page int) ([]byte, error) {
 	vk := api.Valkey()
 	cached := vk.Do(context.Background(),
 		vk.B().
@@ -118,7 +118,7 @@ func getCachedPosts(tags string, page int) ([]byte, error) {
 	return data, nil
 }
 
-func writePostsToCache(query string, afterId int, data []byte) error {
+func WritePostsToCache(query string, afterId int, data []byte) error {
 	vk := api.Valkey()
 	compressed, err := api.CompressData(data)
 	if err != nil {
