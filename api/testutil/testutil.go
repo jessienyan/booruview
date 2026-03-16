@@ -8,6 +8,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	gb "codeberg.org/jessienyan/booruview/gelbooru"
+	"codeberg.org/jessienyan/booruview/models"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/mock"
@@ -72,4 +73,29 @@ func MustMarshalJSON(val any) []byte {
 		log.Fatal().Msgf("failed to marshal JSON: %v", err)
 	}
 	return data
+}
+
+func CreateUser(username, password string) models.Users {
+	salt := api.GenerateSalt()
+	passHash := api.HashPassword(password, salt)
+
+	db := models.New(api.UserDB())
+	user, err := db.CreateUser(context.Background(), models.CreateUserParams{
+		Username:     username,
+		Password:     passHash,
+		PasswordSalt: salt,
+	})
+	if err != nil {
+		log.Fatal().Msgf("failed to create user: %v", err)
+	}
+
+	_, err = db.CreateUserData(context.Background(), models.CreateUserDataParams{
+		UserID: user.ID,
+		Data:   "",
+	})
+	if err != nil {
+		log.Fatal().Msgf("failed to create user data: %v", err)
+	}
+
+	return user
 }
