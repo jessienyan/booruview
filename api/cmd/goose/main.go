@@ -45,6 +45,9 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("goose: failed to open DB: %v", err)
 	}
+	defer func() {
+		db.Close()
+	}()
 
 	// Use the embedded filesystem for the migrations
 	goose.SetBaseFS(migrations.FS)

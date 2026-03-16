@@ -2,6 +2,7 @@ package api
 
 import (
 	"os"
+	"path"
 	"regexp"
 	"strings"
 
@@ -28,8 +29,12 @@ var (
 
 func LoadDatabaseEnv() {
 	if DatabasePath == "" {
-		DatabasePath = "database/sqlite.db"
-		log.Warn().Msgf("env DATABASE_PATH is not set, defaulting to %s", DatabasePath)
+		log.Fatal().Msg("env DATABASE_PATH cannot be blank")
+	}
+
+	DatabasePath = path.Clean(DatabasePath)
+	if !path.IsAbs(DatabasePath) {
+		log.Fatal().Msg("DATABASE_PATH must be an absolute path")
 	}
 }
 
