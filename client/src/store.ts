@@ -220,8 +220,6 @@ async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Pr
 		if(empty) {
 			return;
 		}
-
-		try {
 			const resp = await fetch("/api/account", {
 				body: JSON.stringify(payload),
 				method: "PATCH",
@@ -234,9 +232,6 @@ async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Pr
 				console.error("error saving data", resp);
 				throw new Error("error saving data");
 			}
-		} catch(err) {
-			throw err;
-		}
 	},
 
     async fetchAccountData()  {
@@ -441,12 +436,8 @@ async updateCDNHosts() {
     },
 
 async tagsForPost(post: Post): Promise<Tag[]> {
-		try {
 			await store.loadTags(post.tags);
 			return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
-		} catch(err) {
-			throw err;
-		}
 	},
 
 async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise<void> {
@@ -457,8 +448,6 @@ async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise
 		};
 
 		this.fetchingPosts = true;
-
-		try {
 			page = page ?? this.currentPage;
 			const sameQuery = this.query.equals(this.lastQuery);
 
@@ -539,9 +528,6 @@ async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise
 				// Wait to search until we're done fetching account data since we need the blacklist
 				watch(() => this.fetchingAccountData, doSearch, { once: true });
 			}
-		} catch(err) {
-			throw err;
-		}
 	},
 
     maxPage(): number {
