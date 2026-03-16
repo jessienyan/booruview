@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	api "codeberg.org/jessienyan/booruview"
@@ -17,59 +16,87 @@ func init() {
 	testutil.Setup()
 }
 
-func TestSearchTags_ReturnsTagSuggestions(t *testing.T) {
-	mockResponse := []gelbooru.TagSearchResponse{
-		{Type: "tag", Label: "example", Value: "example_tag", Count: "100", Category: "tag"},
-		{Type: "tag", Label: "exa", Value: "example_tag_2", Count: "50", Category: "tag"},
-	}
-
+func TestSearchTags_MakesExpectedAPICall(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "autocomplete2" && query.Get("term") == "exa" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "autocomplete2", query.Get("page"))
+		require.Equal(t, "foo", query.Get("term"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode([]gelbooru.TagSearchResponse{})
 	}))
 	defer server.Close()
 
 	client := gelbooru.NewClient(server.Client())
 	client.ApiUrl = server.URL
 
-	tags, err := client.SearchTags("exa")
+	_, err := client.SearchTags("foo")
 	require.NoError(t, err)
+}
 
-	require.Equal(t, 2, len(tags))
-	require.Equal(t, "example_tag", tags[0].Name)
-	require.Equal(t, "example_tag_2", tags[1].Name)
+func TestSearchTags_ParsesResponse(t *testing.T) {
+	mockResponse := []gelbooru.TagSearchResponse{
+		{Type: "tag", Label: "foo", Value: "foo", Count: "1", Category: "tag"},
+		{Type: "tag", Label: "foobar", Value: "foobar", Count: "2", Category: "tag"},
+	}
+	expected := []api.TagResponse{
+		{Name: "foo", Type: api.Tag, Count: 1},
+		{Name: "foobar", Type: api.Tag, Count: 2},
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
+	}))
+	defer server.Close()
+
+	client := gelbooru.NewClient(server.Client())
+	client.ApiUrl = server.URL
+
+	actual, err := client.SearchTags("foo")
+	require.NoError(t, err)
+	require.Equal(t, expected, actual)
 }
 
 func TestSearchTags_ReturnsRatingSuggestions(t *testing.T) {
-	suggestions := []string{"general", "sensitive", "questionable", "explicit"}
-
+	expected := []api.TagResponse{
+		{Name: "rating:general", Type: api.Metadata},
+		{Name: "rating:questionable", Type: api.Metadata},
+		{Name: "rating:sensitive", Type: api.Metadata},
+		{Name: "rating:explicit", Type: api.Metadata},
+	}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		if query.Get("page") == "autocomplete2" && strings.HasPrefix(query.Get("term"), "rating:") {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(suggestions)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Fail(t, "api shouldn't be called")
 	}))
-	defer server.Close()
-
 	client := gelbooru.NewClient(server.Client())
 	client.ApiUrl = server.URL
 
-	tags, err := client.SearchTags("rating:")
+	actual, err := client.SearchTags("rating:")
 	require.NoError(t, err)
+	require.ElementsMatch(t, expected, actual)
+}
 
-	require.Equal(t, 4, len(tags))
-
-	for _, tag := range tags {
-		require.Equal(t, api.Metadata, tag.Type)
+func TestSearchTags_ReturnsSortSuggestions(t *testing.T) {
+	expected := []api.TagResponse{
+		{Name: "sort:random", Type: api.Unknown},
+		{Name: "sort:score", Type: api.Unknown},
+		{Name: "sort:id", Type: api.Unknown},
+		{Name: "sort:rating", Type: api.Unknown},
+		{Name: "sort:user", Type: api.Unknown},
+		{Name: "sort:height", Type: api.Unknown},
+		{Name: "sort:width", Type: api.Unknown},
+		{Name: "sort:source", Type: api.Unknown},
+		{Name: "sort:updated", Type: api.Unknown},
 	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		require.Fail(t, "api shouldn't be called")
+	}))
+	client := gelbooru.NewClient(server.Client())
+	client.ApiUrl = server.URL
+
+	actual, err := client.SearchTags("sort:")
+	require.NoError(t, err)
+	require.ElementsMatch(t, expected, actual)
 }
 
 func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
@@ -108,12 +135,11 @@ func TestListPosts_ReturnsPaginatedPosts(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "post" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "post", query.Get("s"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
@@ -154,12 +180,11 @@ func TestListPosts_IncludesRatingAsMetadataTag(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "post" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "post", query.Get("s"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
@@ -204,12 +229,11 @@ func TestListPosts_UnescapesHTMLTags(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "post" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "post", query.Get("s"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
@@ -254,12 +278,11 @@ func TestListPosts_RewritesVideoCDN3(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "post" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "post", query.Get("s"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
@@ -294,12 +317,11 @@ func TestListTags_ReturnsCorrectTagInfo(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "tag" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "tag", query.Get("s"))
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
@@ -338,12 +360,10 @@ func TestListTags_SkipsEmptyTags(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
-		if query.Get("page") == "dapi" && query.Get("s") == "tag" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(mockResponse)
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-		}
+		require.Equal(t, "dapi", query.Get("page"))
+		require.Equal(t, "tag", query.Get("s"))
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(mockResponse)
 	}))
 	defer server.Close()
 
