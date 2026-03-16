@@ -5,26 +5,26 @@ repos:
         name: Run yarn format
         language: system
         pass_filenames: false
-        entry: sh -c "cd client && yarn format && git add -u"
+        entry: sh -ce "cd client && yarn format && git add -u"
         files: ^client/
 
       - id: gofmt
         name: Run gofmt
         language: system
         pass_filenames: false
-        entry: sh -c "cd api && gofmt -s -w . && git add -u"
+        entry: sh -ce "cd api && gofmt -s -w . && git add -u"
         types: [go]
 
       - id: go-mod-tidy
         name: Tidy go.mod
         language: system
         pass_filenames: false
-        entry: sh -c "cd api && go mod tidy && git add -u"
+        entry: sh -ce "cd api && go mod tidy && git add -u"
         files: go\.(mod|sum)$
 
       - id: sqlc-generate
         name: Generate go models from sql
-        entry: sh -c "cd api && sqlc generate && git add -u"
+        entry: sh -ce "cd api && sqlc generate && git add -u"
         language: system
         pass_filenames: false
         files: \.sql$
