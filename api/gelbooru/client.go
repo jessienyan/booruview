@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	ApiUrl = "https://gelbooru.com/index.php"
+	GelbooruApiUrl = "https://gelbooru.com/index.php"
 )
 
 var (
@@ -32,15 +32,18 @@ type GelbooruClient interface {
 }
 
 type Client struct {
-	http *http.Client
+	HTTP   *http.Client
+	ApiUrl string
 }
 
-func NewClient(httpClient *http.Client) GelbooruClient {
+var _ GelbooruClient = (*Client)(nil)
+
+func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient
 	}
 
-	return Client{http: httpClient}
+	return &Client{HTTP: httpClient, ApiUrl: GelbooruApiUrl}
 }
 
 func (c Client) withAuth(params url.Values) {
@@ -108,7 +111,7 @@ func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	params.Add("term", query)
 	c.withAuth(params)
 
-	if err := httpGetJson(c.http, params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -217,7 +220,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 	params.Add("pid", strconv.Itoa(page-1))     // Pages are 0-indexed
 	c.withAuth(params)
 
-	if err := httpGetJson(c.http, params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -314,7 +317,7 @@ func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
 	params.Add("names", tags)
 	c.withAuth(params)
 
-	if err := httpGetJson(c.http, params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 

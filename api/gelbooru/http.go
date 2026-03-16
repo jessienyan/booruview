@@ -83,8 +83,8 @@ func httpGet(httpClient *http.Client, theUrl string, params url.Values) (*http.R
 	return resp, nil
 }
 
-func httpGetJson[T any](httpClient *http.Client, params url.Values, dst T) error {
-	resp, err := httpGet(httpClient, ApiUrl, params)
+func httpGetJson[T any](httpClient *http.Client, apiUrl string, params url.Values, dst T) error {
+	resp, err := httpGet(httpClient, apiUrl, params)
 	if err != nil {
 		return err
 	}
