@@ -6,14 +6,15 @@ import store from "./store";
 import { createRouterScroller } from "./vue-router-better-scroller";
 
 // Periodically check the API and notify the user if the version updated
-let currentVersion = COMMIT_SHA;
-setInterval(() => {
-	if (!store.settings.checkForUpdates) {
-		return;
-	}
+	let currentVersion = COMMIT_SHA;
+	setInterval(async () => {
+		if (!store.settings.checkForUpdates) {
+			return;
+		}
 
-	fetch("/api/version").then(resp =>
-		resp.json().then(({ version }: { version: string }) => {
+		try {
+			const resp = await fetch("/api/version");
+			const { version }: { version: string } = await resp.json();
 			if (version !== currentVersion) {
 				store.toast = {
 					msg: "booruview updated, refresh the page",
@@ -21,9 +22,10 @@ setInterval(() => {
 				};
 				currentVersion = version;
 			}
-		}),
-	);
-}, 60 * 1000);
+		} catch (e) {
+			console.error(e);
+		}
+	}, 60 * 1000);
 
 store.loadSettings();
 store.updateCDNHosts();

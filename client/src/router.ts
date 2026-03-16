@@ -40,37 +40,32 @@ export const router = createRouter({
 	],
 });
 
-router.beforeEach(to => {
-	if (to.name === "search") {
-		if (!store.settings.consented) {
-			return;
-		}
+router.beforeEach(async to => {
+		if (to.name === "search") {
+			if (!store.settings.consented) {
+				return;
+			}
 
-		const page = parseInt(to.params.page as string, 10);
-		let query: string[];
+			const page = parseInt(to.params.page as string, 10);
+			let query: string[];
 
-		if(!to.params.query || to.params.query.length === 0) {
-			query = [];
-		} else if(!Array.isArray(to.params.query)) {
-			query = to.params.query.split(",");
-		} else {
-			query = to.params.query;
-		}
+			if(!to.params.query || to.params.query.length === 0) {
+				query = [];
+			} else if(!Array.isArray(to.params.query)) {
+				query = to.params.query.split(",");
+			} else {
+				query = to.params.query;
+			}
 
-		return new Promise<void>((resolve, reject) => {
-			tagsToSearchQuery(query || []).then(q => {
+			try {
+				const q = await tagsToSearchQuery(query || []);
 				store.query = q;
-				store
-					.searchPosts({ page, force: store.justClickedSearchButton })
-					.then(() => {
-						store.lastSearchRoute = to;
-						resolve();
-					})
-					.catch(reject)
-					.finally(() => {
-						store.justClickedSearchButton = false;
-					});
-			});
-		});
-	}
-});
+				await store.searchPosts({ page, force: store.justClickedSearchButton });
+				store.lastSearchRoute = to;
+			} catch(err) {
+				throw err;
+			} finally {
+				store.justClickedSearchButton = false;
+			}
+		}
+	});
