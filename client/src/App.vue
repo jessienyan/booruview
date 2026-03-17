@@ -44,7 +44,11 @@ const hasConsented = computed(() => {
     <div class="app-outer">
         <div
             class="banner banner-announcement"
-            v-if="hasConsented && dataUpdate400IssueBanner.show.value"
+            v-if="
+                hasConsented &&
+                store.account !== null &&
+                dataUpdate400IssueBanner.show.value
+            "
         >
             We're aware of a bug affecting a small number of users that's
             preventing them from saving favorites. If this is happening to you,
