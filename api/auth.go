@@ -25,7 +25,7 @@ const (
 var (
 	// For easy stubbing in tests
 	// source: https://ekm.id.au/posts/golang-mock-time/
-	now = time.Now
+	Now = time.Now
 )
 
 func HashPassword(password string, salt []byte) []byte {
@@ -46,8 +46,8 @@ var (
 func NewAuthToken(userID int, ttl time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": strconv.Itoa(userID),
-		"iat": jwt.NewNumericDate(now()),
-		"exp": jwt.NewNumericDate(now().Add(ttl)),
+		"iat": jwt.NewNumericDate(Now()),
+		"exp": jwt.NewNumericDate(Now().Add(ttl)),
 	})
 	return token.SignedString(SecretKey)
 }

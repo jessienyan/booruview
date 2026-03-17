@@ -40,11 +40,11 @@ func TestGenerateSalt(t *testing.T) {
 func TestNewAuthToken_Valid(t *testing.T) {
 	userID := 123
 	issuedAt := time.Now().Truncate(time.Second)
-	now = func() time.Time {
+	Now = func() time.Time {
 		return issuedAt
 	}
 	token, err := NewAuthToken(userID, 1*time.Minute)
-	now = time.Now
+	Now = time.Now
 
 	require.NoError(t, err)
 
@@ -59,11 +59,11 @@ func TestNewAuthToken_Valid(t *testing.T) {
 
 func TestParseAuthToken_Expired(t *testing.T) {
 	issuedAt := time.Now().Add(-1 * time.Hour)
-	now = func() time.Time {
+	Now = func() time.Time {
 		return issuedAt
 	}
 	token, _ := NewAuthToken(0, 1*time.Minute)
-	now = time.Now
+	Now = time.Now
 
 	_, err := ParseAuthToken(token)
 	require.ErrorIs(t, err, AuthTokenExpired)
