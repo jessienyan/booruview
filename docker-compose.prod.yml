@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     environment:
       - "VALKEY_ADDR=valkey:6379"
+      - "DATABASE_PATH=/app/database/sqlite.db"
     env_file:
       - ".env"
     volumes:
