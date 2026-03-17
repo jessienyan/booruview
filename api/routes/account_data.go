@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -68,14 +69,14 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		var form models.UserDataJSON
 		if err := json.Unmarshal(body, &form); err != nil {
-			log.Err(err).Msg("failed to parse form")
+			logger.Err(err).Msg("failed to parse form. body: " + base64.StdEncoding.EncodeToString(body))
 			respondWithBadRequest(w, "form is not valid")
 			return
 		}
 
 		if err := api.V.Struct(form); err != nil {
 			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				log.Err(err).Msg("validation failed")
+				logger.Err(err).Msg("validation failed. body: " + base64.StdEncoding.EncodeToString(body))
 				respondWithBadRequest(w, validationErrs.Error())
 				return
 			}
