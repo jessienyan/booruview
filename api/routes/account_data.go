@@ -36,10 +36,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	user := getUser(req)
-	if user == nil {
-		respondWithUnauthorized(w)
-		return
-	}
+	logger := log.Logger.With().Str("user", user.User.String()).Logger()
 
 	data, err := user.Data.ParseJSON()
 	if err != nil {
@@ -122,7 +119,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 
-			log.Info().Int64("userid", user.User.ID).Msg("updated user data")
+			log.Info().Msg("updated user data")
 		}
 
 		respondJson(w, 200, data)
@@ -180,6 +177,8 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 			respondWithInternalError(w, err)
 			return
 		}
+
+		log.Info().Msg("user deleted account")
 
 		// On successful DELETE, return 204 no response
 		w.WriteHeader(204)

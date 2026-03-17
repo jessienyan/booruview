@@ -103,7 +103,7 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user registered")
+	log.Info().Str("user", u.String()).Msg("user registered")
 
 	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
 	if err != nil {

@@ -94,6 +94,6 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Info().Int("id", int(u.ID)).Str("username", u.Username).Msg("user logged in")
+	log.Info().Str("user", u.String()).Msg("user logged in")
 	respondJson(w, 200, LoginResponse{AuthToken: token, Username: u.Username})
 }
