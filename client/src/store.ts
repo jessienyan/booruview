@@ -652,7 +652,7 @@ const store = reactive<Store>({
             return this.saveAccountData({favorite_posts: true});
         }
 
-        this.settings.favorites = this.settings.favorites.concat(post);
+        this.settings.favorites = [post].concat(this.settings.favorites);
         this.saveSettings();
     },
 
