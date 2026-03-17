@@ -47,6 +47,11 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if params.Username == "" || params.Password == "" {
+		respondWithBadRequest(w, "username and password are required")
+		return
+	}
+
 	if !reUsername.MatchString(params.Username) {
 		respondWithBadRequest(w, "username can only contain letters, numbers, hyphens, and underscores")
 		return

@@ -1,0 +1,23 @@
+name: booruview-test
+
+services:
+  api:
+    build:
+      context: ./api/
+    #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/server/main.go
+    # security_opt: # IMPORTANT: only use when debugging
+    #   - seccomp:unconfined
+    environment:
+      - "DATABASE_PATH=/app/database/test.db"
+      - "SECRET_KEY=test"
+      - "VALKEY_ADDR=valkey:6379"
+    volumes:
+      - ./api:/app
+      - ./.gotestcache:/home/nyaa/.cache
+    depends_on:
+      - valkey
+
+  valkey:
+    build:
+      context: valkey
+

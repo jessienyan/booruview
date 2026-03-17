@@ -4,17 +4,20 @@ import (
 	"net/http"
 
 	api "codeberg.org/jessienyan/booruview"
+	"codeberg.org/jessienyan/booruview/gelbooru"
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() *mux.Router {
+func NewRouter(client gelbooru.GelbooruClient) *mux.Router {
 	r := mux.NewRouter()
+
 	r.Use(RecoverMiddleware)
-	r.HandleFunc("/tags", TagsHandler)
-	r.HandleFunc("/tagsearch", TagSearchHandler)
+
+	r.Handle("/tags", TagsHandler{Client: client})
+	r.Handle("/tagsearch", TagSearchHandler{Client: client})
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
 	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
-	r.HandleFunc("/posts", PostsHandler)
+	r.Handle("/posts", PostsHandler{Client: client})
 	r.HandleFunc("/hosts", CDNHostHandler)
 	r.HandleFunc("/version", func(w http.ResponseWriter, req *http.Request) {
 		type versionResponse struct {
