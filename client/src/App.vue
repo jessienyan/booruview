@@ -13,6 +13,7 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
+import { dataUpdate400IssueBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -41,21 +42,21 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
-        <!--
         <div
             class="banner banner-announcement"
-            v-if="hasConsented && accountAnnouncementBanner.show.value"
+            v-if="hasConsented && dataUpdate400IssueBanner.show.value"
         >
-            Accounts are finally here! Check the 'account' tab in the sidebar.
-            Please report any bugs! :)
+            We're aware of a bug affecting a small number of users that's
+            preventing them from saving favorites. If this is happening to you,
+            click 'Download Data' in the account tab and logout. We'll post an
+            update once the issue is resolved. Sorry for the inconvenience!
             <a
                 href="#"
                 class="banner-close"
-                @click.prevent="accountAnnouncementBanner.onHide()"
+                @click.prevent="dataUpdate400IssueBanner.onHide()"
                 >close</a
             >
         </div>
-        -->
 
         <div
             class="app"
