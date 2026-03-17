@@ -15,15 +15,15 @@ import (
 )
 
 var (
-	testUser         models.Users
-	testUserUsername = "test"
-	testUserPassword = "pass123"
+	loginTestUser     models.Users
+	loginTestUsername = "logintest"
+	loginTestPassword = "pass123"
 )
 
 func init() {
 	testutil.Setup()
 	api.InitUserDatabase()
-	testUser = testutil.CreateUser(testUserUsername, testUserPassword)
+	loginTestUser = testutil.CreateUser(loginTestUsername, loginTestPassword)
 }
 
 func TestLoginHandler_UserDoesntExist(t *testing.T) {
@@ -48,7 +48,7 @@ func TestLoginHandler_IncorrectPassword(t *testing.T) {
 	testutil.Flush()
 
 	params := routes.LoginParams{
-		Username: testUserUsername,
+		Username: loginTestUsername,
 		Password: "wrongagain",
 	}
 	body := testutil.MustMarshalJSON(params)
@@ -66,8 +66,8 @@ func TestLoginHandler_Success(t *testing.T) {
 	testutil.Flush()
 
 	params := routes.LoginParams{
-		Username: testUserUsername,
-		Password: testUserPassword,
+		Username: loginTestUsername,
+		Password: loginTestPassword,
 	}
 	body := testutil.MustMarshalJSON(params)
 
@@ -83,15 +83,15 @@ func TestLoginHandler_Success(t *testing.T) {
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
 	require.NotEmpty(t, response.AuthToken)
-	require.Equal(t, testUser.Username, response.Username)
+	require.Equal(t, loginTestUser.Username, response.Username)
 }
 
 func TestLoginHandler_UpdatesLastLogin(t *testing.T) {
 	testutil.Flush()
 
 	params := routes.LoginParams{
-		Username: testUserUsername,
-		Password: testUserPassword,
+		Username: loginTestUsername,
+		Password: loginTestPassword,
 	}
 	body := testutil.MustMarshalJSON(params)
 
@@ -103,7 +103,7 @@ func TestLoginHandler_UpdatesLastLogin(t *testing.T) {
 	routes.LoginHandler(rec, req)
 
 	db := models.New(api.UserDB())
-	updatedUser, _ := db.GetUserByID(t.Context(), testUser.ID)
+	updatedUser, _ := db.GetUserByID(t.Context(), loginTestUser.ID)
 
 	require.True(t, updatedUser.LastLogin.Valid)
 	require.True(t, updatedUser.LastLogin.Time.After(earlier))
