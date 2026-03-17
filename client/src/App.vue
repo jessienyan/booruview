@@ -9,7 +9,6 @@ import {
 } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
-import { accountAnnouncementBanner } from "@/indicators";
 import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
@@ -42,6 +41,7 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
+        <!--
         <div
             class="banner banner-announcement"
             v-if="hasConsented && accountAnnouncementBanner.show.value"
@@ -55,6 +55,7 @@ const hasConsented = computed(() => {
                 >close</a
             >
         </div>
+        -->
 
         <div
             class="app"
