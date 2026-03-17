@@ -58,6 +58,16 @@
     error @longUrl "URI Too Long" 414
 
     handle_errors {
+        # DuckDuckGo browser spams these
+        @ddg {
+            header  User-Agent      *DuckDuckGo*
+            header  User-Agent      *com.duckduckgo.mobile*
+            path    /favicon.ico    /apple-touch-icon.png
+        }
+
+        # get ghosted nerd
+        abort @ddg
+
         respond "{err.status_code} {err.status_text}"
     }
 
