@@ -50,11 +50,10 @@ const hasConsented = computed(() => {
                 dataUpdate400IssueBanner.show.value
             "
         >
-            <span class="bi bi-exclamation-circle"></span> A small number of
-            users are having issues saving favorites while logged in. If you're
-            affected by this, click <strong>Download Data</strong> in the
-            <strong>account</strong> tab, then logout. We'll post an update once
-            the issue is resolved.
+            We're aware of a bug affecting a small number of users that's
+            preventing them from saving favorites. If this is happening to you,
+            click 'Download Data' in the account tab and logout. We'll post an
+            update once the issue is resolved. Sorry for the inconvenience!
             <a
                 href="#"
                 class="banner-close"
