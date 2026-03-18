@@ -50,9 +50,15 @@
         Content-Security-Policy         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; media-src 'self' gelbooru.com *.gelbooru.com {$MEDIA_PROXY_HOST_SCHEMELESS}; object-src 'none'; frame-src 'none'; base-uri 'none'"
     }
 
-    # Bots running on workers.dev are scanning URLs
-    @botscan header "Cf-Worker" *
-    abort @botscan
+    # Scrapers and other junk
+    @cfWorkers header Cf-Worker *
+    abort @cfWorkers
+
+    @naughtyUserAgents {
+        # Literally just spams favicon.ico. Not related with DuckDuckGo
+        header User-Agent ddg_win
+    }
+    abort @naughtyUserAgents
 
     @longUrl expression {path}.size() > 3000
     error @longUrl "URI Too Long" 414
