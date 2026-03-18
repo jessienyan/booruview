@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-17",
+		changes: ["increased max payload size from 2MB to 4MB for account data"]
+	},
+	{
 		date: "2026-03-16",
 		changes: [
 			"internal: added a bunch of API tests",
