@@ -52,15 +52,21 @@
 
     # Scrapers and other junk
     @cfWorkers header Cf-Worker *
-    log_skip @cfWorkers
-    abort @cfWorkers
+
+    handle @cfWorkers {
+        log_skip
+        abort
+    }
 
     @naughtyUserAgents {
         # Literally just spams favicon.ico. Not related with DuckDuckGo
-        header User-Agent ddg_win
+        header User-Agent *ddg_win*
     }
-    log_skip @naughtyUserAgents
-    abort @naughtyUserAgents
+
+    handle @naughtyUserAgents {
+        log_skip
+        abort
+    }
 
     @longUrl expression {path}.size() > 3000
     error @longUrl "URI Too Long" 414
@@ -74,8 +80,10 @@
         }
 
         # get ghosted nerd
-        log_skip @ddg
-        abort @ddg
+        handle @ddg {
+            log_skip
+            abort
+        }
 
         respond "{err.status_code} {err.status_text}"
     }
