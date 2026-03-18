@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	maxDataSize = 2 * 1024 * 1024 // MB
+	maxDataSize = 4 * 1024 * 1024 // MB
 )
 
 type AccountResponse struct {
