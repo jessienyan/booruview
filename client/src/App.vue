@@ -13,7 +13,6 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
-import { dataLossIssueResolvedBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -42,19 +41,6 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
-        <div
-            class="banner banner-announcement"
-            v-if="hasConsented && dataLossIssueResolvedBanner.show.value"
-        >
-            The account data issue from earlier today has been fixed.
-            <a
-                href="#"
-                class="banner-close"
-                @click.prevent="dataLossIssueResolvedBanner.onHide()"
-                >close</a
-            >
-        </div>
-
         <div
             class="app"
             :class="{
