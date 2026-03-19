@@ -19,7 +19,7 @@ export const router = createRouter({
 			component: SearchResultsView,
 		},
 		{
-			path: "/favs",
+			path: "/favs/:page(\\d+)?",
 			name: "favorites",
 			component: FavoritesView,
 		},
