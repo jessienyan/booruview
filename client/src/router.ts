@@ -12,31 +12,17 @@ export const router = createRouter({
 			path: "/",
 			name: "landing",
 			component: LandingView,
-			beforeEnter(to) {
-				if (!to.hash) {
-					return;
-				}
-
-				const queryParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-
-				// Redirect old URL scheme: /#page=N&q=tag,tag
-				if (queryParams.has("page") && queryParams.has("q")) {
-					return {
-						name: "search",
-						params: {
-							page: queryParams.get("page"),
-							query: queryParams.get("q"),
-						},
-					};
-				}
-			},
 		},
 		{
 			path: "/search/:page(\\d+)/:query?",
 			name: "search",
 			component: SearchResultsView,
 		},
-		{ path: "/favs", name: "favorites", component: FavoritesView },
+		{
+			path: "/favs",
+			name: "favorites",
+			component: FavoritesView,
+		},
 	],
 });
 
