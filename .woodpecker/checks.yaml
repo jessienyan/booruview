@@ -6,8 +6,10 @@ steps:
     image: python:3.14-alpine
     commands: |
       apk update && apk add git
+      # Required since we are running as root
+      git config --global --add safe.directory '*'
       pip install pre-commit
-      pre-commit run -a || cat /root/.cache/pre-commit/pre-commit.log
+      pre-commit run -a
 
   - name: test api
     image: golang:1.25-alpine
@@ -17,6 +19,7 @@ steps:
     commands: |
       cd api
       export DATABASE_PATH=$(pwd)/database/test.db
+      go mod download
       go run ./cmd/goose up
       go test ./...
 
