@@ -68,6 +68,7 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 			respondWithUnauthorized(w)
 			return nil, false
 		}
+		err = errors.Wrap(err, "failed to lookup user")
 		respondWithInternalError(w, err)
 		return nil, false
 	}
@@ -90,6 +91,7 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 			UserID: user.ID,
 		})
 		if err != nil {
+			err = errors.Wrap(err, "failed to create user data")
 			respondWithInternalError(w, err)
 			return nil, false
 		}

@@ -33,6 +33,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := req.ParseForm(); err != nil {
+		err = errors.Wrap(err, "failed to parse form")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -60,6 +61,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	cached, cachedMap, err := GetCachedTags(query)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached tags")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -80,6 +82,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}

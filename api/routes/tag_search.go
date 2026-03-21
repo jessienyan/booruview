@@ -39,6 +39,7 @@ func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	cached, err := GetCachedTagSearch(query)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached tag search")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -56,6 +57,7 @@ func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		err = errors.Wrap(err, "failed to search gelbooru tags")
 		respondWithInternalError(w, err)
 		return
 	}
