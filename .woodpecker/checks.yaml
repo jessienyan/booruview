@@ -27,4 +27,4 @@ steps:
 
 services:
   - name: valkey
-    image: valkey
+    image: valkey/valkey:8.1-alpine
