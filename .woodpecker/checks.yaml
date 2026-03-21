@@ -3,7 +3,7 @@ when:
 
 steps:
   - name: pre-commit
-    image: "python:3.14-alpine"
+    image: python:3.14-alpine
     commands: |
       apk update && apk add git
       pip install pre-commit
@@ -14,24 +14,17 @@ steps:
         exit 1
       fi
 
-  - name: test
-    image: docker:cli
+  - name: test api
+    image: golang:1.25-alpine
     environment:
-      DOCKER_HOST: 'tcp://docker:2376'
-      DOCKER_CERT_PATH: '/dind-certs/client'
-      DOCKER_TLS_VERIFY: '1'
-    volumes:
-      - /opt/woodpeckerci/dind-certs:/dind-certs
-    commands:
-      - ./tests.sh
+      - SECRET_KEY=test
+      - VALKEY_ADDR=valkey:6379
+    commands: |
+      cd api
+      export DATABASE_PATH=$(pwd)/database/test.db
+      go run ./cmd/goose up
+      go test ./...
 
 services:
-  - name: docker # yo dawg, heard you like docker
-    image: docker:dind
-    privileged: true
-    environment:
-      DOCKER_TLS_CERTDIR: /dind-certs
-    volumes:
-      - /opt/woodpeckerci/dind-certs:/dind-certs
-    ports:
-      - 2376
+  - name: valkey
+    image: valkey
