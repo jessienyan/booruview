@@ -4,6 +4,7 @@ when:
 steps:
   - name: pre-commit
     image: python:3.14-alpine
+    depends_on: [] # enables parallel steps
     commands: |
       apk update && apk add git
       # Required since we are running as root
