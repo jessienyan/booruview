@@ -17,8 +17,8 @@ steps:
   - name: test api
     image: golang:1.25-alpine
     environment:
-      - SECRET_KEY=test
-      - VALKEY_ADDR=valkey:6379
+      SECRET_KEY: test
+      VALKEY_ADDR: valkey:6379
     commands: |
       cd api
       export DATABASE_PATH=$(pwd)/database/test.db
