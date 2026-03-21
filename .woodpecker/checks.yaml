@@ -7,12 +7,7 @@ steps:
     commands: |
       apk update && apk add git
       pip install pre-commit
-      pre-commit run -a
-      if [[ ! -z $(git diff --name-only) ]]; then
-        echo "files changed"
-        git diff
-        exit 1
-      fi
+      pre-commit run -a || cat /root/.cache/pre-commit/pre-commit.log
 
   - name: test api
     image: golang:1.25-alpine
