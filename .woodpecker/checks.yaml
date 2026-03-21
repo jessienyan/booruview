@@ -1,0 +1,37 @@
+when:
+  - event: pull_request
+
+steps:
+  - name: pre-commit
+    image: "python:3.14-alpine"
+    commands: |
+			apk update && apk add git
+			pip install pre-commit
+			pre-commit run -a
+			if [[ ! -z $(git diff --name-only) ]]; then
+				echo "files changed"
+				git diff
+				exit 1
+			fi
+
+  - name: test
+    image: docker:cli
+    environment:
+      DOCKER_HOST: 'tcp://docker:2376'
+      DOCKER_CERT_PATH: '/dind-certs/client'
+      DOCKER_TLS_VERIFY: '1'
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/dind-certs
+    commands:
+      - ./tests.sh
+
+services:
+  - name: docker # yo dawg, heard you like docker
+    image: docker:dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: /dind-certs
+    volumes:
+      - /opt/woodpeckerci/dind-certs:/dind-certs
+    ports:
+      - 2376
