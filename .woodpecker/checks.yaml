@@ -15,6 +15,8 @@ steps:
       export PATH=$PATH:/usr/local/go/bin
       cd api
       go mod download
+      cd ../client
+      yarn
       cd ..
       pre-commit run -a
 
