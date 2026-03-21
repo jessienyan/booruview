@@ -10,6 +10,7 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -41,6 +42,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 	data, err := user.Data.ParseJSON()
 	if err != nil {
+		err = errors.Wrap(err, "failed to parse JSON")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -57,6 +59,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -80,6 +83,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 				respondWithBadRequest(w, validationErrs.Error())
 				return
 			}
+			err = errors.Wrap(err, "failed to validate form")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -105,6 +109,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		if changed {
 			if err := user.Data.Set(data); err != nil {
+				err = errors.Wrap(err, "failed to set user data")
 				respondWithInternalError(w, err)
 				return
 			}
@@ -116,6 +121,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 			}
 
 			if err := db.UpdateUserData(req.Context(), params); err != nil {
+				err = errors.Wrap(err, "failed to update user data")
 				respondWithInternalError(w, err)
 				return
 			}
@@ -132,6 +138,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -158,6 +165,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		db := api.UserDB()
 		tx, err := db.Begin()
 		if err != nil {
+			err = errors.Wrap(err, "failed to begin transaction")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -165,16 +173,19 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		query := models.New(db).WithTx(tx)
 
 		if err := query.DeleteUserData(req.Context(), user.User.ID); err != nil {
+			err = errors.Wrap(err, "failed to delete user data")
 			respondWithInternalError(w, err)
 			return
 		}
 
 		if err := query.DeleteUser(req.Context(), user.User.ID); err != nil {
+			err = errors.Wrap(err, "failed to delete user")
 			respondWithInternalError(w, err)
 			return
 		}
 
 		if err := tx.Commit(); err != nil {
+			err = errors.Wrap(err, "failed to commit transaction")
 			respondWithInternalError(w, err)
 			return
 		}
