@@ -27,6 +27,8 @@ export type FullscreenViewMenuAnchorPoint =
 
 const QUERY_HISTORY_KEEP_RECENT_LIMIT = 100;
 
+export const APP_VERSION_TTL_MS = 60 * 1000;
+
 export type ColumnSizing = "fixed" | "dynamic";
 
 type Store = {
@@ -426,14 +428,13 @@ const store = reactive<Store>({
 		}
 
 		const CACHE_KEY = "appversion"
-		const TTL_MS = 60 * 1000;
 		const cached = localStorage.getItem(CACHE_KEY);
 
 		if(cached) {
 			const storedVal = JSON.parse(cached) as versionStorage;
 
 			// Cached version is still fresh
-			if(storedVal.checkedAt + TTL_MS >= Date.now()) {
+			if(storedVal.checkedAt + APP_VERSION_TTL_MS >= Date.now()) {
 				return storedVal.version;
 			}
 		}
