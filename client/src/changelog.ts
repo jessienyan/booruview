@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-21",
+		changes: ["cache /api/version in localstorage so it only needs to be checked once no matter how many browser tabs are open"]
+	},
+	{
 		date: "2026-03-20",
 		changes: ["added better logging for internal server errors"]
 	},
