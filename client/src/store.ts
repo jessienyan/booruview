@@ -89,6 +89,7 @@ type Store = {
 
 	loadSettings(): void;
 	saveSettings(): void;
+	appVersion(): Promise<string>;
 
 	query: SearchQuery;
 	lastQuery: SearchQuery;
@@ -417,6 +418,37 @@ const store = reactive<Store>({
             localStorage.setItem(k, JSON.stringify(v));
         });
     },
+
+	async appVersion(): Promise<string> {
+		type versionStorage = {
+			version: string;
+			checkedAt: number;
+		}
+
+		const CACHE_KEY = "appversion"
+		const TTL_MS = 60 * 1000;
+		const cached = localStorage.getItem(CACHE_KEY);
+
+		if(cached) {
+			const storedVal = JSON.parse(cached) as versionStorage;
+
+			// Cached version is still fresh
+			if(storedVal.checkedAt + TTL_MS >= Date.now()) {
+				return storedVal.version;
+			}
+		}
+
+		// Refetch if cache is stale or empty
+		const resp = await fetch("/api/version");
+		const { version }: { version: string } = await resp.json();
+		const val: versionStorage = {
+			version,
+			checkedAt: Date.now(),
+		};
+		localStorage.setItem(CACHE_KEY, JSON.stringify(val));
+
+		return version;
+	},
 
     query: new SearchQuery(),
     lastQuery: new SearchQuery(),

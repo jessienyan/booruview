@@ -13,9 +13,8 @@ setInterval(async () => {
 	}
 
 	try {
-		const resp = await fetch("/api/version");
-		const { version }: { version: string } = await resp.json();
-		if (version !== currentVersion) {
+		const version = await store.appVersion();
+		if(version !== currentVersion) {
 			store.toast = {
 				msg: "booruview updated, refresh the page",
 				type: "info",
