@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-22",
+		changes: ["fullscreen view now closes when using the browser's back button instead of changing the page"]
+	},
+	{
 		date: "2026-03-21",
 		changes: ["cache /api/version in localstorage so it only needs to be checked once no matter how many browser tabs are open"]
 	},
