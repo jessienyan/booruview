@@ -248,13 +248,29 @@ const favoriteIndex = computed(() =>
 const isFavorited = computed(() => favoriteIndex.value !== -1);
 const mainContainer = useMainContainer();
 
+const wasClosedFromBackButton = ref(false);
+function onBrowserBack() {
+    store.fullscreenPost = null;
+    wasClosedFromBackButton.value = true;
+}
+
 onMounted(() => {
     document.addEventListener("keydown", onKeyDown, { capture: true });
+
+    // Close the fullscreen view when the user hits the back button.
+    // Adding a duplicate history entry prevents the URL from changing.
+    window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", onBrowserBack);
 });
 
 onUnmounted(() => {
     document.removeEventListener("keydown", onKeyDown, { capture: true });
+    window.removeEventListener("popstate", onBrowserBack);
     mainContainer.value.focus();
+
+    if (!wasClosedFromBackButton.value) {
+        window.history.back();
+    }
 });
 </script>
 
