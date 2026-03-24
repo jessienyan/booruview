@@ -1,20 +1,14 @@
 <script setup lang="tsx">
-import { onMounted, ref } from "vue";
+import { onDeactivated, onUnmounted } from "vue";
 import { useRelativeTime } from "@/composable";
 import store from "@/store";
 import updates from "@/updates";
 
 const relativeTime = useRelativeTime();
-const oldNumberUpdatesViewed = ref(store.settings.numberUpdatesViewed);
-
-onMounted(() => {
-    store.settings.numberUpdatesViewed = updates.length;
-    store.saveSettings();
-});
 
 function isEntryNew(i: number) {
     const entryNumber = updates.length - i;
-    return entryNumber > oldNumberUpdatesViewed.value;
+    return entryNumber > store.settings.numberUpdatesViewed;
 }
 
 const choices = ["wow", "new", "neat", "nice", "cool", "ok"];
@@ -23,6 +17,16 @@ const entryStripeText = [];
 for (let i = 0; i < updates.length; i++) {
     entryStripeText.push(choices[Math.floor(Math.random() * choices.length)]);
 }
+
+function sawUpdates() {
+    store.settings.numberUpdatesViewed = updates.length;
+    store.saveSettings();
+}
+
+// Defer updating this until the user leaves the tab. This way the tab title
+// and entries will still appear as new
+onUnmounted(sawUpdates);
+onDeactivated(sawUpdates);
 </script>
 
 <template>

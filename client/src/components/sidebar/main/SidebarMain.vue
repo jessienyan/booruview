@@ -2,15 +2,15 @@
 import { type Component, computed, ref } from "vue";
 import store from "@/store";
 import updates from "@/updates";
+import NewsTab from "./NewsTab.vue";
 import RecentTab from "./RecentTab.vue";
 import SearchTab from "./SearchTab.vue";
-import UpdatesTab from "./UpdatesTab.vue";
 
-type Tab = "search" | "recent" | "updates";
+type Tab = "search" | "recent" | "news";
 const tabComponents: Record<Tab, Component> = {
     search: SearchTab,
     recent: RecentTab,
-    updates: UpdatesTab,
+    news: NewsTab,
 };
 const currentTab = ref<Tab>("search");
 
@@ -18,9 +18,9 @@ function switchTab(tab: Tab) {
     currentTab.value = tab;
 }
 
-const newUpdates = computed(() => {
-    return store.settings.numberUpdatesViewed !== updates.length;
-});
+const newUpdates = computed(
+    () => updates.length - store.settings.numberUpdatesViewed,
+);
 </script>
 
 <template>
@@ -46,12 +46,13 @@ const newUpdates = computed(() => {
             <button
                 class="tab-btn"
                 :class="{
-                    active: currentTab === 'updates',
-                    highlight: newUpdates,
+                    active: currentTab === 'news',
+                    highlight: newUpdates > 0,
                 }"
-                @click="switchTab('updates')"
+                @click="switchTab('news')"
             >
-                updates
+                news
+                <template v-if="newUpdates > 0">({{ newUpdates }})</template>
             </button>
         </header>
 
@@ -109,7 +110,6 @@ const newUpdates = computed(() => {
     }
 
     &.highlight {
-        color: #cf93f7;
         font-weight: bold;
     }
 }
