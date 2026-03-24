@@ -1,4 +1,5 @@
 import type { Component} from "vue";
+import { SURVEY_LINK } from "./config";
 
 type Update = {
 	date: Date;
@@ -10,8 +11,20 @@ type Update = {
 const updates: Update[] = [
 	{
 		date: new Date("2026-03-24T02:03:05+00:00"),
-		title: "example title",
-		component: <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed feugiat eros. Vivamus mattis dolor at nisi finibus condimentum. Maecenas sodales non dui id interdum. Morbi dignissim justo vitae fermentum accumsan. Aliquam faucibus ex ex, a lobortis lectus dignissim quis. Aliquam in viverra mauris.</p>
+		title: "coming soon™",
+		component: (
+			<>
+				<p>I've been busy but still trying to work on the site when I can. I'm hoping to have these out in the next couple weeks:</p>
+				<ul>
+					<li>create multiple fav lists</li>
+					<li>import favs from gelbooru</li>
+					<li>save searches + search feeds (TBD)</li>
+					<li><a href="https://codeberg.org/jessienyan/booruview/issues/36" target="_blank" rel="noopener">variant set</a> grouping (combines visually similar images, opt-in feature)</li>
+				</ul>
+				<p>I have some big plans for this year, more on that later :)</p>
+				<p>As always, you can post your feedback on the <a href={SURVEY_LINK} target="_blank">anonymous survey</a> or the <a href="https://codeberg.org/jessienyan/booruview/issues">codeberg repo</a></p>
+			</>
+		)
 	}
 ];
 
