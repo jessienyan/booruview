@@ -19,10 +19,15 @@ type PostsResponse struct {
 	Results      []api.PostResponse `json:"results"`
 }
 
-func PostsHandler(w http.ResponseWriter, req *http.Request) {
+type PostsHandler struct {
+	Client gelbooru.GelbooruClient
+}
+
+func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// NOTE: post rate limiting happens after checking the cache. The cost increases
 	// if there's a cache miss
 	if err := req.ParseForm(); err != nil {
+		err = errors.Wrap(err, "failed to parse form")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -49,8 +54,9 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
-	cached, err := getCachedPosts(query, page)
+	cached, err := GetCachedPosts(query, page)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached posts")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -70,15 +76,14 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	client := gelbooru.NewClient()
-
-	results, err := client.ListPosts(query, page)
+	results, err := h.Client.ListPosts(query, page)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
 			respondWithGelbooruUnavailable(w)
 			return
 		}
 
+		err = errors.Wrap(err, "failed to list posts")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -88,10 +93,10 @@ func PostsHandler(w http.ResponseWriter, req *http.Request) {
 	resp.Results = results.Posts
 
 	respData := respondJson(w, http.StatusOK, resp)
-	writePostsToCache(query, page, respData)
+	WritePostsToCache(query, page, respData)
 }
 
-func getCachedPosts(tags string, page int) ([]byte, error) {
+func GetCachedPosts(tags string, page int) ([]byte, error) {
 	vk := api.Valkey()
 	cached := vk.Do(context.Background(),
 		vk.B().
@@ -116,7 +121,7 @@ func getCachedPosts(tags string, page int) ([]byte, error) {
 	return data, nil
 }
 
-func writePostsToCache(query string, afterId int, data []byte) error {
+func WritePostsToCache(query string, afterId int, data []byte) error {
 	vk := api.Valkey()
 	compressed, err := api.CompressData(data)
 	if err != nil {

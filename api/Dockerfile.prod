@@ -1,13 +1,10 @@
-FROM golang:1.24-alpine AS build
+FROM golang:1.25-alpine AS build
 
 WORKDIR /app
 
 RUN apk update \
 	&& apk add ca-certificates git \
 	&& update-ca-certificates
-
-COPY api/get_goose.sh .
-RUN ./get_goose.sh
 
 COPY api/go.mod api/go.sum ./
 RUN go mod download
@@ -26,8 +23,9 @@ WORKDIR /app
 COPY client/dist/index.html .
 COPY --from=build /go/bin/goose /dist/createdb /dist/server ./
 COPY --from=build /app/database ./database
+COPY --from=build /dist/goose /dist/server ./
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-RUN echo -e '#!/bin/sh\ncd /app && ./createdb && ./goose up && exec ./server' > start.sh && chmod +x start.sh
+RUN echo -e '#!/bin/sh\ncd /app && ./goose up && exec ./server' > start.sh && chmod +x start.sh
 
 ENTRYPOINT ["/app/start.sh"]

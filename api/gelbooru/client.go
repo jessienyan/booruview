@@ -3,6 +3,7 @@ package gelbooru
 import (
 	"fmt"
 	"html"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -14,22 +15,40 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 )
 
-var (
-	ApiUrl = "https://gelbooru.com/index.php"
+const (
+	GelbooruApiUrl = "https://gelbooru.com/index.php"
+)
 
+var (
 	// Selects which userid/apikey pair to use
 	authPairIndex      = 0
 	authPairIndexMutex sync.Mutex
 )
 
-type Client struct {
-	UserId string
-	ApiKey string
+type GelbooruClient interface {
+	SearchTags(query string) ([]api.TagResponse, error)
+	ListPosts(tags string, page int) (*PostList, error)
+	ListTags(tags string) ([]api.TagResponse, error)
 }
 
-func NewClient() Client {
+type Client struct {
+	HTTP   *http.Client
+	ApiUrl string
+}
+
+var _ GelbooruClient = (*Client)(nil)
+
+func NewClient(httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = defaultHTTPClient
+	}
+
+	return &Client{HTTP: httpClient, ApiUrl: GelbooruApiUrl}
+}
+
+func (c Client) withAuth(params url.Values) {
 	if api.GelbooruApiKeys == nil {
-		return Client{}
+		return
 	}
 
 	authPairIndexMutex.Lock()
@@ -39,16 +58,8 @@ func NewClient() Client {
 	uid, apiKey := api.GelbooruUserIds[authPairIndex], api.GelbooruApiKeys[authPairIndex]
 	authPairIndex = (authPairIndex + 1) % len(api.GelbooruApiKeys)
 
-	return Client{UserId: uid, ApiKey: apiKey}
-}
-
-func (c Client) withAuth(params url.Values) {
-	if c.UserId == "" || c.ApiKey == "" {
-		return
-	}
-
-	params.Add("user_id", c.UserId)
-	params.Add("api_key", c.ApiKey)
+	params.Add("user_id", uid)
+	params.Add("api_key", apiKey)
 }
 
 type TagSearchResponse struct {
@@ -100,7 +111,7 @@ func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	params.Add("term", query)
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -174,14 +185,15 @@ type PostResponse struct {
 	SampleHeight  int    `json:"sample_height"`
 }
 
-type FullPostResponse struct {
-	Attributes struct {
-		Limit  int
-		Offset int
-		Count  int
-	} `json:"@attributes"`
+type ResultListInfo struct {
+	Limit  int
+	Offset int
+	Count  int
+}
 
-	Post []PostResponse
+type FullPostResponse struct {
+	Attributes ResultListInfo `json:"@attributes"`
+	Post       []PostResponse
 }
 
 type PostList struct {
@@ -209,7 +221,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 	params.Add("pid", strconv.Itoa(page-1))     // Pages are 0-indexed
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 
@@ -285,13 +297,8 @@ type TagInfo struct {
 }
 
 type FullTagInfoResponse struct {
-	Attributes struct {
-		Limit  int
-		Offset int
-		Count  int
-	} `json:"@attributes"`
-
-	Tag []TagInfo
+	Attributes ResultListInfo `json:"@attributes"`
+	Tag        []TagInfo
 }
 
 // ListTags returns a list of info found on the given tags (e.g. count, type).
@@ -306,7 +313,7 @@ func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
 	params.Add("names", tags)
 	c.withAuth(params)
 
-	if err := httpGetJson(params, &resp); err != nil {
+	if err := httpGetJson(c.HTTP, c.ApiUrl, params, &resp); err != nil {
 		return nil, err
 	}
 

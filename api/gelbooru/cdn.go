@@ -25,17 +25,17 @@ func GetCDNHosts() GelbooruCDN {
 	return cdn
 }
 
-func UpdateCDNHosts() error {
+func UpdateCDNHosts(client GelbooruClient) error {
 	if api.UseMediaProxy {
 		return nil
 	}
 
-	images, err := NewClient().ListPosts("-video", 1)
+	images, err := client.ListPosts("-video", 1)
 	if err != nil {
 		return err
 	}
 
-	videos, err := NewClient().ListPosts("video", 1)
+	videos, err := client.ListPosts("video", 1)
 	if err != nil {
 		return err
 	}

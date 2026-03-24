@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { useTemplateRef, watchPostEffect } from "vue";
+import {
+    type ComputedRef,
+    computed,
+    useTemplateRef,
+    watchPostEffect,
+} from "vue";
+import store from "@/store";
 
 defineEmits<{ click: [index: number] }>();
 
@@ -9,19 +15,24 @@ const props = defineProps<{
 }>();
 
 const listRef = useTemplateRef("list");
+function isFavorited(tag: Tag): ComputedRef<boolean> {
+    return computed(() => {
+        return (
+            store.favoriteTags().value.findIndex((t) => t.name === tag.name) !==
+            -1
+        );
+    });
+}
 
 watchPostEffect(() => {
     if (!listRef.value || props.tags.length === 0 || props.selectedIndex < 0) {
         return;
     }
 
-    const item = listRef.value.children.item(props.selectedIndex);
-
-    if (!item) {
-        console.error("shouldn't happen");
-    } else {
-        (item as HTMLLIElement).focus();
-    }
+    const item = listRef.value.children.item(
+        props.selectedIndex,
+    ) as HTMLElement | null;
+    item?.focus();
 });
 </script>
 
@@ -36,7 +47,13 @@ watchPostEffect(() => {
             tabindex="-1"
             @click="$emit('click', i)"
         >
-            <span class="name">{{ tag.name.replace(/_/g, " ") }}</span>
+            <span class="name"
+                ><span
+                    class="fav-icon bi bi-heart-fill"
+                    v-if="isFavorited(tag).value"
+                ></span>
+                {{ tag.name.replace(/_/g, " ") }}</span
+            >
             <span class="count" v-if="tag.type !== 'unknown'">
                 {{ tag.count }}
             </span>
@@ -72,6 +89,10 @@ watchPostEffect(() => {
 .name {
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.fav-icon {
+    font-size: 0.8em;
 }
 
 .count {

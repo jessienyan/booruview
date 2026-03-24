@@ -5,6 +5,42 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-23",
+		changes: ["added news tab (it's not replacing the changelog)"]
+	},
+	{
+		date: "2026-03-22",
+		changes: ["fullscreen view now closes when using the browser's back button instead of changing the page"]
+	},
+	{
+		date: "2026-03-21",
+		changes: ["cache /api/version in localstorage so it only needs to be checked once no matter how many browser tabs are open"]
+	},
+	{
+		date: "2026-03-20",
+		changes: ["added better logging for internal server errors"]
+	},
+	{
+		date: "2026-03-17",
+		changes: ["increased max payload size from 2MB to 4MB for account data"]
+	},
+	{
+		date: "2026-03-16",
+		changes: [
+			"internal: added a bunch of API tests",
+			"fixed the favorite post ordering issue for logged out users",
+			"temporarily blocked duckduckgo browser from spamming favicon requests",
+		],
+	},
+	{
+		date: "2026-03-14",
+		changes: ["added heart icon to favorited tags in search suggestions"]
+	},
+	{
+		date: "2026-03-07",
+		changes: ["fixed accidental change with favorites being added to the bottom of the page"],
+	},
+	{
 		date: "2026-03-02",
 		changes: ["fixed post searches not using blacklist sometimes"]
 	},

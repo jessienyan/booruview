@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	httpClient = &http.Client{Timeout: 4 * time.Second}
+	defaultHTTPClient = &http.Client{Timeout: 4 * time.Second}
 )
 
 // Checks if the error is timeout related, and if so, replaces it with a GelbooruError
@@ -36,7 +36,7 @@ func transformTimeoutError(err error) error {
 	return err
 }
 
-func doRequest(req *http.Request) (*http.Response, error) {
+func doRequest(httpClient *http.Client, req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
 	resp, err := httpClient.Do(req)
 
@@ -59,7 +59,7 @@ func doRequest(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-func httpGet(theUrl string, params url.Values) (*http.Response, error) {
+func httpGet(httpClient *http.Client, theUrl string, params url.Values) (*http.Response, error) {
 	_url, err := url.Parse(theUrl + "?" + params.Encode())
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	req := &http.Request{URL: _url, Header: http.Header{}}
 	req.Header.Set("Cookie", "fringeBenefits=yup") // Enable all content
 
-	resp, err := doRequest(req)
+	resp, err := doRequest(httpClient, req)
 	if err != nil {
 		return nil, transformTimeoutError(err)
 	}
@@ -83,8 +83,8 @@ func httpGet(theUrl string, params url.Values) (*http.Response, error) {
 	return resp, nil
 }
 
-func httpGetJson[T any](params url.Values, dst T) error {
-	resp, err := httpGet(ApiUrl, params)
+func httpGetJson[T any](httpClient *http.Client, apiUrl string, params url.Values, dst T) error {
+	resp, err := httpGet(httpClient, apiUrl, params)
 	if err != nil {
 		return err
 	}

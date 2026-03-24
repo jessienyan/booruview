@@ -2,10 +2,22 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"slices"
+	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 )
+
+func (u Users) String() string {
+	return fmt.Sprintf(
+		"User<ID=%d, Username='%s', CreatedAt=%s, LastLogin=%s>",
+		u.ID,
+		u.Username,
+		u.CreatedAt.Format(time.RFC3339),
+		u.LastLogin.Time.Format(time.RFC3339),
+	)
+}
 
 func (ud UserData) ParseJSON() (UserDataJSON, error) {
 	var parsed UserDataJSON

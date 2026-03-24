@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,11 +10,12 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
 const (
-	maxDataSize = 2 * 1024 * 1024 // MB
+	maxDataSize = 4 * 1024 * 1024 // MB
 )
 
 type AccountResponse struct {
@@ -36,13 +38,11 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	user := getUser(req)
-	if user == nil {
-		respondWithUnauthorized(w)
-		return
-	}
+	logger := log.Logger.With().Str("user", user.User.String()).Logger()
 
 	data, err := user.Data.ParseJSON()
 	if err != nil {
+		err = errors.Wrap(err, "failed to parse JSON")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -59,6 +59,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -71,17 +72,18 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		var form models.UserDataJSON
 		if err := json.Unmarshal(body, &form); err != nil {
-			log.Err(err).Msg("failed to parse form")
+			logger.Err(err).Msg("failed to parse form. body: " + base64.StdEncoding.EncodeToString(body))
 			respondWithBadRequest(w, "form is not valid")
 			return
 		}
 
 		if err := api.V.Struct(form); err != nil {
 			if validationErrs, ok := err.(validator.ValidationErrors); ok {
-				log.Err(err).Msg("validation failed")
+				logger.Err(err).Msg("validation failed. body: " + base64.StdEncoding.EncodeToString(body))
 				respondWithBadRequest(w, validationErrs.Error())
 				return
 			}
+			err = errors.Wrap(err, "failed to validate form")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -107,6 +109,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		if changed {
 			if err := user.Data.Set(data); err != nil {
+				err = errors.Wrap(err, "failed to set user data")
 				respondWithInternalError(w, err)
 				return
 			}
@@ -118,11 +121,12 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 			}
 
 			if err := db.UpdateUserData(req.Context(), params); err != nil {
+				err = errors.Wrap(err, "failed to update user data")
 				respondWithInternalError(w, err)
 				return
 			}
 
-			log.Info().Int64("userid", user.User.ID).Msg("updated user data")
+			log.Info().Msg("updated user data")
 		}
 
 		respondJson(w, 200, data)
@@ -134,6 +138,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -160,6 +165,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		db := api.UserDB()
 		tx, err := db.Begin()
 		if err != nil {
+			err = errors.Wrap(err, "failed to begin transaction")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -167,19 +173,24 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		query := models.New(db).WithTx(tx)
 
 		if err := query.DeleteUserData(req.Context(), user.User.ID); err != nil {
+			err = errors.Wrap(err, "failed to delete user data")
 			respondWithInternalError(w, err)
 			return
 		}
 
 		if err := query.DeleteUser(req.Context(), user.User.ID); err != nil {
+			err = errors.Wrap(err, "failed to delete user")
 			respondWithInternalError(w, err)
 			return
 		}
 
 		if err := tx.Commit(); err != nil {
+			err = errors.Wrap(err, "failed to commit transaction")
 			respondWithInternalError(w, err)
 			return
 		}
+
+		log.Info().Msg("user deleted account")
 
 		// On successful DELETE, return 204 no response
 		w.WriteHeader(204)

@@ -1,0 +1,37 @@
+when:
+  - event: [pull_request, manual]
+
+steps:
+  - name: pre-commit
+    image: python:3.14-alpine
+    depends_on: [] # enables parallel steps
+    commands: |
+      apk update && apk add curl git yarn
+      # Required since we are running as root
+      git config --global --add safe.directory '*'
+      pip install pre-commit
+      curl -L https://go.dev/dl/go1.25.8.linux-amd64.tar.gz \
+        | tar -C /usr/local -xzf -
+      export PATH=$PATH:/usr/local/go/bin
+      cd api
+      go mod download
+      cd ../client
+      yarn
+      cd ..
+      pre-commit run -a --show-diff-on-failure
+
+  - name: test api
+    image: golang:1.25-alpine
+    environment:
+      SECRET_KEY: test
+      VALKEY_ADDR: valkey:6379
+    commands: |
+      cd api
+      export DATABASE_PATH=$(pwd)/database/test.db
+      go mod download
+      go run ./cmd/goose up
+      go test ./...
+
+services:
+  - name: valkey
+    image: valkey/valkey:8.1-alpine
