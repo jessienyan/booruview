@@ -11,7 +11,7 @@ function isNew(d: Date) {
 }
 
 const choices = ["wow", "new", "neat", "nice", "cool", "ok"];
-const entryStripeText = [];
+const entryStripeText: string[] = [];
 
 for (let i = 0; i < allNews.length; i++) {
     entryStripeText.push(choices[Math.floor(Math.random() * choices.length)]);
