@@ -28,7 +28,7 @@ func IndexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var templateContext any
-	user := getUser(req)
+	user := GetUser(req)
 	if user == nil {
 		templateContext = nil
 	} else {

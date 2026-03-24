@@ -31,13 +31,15 @@ func TestAuthMiddleware_MissingAuthHeader(t *testing.T) {
 	req := httptest.NewRequest("GET", "/faked", nil)
 	rec := httptest.NewRecorder()
 
-	mw := routes.NewAuthMiddleware(true)
-	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.Fail(t, "should not be called")
+	called := false
+	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		u := routes.GetUser(r)
+		require.Nil(t, u)
 	}))
 	handler.ServeHTTP(rec, req)
 
-	require.Equal(t, http.StatusUnauthorized, rec.Code)
+	require.True(t, called)
 }
 
 func TestAuthMiddleware_InvalidToken(t *testing.T) {
@@ -47,8 +49,7 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer invalidtoken")
 	rec := httptest.NewRecorder()
 
-	mw := routes.NewAuthMiddleware(true)
-	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -65,8 +66,7 @@ func TestAuthMiddleware_ExpiredToken(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
 
-	mw := routes.NewAuthMiddleware(true)
-	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -83,8 +83,7 @@ func TestAuthMiddleware_NonExistentUser(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
 
-	mw := routes.NewAuthMiddleware(true)
-	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -102,13 +101,12 @@ func TestAuthMiddleware_ValidTokenCallsNextHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	called := false
-	mw := routes.NewAuthMiddleware(true)
-	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		called = true // sanity check
-		w.WriteHeader(http.StatusOK)
+	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		u := routes.GetUser(r).User
+		require.Equal(t, authMiddlewareUser, u)
 	}))
 	handler.ServeHTTP(rec, req)
 
-	require.Equal(t, http.StatusOK, rec.Code)
 	require.True(t, called)
 }

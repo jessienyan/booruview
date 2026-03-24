@@ -8,7 +8,6 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -50,7 +49,7 @@ type userContextValue struct {
 	Data models.UserData
 }
 
-func getUser(req *http.Request) *userContextValue {
+func GetUser(req *http.Request) *userContextValue {
 	user := req.Context().Value(userKey)
 	if user == nil {
 		return nil
@@ -112,42 +111,46 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 
 // Adds a user to the request context if a valid auth token was sent.
 // Looks for the token in the Authorization header, then as a cookie.
-// If requireAuth is true, returns 401 unless the user is authenticated.
-// If requireAuth is false, unauthenticated requests are allowed
-func NewAuthMiddleware(requireAuth bool) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			var token string
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var token string
 
-			token = strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+		token = strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
 
-			if token == "" {
-				cookie, _ := req.Cookie(api.AuthCookieName)
-				if cookie != nil {
-					token = cookie.Value
-				}
+		if token == "" {
+			cookie, _ := req.Cookie(api.AuthCookieName)
+			if cookie != nil {
+				token = cookie.Value
 			}
+		}
 
-			if requireAuth && token == "" {
+		if token != "" {
+			if parsedToken, err := api.ParseAuthToken(token); err == nil {
+				// Make sure we don't clobber `req`
+				var ok bool
+				if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
+					// loadUserIntoContext sent a response already, nothing to do here
+					return
+				}
+			} else {
 				respondWithUnauthorized(w)
 				return
 			}
+		}
 
-			if token != "" {
-				if parsedToken, err := api.ParseAuthToken(token); err == nil {
-					// Make sure we don't clobber `req`
-					var ok bool
-					if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
-						// loadUserIntoContext sent a response already, nothing to do here
-						return
-					}
-				} else {
-					respondWithUnauthorized(w)
-					return
-				}
-			}
+		next.ServeHTTP(w, req)
+	})
+}
 
-			next.ServeHTTP(w, req)
-		})
-	}
+// Aborts the request with a 401 if the user wasn't authenticated
+func RequireAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u := GetUser(r)
+		if u == nil {
+			respondWithUnauthorized(w)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
