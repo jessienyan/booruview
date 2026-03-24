@@ -8,6 +8,13 @@ repos:
         entry: sh -ce "cd client && yarn format"
         files: ^client/
 
+      - id: yarn-typecheck
+        name: Run yarn type-check
+        language: system
+        pass_filenames: false
+        entry: sh -ce "cd client && yarn type-check"
+        files: ^client/
+
       - id: gofmt
         name: Run gofmt
         language: system
