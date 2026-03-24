@@ -144,13 +144,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 // Aborts the request with a 401 if the user wasn't authenticated
 func RequireAuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		u := GetUser(r)
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		u := GetUser(req)
 		if u == nil {
 			respondWithUnauthorized(w)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, req)
 	})
 }
