@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-23",
+		changes: ["added news tab (it's not replacing the changelog)"]
+	},
+	{
 		date: "2026-03-22",
 		changes: ["fullscreen view now closes when using the browser's back button instead of changing the page"]
 	},
