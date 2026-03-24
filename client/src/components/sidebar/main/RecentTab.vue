@@ -69,7 +69,7 @@ function onDelete(index: number) {
 @import "@/assets/colors";
 
 .history-entry {
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .entry-footer {
