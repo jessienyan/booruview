@@ -87,7 +87,7 @@ type Store = {
         queryHistory: SearchHistory[];
         sidebarTabsHidden: boolean;
         maxPostHeight: number | null;
-        numberUpdatesViewed: number;
+        newsLastViewedAt: Date;
     };
 
     loadSettings(): void;
@@ -359,7 +359,7 @@ const store = reactive<Store>({
         queryHistory: [],
         sidebarTabsHidden: false,
         maxPostHeight: 600,
-        numberUpdatesViewed: 0,
+        newsLastViewedAt: new Date(0),
     },
 
     loadSettings() {

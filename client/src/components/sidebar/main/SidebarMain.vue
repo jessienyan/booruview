@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Component, computed, ref } from "vue";
+import news from "@/news";
 import store from "@/store";
-import updates from "@/updates";
 import NewsTab from "./NewsTab.vue";
 import RecentTab from "./RecentTab.vue";
 import SearchTab from "./SearchTab.vue";
@@ -18,9 +18,15 @@ function switchTab(tab: Tab) {
     currentTab.value = tab;
 }
 
-const newUpdates = computed(
-    () => updates.length - store.settings.numberUpdatesViewed,
-);
+const numUnreadNews = computed(() => {
+    let i = 0;
+    for (const { date } of news) {
+        if (date > store.settings.newsLastViewedAt) {
+            i++;
+        }
+    }
+    return i;
+});
 </script>
 
 <template>
@@ -47,12 +53,14 @@ const newUpdates = computed(
                 class="tab-btn"
                 :class="{
                     active: currentTab === 'news',
-                    highlight: newUpdates > 0,
+                    highlight: numUnreadNews > 0,
                 }"
                 @click="switchTab('news')"
             >
                 news
-                <template v-if="newUpdates > 0">({{ newUpdates }})</template>
+                <template v-if="numUnreadNews > 0"
+                    >({{ numUnreadNews }})</template
+                >
             </button>
         </header>
 

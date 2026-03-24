@@ -1,47 +1,46 @@
 <script setup lang="tsx">
 import { onDeactivated, onUnmounted } from "vue";
 import { useRelativeTime } from "@/composable";
+import allNews from "@/news";
 import store from "@/store";
-import updates from "@/updates";
 
 const relativeTime = useRelativeTime();
 
-function isEntryNew(i: number) {
-    const entryNumber = updates.length - i;
-    return entryNumber > store.settings.numberUpdatesViewed;
+function isNew(d: Date) {
+    return d > store.settings.newsLastViewedAt;
 }
 
 const choices = ["wow", "new", "neat", "nice", "cool", "ok"];
 const entryStripeText = [];
 
-for (let i = 0; i < updates.length; i++) {
+for (let i = 0; i < allNews.length; i++) {
     entryStripeText.push(choices[Math.floor(Math.random() * choices.length)]);
 }
 
-function sawUpdates() {
-    store.settings.numberUpdatesViewed = updates.length;
+function sawNews() {
+    store.settings.newsLastViewedAt = new Date();
     store.saveSettings();
 }
 
 // Defer updating this until the user leaves the tab. This way the tab title
 // and entries will still appear as new
-onUnmounted(sawUpdates);
-onDeactivated(sawUpdates);
+onUnmounted(sawNews);
+onDeactivated(sawNews);
 </script>
 
 <template>
     <div
-        v-for="(update, i) in updates"
+        v-for="(news, i) in allNews"
         class="entry"
-        :class="{ 'entry-seen': !isEntryNew(i) }"
+        :class="{ 'entry-seen': !isNew(news.date) }"
     >
-        <h2>{{ update.title }}</h2>
-        <span v-if="isEntryNew(i)" class="new-stripe">{{
+        <h2>{{ news.title }}</h2>
+        <span v-if="isNew(news.date)" class="new-stripe">{{
             entryStripeText[i]
         }}</span>
-        <component :is="update.component" />
-        <p class="timestamp" :title="update.date.toLocaleString()">
-            posted {{ relativeTime(update.date) }}
+        <component :is="news.component" />
+        <p class="timestamp" :title="news.date.toLocaleString()">
+            posted {{ relativeTime(news.date) }}
         </p>
     </div>
 </template>
