@@ -21,7 +21,6 @@ WORKDIR /app
 
 # Embed the generated index.html
 COPY client/dist/index.html .
-COPY --from=build /go/bin/goose /dist/createdb /dist/server ./
 COPY --from=build /app/database ./database
 COPY --from=build /dist/goose /dist/server ./
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
