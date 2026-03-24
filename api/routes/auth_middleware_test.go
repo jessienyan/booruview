@@ -31,7 +31,8 @@ func TestAuthMiddleware_MissingAuthHeader(t *testing.T) {
 	req := httptest.NewRequest("GET", "/faked", nil)
 	rec := httptest.NewRecorder()
 
-	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := routes.NewAuthMiddleware(true)
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -46,7 +47,8 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer invalidtoken")
 	rec := httptest.NewRecorder()
 
-	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := routes.NewAuthMiddleware(true)
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -63,7 +65,8 @@ func TestAuthMiddleware_ExpiredToken(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
 
-	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := routes.NewAuthMiddleware(true)
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -80,7 +83,8 @@ func TestAuthMiddleware_NonExistentUser(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
 
-	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := routes.NewAuthMiddleware(true)
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		require.Fail(t, "should not be called")
 	}))
 	handler.ServeHTTP(rec, req)
@@ -98,7 +102,8 @@ func TestAuthMiddleware_ValidTokenCallsNextHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	called := false
-	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mw := routes.NewAuthMiddleware(true)
+	handler := mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		called = true // sanity check
 		w.WriteHeader(http.StatusOK)
 	}))
