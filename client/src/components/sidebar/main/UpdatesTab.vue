@@ -17,7 +17,7 @@ function isEntryNew(i: number) {
     return entryNumber > oldNumberUpdatesViewed.value;
 }
 
-const choices = ["wow", "neat", "nice", "cool"];
+const choices = ["wow", "new", "neat", "nice", "cool", "ok"];
 const entryStripeText = [];
 
 for (let i = 0; i < updates.length; i++) {
@@ -29,7 +29,7 @@ for (let i = 0; i < updates.length; i++) {
     <div
         v-for="(update, i) in updates"
         class="entry"
-        :class="[isEntryNew(i) ? 'entry-new' : 'entry-seen']"
+        :class="{ 'entry-seen': !isEntryNew(i) }"
     >
         <h2>{{ update.title }}</h2>
         <span v-if="isEntryNew(i)" class="new-stripe">{{
@@ -51,12 +51,7 @@ for (let i = 0; i < updates.length; i++) {
     margin-bottom: 0.8rem;
     padding: 0.8rem;
     overflow: hidden;
-
-    background-color: color.scale(
-        $color-primary-darker,
-        $saturation: 25%,
-        $lightness: 2%
-    );
+    background-color: #2d1b39;
 
     /* deep pp */
     :deep(p) {
@@ -81,6 +76,10 @@ for (let i = 0; i < updates.length; i++) {
         opacity: 0.7;
         font-size: 0.9em;
     }
+}
+
+.entry-seen {
+    filter: brightness(0.85) saturate(0.6);
 }
 
 .new-stripe {

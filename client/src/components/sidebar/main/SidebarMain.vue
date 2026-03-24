@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { type Component, ref } from "vue";
+import { type Component, computed, ref } from "vue";
+import store from "@/store";
+import updates from "@/updates";
 import RecentTab from "./RecentTab.vue";
 import SearchTab from "./SearchTab.vue";
 import UpdatesTab from "./UpdatesTab.vue";
@@ -15,6 +17,10 @@ const currentTab = ref<Tab>("search");
 function switchTab(tab: Tab) {
     currentTab.value = tab;
 }
+
+const newUpdates = computed(() => {
+    return store.settings.numberUpdatesViewed !== updates.length;
+});
 </script>
 
 <template>
@@ -39,7 +45,10 @@ function switchTab(tab: Tab) {
 
             <button
                 class="tab-btn"
-                :class="{ active: currentTab === 'updates', highlight: true }"
+                :class="{
+                    active: currentTab === 'updates',
+                    highlight: newUpdates,
+                }"
                 @click="switchTab('updates')"
             >
                 updates
