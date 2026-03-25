@@ -190,7 +190,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		log.Info().Msg("user deleted account")
+		log.Info().Str("user", user.User.String()).Msg("user deleted account")
 
 		// On successful DELETE, return 204 no response
 		w.WriteHeader(204)

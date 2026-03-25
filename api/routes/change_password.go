@@ -9,6 +9,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
+	"github.com/rs/zerolog/log"
 )
 
 type ChangePasswordParams struct {
@@ -70,6 +71,8 @@ func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 		respondWithInternalError(w, err)
 		return
 	}
+
+	log.Info().Str("user", user.User.String()).Msg("user changed password")
 
 	// Generate a new token for the user so they aren't immediately logged out
 	token, err := api.NewAuthToken(int(user.User.ID), api.AuthTokenTTL)
