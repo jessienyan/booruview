@@ -62,9 +62,9 @@ function consentNSFWWithBlacklist() {
 </script>
 
 <template>
-    <ScreenCover blackout />
     <div class="cw-container">
-        <div v-if="view === 'initial'" class="content-warning">
+        <ScreenCover blackout />
+        <div v-if="view === 'initial'" class="content-warning appear">
             <p>
                 Booruview is an image browser for Gelbooru, an image board that
                 hosts
@@ -124,6 +124,19 @@ function consentNSFWWithBlacklist() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
+@keyframes fade-out-anim {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.transition-leave-active {
+    animation: 400ms ease fade-out-anim;
+}
+
 .btn-green {
     background-color: #70e570;
     color: black;
@@ -149,6 +162,7 @@ function consentNSFWWithBlacklist() {
 .content-warning {
     padding: 0.8rem;
     max-width: 500px;
+    z-index: 10;
 }
 
 .nsfw-warning {
@@ -167,7 +181,7 @@ function consentNSFWWithBlacklist() {
     padding: 1rem;
     cursor: pointer;
 
-    transition: opacity ease 0.9s;
+    transition: opacity ease 900ms;
 
     &:disabled {
         opacity: 0.5;
@@ -186,7 +200,7 @@ function consentNSFWWithBlacklist() {
     }
 }
 .appear {
-    animation: 0.7s ease appear-anim;
+    animation: 700ms ease appear-anim;
 }
 
 .btn-container {

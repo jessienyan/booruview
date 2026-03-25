@@ -56,7 +56,10 @@ const hasConsented = computed(() => {
                     >{{ store.toast.msg }}</Toast
                 >
             </Transition>
-            <ContentWarning v-if="!hasConsented" />
+
+            <Transition name="transition">
+                <ContentWarning v-if="!hasConsented" />
+            </Transition>
 
             <FullscreenView
                 v-if="store.fullscreenPost !== null"
