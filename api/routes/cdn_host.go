@@ -13,19 +13,22 @@ type CDNHostResponse struct {
 	MediaProxy bool   `json:"media_proxy"`
 }
 
-func CDNHostHandler(w http.ResponseWriter, req *http.Request) {
+func NewCDNHostResponse() CDNHostResponse {
 	if api.UseMediaProxy {
-		respondJson(w, 200, CDNHostResponse{
+		return CDNHostResponse{
 			Image:      api.MediaProxyHost + "/?to=",
 			Video:      api.MediaProxyHost + "/?to=",
 			MediaProxy: true,
-		})
-		return
+		}
 	}
 
 	hosts := gelbooru.GetCDNHosts()
-	respondJson(w, 200, CDNHostResponse{
+	return CDNHostResponse{
 		Image: hosts.ImageHost,
 		Video: hosts.VideoHost,
-	})
+	}
+}
+
+func CDNHostHandler(w http.ResponseWriter, req *http.Request) {
+	respondJson(w, 200, NewCDNHostResponse())
 }

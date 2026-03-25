@@ -25,7 +25,7 @@ func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user := getUser(req)
+	user := GetUser(req)
 	if user == nil {
 		respondWithUnauthorized(w)
 		return

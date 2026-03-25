@@ -54,7 +54,7 @@ type Store = {
     cdnHosts: {
         image: string;
         video: string;
-        mediaProxy: boolean;
+        media_proxy: boolean;
     } | null;
 
     updateCDNHosts(): void;
@@ -240,6 +240,14 @@ const store = reactive<Store>({
             return;
         }
 
+        // If the data is already available in the HTML, use it directly
+        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null");
+
+        if(preloadedData) {
+            this.account.data = preloadedData;
+            return;
+        }
+
         const { authToken } = this.account;
 
         try {
@@ -317,18 +325,8 @@ const store = reactive<Store>({
 
     cdnHosts: null,
 
-    async updateCDNHosts() {
-        try {
-            const resp = await fetch("/api/hosts");
-            const data = await resp.json();
-            this.cdnHosts = {
-                image: data.image,
-                video: data.video,
-                mediaProxy: data.media_proxy,
-            };
-        } catch (e) {
-            console.error(e);
-        }
+    updateCDNHosts() {
+        this.cdnHosts = JSON.parse(document.getElementById("cdn-hosts")!.innerText);
     },
 
     toast: {
@@ -411,6 +409,8 @@ const store = reactive<Store>({
                 });
 
                 val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+            } else if (k === "newsLastViewedAt") {
+                val = new Date(val);
             }
 
             (this.settings as any)[k] = val;

@@ -10,6 +10,21 @@ type Update = {
 // NOTE: add new updates to the top of the list so it's sorted by most recent
 const updates: Update[] = [
 	{
+		date: new Date("2026-03-25T01:27:33+00:00"),
+		title: "please login again",
+		component: (
+			<>
+			<p>I've fixed a couple bugs affecting logged in users:</p>
+				<ul>
+			<li>searches sometimes wouldn't use your blacklist</li>
+			<li>the page gets stuck or takes a while to load</li>
+			</ul>
+		<p>Logging in again will fix the issue (<a href="https://codeberg.org/jessienyan/booruview/pulls/39" target="_blank" rel="noopener">#39</a>)</p>
+		<p>Also, the site now uses a login cookie, so consider adding an exception if you have cookies disabled. Thanks ඞ</p>
+			</>
+		)
+	},
+	{
 		date: new Date("2026-03-24T02:03:05+00:00"),
 		title: "coming soon™",
 		component: (

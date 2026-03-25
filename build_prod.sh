@@ -19,12 +19,11 @@ COMMIT=$(git rev-parse --short HEAD)
 DATE=$(git show -s --format=%cs HEAD)
 
 echo ">>> building API image"
-docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod api/
+docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod .
 echo ">>> building valkey image"
 docker build --quiet -t $VALKEY_IMG valkey/
 echo ">>> building client image"
 docker build --quiet -t $CLIENT_IMG client/
-
 echo ">>> bundling assets"
 mkdir -p client/dist
 docker run --rm \

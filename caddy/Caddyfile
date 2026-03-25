@@ -29,9 +29,6 @@
         }
     }
 
-    # Clients must always check if index.html changed
-    header / Cache-Control "public, no-cache"
-
     # Assets are hashed and never change so are safe to cache
     header /assets/* Cache-Control "max-age=31536000, immutable"
 
@@ -96,17 +93,25 @@
         reverse_proxy http://api:8000
     }
 
-    # Including some common file extensions here will prevent the server from
-    # falling back to index.html
+    # Handle these explicitly so we don't fallback to index.html and incorrectly serve a 200
     @static path /assets/* *.html *.css *.js *.png *.jpg *.ico *.txt
     handle @static {
         file_server
     }
 
-    # index.html fallback to handle SPA routing
-    handle {
-        file_server
-        try_files {path} /index.html
+    route {
+        file_server {
+            # Ensure API handles index.html
+            hide index.html
+
+            # If the file isn't found, continue to the reverse_proxy handler instead of 404
+            pass_thru
+        }
+
+        reverse_proxy http://api:8000 {
+            rewrite /index.html
+            header_down Cache-Control no-store
+        }
     }
 }
 

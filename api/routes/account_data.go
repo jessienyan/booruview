@@ -37,7 +37,7 @@ func AccountHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	user := getUser(req)
+	user := GetUser(req)
 	logger := log.Logger.With().Str("user", user.User.String()).Logger()
 
 	data, err := user.Data.ParseJSON()

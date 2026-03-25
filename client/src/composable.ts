@@ -161,7 +161,7 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 			return url;
 		}
 
-		if(store.cdnHosts.mediaProxy) {
+		if(store.cdnHosts.media_proxy) {
 			if(!url.includes(store.cdnHosts.image)) {
 				// If it's missing the media proxy host, add it. Useful for favorites that are saved
 				// with a static URL
@@ -192,7 +192,7 @@ export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<stri
 			return url;
 		}
 
-		if(store.cdnHosts.mediaProxy) {
+		if(store.cdnHosts.media_proxy) {
 			if(!url.includes(store.cdnHosts.video)) {
 				// If it's missing the media proxy host, add it. Useful for favorites that are saved
 				// with a static URL

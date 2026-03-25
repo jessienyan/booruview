@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -97,6 +98,15 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	w.Header().Add(
+		"Set-Cookie",
+		fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
+			api.AuthCookieName,
+			token,
+			int(api.AuthTokenTTL.Seconds()),
+		),
+	)
 	log.Info().Str("user", u.String()).Msg("user logged in")
 	respondJson(w, 200, LoginResponse{AuthToken: token, Username: u.Username})
 }
