@@ -40,14 +40,9 @@ export const router = createRouter({
 	],
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async to => {
 	if (to.name === "search") {
 		if (!store.settings.consented) {
-			return;
-		}
-
-		// No change, don't overwrite stored query
-		if(to.params.query === from.params.query) {
 			return;
 		}
 
