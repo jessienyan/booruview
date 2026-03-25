@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"codeberg.org/jessienyan/booruview/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -27,19 +28,24 @@ func IndexHandler(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	var templateContext any
+	type TemplateContext struct {
+		AccountData models.UserDataJSON
+		CDNHosts    CDNHostResponse
+	}
+	tmplContext := TemplateContext{
+		CDNHosts: NewCDNHostResponse(),
+	}
+
 	user := GetUser(req)
-	if user == nil {
-		templateContext = nil
-	} else {
+	if user != nil {
 		data, err := user.Data.ParseJSON()
 		if err != nil {
 			respondWithInternalError(w, err)
 			return
 		}
-		templateContext = data
+		tmplContext.AccountData = data
 	}
 
 	w.Header().Add("Content-Type", "text/html")
-	indexTemplate.Execute(w, templateContext)
+	indexTemplate.Execute(w, tmplContext)
 }

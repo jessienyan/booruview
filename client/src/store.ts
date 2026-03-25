@@ -325,18 +325,8 @@ const store = reactive<Store>({
 
     cdnHosts: null,
 
-    async updateCDNHosts() {
-        try {
-            const resp = await fetch("/api/hosts");
-            const data = await resp.json();
-            this.cdnHosts = {
-                image: data.image,
-                video: data.video,
-                mediaProxy: data.media_proxy,
-            };
-        } catch (e) {
-            console.error(e);
-        }
+    updateCDNHosts() {
+        this.cdnHosts = JSON.parse(document.getElementById("cdn-hosts")!.innerText);
     },
 
     toast: {

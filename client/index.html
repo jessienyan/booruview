@@ -35,6 +35,8 @@
         <style>
             @import "./src/assets/_document.scss";
         </style>
+        <script id="account-data" type="application/json">{{.AccountData}}</script>
+        <script id="cdn-hosts" type="application/json">{{.CDNHosts}}</script>
         <link rel="stylesheet" href="./src/assets/main.scss" />
     </head>
     <body>
@@ -44,8 +46,6 @@
             </div></noscript
         >
 
-        <script id="account-data" type="application/json">{{.AccountData}}</script>
-        <script id="cdn-hosts" type="application/json">{{.CDNHosts}}</script>
 
         <script type="module" src="/src/main.ts"></script>
     </body>
