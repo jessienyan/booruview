@@ -14,12 +14,13 @@ const updates: Update[] = [
 		title: "please login again",
 		component: (
 			<>
-			<p>There were some issues with searching while logged in that should be resolved now. These happened when opening a new search page or refreshing:</p>
+			<p>I've fixed a couple bugs affecting logged in users:</p>
 				<ul>
 			<li>searches sometimes wouldn't use your blacklist</li>
 			<li>the page gets stuck or takes a while to load</li>
 			</ul>
-		<p>Please login again to fix these issues. The site now uses a login cookie, so consider adding an exception if you have cookies disabled. Thanks ඞ</p>
+		<p>Logging in again will fix the issue (<a href="https://codeberg.org/jessienyan/booruview/pulls/39" target="_blank" rel="noopener">#39</a>)</p>
+		<p>Also, the site now uses a login cookie, so consider adding an exception if you have cookies disabled. Thanks ඞ</p>
 			</>
 		)
 	},
