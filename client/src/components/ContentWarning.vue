@@ -7,7 +7,7 @@ import ScreenCover from "./ScreenCover.vue";
 
 const view = ref<"initial" | "nsfw-blacklist">("initial");
 
-const WAIT_TIME_MS = 1500;
+const WAIT_TIME_MS = 1800;
 const needsToWait = ref(true);
 const router = useRouter();
 const route = useRoute();
@@ -92,7 +92,10 @@ function consentNSFWWithBlacklist() {
             </p>
         </div>
 
-        <div v-else-if="view === 'nsfw-blacklist'" class="content-warning">
+        <div
+            v-else-if="view === 'nsfw-blacklist'"
+            class="content-warning appear"
+        >
             <p>Some content is considered controversial or extreme.</p>
             <p>
                 Do you want to use the default blacklist? You can always edit
@@ -170,6 +173,20 @@ function consentNSFWWithBlacklist() {
         opacity: 0.5;
         cursor: not-allowed;
     }
+}
+
+@keyframes appear-anim {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+.appear {
+    animation: 0.7s ease appear-anim;
 }
 
 .btn-container {
