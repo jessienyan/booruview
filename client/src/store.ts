@@ -409,6 +409,8 @@ const store = reactive<Store>({
                 });
 
                 val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+            } else if (k === "newsLastViewedAt") {
+                val = new Date(val);
             }
 
             (this.settings as any)[k] = val;
