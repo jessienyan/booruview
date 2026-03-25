@@ -7,18 +7,21 @@ import ScreenCover from "./ScreenCover.vue";
 
 const view = ref<"initial" | "nsfw-blacklist">("initial");
 
-const timeRemaining = ref(3);
+const WAIT_TIME_MS = 1500;
+const needsToWait = ref(true);
 const router = useRouter();
 const route = useRoute();
 
-onMounted(() => {
-    const timer = setInterval(() => {
-        timeRemaining.value--;
-        if (timeRemaining.value === 0) {
-            clearInterval(timer);
-        }
-    }, 1000);
-});
+// Add an artificial delay until the buttons are clickable to prevent users from
+// accidentally clicking past the consent or accidentally double click.
+function makeUserWait() {
+    needsToWait.value = true;
+    setTimeout(() => {
+        needsToWait.value = false;
+    }, WAIT_TIME_MS);
+}
+
+onMounted(makeUserWait);
 
 function consent() {
     store.settings.consented = true;
@@ -40,6 +43,11 @@ function consent() {
         force: true,
         replace: true,
     });
+}
+
+function showBlacklistOptions() {
+    view.value = "nsfw-blacklist";
+    makeUserWait();
 }
 
 function consentSFW() {
@@ -69,15 +77,15 @@ function consentNSFWWithBlacklist() {
             <p class="btn-container">
                 <button
                     class="btn-consent btn-green"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consentSFW"
                 >
                     only view SFW content
                 </button>
                 <button
                     class="btn-consent btn-red"
-                    :disabled="timeRemaining > 0"
-                    @click="view = 'nsfw-blacklist'"
+                    :disabled="needsToWait"
+                    @click="showBlacklistOptions"
                 >
                     view all content (18+)
                 </button>
@@ -93,14 +101,14 @@ function consentNSFWWithBlacklist() {
             <p class="btn-container">
                 <button
                     class="btn-consent btn-green"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consentNSFWWithBlacklist"
                 >
                     yes, use default blacklist
                 </button>
                 <button
                     class="btn-consent btn-red"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consent"
                 >
                     no, don't filter anything
@@ -115,6 +123,7 @@ function consentNSFWWithBlacklist() {
 
 .btn-green {
     background-color: #70e570;
+    color: black;
 }
 
 .btn-red {
@@ -155,8 +164,10 @@ function consentNSFWWithBlacklist() {
     padding: 1rem;
     cursor: pointer;
 
+    transition: opacity ease 0.9s;
+
     &:disabled {
-        filter: grayscale(0.5) brightness(0.8);
+        opacity: 0.5;
         cursor: not-allowed;
     }
 }
