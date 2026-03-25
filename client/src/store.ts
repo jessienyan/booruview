@@ -54,7 +54,7 @@ type Store = {
     cdnHosts: {
         image: string;
         video: string;
-        mediaProxy: boolean;
+        media_proxy: boolean;
     } | null;
 
     updateCDNHosts(): void;
