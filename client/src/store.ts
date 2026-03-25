@@ -240,6 +240,14 @@ const store = reactive<Store>({
             return;
         }
 
+        // If the data is already available in the HTML, use it directly
+        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null");
+
+        if(preloadedData) {
+            this.account.data = preloadedData;
+            return;
+        }
+
         const { authToken } = this.account;
 
         try {

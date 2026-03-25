@@ -43,10 +43,10 @@
                 Enable javascript to use booruview
             </div></noscript
         >
-        <script type="text/javascript">
-            {{/* Inject account data so the user's browser doesn't have to make an extra request */}}
-            var _accountdata = {{.}};
-        </script>
+
+        <script id="account-data" type="application/json">{{.AccountData}}</script>
+        <script id="cdn-hosts" type="application/json">{{.CDNHosts}}</script>
+
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>
