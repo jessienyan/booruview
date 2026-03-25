@@ -628,7 +628,7 @@ const store = reactive<Store>({
             name: "search",
             params: {
                 page: this.currentPage + 1,
-                query: this.query.asQueryParams(),
+                query: router.currentRoute.value.params.query,
             },
         });
     },
@@ -642,7 +642,7 @@ const store = reactive<Store>({
             name: "search",
             params: {
                 page: this.currentPage - 1,
-                query: this.query.asQueryParams(),
+                query: router.currentRoute.value.params.query,
             },
         });
     },
