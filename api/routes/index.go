@@ -31,7 +31,7 @@ func IndexHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	type TemplateContext struct {
-		AccountData models.UserDataJSON
+		AccountData *models.UserDataJSON
 		CDNHosts    CDNHostResponse
 	}
 	tmplContext := TemplateContext{
@@ -45,7 +45,7 @@ func IndexHandler(w http.ResponseWriter, req *http.Request) {
 			respondWithInternalError(w, err)
 			return
 		}
-		tmplContext.AccountData = data
+		tmplContext.AccountData = &data
 	}
 
 	w.Header().Add("Content-Type", "text/html")
