@@ -114,7 +114,7 @@ type Store = {
     nextPage(): Promise<void>;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void>;
-    searchPosts(opts: { page?: number; force?: boolean }): Promise<void>;
+    searchPosts(opts: { query: SearchQuery, page?: number; force?: boolean }): Promise<void>;
     addQueryToHistory(): void;
     clearPosts(): void;
     getTag(name: string): Tag | undefined;
@@ -472,7 +472,7 @@ const store = reactive<Store>({
         return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
     },
 
-    async searchPosts({ page, force }: { page?: number; force?: boolean; }): Promise<void> {
+    async searchPosts({ query, page, force }: { query: SearchQuery, page?: number; force?: boolean; }): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
             total_count: number;
@@ -481,7 +481,7 @@ const store = reactive<Store>({
 
         this.fetchingPosts = true;
             page = page ?? this.currentPage;
-            const sameQuery = this.query.equals(this.lastQuery);
+            const sameQuery = query.equals(this.lastQuery);
 
             // Don't refetch posts we already have
             if (!force && sameQuery && this.posts.has(page)) {
@@ -490,7 +490,7 @@ const store = reactive<Store>({
                 return;
             }
 
-            const searchTags = this.query.asList().concat(this.blacklist().value.map(t => `-${t.name}`));
+            const searchTags = query.asList().concat(this.blacklist().value.map(t => `-${t.name}`));
 
             const queryParams = new URLSearchParams();
             queryParams.append("page", page.toString());

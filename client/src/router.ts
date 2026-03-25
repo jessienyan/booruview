@@ -46,26 +46,28 @@ router.beforeEach(async (to, from) => {
 			return;
 		}
 
-		// No change, don't overwrite stored query
-		if(to.params.query === from.params.query) {
-			return;
-		}
-
 		const page = parseInt(to.params.page as string, 10);
-		let query: string[];
+		let rawQuery: string[];
 
 		if(!to.params.query || to.params.query.length === 0) {
-			query = [];
+			rawQuery = [];
 		} else if(!Array.isArray(to.params.query)) {
-			query = to.params.query.split(",");
+			rawQuery = to.params.query.split(",");
 		} else {
-			query = to.params.query;
+			rawQuery = to.params.query;
 		}
 
 		try {
-			const q = await tagsToSearchQuery(query || []);
-			store.query = q;
-			await store.searchPosts({ page, force: store.justClickedSearchButton });
+			const query = await tagsToSearchQuery(rawQuery || []);
+
+			// Overwrite stored query only if it changed in the URL. This lets users edit
+			// their search between pages or when pressing forward/back in the browser.
+			// The query won't be applied until they click search
+			if(to.params.query !== from.params.query) {
+				store.query = query;
+			}
+
+			await store.searchPosts({ query, page, force: store.justClickedSearchButton });
 			store.lastSearchRoute = to;
 		} finally {
 			store.justClickedSearchButton = false;
