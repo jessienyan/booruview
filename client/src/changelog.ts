@@ -13,6 +13,7 @@ export const changeLog: ChangeLogEntry[] = [
 			"added 'please login again' news post",
 			"maybe fixed blacklist not working this time",
 			"reverted the change from 2026-03-22 as it's preventing tags from being added in fullscreen view",
+			"un-reverted the breaking change and fixed it for real this time :)",
 		]
 	},
 	{
