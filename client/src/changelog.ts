@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-25",
+		changes: [
+			"reduced delay that disables buttons on the consent form",
+			"added some subtle fade animations to the consent form",
+			"Hauwei joined the favicon naughty list",
+		]
+	},
+	{
 		date: "2026-03-24",
 		changes: [
 			"added login cookie",
