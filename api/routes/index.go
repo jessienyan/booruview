@@ -5,18 +5,20 @@ import (
 	"net/http"
 	"os"
 
+	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
 	"github.com/rs/zerolog/log"
 )
 
 const (
-	indexTemplatePath = "/index.html"
+	indexTemplatePath = "/dist/index.html"
 )
 
 var indexTemplate *template.Template
 
 func IndexHandler(w http.ResponseWriter, req *http.Request) {
-	if indexTemplate == nil {
+	readTemplateFile := indexTemplate == nil || api.DevMode
+	if readTemplateFile {
 		f, err := os.ReadFile(indexTemplatePath)
 		if err != nil {
 			log.Fatal().Err(err).Msg("failed to read index.html")

@@ -11,13 +11,16 @@ services:
       - "8000:8000"
       - "12345:12345"
     environment:
-      - "VALKEY_ADDR=valkey:6379"
-      - "DATABASE_PATH=/app/database/sqlite.db"
+      - VALKEY_ADDR=valkey:6379
+      - DATABASE_PATH=/app/database/sqlite.db
+      - DEV=1
     env_file:
       - ".env"
     volumes:
       - ./api:/app
-      - ./client/dist/index.html:/index.html:ro
+      # This is for index.html. Binding the file directly doesn't work though because
+      # it won't be updated in the container if it changes, so we have to bind the dir instead
+      - ./client/dist:/dist
     depends_on:
       - client
       - valkey
