@@ -32,6 +32,13 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 				} else {
 					err = errors.Errorf("%v", recoverErr)
 				}
+
+				// This happens when the connection closes while we're writing a response.
+				// Usually it means the user refreshed the page or closed their browser
+				if strings.Contains(err.Error(), "write: broken pipe") {
+					return
+				}
+
 				respondWithInternalError(w, errors.Wrap(err, "recovered from panic"))
 			}
 		}()
