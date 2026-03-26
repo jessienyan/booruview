@@ -99,34 +99,28 @@ export class SearchQuery {
 	}
 }
 
-export function tagsToSearchQuery(tagNames: string[]): Promise<SearchQuery> {
-	return new Promise<SearchQuery>((resolve, reject) => {
-		store
-			.loadTags(tagNames)
-			.then(() => {
-				const query = new SearchQuery();
+export async function tagsToSearchQuery(tagNames: string[]): Promise<SearchQuery> {
+	await store.loadTags(tagNames);
+	const query = new SearchQuery();
 
-				for (const name of tagNames) {
-					let tag = store.getTag(name);
+	for (const name of tagNames) {
+		let tag = store.getTag(name);
 
-					// Handle raw tags
-					if (tag === undefined) {
-						tag = {
-							count: 0,
-							name: name.replace(/^-+/, ""),
-							type: "unknown",
-						};
-					}
+		// Handle raw tags
+		if (tag === undefined) {
+			tag = {
+				count: 0,
+				name: name.replace(/^-+/, ""),
+				type: "unknown",
+			};
+		}
 
-					if (name.startsWith("-")) {
-						query.excludeTag(tag);
-					} else {
-						query.includeTag(tag);
-					}
-				}
+		if (name.startsWith("-")) {
+			query.excludeTag(tag);
+		} else {
+			query.includeTag(tag);
+		}
+	}
 
-				resolve(query);
-			})
-			.catch(reject);
-	});
+	return query;
 }

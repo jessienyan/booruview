@@ -187,3 +187,9 @@ func IsRateLimited(req *http.Request, ip string, cost int) (cb *ClientBan, err e
 
 	return
 }
+
+func FlushRateLimits() {
+	clientLimitsMutex.Lock()
+	defer clientLimitsMutex.Unlock()
+	clientLimits = make(map[string]*rate.Limiter)
+}

@@ -1,18 +1,32 @@
 <script setup lang="ts">
-import { type Component, ref } from "vue";
+import { type Component, computed, ref } from "vue";
+import news from "@/news";
+import store from "@/store";
+import NewsTab from "./NewsTab.vue";
 import RecentTab from "./RecentTab.vue";
 import SearchTab from "./SearchTab.vue";
 
-type Tab = "search" | "recent";
+type Tab = "search" | "recent" | "news";
 const tabComponents: Record<Tab, Component> = {
     search: SearchTab,
     recent: RecentTab,
+    news: NewsTab,
 };
 const currentTab = ref<Tab>("search");
 
 function switchTab(tab: Tab) {
     currentTab.value = tab;
 }
+
+const numUnreadNews = computed(() => {
+    let i = 0;
+    for (const { date } of news) {
+        if (date > store.settings.newsLastViewedAt) {
+            i++;
+        }
+    }
+    return i;
+});
 </script>
 
 <template>
@@ -31,6 +45,22 @@ function switchTab(tab: Tab) {
                 @click="switchTab('recent')"
             >
                 recent
+            </button>
+
+            <div class="spacer" />
+
+            <button
+                class="tab-btn"
+                :class="{
+                    active: currentTab === 'news',
+                    highlight: numUnreadNews > 0,
+                }"
+                @click="switchTab('news')"
+            >
+                news
+                <template v-if="numUnreadNews > 0"
+                    >({{ numUnreadNews }})</template
+                >
             </button>
         </header>
 
@@ -64,6 +94,10 @@ function switchTab(tab: Tab) {
     display: flex;
     padding: 0 0.8rem;
     gap: 0.4rem;
+
+    .spacer {
+        flex: 1;
+    }
 }
 
 .tab-btn {
@@ -75,12 +109,16 @@ function switchTab(tab: Tab) {
     color: #999;
     cursor: pointer;
     font-size: 16px;
-    width: min-content;
+    max-width: 100%;
 
     &.active {
         border-color: #695675;
         color: #bb9fce;
         background-color: #342b3a;
+    }
+
+    &.highlight {
+        font-weight: bold;
     }
 }
 

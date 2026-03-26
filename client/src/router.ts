@@ -40,37 +40,37 @@ export const router = createRouter({
 	],
 });
 
-router.beforeEach(to => {
+router.beforeEach(async (to, from) => {
 	if (to.name === "search") {
 		if (!store.settings.consented) {
 			return;
 		}
 
 		const page = parseInt(to.params.page as string, 10);
-		let query: string[];
+		let rawQuery: string[];
 
 		if(!to.params.query || to.params.query.length === 0) {
-			query = [];
+			rawQuery = [];
 		} else if(!Array.isArray(to.params.query)) {
-			query = to.params.query.split(",");
+			rawQuery = to.params.query.split(",");
 		} else {
-			query = to.params.query;
+			rawQuery = to.params.query;
 		}
 
-		return new Promise<void>((resolve, reject) => {
-			tagsToSearchQuery(query || []).then(q => {
-				store.query = q;
-				store
-					.searchPosts({ page, force: store.justClickedSearchButton })
-					.then(() => {
-						store.lastSearchRoute = to;
-						resolve();
-					})
-					.catch(reject)
-					.finally(() => {
-						store.justClickedSearchButton = false;
-					});
-			});
-		});
+		try {
+			const query = await tagsToSearchQuery(rawQuery || []);
+
+			// Overwrite stored query only if it changed in the URL. This lets users edit
+			// their search between pages or when pressing forward/back in the browser.
+			// The query won't be applied until they click search
+			if(to.params.query !== from.params.query) {
+				store.query = query;
+			}
+
+			await store.searchPosts({ query, page, force: store.justClickedSearchButton });
+			store.lastSearchRoute = to;
+		} finally {
+			store.justClickedSearchButton = false;
+		}
 	}
 });

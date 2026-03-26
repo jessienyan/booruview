@@ -5,6 +5,57 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-25",
+		changes: [
+			"reduced delay that disables buttons on the consent form",
+			"added some subtle fade animations to the consent form",
+			"Hauwei joined the favicon naughty list",
+		]
+	},
+	{
+		date: "2026-03-24",
+		changes: [
+			"added login cookie",
+			"include account data in the HTML if you're logged in",
+			"include cdn hosts in the HTML",
+			"added 'please login again' news post",
+			"maybe fixed blacklist not working this time",
+			"reverted the change from 2026-03-22 as it's preventing tags from being added in fullscreen view",
+			"un-reverted the breaking change and fixed it for real this time :)",
+		]
+	},
+	{
+		date: "2026-03-23",
+		changes: [
+			"added news tab (it's not replacing the changelog)",
+			"added 'coming soon' news post",
+		]
+	},
+	{
+		date: "2026-03-22",
+		changes: ["fullscreen view now closes when using the browser's back button instead of changing the page"]
+	},
+	{
+		date: "2026-03-21",
+		changes: ["cache /api/version in localstorage so it only needs to be checked once no matter how many browser tabs are open"]
+	},
+	{
+		date: "2026-03-20",
+		changes: ["added better logging for internal server errors"]
+	},
+	{
+		date: "2026-03-17",
+		changes: ["increased max payload size from 2MB to 4MB for account data"]
+	},
+	{
+		date: "2026-03-16",
+		changes: [
+			"internal: added a bunch of API tests",
+			"fixed the favorite post ordering issue for logged out users",
+			"temporarily blocked duckduckgo browser from spamming favicon requests",
+		],
+	},
+	{
 		date: "2026-03-14",
 		changes: ["added heart icon to favorited tags in search suggestions"]
 	},

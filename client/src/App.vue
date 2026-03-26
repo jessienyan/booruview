@@ -9,7 +9,6 @@ import {
 } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
-import { accountAnnouncementBanner } from "@/indicators";
 import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
@@ -43,20 +42,6 @@ const hasConsented = computed(() => {
 <template>
     <div class="app-outer">
         <div
-            class="banner banner-announcement"
-            v-if="hasConsented && accountAnnouncementBanner.show.value"
-        >
-            Accounts are finally here! Check the 'account' tab in the sidebar.
-            Please report any bugs! :)
-            <a
-                href="#"
-                class="banner-close"
-                @click.prevent="accountAnnouncementBanner.onHide()"
-                >close</a
-            >
-        </div>
-
-        <div
             class="app"
             :class="{
                 'sidebar-closed': store.sidebarClosed,
@@ -71,7 +56,10 @@ const hasConsented = computed(() => {
                     >{{ store.toast.msg }}</Toast
                 >
             </Transition>
-            <ContentWarning v-if="!hasConsented" />
+
+            <Transition name="transition">
+                <ContentWarning v-if="!hasConsented" />
+            </Transition>
 
             <FullscreenView
                 v-if="store.fullscreenPost !== null"

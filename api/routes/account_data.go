@@ -9,11 +9,12 @@ import (
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
 const (
-	maxDataSize = 2 * 1024 * 1024 // MB
+	maxDataSize = 4 * 1024 * 1024 // MB
 )
 
 type AccountDataResponse struct {
@@ -25,9 +26,10 @@ func AccountDataGetHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user := getUser(req)
+	user := GetUser(req)
 	data, err := user.Data.ParseJSON()
 	if err != nil {
+		err = errors.Wrap(err, "failed to parse JSON")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -44,7 +46,9 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user := getUser(req)
+	// TODO: wrap this in a transaction
+
+	user := GetUser(req)
 	data, err := user.Data.ParseJSON()
 	if err != nil {
 		respondWithInternalError(w, err)
@@ -151,7 +155,9 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user := getUser(req)
+	// TODO: wrap this in a transaction
+
+	user := GetUser(req)
 	data, err := user.Data.ParseJSON()
 	if err != nil {
 		respondWithInternalError(w, err)

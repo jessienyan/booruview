@@ -7,18 +7,21 @@ import ScreenCover from "./ScreenCover.vue";
 
 const view = ref<"initial" | "nsfw-blacklist">("initial");
 
-const timeRemaining = ref(3);
+const WAIT_TIME_MS = 1800;
+const needsToWait = ref(true);
 const router = useRouter();
 const route = useRoute();
 
-onMounted(() => {
-    const timer = setInterval(() => {
-        timeRemaining.value--;
-        if (timeRemaining.value === 0) {
-            clearInterval(timer);
-        }
-    }, 1000);
-});
+// Add an artificial delay until the buttons are clickable to prevent users from
+// accidentally clicking past the consent or accidentally double click.
+function makeUserWait() {
+    needsToWait.value = true;
+    setTimeout(() => {
+        needsToWait.value = false;
+    }, WAIT_TIME_MS);
+}
+
+onMounted(makeUserWait);
 
 function consent() {
     store.settings.consented = true;
@@ -42,6 +45,11 @@ function consent() {
     });
 }
 
+function showBlacklistOptions() {
+    view.value = "nsfw-blacklist";
+    makeUserWait();
+}
+
 function consentSFW() {
     store.setBlacklist(defaultSFWBlacklist());
     consent();
@@ -54,9 +62,9 @@ function consentNSFWWithBlacklist() {
 </script>
 
 <template>
-    <ScreenCover blackout />
     <div class="cw-container">
-        <div v-if="view === 'initial'" class="content-warning">
+        <ScreenCover blackout />
+        <div v-if="view === 'initial'" class="content-warning appear">
             <p>
                 Booruview is an image browser for Gelbooru, an image board that
                 hosts
@@ -69,22 +77,25 @@ function consentNSFWWithBlacklist() {
             <p class="btn-container">
                 <button
                     class="btn-consent btn-green"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consentSFW"
                 >
                     only view SFW content
                 </button>
                 <button
                     class="btn-consent btn-red"
-                    :disabled="timeRemaining > 0"
-                    @click="view = 'nsfw-blacklist'"
+                    :disabled="needsToWait"
+                    @click="showBlacklistOptions"
                 >
                     view all content (18+)
                 </button>
             </p>
         </div>
 
-        <div v-else-if="view === 'nsfw-blacklist'" class="content-warning">
+        <div
+            v-else-if="view === 'nsfw-blacklist'"
+            class="content-warning appear"
+        >
             <p>Some content is considered controversial or extreme.</p>
             <p>
                 Do you want to use the default blacklist? You can always edit
@@ -93,14 +104,14 @@ function consentNSFWWithBlacklist() {
             <p class="btn-container">
                 <button
                     class="btn-consent btn-green"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consentNSFWWithBlacklist"
                 >
                     yes, use default blacklist
                 </button>
                 <button
                     class="btn-consent btn-red"
-                    :disabled="timeRemaining > 0"
+                    :disabled="needsToWait"
                     @click="consent"
                 >
                     no, don't filter anything
@@ -113,8 +124,22 @@ function consentNSFWWithBlacklist() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
+@keyframes fade-out-anim {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.transition-leave-active {
+    animation: 400ms ease fade-out-anim;
+}
+
 .btn-green {
     background-color: #70e570;
+    color: black;
 }
 
 .btn-red {
@@ -137,6 +162,7 @@ function consentNSFWWithBlacklist() {
 .content-warning {
     padding: 0.8rem;
     max-width: 500px;
+    z-index: 10;
 }
 
 .nsfw-warning {
@@ -155,10 +181,26 @@ function consentNSFWWithBlacklist() {
     padding: 1rem;
     cursor: pointer;
 
+    transition: opacity ease 900ms;
+
     &:disabled {
-        filter: grayscale(0.5) brightness(0.8);
+        opacity: 0.5;
         cursor: not-allowed;
     }
+}
+
+@keyframes appear-anim {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+.appear {
+    animation: 700ms ease appear-anim;
 }
 
 .btn-container {

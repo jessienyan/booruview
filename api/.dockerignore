@@ -1,0 +1,4 @@
+.env
+
+# databases should be mounted
+**/*.db

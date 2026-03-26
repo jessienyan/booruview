@@ -1,6 +1,7 @@
 .git
-.env
+.gotestcache
 .vscode
+.env
 logs
 node_modules
 grafana.sh

@@ -16,7 +16,11 @@ type TagSearchResponse struct {
 	Results api.TagList `json:"results"`
 }
 
-func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
+type TagSearchHandler struct {
+	Client gelbooru.GelbooruClient
+}
+
+func (h TagSearchHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, tagSearchApiCost) {
 		return
 	}
@@ -33,8 +37,9 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cached, err := getCachedTagSearch(query)
+	cached, err := GetCachedTagSearch(query)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached tag search")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -45,23 +50,24 @@ func TagSearchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	results, err := gelbooru.NewClient().SearchTags(query)
+	results, err := h.Client.SearchTags(query)
 	if err != nil {
 		if errors.As(err, &gelbooru.GelbooruError{}) {
 			respondWithGelbooruUnavailable(w)
 			return
 		}
 
+		err = errors.Wrap(err, "failed to search gelbooru tags")
 		respondWithInternalError(w, err)
 		return
 	}
 
 	resp.Results = results
 	respData := respondJson(w, http.StatusOK, resp)
-	writeTagSearchToCache(query, respData)
+	WriteTagSearchToCache(query, respData)
 }
 
-func getCachedTagSearch(query string) ([]byte, error) {
+func GetCachedTagSearch(query string) ([]byte, error) {
 	vk := api.Valkey()
 	cached := vk.Do(context.Background(),
 		vk.B().
@@ -86,7 +92,7 @@ func getCachedTagSearch(query string) ([]byte, error) {
 	return data, nil
 }
 
-func writeTagSearchToCache(query string, data []byte) error {
+func WriteTagSearchToCache(query string, data []byte) error {
 	vk := api.Valkey()
 	compressed, err := api.CompressData(data)
 	if err != nil {

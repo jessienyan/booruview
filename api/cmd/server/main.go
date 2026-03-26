@@ -38,17 +38,19 @@ func main() {
 
 	gelbooru.AddRatingTagsToValkey()
 
+	client := gelbooru.NewClient(nil)
+
 	// Periodically check if the CDN hosts changed. Runs immediately on server start
 	go func() {
 		ticker := time.NewTicker(15 * time.Minute)
 		for {
-			gelbooru.UpdateCDNHosts()
+			gelbooru.UpdateCDNHosts(client)
 			<-ticker.C
 		}
 	}()
 
 	listenAddr := ":8000"
-	router := routes.NewRouter()
+	router := routes.NewRouter(client)
 	srv := &http.Server{
 		Addr:    listenAddr,
 		Handler: router,
