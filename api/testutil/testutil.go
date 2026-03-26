@@ -51,14 +51,14 @@ func (m *MockGelbooruClient) ListPosts(tags string, page int) (*gb.PostList, err
 	return result.(*gb.PostList), args.Error(1)
 }
 
-func (m *MockGelbooruClient) ListTags(tags string) ([]api.TagResponse, error) {
+func (m *MockGelbooruClient) ListTags(tags string) (api.TagList, error) {
 	args := m.Called(tags)
-	return args.Get(0).([]api.TagResponse), args.Error(1)
+	return args.Get(0).(api.TagList), args.Error(1)
 }
 
-func (m *MockGelbooruClient) SearchTags(query string) ([]api.TagResponse, error) {
+func (m *MockGelbooruClient) SearchTags(query string) (api.TagList, error) {
 	args := m.Called(query)
-	return args.Get(0).([]api.TagResponse), args.Error(1)
+	return args.Get(0).(api.TagList), args.Error(1)
 }
 
 func MustUnmarshalJSON(data []byte, dst any) {

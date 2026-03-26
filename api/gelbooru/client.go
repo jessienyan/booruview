@@ -26,9 +26,9 @@ var (
 )
 
 type GelbooruClient interface {
-	SearchTags(query string) ([]api.TagResponse, error)
+	SearchTags(query string) (api.TagList, error)
 	ListPosts(tags string, page int) (*PostList, error)
-	ListTags(tags string) ([]api.TagResponse, error)
+	ListTags(tags string) (api.TagList, error)
 }
 
 type Client struct {

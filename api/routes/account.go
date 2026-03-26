@@ -54,7 +54,7 @@ func AccountDeleteHandler(w http.ResponseWriter, req *http.Request) {
 	defer tx.Rollback()
 
 	query := models.New(db).WithTx(tx)
-	user := getUser(req)
+	user := GetUser(req)
 	if err := query.DeleteUserData(req.Context(), user.User.ID); err != nil {
 		respondWithInternalError(w, err)
 		return
