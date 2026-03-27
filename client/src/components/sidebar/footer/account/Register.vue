@@ -81,11 +81,11 @@ async function onSubmit(e: Event) {
     };
 
     // Upload existing data
-    store.saveAccountData({
-        blacklist: true,
-        favorite_posts: true,
-        favorite_tags: true,
-        search_history: true,
+    store.addToAccountData({
+        blacklist: store.settings.blacklist,
+        favorite_posts: store.settings.favorites,
+        favorite_tags: store.settings.favoriteTags,
+        search_history: store.settings.queryHistory,
     });
 }
 </script>

@@ -51,12 +51,12 @@ function showBlacklistOptions() {
 }
 
 function consentSFW() {
-    store.setBlacklist(defaultSFWBlacklist());
+    store.addToBlacklist(defaultSFWBlacklist());
     consent();
 }
 
 function consentNSFWWithBlacklist() {
-    store.setBlacklist(defaultNSFWBlacklist());
+    store.addToBlacklist(defaultNSFWBlacklist());
     consent();
 }
 </script>

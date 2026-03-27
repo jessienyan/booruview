@@ -90,10 +90,10 @@ async function uploadData() {
     );
 
     try {
-        await store.saveAccountData({
-            favorite_posts: true,
-            favorite_tags: true,
-            blacklist: true,
+        await store.addToAccountData({
+            favorite_posts: store.account.data.favorite_posts,
+            favorite_tags: store.account.data.favorite_tags,
+            blacklist: store.account.data.blacklist,
         });
         store.toast = {
             msg: "Upload OK!",

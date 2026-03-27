@@ -232,9 +232,9 @@ function showPrevPost() {
 
 function toggleFavorite() {
     if (isFavorited.value) {
-        store.removeFavoritePost(post);
+        store.removeFavoritePosts([post.id]);
     } else {
-        store.addFavoritePost(post);
+        store.addFavoritePosts([post]);
         favAnimation.value = true;
         setTimeout(() => {
             favAnimation.value = false;
