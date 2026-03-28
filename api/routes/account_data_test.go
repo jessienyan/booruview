@@ -89,7 +89,7 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	post := api.PostResponse{Id: 12345}
+	post := api.PostResponse{Id: 12345, Tags: []string{}}
 	params := routes.AccountDataPatchParams{
 		Add: routes.AddAccountData{
 			FavoritePosts: api.PostList{post},
