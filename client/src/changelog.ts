@@ -10,6 +10,7 @@ export const changeLog: ChangeLogEntry[] = [
 			"added an actual PATCH api for account data. this fixes an issue on slower connections where favorites were sometimes not being saved",
 			"removed needing to fetch account data before updating. this helps to reduce bandwidth and further prevents data loss",
 			"added backend tests for account data",
+			"actually actually fixed the blacklist issue this time i promise"
 		]
 	},
 	{
