@@ -139,10 +139,10 @@ type AddAccountData struct {
 }
 
 type RemoveAccountData struct {
-	FavoritePostIDs  []int                `json:"favorite_post_ids"`
-	FavoriteTagNames []string             `json:"favorite_tag_names"`
-	BlacklistNames   []string             `json:"blacklist_names"`
-	SearchQueries    []models.SearchQuery `json:"search_queries" validate:"dive"`
+	FavoritePostIDs  []int                     `json:"favorite_post_ids"`
+	FavoriteTagNames []string                  `json:"favorite_tag_names"`
+	BlacklistNames   []string                  `json:"blacklist_names"`
+	SearchQueries    []models.SearchQueryNames `json:"search_queries" validate:"dive"`
 }
 
 type AccountDataPatchParams struct {
@@ -202,22 +202,26 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 
 	if form.Add != nil {
 		if len(form.Add.Blacklist) > 0 {
+			form.Add.Blacklist.Clean()
 			data.Blacklist = append(data.Blacklist, form.Add.Blacklist...)
 			changed = true
 		}
 
 		if len(form.Add.FavoritePosts) > 0 {
+			form.Add.FavoritePosts.Clean()
 			// NOTE: for compatibility, new posts are added to the beginning of the list
 			data.FavoritePosts = append(form.Add.FavoritePosts, data.FavoritePosts...)
 			changed = true
 		}
 
 		if len(form.Add.FavoriteTags) > 0 {
+			form.Add.FavoriteTags.Clean()
 			data.FavoriteTags = append(data.FavoriteTags, form.Add.FavoriteTags...)
 			changed = true
 		}
 
 		if len(form.Add.SearchHistory) > 0 {
+			form.Add.SearchHistory.Clean()
 			data.SearchHistory = append(data.SearchHistory, form.Add.SearchHistory...)
 			changed = true
 		}
@@ -240,7 +244,12 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if len(form.Remove.SearchQueries) > 0 {
-			data.SearchHistory.Remove(form.Remove.SearchQueries)
+			queries := make([]string, 0, len(form.Remove.SearchQueries))
+			for _, q := range form.Remove.SearchQueries {
+				q.Clean()
+				queries = append(queries, q.Tags())
+			}
+			data.SearchHistory.Remove(queries)
 			changed = true
 		}
 	}

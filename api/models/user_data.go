@@ -18,6 +18,32 @@ type SearchQuery struct {
 	Exclude api.TagList `json:"exclude" validate:"required"`
 }
 
+type SearchQueryNames struct {
+	Include []string `json:"include" validate:"required"`
+	Exclude []string `json:"exclude" validate:"required"`
+}
+
+func (query *SearchQueryNames) Clean() {
+	slices.Sort(query.Include)
+	query.Include = slices.Compact(query.Include)
+	slices.Sort(query.Exclude)
+	query.Include = slices.Compact(query.Exclude)
+}
+
+func (query SearchQueryNames) Tags() string {
+	tags := strings.Builder{}
+	for _, t := range query.Include {
+		tags.WriteString(t)
+		tags.WriteByte(',')
+	}
+	for _, t := range query.Exclude {
+		tags.WriteByte('-')
+		tags.WriteString(t)
+		tags.WriteByte(',')
+	}
+	return tags.String()
+}
+
 // Clean normalizes the query tags to be sorted and de-duped
 func (query *SearchQuery) Clean() {
 	query.Include.Clean()
@@ -85,18 +111,20 @@ func (lst *SearchHistoryList) Clean() {
 	})
 }
 
-func (lst *SearchHistoryList) Remove(queries []SearchQuery) {
+// queries should be the result of calling .Tags() on a tag list
+func (lst *SearchHistoryList) Remove(queries []string) {
 	if len(queries) == 0 {
 		return
 	}
 
-	removeTags := make([]string, 0, len(queries))
+	lookup := make(map[string]struct{}, len(queries))
 	for _, q := range queries {
-		removeTags = append(removeTags, q.Tags())
+		lookup[q] = struct{}{}
 	}
 
 	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
-		return slices.Contains(removeTags, entry.Query.Tags())
+		_, shouldDelete := lookup[entry.Query.Tags()]
+		return shouldDelete
 	})
 }
 
