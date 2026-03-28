@@ -41,7 +41,14 @@ func (query SearchQueryNames) Tags() string {
 		tags.WriteString(t)
 		tags.WriteByte(',')
 	}
-	return tags.String()
+
+	result := tags.String()
+	if len(result) > 0 {
+		// Remove trailing comma
+		result = result[:len(result)-1]
+	}
+
+	return result
 }
 
 // Clean normalizes the query tags to be sorted and de-duped
@@ -69,7 +76,14 @@ func (query SearchQuery) Tags() string {
 		tags.WriteString(t.Name)
 		tags.WriteByte(',')
 	}
-	return tags.String()
+
+	result := tags.String()
+	if len(result) > 0 {
+		// Remove trailing comma
+		result = result[:len(result)-1]
+	}
+
+	return result
 }
 
 type SearchHistoryEntry struct {

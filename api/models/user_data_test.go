@@ -78,7 +78,7 @@ func TestSearchHistoryList_Remove_ByQuery(t *testing.T) {
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "b"}}}},
 	}
 
-	list.Remove([]string{"a,"})
+	list.Remove([]string{"a"})
 
 	expected := models.SearchHistoryList{
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "b"}}}},
@@ -137,7 +137,7 @@ func TestSearchHistoryList_Remove_DeduplicatesAndSorts(t *testing.T) {
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "c"}}}},
 	}
 
-	list.Remove([]string{"b,"})
+	list.Remove([]string{"b"})
 
 	expected := models.SearchHistoryList{
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "c"}}}},
