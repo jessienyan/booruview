@@ -28,9 +28,15 @@ func (rw redactedWriter) Write(data []byte) (n int, err error) {
 }
 
 func InitLogging() {
+	minLevel := zerolog.InfoLevel
+	if DevMode {
+		minLevel = zerolog.DebugLevel
+	}
+
 	zerolog.DurationFieldUnit = time.Second
 	log.Logger = log.
 		Output(zerolog.ConsoleWriter{Out: redactedWriter{out: os.Stderr}, TimeFormat: time.StampMicro}).
+		Level(minLevel).
 		With().
 		Caller().
 		Logger()
