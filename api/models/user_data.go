@@ -27,7 +27,7 @@ func (query *SearchQueryNames) Clean() {
 	slices.Sort(query.Include)
 	query.Include = slices.Compact(query.Include)
 	slices.Sort(query.Exclude)
-	query.Include = slices.Compact(query.Exclude)
+	query.Exclude = slices.Compact(query.Exclude)
 }
 
 func (query SearchQueryNames) Tags() string {
