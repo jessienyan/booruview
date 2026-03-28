@@ -23,7 +23,7 @@ var (
 func init() {
 	testutil.Setup()
 	api.InitUserDatabase()
-	loginTestUser = testutil.CreateUser(loginTestUsername, loginTestPassword)
+	loginTestUser, _ = testutil.CreateUser(loginTestUsername, loginTestPassword)
 }
 
 func TestLoginHandler_UserDoesntExist(t *testing.T) {
