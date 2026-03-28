@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"slices"
 	"time"
 
 	api "codeberg.org/jessienyan/booruview"
@@ -31,12 +30,6 @@ func (ud UserData) ParseJSON() (UserDataJSON, error) {
 }
 
 func (ud *UserData) Set(udJSON UserDataJSON) error {
-	udJSON.SearchHistory = udJSON.SearchHistory[:min(len(udJSON.SearchHistory), SearchHistoryLimit)]
-	slices.SortFunc(udJSON.SearchHistory, func(a, b SearchHistoryEntry) int {
-		// Sort in descending order (newest first)
-		return b.Date.Compare(a.Date)
-	})
-
 	marshalled, err := json.Marshal(udJSON)
 	if err != nil {
 		return err

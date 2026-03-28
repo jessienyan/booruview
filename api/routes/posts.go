@@ -14,9 +14,9 @@ import (
 )
 
 type PostsResponse struct {
-	CountPerPage int                `json:"count_per_page"`
-	TotalCount   int                `json:"total_count"`
-	Results      []api.PostResponse `json:"results"`
+	CountPerPage int          `json:"count_per_page"`
+	TotalCount   int          `json:"total_count"`
+	Results      api.PostList `json:"results"`
 }
 
 type PostsHandler struct {
@@ -49,7 +49,7 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := PostsResponse{
-		Results: []api.PostResponse{},
+		Results: api.PostList{},
 	}
 	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")

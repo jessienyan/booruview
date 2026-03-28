@@ -18,6 +18,5 @@ onMounted(() => mainContainer.value.focus());
         v-else
         :posts="favPosts"
         :scroll-container="mainContainer"
-        @change="(posts) => store.setFavoritePosts(posts)"
     />
 </template>

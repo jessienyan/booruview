@@ -36,6 +36,28 @@ func Flush() {
 	api.FlushRateLimits()
 }
 
+func ResetUserData(userID int64) {
+	db := models.New(api.UserDB())
+	err := db.UpdateUserData(context.Background(), models.UpdateUserDataParams{
+		UserID: userID,
+		Data:   "",
+	})
+	if err != nil {
+		log.Fatal().Msgf("error resetting user data: %v", err)
+	}
+}
+
+func UpdateUserData(userID int64, data models.UserData) {
+	db := models.New(api.UserDB())
+	err := db.UpdateUserData(context.Background(), models.UpdateUserDataParams{
+		UserID: userID,
+		Data:   data.Data,
+	})
+	if err != nil {
+		log.Fatal().Msgf("error updating user data: %v", err)
+	}
+}
+
 type MockGelbooruClient struct {
 	mock.Mock
 }
@@ -51,14 +73,14 @@ func (m *MockGelbooruClient) ListPosts(tags string, page int) (*gb.PostList, err
 	return result.(*gb.PostList), args.Error(1)
 }
 
-func (m *MockGelbooruClient) ListTags(tags string) ([]api.TagResponse, error) {
+func (m *MockGelbooruClient) ListTags(tags string) (api.TagList, error) {
 	args := m.Called(tags)
-	return args.Get(0).([]api.TagResponse), args.Error(1)
+	return args.Get(0).(api.TagList), args.Error(1)
 }
 
-func (m *MockGelbooruClient) SearchTags(query string) ([]api.TagResponse, error) {
+func (m *MockGelbooruClient) SearchTags(query string) (api.TagList, error) {
 	args := m.Called(query)
-	return args.Get(0).([]api.TagResponse), args.Error(1)
+	return args.Get(0).(api.TagList), args.Error(1)
 }
 
 func MustUnmarshalJSON(data []byte, dst any) {
@@ -75,7 +97,7 @@ func MustMarshalJSON(val any) []byte {
 	return data
 }
 
-func CreateUser(username, password string) models.Users {
+func CreateUser(username, password string) (models.Users, models.UserData) {
 	salt := api.GenerateSalt()
 	passHash := api.HashPassword(password, salt)
 
@@ -89,7 +111,7 @@ func CreateUser(username, password string) models.Users {
 		log.Fatal().Msgf("failed to create user: %v", err)
 	}
 
-	_, err = db.CreateUserData(context.Background(), models.CreateUserDataParams{
+	data, err := db.CreateUserData(context.Background(), models.CreateUserDataParams{
 		UserID: user.ID,
 		Data:   "",
 	})
@@ -97,5 +119,9 @@ func CreateUser(username, password string) models.Users {
 		log.Fatal().Msgf("failed to create user data: %v", err)
 	}
 
-	return user
+	return user, data
+}
+
+func Now() time.Time {
+	return time.Now().Truncate(time.Millisecond).UTC()
 }

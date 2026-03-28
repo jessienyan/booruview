@@ -1,7 +1,7 @@
 import { type ComputedRef, computed, reactive, watch } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
-import { SearchQuery, type SerializedSearchQuery } from "./search";
+import { SearchQuery, type SerializedSearchQuery, type SimpleSerializedSearchQuery } from "./search";
 
 export type SearchHistory = {
     date: Date;
@@ -14,6 +14,57 @@ export type AccountData = {
     blacklist: Tag[];
     search_history: SearchHistory[];
 };
+
+export type AddAccountDataPayload = {
+    favorite_posts: Post[];
+    favorite_tags: Tag[];
+    blacklist: Tag[];
+    search_history: {
+        date: string;
+        query: SerializedSearchQuery;
+    }[];
+};
+
+export type RemoveAccountDataPayload = {
+    favorite_post_ids: number[];
+    favorite_tag_names: string[];
+    blacklist_names: string[];
+    search_queries: SimpleSerializedSearchQuery[];
+};
+
+type AccountDataResponse = {
+    favorite_posts: Post[];
+    favorite_tags: Tag[];
+    blacklist: Tag[];
+    search_history: {
+        date: string;
+        query: {
+            include: Tag[];
+            exclude: Tag[];
+        };
+    }[];
+};
+
+function parseAccountDataFromAPI(resp: Partial<AccountDataResponse>): Partial<AccountData> {
+    const parsed: Partial<AccountData> = {};
+
+    if(resp.favorite_posts != null)
+        parsed.favorite_posts = resp.favorite_posts;
+
+    if(resp.favorite_tags != null)
+        parsed.favorite_tags = resp.favorite_tags;
+
+    if(resp.blacklist != null)
+        parsed.blacklist = resp.blacklist;
+
+    if(resp.search_history != null)
+        parsed.search_history = resp.search_history.map(h => ({
+            date: new Date(h.date),
+            query: new SearchQuery(h.query),
+        }));
+
+    return parsed;
+}
 
 export type FullscreenViewMenuAnchorPoint =
     | "topleft"
@@ -41,7 +92,8 @@ type Store = {
 
     login(username: string, password: string): Promise<void>;
     saveAccountCredentials(): void;
-    saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void>;
+    addToAccountData(data: Partial<AddAccountDataPayload>): Promise<void>;
+    removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void>;
     fetchAccountData(): Promise<void>;
 
     currentPage: number;
@@ -120,24 +172,20 @@ type Store = {
     getTag(name: string): Tag | undefined;
 
     favoritePosts(): ComputedRef<Post[]>;
-    addFavoritePost(post: Post): Promise<void>;
-    removeFavoritePost(post: Post): Promise<void>;
-    setFavoritePosts(posts: Post[]): Promise<void>;
+    addFavoritePosts(posts: Post[]): Promise<void>;
+    removeFavoritePosts(postIds: number[]): Promise<void>;
 
     favoriteTags(): ComputedRef<Tag[]>;
-    addFavoriteTag(tag: Tag): Promise<void>;
-    removeFavoriteTag(tag: Tag): Promise<void>;
-    setFavoriteTags(tags: Tag[]): Promise<void>;
+    addFavoriteTags(tags: Tag[]): Promise<void>;
+    removeFavoriteTags(tagNames: string[]): Promise<void>;
 
     blacklist(): ComputedRef<Tag[]>;
-    addToBlacklist(tag: Tag): Promise<void>;
-    removeFromBlacklist(tag: Tag): Promise<void>;
-    setBlacklist(tags: Tag[]): Promise<void>;
+    addToBlacklist(tags: Tag[]): Promise<void>;
+    removeFromBlacklist(tagNames: string[]): Promise<void>;
 
     searchHistory(): ComputedRef<SearchHistory[]>;
-    addToSearchHistory(hist: SearchHistory): Promise<void>;
-    removeFromSearchHistory(hist: SearchHistory): Promise<void>;
-    setSearchHistory(history: SearchHistory[]): Promise<void>;
+    addToSearchHistory(history: SearchHistory[]): Promise<void>;
+    removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]): Promise<void>;
 };
 
 const store = reactive<Store>({
@@ -192,47 +240,58 @@ const store = reactive<Store>({
         localStorage.setItem("account", JSON.stringify(payload));
     },
 
-    async saveAccountData(which: Partial<{ [K in keyof AccountData]: boolean }>): Promise<void> {
+    async addToAccountData(data: Partial<AddAccountDataPayload>): Promise<void> {
         if(this.account === null) {
             return;
         }
 
-        const { authToken, data } = this.account;
-        const payload: Partial<AccountData> = {};
-        let empty = true;
+        const { authToken } = this.account;
+        const payload = { add: data };
 
-        if(which.blacklist) {
-            payload.blacklist = data.blacklist;
-            empty = false;
-        }
-        if(which.favorite_posts) {
-            payload.favorite_posts = data.favorite_posts;
-            empty = false;
-        }
-        if(which.favorite_tags) {
-            payload.favorite_tags = data.favorite_tags;
-            empty = false;
-        }
-        if(which.search_history) {
-            payload.search_history = data.search_history;
-            empty = false;
+        const resp = await fetch("/api/account/data", {
+            body: JSON.stringify(payload),
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json"
+            }
+        });
+        if(!resp.ok) {
+            console.error("error adding data", resp);
+            throw new Error("error adding data");
         }
 
-        if(empty) {
+        this.account.data = {
+            ...this.account.data,
+            ...parseAccountDataFromAPI(await resp.json() as Partial<AccountDataResponse>)
+        }
+    },
+
+    async removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void> {
+        if(this.account === null) {
             return;
         }
-            const resp = await fetch("/api/account", {
-                body: JSON.stringify(payload),
-                method: "PATCH",
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                    "Content-Type": "application/json"
-                }
-            });
-            if(!resp.ok) {
-                console.error("error saving data", resp);
-                throw new Error("error saving data");
+
+        const { authToken } = this.account;
+        const payload = { remove: data };
+
+        const resp = await fetch("/api/account/data", {
+            body: JSON.stringify(payload),
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json"
             }
+        });
+        if(!resp.ok) {
+            console.error("error removing data", resp);
+            throw new Error("error removing data");
+        }
+
+        this.account.data = {
+            ...this.account.data,
+            ...parseAccountDataFromAPI(await resp.json() as Partial<AccountDataResponse>)
+        }
     },
 
     async fetchAccountData()  {
@@ -241,10 +300,16 @@ const store = reactive<Store>({
         }
 
         // If the data is already available in the HTML, use it directly
-        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null");
+        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null") as AccountDataResponse;
 
         if(preloadedData) {
-            this.account.data = preloadedData;
+            this.account.data = {
+                favorite_posts: [],
+                favorite_tags: [],
+                blacklist: [],
+                search_history: [],
+                ...parseAccountDataFromAPI(preloadedData),
+            }
             return;
         }
 
@@ -253,7 +318,7 @@ const store = reactive<Store>({
         try {
             this.fetchingAccountData = true;
 
-            const resp = await fetch("/api/account", {
+            const resp = await fetch("/api/account/data", {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${authToken}`
@@ -276,35 +341,13 @@ const store = reactive<Store>({
                 return;
             }
 
-            type accountResponse = {
-                username: string;
-                data: {
-                    favorite_posts: Post[];
-                    favorite_tags: Tag[];
-                    blacklist: Tag[];
-                    search_history: {
-                        date: string;
-                        query: {
-                            include: Tag[];
-                            exclude: Tag[];
-                        }
-                    }[]
-                };
-            }
-
-            const { data } = await resp.json() as accountResponse;
-
             this.account.data = {
-                favorite_posts: data.favorite_posts,
-                favorite_tags: data.favorite_tags,
-                blacklist: data.blacklist,
-                search_history: data.search_history.map(hist => {
-                    return {
-                        date: new Date(hist.date),
-                        query: new SearchQuery({ include: hist.query.include, exclude: hist.query.exclude })
-                    }
-                })
-            };
+                favorite_posts: [],
+                favorite_tags: [],
+                blacklist: [],
+                search_history: [],
+                ...parseAccountDataFromAPI(await resp.json() as AccountDataResponse),
+            }
         } catch(e) {
             console.error(e);
             this.toast = {
@@ -652,10 +695,10 @@ const store = reactive<Store>({
             return;
         }
 
-        this.addToSearchHistory({
+        this.addToSearchHistory([{
             date: new Date(),
             query: this.query.copy(),
-        });
+        }]);
     },
 
     clearPosts() {
@@ -679,43 +722,19 @@ const store = reactive<Store>({
         })
     },
 
-    async addFavoritePost(post: Post) {
+    async addFavoritePosts(posts: Post[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            this.account.data.favorite_posts = [post].concat(this.account.data.favorite_posts);
-            return this.saveAccountData({favorite_posts: true});
+            return this.addToAccountData({favorite_posts: posts});
         }
-
-        this.settings.favorites = [post].concat(this.settings.favorites);
+        this.settings.favorites = posts.concat(this.settings.favorites);
         this.saveSettings();
     },
 
-    async removeFavoritePost(post: Post) {
+    async removeFavoritePosts(postIds: number[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            const i = this.account.data.favorite_posts.findIndex(p => p.id === post.id);
-            if(i !== -1) {
-                this.account.data.favorite_posts.splice(i, 1);
-            }
-            return this.saveAccountData({favorite_posts: true});
+            return this.removeFromAccountData({favorite_post_ids: postIds});
         }
-
-        const i = this.settings.favorites.findIndex(p => p.id === post.id);
-        if(i !== -1) {
-            this.settings.favorites.splice(i, 1);
-        }
-        this.saveSettings();
-    },
-
-    async setFavoritePosts(posts: Post[]) {
-        if(this.account !== null) {
-            this.account.data.favorite_posts = posts;
-            return this.saveAccountData({favorite_posts: true});
-        }
-
-        this.settings.favorites = posts;
+        this.settings.favorites = this.settings.favorites.filter(p => !postIds.includes(p.id));
         this.saveSettings();
     },
 
@@ -728,43 +747,19 @@ const store = reactive<Store>({
         });
     },
 
-    async addFavoriteTag(tag: Tag) {
+    async addFavoriteTags(tags: Tag[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            this.account.data.favorite_tags = this.account.data.favorite_tags.concat(tag);
-            return this.saveAccountData({favorite_tags: true});
+            return this.addToAccountData({favorite_tags: tags});
         }
-
-        this.settings.favoriteTags = this.settings.favoriteTags.concat(tag);
+        this.settings.favoriteTags = tags.concat(this.settings.favoriteTags);
         this.saveSettings();
     },
 
-    async removeFavoriteTag(tag: Tag) {
+    async removeFavoriteTags(tagNames: string[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            const i = this.account.data.favorite_tags.findIndex(t => t.name === tag.name);
-            if(i !== -1) {
-                this.account.data.favorite_tags.splice(i, 1);
-            }
-            return this.saveAccountData({favorite_tags: true});
+            return this.removeFromAccountData({favorite_tag_names: tagNames});
         }
-
-        const i = this.settings.favoriteTags.findIndex(t => t.name === tag.name);
-        if(i !== -1) {
-            this.settings.favoriteTags.splice(i, 1);
-        }
-        this.saveSettings();
-    },
-
-    async setFavoriteTags(tags: Tag[])  {
-        if(this.account !== null) {
-            this.account.data.favorite_tags = tags;
-            return this.saveAccountData({favorite_tags: true});
-        }
-
-        this.settings.favoriteTags = tags;
+        this.settings.favoriteTags = this.settings.favoriteTags.filter(t => !tagNames.includes(t.name));
         this.saveSettings();
     },
 
@@ -777,43 +772,19 @@ const store = reactive<Store>({
         });
     },
 
-    async addToBlacklist(tag: Tag) {
+    async addToBlacklist(tags: Tag[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            this.account.data.blacklist = this.account.data.blacklist.concat(tag);
-            return this.saveAccountData({blacklist: true});
+            return this.addToAccountData({blacklist: tags});
         }
-
-        this.settings.blacklist = this.settings.blacklist.concat(tag);
+        this.settings.blacklist = tags.concat(this.settings.blacklist);
         this.saveSettings();
     },
 
-    async removeFromBlacklist(tag: Tag) {
+    async removeFromBlacklist(tagNames: string[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            const i = this.account.data.blacklist.findIndex(t => t.name === tag.name);
-            if(i !== -1) {
-                this.account.data.blacklist.splice(i, 1);
-            }
-            return this.saveAccountData({blacklist: true});
+            return this.removeFromAccountData({blacklist_names: tagNames});
         }
-
-        const i = this.settings.blacklist.findIndex(t => t.name === tag.name);
-        if(i !== -1) {
-            this.settings.blacklist.splice(i, 1);
-        }
-        this.saveSettings();
-    },
-
-    async setBlacklist(tags: Tag[])  {
-        if(this.account !== null) {
-            this.account.data.blacklist = tags;
-            return this.saveAccountData({blacklist: true});
-        }
-
-        this.settings.blacklist = tags;
+        this.settings.blacklist = this.settings.blacklist.filter(t => !tagNames.includes(t.name));
         this.saveSettings();
     },
 
@@ -826,52 +797,25 @@ const store = reactive<Store>({
         });
     },
 
-    async addToSearchHistory(hist: SearchHistory) {
+    async addToSearchHistory(history: SearchHistory[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-
-            const i = this.account.data.search_history.findIndex(h => h.query.equals(hist.query));
-            if(i !== -1) {
-                this.account.data.search_history.splice(i, 1);
-            }
-            this.account.data.search_history = [hist].concat(this.account.data.search_history);
-            return this.saveAccountData({search_history: true});
+            const serialized = history.map(h => ({
+                date: h.date.toISOString(),
+                query: h.query.toJSON()
+            }));
+            return this.addToAccountData({search_history: serialized});
         }
-
-        const i = this.settings.queryHistory.findIndex(h => h.query.equals(hist.query));
-        if(i !== -1) {
-            this.settings.queryHistory.splice(i, 1);
-        }
-        this.settings.queryHistory = [hist].concat(this.settings.queryHistory);
+        this.settings.queryHistory = history.concat(this.settings.queryHistory);
         this.saveSettings();
     },
 
-    async removeFromSearchHistory(hist: SearchHistory) {
+    async removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]) {
         if(this.account !== null) {
-            // HACK: https://codeberg.org/jessienyan/booruview/issues/7
-            await this.fetchAccountData();
-            const i = this.account.data.search_history.findIndex(h => h.query.equals(hist.query));
-            if(i !== -1) {
-                this.account.data.search_history.splice(i, 1);
-            }
-            return this.saveAccountData({search_history: true});
+            return this.removeFromAccountData({search_queries: queries});
         }
-
-        const i = this.settings.queryHistory.findIndex(h => h.query.equals(hist.query));
-        if(i !== -1) {
-            this.settings.queryHistory.splice(i, 1);
-        }
-        this.saveSettings();
-    },
-
-    async setSearchHistory(hist: SearchHistory[])  {
-        if(this.account !== null) {
-            this.account.data.search_history = hist;
-            return this.saveAccountData({search_history: true});
-        }
-
-        this.settings.queryHistory = hist;
+        this.settings.queryHistory = this.settings.queryHistory.filter(h =>
+            !queries.some(q => h.query.equalsSimple(q))
+        );
         this.saveSettings();
     },
 });

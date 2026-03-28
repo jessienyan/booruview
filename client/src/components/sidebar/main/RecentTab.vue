@@ -24,7 +24,7 @@ function styledTags(query: SearchQuery) {
 }
 
 function onDelete(index: number) {
-    store.removeFromSearchHistory(history.value[index]);
+    store.removeFromSearchHistory([history.value[index].query.toJSONSimple()]);
 }
 </script>
 

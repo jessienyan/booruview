@@ -22,7 +22,7 @@ var (
 func init() {
 	testutil.Setup()
 	api.InitUserDatabase()
-	authMiddlewareUser = testutil.CreateUser(authMiddlewareUsername, authMiddlewarePassword)
+	authMiddlewareUser, _ = testutil.CreateUser(authMiddlewareUsername, authMiddlewarePassword)
 }
 
 func TestAuthMiddleware_Ok(t *testing.T) {

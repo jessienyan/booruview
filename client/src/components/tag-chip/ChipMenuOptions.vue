@@ -56,7 +56,7 @@ function onBlacklist() {
 }
 
 function onConfirmBlacklist() {
-    store.addToBlacklist(tag);
+    store.addToBlacklist([tag]);
     store.query.removeTag(tag);
     onClick();
 }
@@ -72,7 +72,7 @@ function onRemove() {
 }
 
 function onFavorite() {
-    store.addFavoriteTag(tag);
+    store.addFavoriteTags([tag]);
     onClick();
 }
 
@@ -82,12 +82,12 @@ function onEdit() {
 }
 
 function onUnfavorite() {
-    store.removeFavoriteTag(favTags.value[favoriteIndex.value]);
+    store.removeFavoriteTags([favTags.value[favoriteIndex.value].name]);
     onClick();
 }
 
 function onWhitelist() {
-    store.removeFromBlacklist(blacklist.value[blacklistIndex.value]);
+    store.removeFromBlacklist([blacklist.value[blacklistIndex.value].name]);
     onClick();
 }
 </script>

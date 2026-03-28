@@ -49,7 +49,7 @@ func TestSearchTags_MakesExpectedAPICall(t *testing.T) {
 }
 
 func TestSearchTags_ParsesResponse(t *testing.T) {
-	expected := []api.TagResponse{
+	expected := api.TagList{
 		{Name: "foo", Type: api.Tag, Count: 1},
 		{Name: "foobar", Type: api.Tag, Count: 2},
 	}
@@ -68,7 +68,7 @@ func TestSearchTags_ParsesResponse(t *testing.T) {
 }
 
 func TestSearchTags_ReturnsRatingSuggestions(t *testing.T) {
-	expected := []api.TagResponse{
+	expected := api.TagList{
 		{Name: "rating:general", Type: api.Metadata},
 		{Name: "rating:questionable", Type: api.Metadata},
 		{Name: "rating:sensitive", Type: api.Metadata},
@@ -85,7 +85,7 @@ func TestSearchTags_ReturnsRatingSuggestions(t *testing.T) {
 }
 
 func TestSearchTags_ReturnsSortSuggestions(t *testing.T) {
-	expected := []api.TagResponse{
+	expected := api.TagList{
 		{Name: "sort:random", Type: api.Unknown},
 		{Name: "sort:score", Type: api.Unknown},
 		{Name: "sort:id", Type: api.Unknown},
@@ -326,7 +326,7 @@ func TestListTags_MakesExpectedAPICall(t *testing.T) {
 }
 
 func TestListTags_ParsesResponse(t *testing.T) {
-	expected := []api.TagResponse{
+	expected := api.TagList{
 		{Name: "test_tag", Count: 100, Type: api.Tag},
 		{Name: "artist_name", Count: 50, Type: api.Artist},
 	}

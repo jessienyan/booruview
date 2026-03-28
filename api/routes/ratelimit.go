@@ -15,8 +15,9 @@ const (
 	settingImportApiCost   = 1
 	tagSearchApiCost       = 1
 	tagApiCost             = 2
-	accountFetchCost       = 3
-	accountPatchCost       = 5
+	accountDataGetCost     = 3
+	accountDataPutCost     = 5
+	accountDataPatchCost   = 5
 	accountDeleteCost      = 10
 	loginCost              = 10
 	registerCost           = 20
