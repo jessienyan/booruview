@@ -14,8 +14,8 @@ const (
 )
 
 type SearchQuery struct {
-	Include api.TagList `json:"include" validate:"dive"`
-	Exclude api.TagList `json:"exclude" validate:"dive"`
+	Include api.TagList `json:"include" validate:"dive,required"`
+	Exclude api.TagList `json:"exclude" validate:"dive,required"`
 }
 
 type SearchQueryNames struct {

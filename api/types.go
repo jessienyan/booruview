@@ -90,7 +90,7 @@ type PostResponse struct {
 	SourceUrl          string   `json:"source_url"`
 	Uploader           string   `json:"uploader"`
 	UploaderUrl        string   `json:"uploader_url"`
-	Tags               []string `json:"tags"`
+	Tags               []string `json:"tags" validate:"required"`
 	ThumbnailUrl       string   `json:"thumbnail_url"`
 	ThumbnailWidth     int      `json:"thumbnail_width"`
 	ThumbnailHeight    int      `json:"thumbnail_height"`
