@@ -86,7 +86,7 @@ type Store = {
     account: {
         authToken: string;
         username: string;
-        data: AccountData;
+        data?: AccountData;
     } | null;
     fetchingAccountData: boolean;
 
@@ -241,7 +241,7 @@ const store = reactive<Store>({
     },
 
     async addToAccountData(data: Partial<AddAccountDataPayload>): Promise<void> {
-        if(this.account === null) {
+        if(!this.account?.data) {
             return;
         }
 
@@ -268,7 +268,7 @@ const store = reactive<Store>({
     },
 
     async removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void> {
-        if(this.account === null) {
+        if(!this.account?.data) {
             return;
         }
 
@@ -715,7 +715,7 @@ const store = reactive<Store>({
 
     favoritePosts(): ComputedRef<Post[]> {
         return computed(() => {
-            if (this.account !== null) {
+            if (this.account?.data) {
                 return this.account.data.favorite_posts;
             }
             return this.settings.favorites;
@@ -723,7 +723,7 @@ const store = reactive<Store>({
     },
 
     async addFavoritePosts(posts: Post[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.addToAccountData({favorite_posts: posts});
         }
         this.settings.favorites = posts.concat(this.settings.favorites);
@@ -731,7 +731,7 @@ const store = reactive<Store>({
     },
 
     async removeFavoritePosts(postIds: number[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.removeFromAccountData({favorite_post_ids: postIds});
         }
         this.settings.favorites = this.settings.favorites.filter(p => !postIds.includes(p.id));
@@ -740,7 +740,7 @@ const store = reactive<Store>({
 
     favoriteTags(): ComputedRef<Tag[]> {
         return computed(() => {
-            if (this.account !== null) {
+            if (this.account?.data) {
                 return this.account.data.favorite_tags;
             }
             return this.settings.favoriteTags;
@@ -748,7 +748,7 @@ const store = reactive<Store>({
     },
 
     async addFavoriteTags(tags: Tag[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.addToAccountData({favorite_tags: tags});
         }
         this.settings.favoriteTags = tags.concat(this.settings.favoriteTags);
@@ -756,7 +756,7 @@ const store = reactive<Store>({
     },
 
     async removeFavoriteTags(tagNames: string[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.removeFromAccountData({favorite_tag_names: tagNames});
         }
         this.settings.favoriteTags = this.settings.favoriteTags.filter(t => !tagNames.includes(t.name));
@@ -765,7 +765,7 @@ const store = reactive<Store>({
 
     blacklist(): ComputedRef<Tag[]> {
         return computed(() => {
-            if (this.account !== null) {
+            if (this.account?.data) {
                 return this.account.data.blacklist;
             }
             return this.settings.blacklist;
@@ -773,7 +773,7 @@ const store = reactive<Store>({
     },
 
     async addToBlacklist(tags: Tag[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.addToAccountData({blacklist: tags});
         }
         this.settings.blacklist = tags.concat(this.settings.blacklist);
@@ -781,7 +781,7 @@ const store = reactive<Store>({
     },
 
     async removeFromBlacklist(tagNames: string[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.removeFromAccountData({blacklist_names: tagNames});
         }
         this.settings.blacklist = this.settings.blacklist.filter(t => !tagNames.includes(t.name));
@@ -790,7 +790,7 @@ const store = reactive<Store>({
 
     searchHistory(): ComputedRef<SearchHistory[]> {
         return computed(() => {
-            if (this.account !== null) {
+            if (this.account?.data) {
                 return this.account.data.search_history;
             }
             return this.settings.queryHistory;
@@ -798,7 +798,7 @@ const store = reactive<Store>({
     },
 
     async addToSearchHistory(history: SearchHistory[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             const serialized = history.map(h => ({
                 date: h.date.toISOString(),
                 query: h.query.toJSON()
@@ -810,7 +810,7 @@ const store = reactive<Store>({
     },
 
     async removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]) {
-        if(this.account !== null) {
+        if(this.account?.data) {
             return this.removeFromAccountData({search_queries: queries});
         }
         this.settings.queryHistory = this.settings.queryHistory.filter(h =>
