@@ -111,6 +111,10 @@ func (lst *SearchHistoryList) Clean() {
 		queries[tags] = struct{}{}
 		return false
 	})
+
+	if len(*lst) > SearchHistoryLimit {
+		*lst = (*lst)[:SearchHistoryLimit]
+	}
 }
 
 // queries should be the result of calling .Tags() on a tag list
@@ -128,6 +132,8 @@ func (lst *SearchHistoryList) Remove(queries []string) {
 		_, shouldDelete := lookup[entry.Query.Tags()]
 		return shouldDelete
 	})
+
+	lst.Clean()
 }
 
 type UserDataJSON struct {

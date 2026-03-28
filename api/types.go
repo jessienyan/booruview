@@ -80,6 +80,8 @@ func (lst *TagList) Remove(tagNames []string) {
 		_, shouldDelete := lookup[t.Name]
 		return shouldDelete
 	})
+
+	lst.Clean()
 }
 
 type PostResponse struct {
@@ -142,4 +144,6 @@ func (lst *PostList) Remove(ids []int) {
 		_, shouldDelete := lookup[t.Id]
 		return shouldDelete
 	})
+
+	lst.Clean()
 }

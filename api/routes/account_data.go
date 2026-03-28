@@ -109,6 +109,8 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if changed {
+		data.Clean()
+
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
 			return
@@ -258,8 +260,6 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil {
-		data.Clean()
-
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
 			return
