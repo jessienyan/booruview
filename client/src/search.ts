@@ -94,13 +94,13 @@ export class SearchQuery {
 			return false;
 		}
 
-		for (const k in o.include) {
+		for (const k of o.include) {
 			if (!this._include.has(k)) {
 				return false;
 			}
 		}
 
-		for (const k in o.exclude) {
+		for (const k of o.exclude) {
 			if (!this._exclude.has(k)) {
 				return false;
 			}
