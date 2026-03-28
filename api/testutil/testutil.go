@@ -121,3 +121,7 @@ func CreateUser(username, password string) (models.Users, models.UserData) {
 
 	return user, data
 }
+
+func Now() time.Time {
+	return time.Now().Truncate(time.Millisecond).UTC()
+}

@@ -10,7 +10,8 @@ dcc() {
 
 mkdir -p .gotestcache
 
-dcc build
+echo ">>> building..."
+dcc build --quiet
 dcc up -d --renew-anon-volumes valkey
-dcc run --rm api ash -c 'rm -f $DATABASE_PATH && goose up && go test ./...'
-dcc down
+dcc run --rm --quiet api ash -c 'rm -f $DATABASE_PATH && goose up && go test ./...'
+dcc down --quiet

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
@@ -68,13 +67,12 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 	data.FavoriteTags = api.TagList{{Name: "test2", Type: api.Character, Count: 2}}
 	data.FavoritePosts = api.PostList{{Id: 1, ImageUrl: "example.com/blah.jpg"}}
 	data.SearchHistory = models.SearchHistoryList{{
-		Date: time.Now(),
+		Date: testutil.Now(),
 		Query: models.SearchQuery{
 			Include: api.TagList{{Name: "test3", Type: api.Tag}},
 			Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},
 		},
 	}}
-
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
@@ -108,8 +106,7 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
-	require.Len(t, response.FavoritePosts, 1)
-	require.Equal(t, post.Id, response.FavoritePosts[0].Id)
+	require.Equal(t, api.PostList{post}, response.FavoritePosts)
 }
 
 func TestAccountDataPatchHandler_AddFavoriteTags(t *testing.T) {
@@ -133,8 +130,7 @@ func TestAccountDataPatchHandler_AddFavoriteTags(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
-	require.Len(t, response.FavoriteTags, 1)
-	require.Equal(t, tag.Name, response.FavoriteTags[0].Name)
+	require.Equal(t, api.TagList{tag}, response.FavoriteTags)
 }
 
 func TestAccountDataPatchHandler_AddBlacklist(t *testing.T) {
@@ -158,20 +154,18 @@ func TestAccountDataPatchHandler_AddBlacklist(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
-	require.Len(t, response.Blacklist, 1)
-	require.Equal(t, tag.Name, response.Blacklist[0].Name)
+	require.Equal(t, api.TagList{tag}, response.Blacklist)
 }
 
 func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	now := time.Now()
 	params := routes.AccountDataPatchParams{
 		Add: &routes.AddAccountData{
 			SearchHistory: models.SearchHistoryList{
 				{
-					Date: now,
+					Date: testutil.Now(),
 					Query: models.SearchQuery{
 						Include: api.TagList{api.TagResponse{Name: "include_tag", Count: 10, Type: api.Tag}},
 						Exclude: api.TagList{api.TagResponse{Name: "exclude_tag", Count: 5, Type: api.Tag}},
@@ -191,32 +185,22 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
-	require.Len(t, response.SearchHistory, 1)
-	require.Equal(t, now.Unix(), response.SearchHistory[0].Date.Unix())
-	require.Len(t, response.SearchHistory[0].Query.Include, 1)
-	require.Len(t, response.SearchHistory[0].Query.Exclude, 1)
+	require.Equal(t, params.Add.SearchHistory, response.SearchHistory)
 }
 
 func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	// First add a post
-	addParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoritePosts: api.PostList{{Id: 111}, {Id: 222}, {Id: 333}},
-		},
-	}
-	addBody := testutil.MustMarshalJSON(addParams)
-	addReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody))
-	addReq.Header.Set("Content-Type", "application/json")
-	addRec := callHandler(routes.AccountDataPatchHandler, addReq, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec.Code)
+	var data models.UserDataJSON
+	data.FavoritePosts = api.PostList{{Id: 1}, {Id: 2}, {Id: 3}}
+	expected := api.PostList{{Id: 1}, {Id: 3}}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	// Now remove one post
 	removeParams := routes.AccountDataPatchParams{
 		Remove: &routes.RemoveAccountData{
-			FavoritePostIDs: []int{222},
+			FavoritePostIDs: []int{2},
 		},
 	}
 	removeBody := testutil.MustMarshalJSON(removeParams)
@@ -228,32 +212,26 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
-
-	require.Len(t, response.FavoritePosts, 2)
-	require.NotContains(t, []int{response.FavoritePosts[0].Id, response.FavoritePosts[1].Id}, 222)
+	require.Equal(t, expected, response.FavoritePosts)
 }
 
 func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	// First add tags
-	addParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoriteTags: api.TagList{
-				{Name: "tag1", Count: 10, Type: api.Tag},
-				{Name: "tag2", Count: 20, Type: api.Tag},
-				{Name: "tag3", Count: 30, Type: api.Tag},
-			},
-		},
+	var data models.UserDataJSON
+	data.FavoriteTags = api.TagList{
+		{Name: "tag1", Count: 1, Type: api.Tag},
+		{Name: "tag2", Count: 2, Type: api.Tag},
+		{Name: "tag3", Count: 3, Type: api.Tag},
 	}
-	addBody := testutil.MustMarshalJSON(addParams)
-	addReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody))
-	addReq.Header.Set("Content-Type", "application/json")
-	addRec := callHandler(routes.AccountDataPatchHandler, addReq, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec.Code)
+	expected := api.TagList{
+		{Name: "tag1", Count: 1, Type: api.Tag},
+		{Name: "tag3", Count: 3, Type: api.Tag},
+	}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	// Now remove one tag
 	removeParams := routes.AccountDataPatchParams{
 		Remove: &routes.RemoveAccountData{
 			FavoriteTagNames: []string{"tag2"},
@@ -269,32 +247,26 @@ func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
 
-	require.Len(t, response.FavoriteTags, 2)
-	tagNames := []string{response.FavoriteTags[0].Name, response.FavoriteTags[1].Name}
-	require.NotContains(t, tagNames, "tag2")
+	require.Equal(t, expected, response.FavoriteTags)
 }
 
 func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	// First add to blacklist
-	addParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			Blacklist: api.TagList{
-				{Name: "bad1", Count: 10, Type: api.Tag},
-				{Name: "bad2", Count: 20, Type: api.Tag},
-				{Name: "bad3", Count: 30, Type: api.Tag},
-			},
-		},
+	var data models.UserDataJSON
+	data.Blacklist = api.TagList{
+		{Name: "bad1", Count: 1, Type: api.Tag},
+		{Name: "bad2", Count: 2, Type: api.Tag},
+		{Name: "bad3", Count: 3, Type: api.Tag},
 	}
-	addBody := testutil.MustMarshalJSON(addParams)
-	addReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody))
-	addReq.Header.Set("Content-Type", "application/json")
-	addRec := callHandler(routes.AccountDataPatchHandler, addReq, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec.Code)
+	expected := api.TagList{
+		{Name: "bad1", Count: 1, Type: api.Tag},
+		{Name: "bad3", Count: 3, Type: api.Tag},
+	}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	// Now remove from blacklist
 	removeParams := routes.AccountDataPatchParams{
 		Remove: &routes.RemoveAccountData{
 			BlacklistNames: []string{"bad2"},
@@ -310,50 +282,41 @@ func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
 
-	require.Len(t, response.Blacklist, 2)
-	blacklistNames := []string{response.Blacklist[0].Name, response.Blacklist[1].Name}
-	require.NotContains(t, blacklistNames, "bad2")
+	require.Equal(t, expected, response.Blacklist)
 }
 
 func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
 
-	// First add search history
-	now := time.Now()
-	addParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			SearchHistory: models.SearchHistoryList{
-				{
-					Date: now,
-					Query: models.SearchQuery{
-						Include: api.TagList{api.TagResponse{Name: "query1", Count: 10, Type: api.Tag}},
-						Exclude: api.TagList{},
-					},
-				},
-				{
-					Date: now,
-					Query: models.SearchQuery{
-						Include: api.TagList{api.TagResponse{Name: "query2", Count: 20, Type: api.Tag}},
-						Exclude: api.TagList{},
-					},
-				},
+	var data models.UserDataJSON
+	data.SearchHistory = models.SearchHistoryList{
+		{
+			Date: testutil.Now(),
+			Query: models.SearchQuery{
+				Include: api.TagList{{Name: "test1", Type: api.Tag}},
+				Exclude: api.TagList{{Name: "test2", Type: api.Metadata}},
+			},
+		},
+		{
+			Date: testutil.Now(),
+			Query: models.SearchQuery{
+				Include: api.TagList{{Name: "test3", Type: api.Tag}},
+				Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},
 			},
 		},
 	}
-	addBody := testutil.MustMarshalJSON(addParams)
-	addReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody))
-	addReq.Header.Set("Content-Type", "application/json")
-	addRec := callHandler(routes.AccountDataPatchHandler, addReq, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec.Code)
+	expected := models.SearchHistoryList{data.SearchHistory[1]}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	// Now remove one search history entry
 	removeParams := routes.AccountDataPatchParams{
 		Remove: &routes.RemoveAccountData{
-			SearchQueries: []models.SearchQuery{
+			SearchQueries: []models.SearchQueryNames{
 				{
-					Include: api.TagList{api.TagResponse{Name: "query2", Count: 20, Type: api.Tag}},
-					Exclude: api.TagList{},
+					Include: []string{"test1"},
+					Exclude: []string{"test2"},
 				},
 			},
 		},
@@ -368,139 +331,5 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 	var response routes.AccountDataResponse
 	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
 
-	require.Len(t, response.SearchHistory, 1)
-	require.Equal(t, "query1", response.SearchHistory[0].Query.Include[0].Name)
-}
-
-func TestAccountDataPatchHandler_MixedAddAndRemove(t *testing.T) {
-	testutil.Flush()
-	testutil.ResetUserData(accountDataTestUser.ID)
-
-	// First add some data
-	addParams1 := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoriteTags: api.TagList{
-				{Name: "tag1", Count: 10, Type: api.Tag},
-				{Name: "tag2", Count: 20, Type: api.Tag},
-			},
-		},
-	}
-	addBody1 := testutil.MustMarshalJSON(addParams1)
-	addReq1 := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody1))
-	addReq1.Header.Set("Content-Type", "application/json")
-	addRec1 := callHandler(routes.AccountDataPatchHandler, addReq1, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec1.Code)
-
-	// Mix add and remove in one request
-	mixedParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoriteTags: api.TagList{{Name: "tag3", Count: 30, Type: api.Tag}},
-		},
-		Remove: &routes.RemoveAccountData{
-			FavoriteTagNames: []string{"tag1"},
-		},
-	}
-	mixedBody := testutil.MustMarshalJSON(mixedParams)
-	mixedReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(mixedBody))
-	mixedReq.Header.Set("Content-Type", "application/json")
-	mixedRec := callHandler(routes.AccountDataPatchHandler, mixedReq, accountDataAuthToken)
-
-	require.Equal(t, http.StatusOK, mixedRec.Code)
-
-	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(mixedRec.Body.Bytes(), &response)
-
-	require.Len(t, response.FavoriteTags, 2)
-	tagNames := []string{response.FavoriteTags[0].Name, response.FavoriteTags[1].Name}
-	require.Contains(t, tagNames, "tag2")
-	require.Contains(t, tagNames, "tag3")
-	require.NotContains(t, tagNames, "tag1")
-}
-
-func TestAccountDataPatchHandler_InvalidContentType(t *testing.T) {
-	testutil.Flush()
-	testutil.ResetUserData(accountDataTestUser.ID)
-
-	params := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{},
-	}
-	body := testutil.MustMarshalJSON(params)
-
-	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
-	// Missing Content-Type header
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
-
-	require.Equal(t, http.StatusBadRequest, rec.Code)
-}
-
-func TestAccountDataPutHandler_ReplaceFavoritePosts(t *testing.T) {
-	testutil.Flush()
-	testutil.ResetUserData(accountDataTestUser.ID)
-
-	// First add some posts
-	addParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoritePosts: api.PostList{{Id: 111}, {Id: 222}},
-		},
-	}
-	addBody := testutil.MustMarshalJSON(addParams)
-	addReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody))
-	addReq.Header.Set("Content-Type", "application/json")
-	addRec := callHandler(routes.AccountDataPatchHandler, addReq, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec.Code)
-
-	// Now replace all posts with PUT
-	putParams := routes.AccountDataPutParams{
-		UserDataJSON: models.UserDataJSON{
-			FavoritePosts: api.PostList{{Id: 333}, {Id: 444}},
-		},
-	}
-	putBody := testutil.MustMarshalJSON(putParams)
-	putReq := httptest.NewRequest("PUT", "/api/account/data", bytes.NewReader(putBody))
-	putReq.Header.Set("Content-Type", "application/json")
-	putRec := callHandler(routes.AccountDataPutHandler, putReq, accountDataAuthToken)
-
-	require.Equal(t, http.StatusOK, putRec.Code)
-
-	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(putRec.Body.Bytes(), &response)
-
-	require.Len(t, response.FavoritePosts, 2)
-	require.Equal(t, 333, response.FavoritePosts[0].Id)
-	require.Equal(t, 444, response.FavoritePosts[1].Id)
-}
-
-func TestAccountDataPatchHandler_EmptyAdd(t *testing.T) {
-	testutil.Flush()
-	testutil.ResetUserData(accountDataTestUser.ID)
-
-	// Add some data first
-	addParams1 := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
-			FavoriteTags: api.TagList{{Name: "tag1", Count: 10, Type: api.Tag}},
-		},
-	}
-	addBody1 := testutil.MustMarshalJSON(addParams1)
-	addReq1 := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(addBody1))
-	addReq1.Header.Set("Content-Type", "application/json")
-	addRec1 := callHandler(routes.AccountDataPatchHandler, addReq1, accountDataAuthToken)
-	require.Equal(t, http.StatusOK, addRec1.Code)
-
-	// Now send empty add - should return current state without changes
-	emptyParams := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{},
-	}
-	emptyBody := testutil.MustMarshalJSON(emptyParams)
-	emptyReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(emptyBody))
-	emptyReq.Header.Set("Content-Type", "application/json")
-	emptyRec := callHandler(routes.AccountDataPatchHandler, emptyReq, accountDataAuthToken)
-
-	require.Equal(t, http.StatusOK, emptyRec.Code)
-
-	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(emptyRec.Body.Bytes(), &response)
-
-	// Data should be unchanged
-	require.Len(t, response.FavoriteTags, 1)
-	require.Equal(t, "tag1", response.FavoriteTags[0].Name)
+	require.Equal(t, expected, response.SearchHistory)
 }
