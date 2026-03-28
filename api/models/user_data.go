@@ -14,13 +14,13 @@ const (
 )
 
 type SearchQuery struct {
-	Include api.TagList `json:"include" validate:"required"`
-	Exclude api.TagList `json:"exclude" validate:"required"`
+	Include api.TagList `json:"include" validate:"dive"`
+	Exclude api.TagList `json:"exclude" validate:"dive"`
 }
 
 type SearchQueryNames struct {
-	Include []string `json:"include" validate:"required"`
-	Exclude []string `json:"exclude" validate:"required"`
+	Include []string `json:"include"`
+	Exclude []string `json:"exclude"`
 }
 
 func (query *SearchQueryNames) Clean() {
@@ -100,9 +100,11 @@ func (lst *SearchHistoryList) Clean() {
 	queries := make(map[string]struct{}, len(*lst))
 	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
 		tags := entry.Query.Tags()
-		_, seen := queries[tags]
+		if tags == "" {
+			return true
+		}
 
-		if seen {
+		if _, seen := queries[tags]; seen {
 			return true
 		}
 

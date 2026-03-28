@@ -91,7 +91,7 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 
 	post := api.PostResponse{Id: 12345}
 	params := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
+		Add: routes.AddAccountData{
 			FavoritePosts: api.PostList{post},
 		},
 	}
@@ -115,7 +115,7 @@ func TestAccountDataPatchHandler_AddFavoriteTags(t *testing.T) {
 
 	tag := api.TagResponse{Name: "test_tag", Count: 100, Type: api.Tag}
 	params := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
+		Add: routes.AddAccountData{
 			FavoriteTags: api.TagList{tag},
 		},
 	}
@@ -139,7 +139,7 @@ func TestAccountDataPatchHandler_AddBlacklist(t *testing.T) {
 
 	tag := api.TagResponse{Name: "blacklisted", Count: 50, Type: api.Tag}
 	params := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
+		Add: routes.AddAccountData{
 			Blacklist: api.TagList{tag},
 		},
 	}
@@ -162,7 +162,7 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 	testutil.ResetUserData(accountDataTestUser.ID)
 
 	params := routes.AccountDataPatchParams{
-		Add: &routes.AddAccountData{
+		Add: routes.AddAccountData{
 			SearchHistory: models.SearchHistoryList{
 				{
 					Date: testutil.Now(),
@@ -199,7 +199,7 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	removeParams := routes.AccountDataPatchParams{
-		Remove: &routes.RemoveAccountData{
+		Remove: routes.RemoveAccountData{
 			FavoritePostIDs: []int{2},
 		},
 	}
@@ -233,7 +233,7 @@ func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	removeParams := routes.AccountDataPatchParams{
-		Remove: &routes.RemoveAccountData{
+		Remove: routes.RemoveAccountData{
 			FavoriteTagNames: []string{"tag2"},
 		},
 	}
@@ -268,7 +268,7 @@ func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	removeParams := routes.AccountDataPatchParams{
-		Remove: &routes.RemoveAccountData{
+		Remove: routes.RemoveAccountData{
 			BlacklistNames: []string{"bad2"},
 		},
 	}
@@ -312,7 +312,7 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 
 	// Now remove one search history entry
 	removeParams := routes.AccountDataPatchParams{
-		Remove: &routes.RemoveAccountData{
+		Remove: routes.RemoveAccountData{
 			SearchQueries: []models.SearchQueryNames{
 				{
 					Include: []string{"test1"},

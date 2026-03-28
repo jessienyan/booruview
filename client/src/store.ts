@@ -32,6 +32,40 @@ export type RemoveAccountDataPayload = {
     search_queries: SimpleSerializedSearchQuery[];
 };
 
+type AccountDataResponse = {
+    favorite_posts: Post[];
+    favorite_tags: Tag[];
+    blacklist: Tag[];
+    search_history: {
+        date: string;
+        query: {
+            include: Tag[];
+            exclude: Tag[];
+        };
+    }[];
+};
+
+function parseAccountDataFromAPI(resp: Partial<AccountDataResponse>): Partial<AccountData> {
+    const parsed: Partial<AccountData> = {};
+
+    if(resp.favorite_posts != null)
+        parsed.favorite_posts = resp.favorite_posts;
+
+    if(resp.favorite_tags != null)
+        parsed.favorite_tags = resp.favorite_tags;
+
+    if(resp.blacklist != null)
+        parsed.blacklist = resp.blacklist;
+
+    if(resp.search_history != null)
+        parsed.search_history = resp.search_history.map(h => ({
+            date: new Date(h.date),
+            query: new SearchQuery(h.query),
+        }));
+
+    return parsed;
+}
+
 export type FullscreenViewMenuAnchorPoint =
     | "topleft"
     | "topcenter"
@@ -226,6 +260,11 @@ const store = reactive<Store>({
             console.error("error adding data", resp);
             throw new Error("error adding data");
         }
+
+        this.account.data = {
+            ...this.account.data,
+            ...parseAccountDataFromAPI(await resp.json() as Partial<AccountDataResponse>)
+        }
     },
 
     async removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void> {
@@ -248,6 +287,11 @@ const store = reactive<Store>({
             console.error("error removing data", resp);
             throw new Error("error removing data");
         }
+
+        this.account.data = {
+            ...this.account.data,
+            ...parseAccountDataFromAPI(await resp.json() as Partial<AccountDataResponse>)
+        }
     },
 
     async fetchAccountData()  {
@@ -255,36 +299,17 @@ const store = reactive<Store>({
             return;
         }
 
-        type AccountDataResponse = {
-            favorite_posts: Post[];
-            favorite_tags: Tag[];
-            blacklist: Tag[];
-            search_history: {
-                date: string;
-                query: {
-                    include: Tag[];
-                    exclude: Tag[];
-                };
-            }[];
-        }
-
-        function toAccountData(resp: AccountDataResponse): AccountData {
-            return {
-                favorite_posts: resp.favorite_posts,
-                favorite_tags: resp.favorite_tags,
-                blacklist: resp.blacklist,
-                search_history: resp.search_history.map(h => ({
-                    date: new Date(h.date),
-                    query: new SearchQuery(h.query),
-                }))
-            }
-        }
-
         // If the data is already available in the HTML, use it directly
         const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null") as AccountDataResponse;
 
         if(preloadedData) {
-            this.account.data = toAccountData(preloadedData);
+            this.account.data = {
+                favorite_posts: [],
+                favorite_tags: [],
+                blacklist: [],
+                search_history: [],
+                ...parseAccountDataFromAPI(preloadedData),
+            }
             return;
         }
 
@@ -316,7 +341,13 @@ const store = reactive<Store>({
                 return;
             }
 
-            this.account.data = toAccountData(await resp.json() as AccountDataResponse);
+            this.account.data = {
+                favorite_posts: [],
+                favorite_tags: [],
+                blacklist: [],
+                search_history: [],
+                ...parseAccountDataFromAPI(await resp.json() as AccountDataResponse),
+            }
         } catch(e) {
             console.error(e);
             this.toast = {

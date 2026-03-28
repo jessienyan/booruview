@@ -132,9 +132,9 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 type AddAccountData struct {
-	FavoritePosts api.PostList             `json:"favorite_posts"`
-	FavoriteTags  api.TagList              `json:"favorite_tags"`
-	Blacklist     api.TagList              `json:"blacklist"`
+	FavoritePosts api.PostList             `json:"favorite_posts" validate:"dive"`
+	FavoriteTags  api.TagList              `json:"favorite_tags" validate:"dive"`
+	Blacklist     api.TagList              `json:"blacklist" validate:"dive"`
 	SearchHistory models.SearchHistoryList `json:"search_history" validate:"dive"`
 }
 
@@ -146,8 +146,15 @@ type RemoveAccountData struct {
 }
 
 type AccountDataPatchParams struct {
-	Add    *AddAccountData    `json:"add"`
-	Remove *RemoveAccountData `json:"remove"`
+	Add    AddAccountData    `json:"add"`
+	Remove RemoveAccountData `json:"remove"`
+}
+
+type AccountDataPatchResponse struct {
+	FavoritePosts api.PostList             `json:"favorite_posts,omitempty"`
+	FavoriteTags  api.TagList              `json:"favorite_tags,omitempty"`
+	Blacklist     api.TagList              `json:"blacklist,omitempty"`
+	SearchHistory models.SearchHistoryList `json:"search_history,omitempty"`
 }
 
 func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
@@ -198,63 +205,59 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	changed := false
+	response := AccountDataPatchResponse{}
 
-	if form.Add != nil {
-		if len(form.Add.Blacklist) > 0 {
-			form.Add.Blacklist.Clean()
-			data.Blacklist = append(data.Blacklist, form.Add.Blacklist...)
-			changed = true
-		}
-
-		if len(form.Add.FavoritePosts) > 0 {
-			form.Add.FavoritePosts.Clean()
-			// NOTE: for compatibility, new posts are added to the beginning of the list
-			data.FavoritePosts = append(form.Add.FavoritePosts, data.FavoritePosts...)
-			changed = true
-		}
-
-		if len(form.Add.FavoriteTags) > 0 {
-			form.Add.FavoriteTags.Clean()
-			data.FavoriteTags = append(data.FavoriteTags, form.Add.FavoriteTags...)
-			changed = true
-		}
-
-		if len(form.Add.SearchHistory) > 0 {
-			form.Add.SearchHistory.Clean()
-			data.SearchHistory = append(data.SearchHistory, form.Add.SearchHistory...)
-			changed = true
-		}
+	if len(form.Add.Blacklist) > 0 {
+		form.Add.Blacklist.Clean()
+		data.Blacklist = append(data.Blacklist, form.Add.Blacklist...)
+		response.Blacklist = data.Blacklist
 	}
 
-	if form.Remove != nil {
-		if len(form.Remove.BlacklistNames) > 0 {
-			data.Blacklist.Remove(form.Remove.BlacklistNames)
-			changed = true
-		}
-
-		if len(form.Remove.FavoritePostIDs) > 0 {
-			data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
-			changed = true
-		}
-
-		if len(form.Remove.FavoriteTagNames) > 0 {
-			data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
-			changed = true
-		}
-
-		if len(form.Remove.SearchQueries) > 0 {
-			queries := make([]string, 0, len(form.Remove.SearchQueries))
-			for _, q := range form.Remove.SearchQueries {
-				q.Clean()
-				queries = append(queries, q.Tags())
-			}
-			data.SearchHistory.Remove(queries)
-			changed = true
-		}
+	if len(form.Add.FavoritePosts) > 0 {
+		cleanedPosts := form.Add.FavoritePosts.Clean()
+		// NOTE: for compatibility, new posts are added to the beginning of the list
+		data.FavoritePosts = append(cleanedPosts, data.FavoritePosts...)
+		response.FavoritePosts = data.FavoritePosts
 	}
 
-	if changed {
+	if len(form.Add.FavoriteTags) > 0 {
+		form.Add.FavoriteTags.Clean()
+		data.FavoriteTags = append(data.FavoriteTags, form.Add.FavoriteTags...)
+		response.FavoriteTags = data.FavoriteTags
+	}
+
+	if len(form.Add.SearchHistory) > 0 {
+		form.Add.SearchHistory.Clean()
+		data.SearchHistory = append(data.SearchHistory, form.Add.SearchHistory...)
+		response.SearchHistory = data.SearchHistory
+	}
+
+	if len(form.Remove.BlacklistNames) > 0 {
+		data.Blacklist.Remove(form.Remove.BlacklistNames)
+		response.Blacklist = data.Blacklist
+	}
+
+	if len(form.Remove.FavoritePostIDs) > 0 {
+		data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
+		response.FavoritePosts = data.FavoritePosts
+	}
+
+	if len(form.Remove.FavoriteTagNames) > 0 {
+		data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
+		response.FavoriteTags = data.FavoriteTags
+	}
+
+	if len(form.Remove.SearchQueries) > 0 {
+		queries := make([]string, 0, len(form.Remove.SearchQueries))
+		for _, q := range form.Remove.SearchQueries {
+			q.Clean()
+			queries = append(queries, q.Tags())
+		}
+		data.SearchHistory.Remove(queries)
+		response.SearchHistory = data.SearchHistory
+	}
+
+	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil {
 		data.Clean()
 
 		if err := user.Data.Set(data); err != nil {
@@ -276,5 +279,5 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		log.Info().Int64("userid", user.User.ID).Msg("updated user data")
 	}
 
-	respondJson(w, 200, AccountDataResponse{data})
+	respondJson(w, 200, response)
 }
