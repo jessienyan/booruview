@@ -255,11 +255,36 @@ const store = reactive<Store>({
             return;
         }
 
+        type AccountDataResponse = {
+            favorite_posts: Post[];
+            favorite_tags: Tag[];
+            blacklist: Tag[];
+            search_history: {
+                date: string;
+                query: {
+                    include: Tag[];
+                    exclude: Tag[];
+                };
+            }[];
+        }
+
+        function toAccountData(resp: AccountDataResponse): AccountData {
+            return {
+                favorite_posts: resp.favorite_posts,
+                favorite_tags: resp.favorite_tags,
+                blacklist: resp.blacklist,
+                search_history: resp.search_history.map(h => ({
+                    date: new Date(h.date),
+                    query: new SearchQuery(h.query),
+                }))
+            }
+        }
+
         // If the data is already available in the HTML, use it directly
-        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null");
+        const preloadedData = JSON.parse(document.getElementById("account-data")!.innerText || "null") as AccountDataResponse;
 
         if(preloadedData) {
-            this.account.data = preloadedData;
+            this.account.data = toAccountData(preloadedData);
             return;
         }
 
@@ -291,8 +316,7 @@ const store = reactive<Store>({
                 return;
             }
 
-            const data = await resp.json() as AccountData;
-            this.account.data = data;
+            this.account.data = toAccountData(await resp.json() as AccountDataResponse);
         } catch(e) {
             console.error(e);
             this.toast = {
