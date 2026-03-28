@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-03-28",
+		changes: [
+			"added an actual PATCH api for account data. this fixes an issue on slower connections where favorites were sometimes not being saved",
+			"removed needing to fetch account data before updating. this helps to reduce bandwidth and further prevents data loss",
+			"added backend tests for account data",
+		]
+	},
+	{
 		date: "2026-03-25",
 		changes: [
 			"reduced delay that disables buttons on the consent form",
