@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	maxDataSize = 4 * 1024 * 1024 // MB
+	maxDataSize = 4 * 1024 * 1024 // 4 MB
 )
 
 type AccountDataResponse struct {
@@ -139,10 +139,10 @@ type AddAccountData struct {
 }
 
 type RemoveAccountData struct {
-	FavoritePosts []int                `json:"favorite_post_ids"`
-	FavoriteTags  []string             `json:"favorite_tag_names"`
-	Blacklist     []string             `json:"blacklist_names"`
-	SearchHistory []models.SearchQuery `json:"search_history" validate:"dive"`
+	FavoritePostIDs  []int                `json:"favorite_post_ids"`
+	FavoriteTagNames []string             `json:"favorite_tag_names"`
+	BlacklistNames   []string             `json:"blacklist_names"`
+	SearchQueries    []models.SearchQuery `json:"search_queries" validate:"dive"`
 }
 
 type AccountDataPatchParams struct {
@@ -224,23 +224,23 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if form.Remove != nil {
-		if len(form.Remove.Blacklist) > 0 {
-			data.Blacklist.Remove(form.Remove.Blacklist)
+		if len(form.Remove.BlacklistNames) > 0 {
+			data.Blacklist.Remove(form.Remove.BlacklistNames)
 			changed = true
 		}
 
-		if len(form.Remove.FavoritePosts) > 0 {
-			data.FavoritePosts.Remove(form.Remove.FavoritePosts)
+		if len(form.Remove.FavoritePostIDs) > 0 {
+			data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
 			changed = true
 		}
 
-		if len(form.Remove.FavoriteTags) > 0 {
-			data.FavoriteTags.Remove(form.Remove.FavoriteTags)
+		if len(form.Remove.FavoriteTagNames) > 0 {
+			data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
 			changed = true
 		}
 
-		if len(form.Remove.SearchHistory) > 0 {
-			data.SearchHistory.Remove(form.Remove.SearchHistory)
+		if len(form.Remove.SearchQueries) > 0 {
+			data.SearchHistory.Remove(form.Remove.SearchQueries)
 			changed = true
 		}
 	}

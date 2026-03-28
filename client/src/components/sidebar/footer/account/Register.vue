@@ -85,7 +85,10 @@ async function onSubmit(e: Event) {
         blacklist: store.settings.blacklist,
         favorite_posts: store.settings.favorites,
         favorite_tags: store.settings.favoriteTags,
-        search_history: store.settings.queryHistory,
+        search_history: store.settings.queryHistory.map((q) => ({
+            date: q.date.toISOString(),
+            query: q.query.toJSON(),
+        })),
     });
 }
 </script>

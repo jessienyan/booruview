@@ -1,7 +1,7 @@
 import { type ComputedRef, computed, reactive, watch } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
-import { SearchQuery, type SerializedSearchQuery } from "./search";
+import { SearchQuery, type SerializedSearchQuery, type SimpleSerializedSearchQuery } from "./search";
 
 export type SearchHistory = {
     date: Date;
@@ -19,14 +19,17 @@ export type AddAccountDataPayload = {
     favorite_posts: Post[];
     favorite_tags: Tag[];
     blacklist: Tag[];
-    search_history: SearchHistory[];
+    search_history: {
+        date: string;
+        query: SerializedSearchQuery;
+    }[];
 };
 
 export type RemoveAccountDataPayload = {
     favorite_post_ids: number[];
     favorite_tag_names: string[];
     blacklist_names: string[];
-    search_history: SerializedSearchQuery[];
+    search_queries: SimpleSerializedSearchQuery[];
 };
 
 export type FullscreenViewMenuAnchorPoint =
@@ -148,7 +151,7 @@ type Store = {
 
     searchHistory(): ComputedRef<SearchHistory[]>;
     addToSearchHistory(history: SearchHistory[]): Promise<void>;
-    removeFromSearchHistory(queries: SerializedSearchQuery[]): Promise<void>;
+    removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]): Promise<void>;
 };
 
 const store = reactive<Store>({
@@ -741,18 +744,22 @@ const store = reactive<Store>({
 
     async addToSearchHistory(history: SearchHistory[]) {
         if(this.account !== null) {
-            return this.addToAccountData({search_history: history});
+            const serialized = history.map(h => ({
+                date: h.date.toISOString(),
+                query: h.query.toJSON()
+            }));
+            return this.addToAccountData({search_history: serialized});
         }
         this.settings.queryHistory = history.concat(this.settings.queryHistory);
         this.saveSettings();
     },
 
-    async removeFromSearchHistory(queries: SerializedSearchQuery[]) {
+    async removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]) {
         if(this.account !== null) {
-            return this.removeFromAccountData({search_history: queries});
+            return this.removeFromAccountData({search_queries: queries});
         }
         this.settings.queryHistory = this.settings.queryHistory.filter(h =>
-            !queries.some(q => h.query.equals(new SearchQuery(q)))
+            !queries.some(q => h.query.equalsSimple(q))
         );
         this.saveSettings();
     },
