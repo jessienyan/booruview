@@ -44,6 +44,11 @@ type TagResponse struct {
 
 type TagList []TagResponse
 
+func (lst *TagList) Add(entries TagList) {
+	*lst = append(*lst, entries...)
+	lst.Clean()
+}
+
 // Clean modifies the TagList by sorting and removing duplicates
 func (lst *TagList) Clean() {
 	lst.Sort()
@@ -105,20 +110,25 @@ type PostResponse struct {
 }
 
 // Clean sorts and removes dupes from the post's tag list
-func (p PostResponse) Clean() PostResponse {
+func (p *PostResponse) Clean() {
 	slices.Sort(p.Tags)
 	p.Tags = slices.Compact(p.Tags)
-	return p
 }
 
 type PostList []PostResponse
 
+func (lst *PostList) Add(entries PostList) {
+	// NOTE: for compatibility, new posts are added to the beginning of the list
+	*lst = append(entries, *lst...)
+	lst.Clean()
+}
+
 // Clean removes duplicate posts
-func (lst PostList) Clean() PostList {
+func (lst *PostList) Clean() {
 	// Keep track of what post IDs we've seen as we go through the list. If we encounter a post ID
 	// that was seen previously, drop it from the list
-	idsSeen := make(map[int]struct{}, len(lst))
-	lst = slices.DeleteFunc(lst, func(p PostResponse) bool {
+	idsSeen := make(map[int]struct{}, len(*lst))
+	*lst = slices.DeleteFunc(*lst, func(p PostResponse) bool {
 		_, alreadySeen := idsSeen[p.Id]
 		if alreadySeen {
 			return true
@@ -126,7 +136,6 @@ func (lst PostList) Clean() PostList {
 		idsSeen[p.Id] = struct{}{}
 		return false
 	})
-	return lst
 }
 
 // Remove modifies the PostList by removing posts that match by id

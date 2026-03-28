@@ -210,27 +210,22 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	response := AccountDataPatchResponse{}
 
 	if len(form.Add.Blacklist) > 0 {
-		form.Add.Blacklist.Clean()
-		data.Blacklist = append(data.Blacklist, form.Add.Blacklist...)
+		data.Blacklist.Add(form.Add.Blacklist)
 		response.Blacklist = data.Blacklist
 	}
 
 	if len(form.Add.FavoritePosts) > 0 {
-		cleanedPosts := form.Add.FavoritePosts.Clean()
-		// NOTE: for compatibility, new posts are added to the beginning of the list
-		data.FavoritePosts = append(cleanedPosts, data.FavoritePosts...)
+		data.FavoritePosts.Add(form.Add.FavoritePosts)
 		response.FavoritePosts = data.FavoritePosts
 	}
 
 	if len(form.Add.FavoriteTags) > 0 {
-		form.Add.FavoriteTags.Clean()
-		data.FavoriteTags = append(data.FavoriteTags, form.Add.FavoriteTags...)
+		data.FavoriteTags.Add(form.Add.FavoriteTags)
 		response.FavoriteTags = data.FavoriteTags
 	}
 
 	if len(form.Add.SearchHistory) > 0 {
-		form.Add.SearchHistory.Clean()
-		data.SearchHistory = append(data.SearchHistory, form.Add.SearchHistory...)
+		data.SearchHistory.Add(form.Add.SearchHistory)
 		response.SearchHistory = data.SearchHistory
 	}
 

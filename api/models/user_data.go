@@ -84,6 +84,11 @@ func (entry *SearchHistoryEntry) Clean() {
 
 type SearchHistoryList []SearchHistoryEntry
 
+func (lst *SearchHistoryList) Add(entries SearchHistoryList) {
+	*lst = append(*lst, entries...)
+	lst.Clean()
+}
+
 // Clean sorts and de-dupes the search history
 func (lst *SearchHistoryList) Clean() {
 	for _, entry := range *lst {
