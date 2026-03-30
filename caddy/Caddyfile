@@ -38,10 +38,6 @@
     # Assets are hashed and never change so are safe to cache
     header /assets/* Cache-Control "max-age=31536000, immutable"
 
-    # Add explicit favicon caching since webview doesn't seem to respect ETag header
-    @favicons path /favicon*.ico /favicon*.png /apple-touch-icon.png
-    header @favicons Cache-Control "public, max-age=10800, immutable"
-
     # API responses shouldn't be cached by clients, they are too volatile and cached by the API anyway
     header /api/* Cache-Control "no-store"
 
@@ -77,6 +73,25 @@
 
     @longUrl expression {path}.size() > 3000
     error @longUrl "URI Too Long" 414
+
+    # DuckDuckGo browser spams these even if they are present
+    @ddg {
+        header  User-Agent      *DuckDuckGo*
+        header  User-Agent      *com.duckduckgo.mobile*
+        path    /favicon.ico    /apple-touch-icon.png
+    }
+    handle @ddg {
+        import GETGHOSTED
+    }
+
+    # Hauwei OpenHarmony browser spams these
+    @openHarmony {
+        header  User-Agent      *OpenHarmony*
+        path    /favicon.png    /favicon-64.png
+    }
+    handle @openHarmony {
+        import GETGHOSTED
+    }
 
     handle_errors {
         respond "{err.status_code} {err.status_text}"
