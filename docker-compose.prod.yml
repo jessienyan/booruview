@@ -41,7 +41,7 @@ services:
     logging: *logging
 
   grafana:
-    image: grafana/grafana:11.6.0
+    image: grafana/grafana
     restart: unless-stopped
     environment:
       - "GF_SERVER_ROOT_URL=https://grafana.localhost/"
@@ -54,7 +54,7 @@ services:
       - grafana-data:/var/lib/grafana
 
   loki:
-    image: grafana/loki:3.5.0
+    image: grafana/loki
     restart: unless-stopped
     ports:
       - "3100:3100"
