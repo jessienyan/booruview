@@ -76,13 +76,70 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	expected := testutil.MustMarshalJSON(data)
+	expected := `{
+	  "favorite_posts": [
+		{
+		  "id": 1,
+		  "created_at": 0,
+		  "score": 0,
+		  "rating": "",
+		  "source_url": "",
+		  "uploader": "",
+		  "uploader_url": "",
+		  "tags": null,
+		  "thumbnail_url": "",
+		  "thumbnail_width": 0,
+		  "thumbnail_height": 0,
+		  "lowres_url": "",
+		  "lowres_width": 0,
+		  "lowres_height": 0,
+		  "image_url": "example.com/blah.jpg",
+		  "width": 0,
+		  "height": 0
+		}
+	  ],
+	  "favorite_tags": [
+		{
+		  "name": "test2",
+		  "type": "character",
+		  "count": 2
+		}
+	  ],
+	  "blacklist": [
+		{
+		  "name": "test",
+		  "type": "artist",
+		  "count": 1
+		}
+	  ],
+	  "search_history": [
+		{
+		  "date": "2026-04-01T01:23:45Z",
+		  "query": {
+			"include": [
+			  {
+				"name": "test3",
+				"type": "tag",
+				"count": 0
+			  }
+			],
+			"exclude": [
+			  {
+				"name": "test4",
+				"type": "metadata",
+				"count": 0
+			  }
+			]
+		  }
+		}
+	  ]
+	}`
 
 	req := httptest.NewRequest("GET", "/api/account/data", nil)
 	rec := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
 
 	require.Equal(t, http.StatusOK, rec.Code)
-	require.JSONEq(t, string(expected), rec.Body.String())
+	require.JSONEq(t, expected, rec.Body.String())
 }
 
 func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
