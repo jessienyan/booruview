@@ -21,7 +21,7 @@ function clearExcluded() {
 <template>
     <button
         ref="button"
-        class="btn-gray btn-rounded btn-clear-tags"
+        class="btn-gray btn-rounded right-align"
         @click="showMenu = !showMenu"
     >
         clear tags
@@ -64,7 +64,7 @@ function clearExcluded() {
 <style lang="scss" scoped>
 @import "@/assets/buttons";
 
-.btn-clear-tags {
+.right-align {
     margin-top: 0.8rem;
     margin-left: auto;
     display: block;

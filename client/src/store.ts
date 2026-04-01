@@ -208,6 +208,10 @@ type Store = {
     searchHistory(): ComputedRef<SearchHistory[]>;
     addToSearchHistory(history: SearchHistory[]): Promise<void>;
     removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]): Promise<void>;
+
+    savedSearches(): ComputedRef<SavedSearch[]>;
+    addToSavedSearches(searches: SavedSearch[]): Promise<void>;
+    removeFromSavedSearches(queries: SimpleSerializedSearchQuery[]): Promise<void>;
 };
 
 const store = reactive<Store>({
@@ -842,6 +846,37 @@ const store = reactive<Store>({
             return this.removeFromAccountData({search_queries: queries});
         }
         this.settings.queryHistory = this.settings.queryHistory.filter(h =>
+            !queries.some(q => h.query.equalsSimple(q))
+        );
+        this.saveSettings();
+    },
+
+    savedSearches(): ComputedRef<SavedSearch[]> {
+        return computed(() => {
+            if (this.account?.data) {
+                return this.account.data.saved_searches;
+            }
+            return this.settings.savedSearches;
+        });
+    },
+
+    async addToSavedSearches(searches: SavedSearch[]) {
+        if(this.account?.data) {
+            const serialized = searches.map(h => ({
+                date: h.date.toISOString(),
+                query: h.query.toJSON()
+            }));
+            return this.addToAccountData({saved_searches: serialized});
+        }
+        this.settings.savedSearches = searches.concat(this.settings.savedSearches);
+        this.saveSettings();
+    },
+
+    async removeFromSavedSearches(queries: SimpleSerializedSearchQuery[]) {
+        if(this.account?.data) {
+            return this.removeFromAccountData({search_queries: queries});
+        }
+        this.settings.savedSearches = this.settings.savedSearches.filter(h =>
             !queries.some(q => h.query.equalsSimple(q))
         );
         this.saveSettings();

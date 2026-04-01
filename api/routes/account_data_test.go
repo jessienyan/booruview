@@ -56,6 +56,7 @@ func TestAccountDataGetHandler_Empty(t *testing.T) {
 	require.Empty(t, response.FavoriteTags)
 	require.Empty(t, response.Blacklist)
 	require.Empty(t, response.SearchHistory)
+	require.Empty(t, response.SavedSearches)
 }
 
 func TestAccountDataGetHandler_Success(t *testing.T) {
