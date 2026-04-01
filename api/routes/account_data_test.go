@@ -16,9 +16,9 @@ import (
 var (
 	accountDataTestUser     models.Users
 	accountDataTestUserData models.UserData
+	accountDataAuthToken    string
 	accountDataTestUsername = "accountdatatest"
 	accountDataTestPassword = "pass123"
-	accountDataAuthToken    string
 )
 
 func init() {
@@ -273,6 +273,37 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 	require.Equal(t, params.Add.SearchHistory, response.SearchHistory)
 }
 
+func TestAccountDataPatchHandler_AddSavedSearch(t *testing.T) {
+	testutil.Flush()
+	testutil.ResetUserData(accountDataTestUser.ID)
+
+	params := routes.AccountDataPatchParams{
+		Add: routes.AddAccountData{
+			SavedSearches: models.SearchHistoryList{
+				{
+					Date: testutil.Time(),
+					Query: models.SearchQuery{
+						Include: api.TagList{api.TagResponse{Name: "include_tag", Count: 10, Type: api.Tag}},
+						Exclude: api.TagList{api.TagResponse{Name: "exclude_tag", Count: 5, Type: api.Tag}},
+					},
+				},
+			},
+		},
+	}
+	body := testutil.MustMarshalJSON(params)
+
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+
+	var response routes.AccountDataResponse
+	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+
+	require.Equal(t, params.Add.SavedSearches, response.SavedSearches)
+}
+
 func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 	testutil.Flush()
 	testutil.ResetUserData(accountDataTestUser.ID)
@@ -417,4 +448,53 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
 
 	require.Equal(t, expected, response.SearchHistory)
+}
+
+func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
+	testutil.Flush()
+	testutil.ResetUserData(accountDataTestUser.ID)
+
+	var data models.UserDataJSON
+	data.SavedSearches = models.SearchHistoryList{
+		{
+			Date: testutil.Time(),
+			Query: models.SearchQuery{
+				Include: api.TagList{{Name: "test1", Type: api.Tag}},
+				Exclude: api.TagList{{Name: "test2", Type: api.Metadata}},
+			},
+		},
+		{
+			Date: testutil.Time(),
+			Query: models.SearchQuery{
+				Include: api.TagList{{Name: "test3", Type: api.Tag}},
+				Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},
+			},
+		},
+	}
+	expected := models.SearchHistoryList{data.SavedSearches[1]}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
+
+	// Now remove one search history entry
+	removeParams := routes.AccountDataPatchParams{
+		Remove: routes.RemoveAccountData{
+			SavedQueries: []models.SearchQueryNames{
+				{
+					Include: []string{"test1"},
+					Exclude: []string{"test2"},
+				},
+			},
+		},
+	}
+	removeBody := testutil.MustMarshalJSON(removeParams)
+	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
+	removeReq.Header.Set("Content-Type", "application/json")
+	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+
+	require.Equal(t, http.StatusOK, removeRec.Code)
+
+	var response routes.AccountDataResponse
+	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+
+	require.Equal(t, expected, response.SavedSearches)
 }
