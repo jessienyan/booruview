@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-04-01",
+		changes: ["upgraded grafana and loki to latest version"]
+	},
+	{
 		date: "2026-03-28",
 		changes: [
 			"added an actual PATCH api for account data. this fixes an issue on slower connections where favorites were sometimes not being saved",
