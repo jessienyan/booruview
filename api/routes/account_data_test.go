@@ -67,7 +67,7 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 	data.FavoriteTags = api.TagList{{Name: "test2", Type: api.Character, Count: 2}}
 	data.FavoritePosts = api.PostList{{Id: 1, ImageUrl: "example.com/blah.jpg"}}
 	data.SearchHistory = models.SearchHistoryList{{
-		Date: testutil.Now(),
+		Date: testutil.Time(),
 		Query: models.SearchQuery{
 			Include: api.TagList{{Name: "test3", Type: api.Tag}},
 			Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},
@@ -165,7 +165,7 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 		Add: routes.AddAccountData{
 			SearchHistory: models.SearchHistoryList{
 				{
-					Date: testutil.Now(),
+					Date: testutil.Time(),
 					Query: models.SearchQuery{
 						Include: api.TagList{api.TagResponse{Name: "include_tag", Count: 10, Type: api.Tag}},
 						Exclude: api.TagList{api.TagResponse{Name: "exclude_tag", Count: 5, Type: api.Tag}},
@@ -292,14 +292,14 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 	var data models.UserDataJSON
 	data.SearchHistory = models.SearchHistoryList{
 		{
-			Date: testutil.Now(),
+			Date: testutil.Time(),
 			Query: models.SearchQuery{
 				Include: api.TagList{{Name: "test1", Type: api.Tag}},
 				Exclude: api.TagList{{Name: "test2", Type: api.Metadata}},
 			},
 		},
 		{
-			Date: testutil.Now(),
+			Date: testutil.Time(),
 			Query: models.SearchQuery{
 				Include: api.TagList{{Name: "test3", Type: api.Tag}},
 				Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},

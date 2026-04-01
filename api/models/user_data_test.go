@@ -11,7 +11,7 @@ import (
 )
 
 func TestSearchHistoryList_Clean_SortsByNewestFirst(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	oldTime := now.Add(-time.Hour)
 	list := models.SearchHistoryList{
 		{Date: oldTime, Query: models.SearchQuery{Include: api.TagList{{Name: "a"}}}},
@@ -28,7 +28,7 @@ func TestSearchHistoryList_Clean_SortsByNewestFirst(t *testing.T) {
 }
 
 func TestSearchHistoryList_Clean_RemovesDuplicateQueries(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	oldTime := now.Add(-time.Hour)
 	list := models.SearchHistoryList{
 		{Date: oldTime, Query: models.SearchQuery{Include: api.TagList{{Name: "a"}}}},
@@ -44,7 +44,7 @@ func TestSearchHistoryList_Clean_RemovesDuplicateQueries(t *testing.T) {
 }
 
 func TestSearchHistoryList_Clean_SkipsEmptyQueries(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	list := models.SearchHistoryList{
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "a"}}}},
 		{Date: now, Query: models.SearchQuery{}},
@@ -61,7 +61,7 @@ func TestSearchHistoryList_Clean_SkipsEmptyQueries(t *testing.T) {
 func TestSearchHistoryList_Clean_RespectsLimit(t *testing.T) {
 	list := make(models.SearchHistoryList, models.SearchHistoryLimit+10)
 	for i := range list {
-		list[i].Date = testutil.Now().Add(time.Duration(i) * time.Hour)
+		list[i].Date = testutil.Time().Add(time.Duration(i) * time.Hour)
 		list[i].Query = models.SearchQuery{Include: api.TagList{{Name: "tag" + string(rune(i))}}}
 	}
 
@@ -72,7 +72,7 @@ func TestSearchHistoryList_Clean_RespectsLimit(t *testing.T) {
 }
 
 func TestSearchHistoryList_Remove_ByQuery(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	list := models.SearchHistoryList{
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "a"}}}},
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "b"}}}},
@@ -87,7 +87,7 @@ func TestSearchHistoryList_Remove_ByQuery(t *testing.T) {
 }
 
 func TestSearchHistoryList_Remove_EmptyQueryList(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	list := models.SearchHistoryList{
 		{Date: now, Query: models.SearchQuery{Include: api.TagList{{Name: "a"}}}},
 	}
@@ -101,7 +101,7 @@ func TestSearchHistoryList_Remove_EmptyQueryList(t *testing.T) {
 }
 
 func TestSearchHistoryList_Add_DeduplicatesAndSorts(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	oldTime := now.Add(-2 * time.Hour)
 	midTime := now.Add(-time.Hour)
 
@@ -126,7 +126,7 @@ func TestSearchHistoryList_Add_DeduplicatesAndSorts(t *testing.T) {
 }
 
 func TestSearchHistoryList_Remove_DeduplicatesAndSorts(t *testing.T) {
-	now := testutil.Now()
+	now := testutil.Time()
 	oldTime := now.Add(-2 * time.Hour)
 	midTime := now.Add(-time.Hour)
 

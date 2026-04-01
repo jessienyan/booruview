@@ -122,6 +122,7 @@ func CreateUser(username, password string) (models.Users, models.UserData) {
 	return user, data
 }
 
-func Now() time.Time {
-	return time.Now().Truncate(time.Millisecond).UTC()
+func Time() time.Time {
+	testTime, _ := time.Parse(time.RFC3339, "2026-04-01T01:23:45Z")
+	return testTime
 }
