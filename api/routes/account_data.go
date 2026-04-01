@@ -107,6 +107,10 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 		changed = true
 		data.SearchHistory = form.SearchHistory
 	}
+	if form.SavedSearches != nil {
+		changed = true
+		data.SavedSearches = form.SavedSearches
+	}
 
 	if changed {
 		data.Clean()
@@ -138,6 +142,7 @@ type AddAccountData struct {
 	FavoriteTags  api.TagList              `json:"favorite_tags" validate:"dive"`
 	Blacklist     api.TagList              `json:"blacklist" validate:"dive"`
 	SearchHistory models.SearchHistoryList `json:"search_history" validate:"dive"`
+	SavedSearches models.SearchHistoryList `json:"saved_searches" validate:"dive"`
 }
 
 type RemoveAccountData struct {
@@ -145,6 +150,7 @@ type RemoveAccountData struct {
 	FavoriteTagNames []string                  `json:"favorite_tag_names"`
 	BlacklistNames   []string                  `json:"blacklist_names"`
 	SearchQueries    []models.SearchQueryNames `json:"search_queries" validate:"dive"`
+	SavedQueries     []models.SearchQueryNames `json:"saved_queries" validate:"dive"`
 }
 
 type AccountDataPatchParams struct {
@@ -157,6 +163,7 @@ type AccountDataPatchResponse struct {
 	FavoriteTags  api.TagList              `json:"favorite_tags,omitempty"`
 	Blacklist     api.TagList              `json:"blacklist,omitempty"`
 	SearchHistory models.SearchHistoryList `json:"search_history,omitempty"`
+	SavedSearches models.SearchHistoryList `json:"saved_searches,omitempty"`
 }
 
 func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
@@ -213,37 +220,35 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		data.Blacklist.Add(form.Add.Blacklist)
 		response.Blacklist = data.Blacklist
 	}
-
 	if len(form.Add.FavoritePosts) > 0 {
 		data.FavoritePosts.Add(form.Add.FavoritePosts)
 		response.FavoritePosts = data.FavoritePosts
 	}
-
 	if len(form.Add.FavoriteTags) > 0 {
 		data.FavoriteTags.Add(form.Add.FavoriteTags)
 		response.FavoriteTags = data.FavoriteTags
 	}
-
 	if len(form.Add.SearchHistory) > 0 {
 		data.SearchHistory.Add(form.Add.SearchHistory)
 		response.SearchHistory = data.SearchHistory
+	}
+	if len(form.Add.SavedSearches) > 0 {
+		data.SavedSearches.Add(form.Add.SavedSearches)
+		response.SavedSearches = data.SavedSearches
 	}
 
 	if len(form.Remove.BlacklistNames) > 0 {
 		data.Blacklist.Remove(form.Remove.BlacklistNames)
 		response.Blacklist = data.Blacklist
 	}
-
 	if len(form.Remove.FavoritePostIDs) > 0 {
 		data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
 		response.FavoritePosts = data.FavoritePosts
 	}
-
 	if len(form.Remove.FavoriteTagNames) > 0 {
 		data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
 		response.FavoriteTags = data.FavoriteTags
 	}
-
 	if len(form.Remove.SearchQueries) > 0 {
 		queries := make([]string, 0, len(form.Remove.SearchQueries))
 		for _, q := range form.Remove.SearchQueries {
@@ -253,8 +258,17 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		data.SearchHistory.Remove(queries)
 		response.SearchHistory = data.SearchHistory
 	}
+	if len(form.Remove.SavedQueries) > 0 {
+		queries := make([]string, 0, len(form.Remove.SavedQueries))
+		for _, q := range form.Remove.SavedQueries {
+			q.Clean()
+			queries = append(queries, q.Tags())
+		}
+		data.SavedSearches.Remove(queries)
+		response.SavedSearches = data.SavedSearches
+	}
 
-	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil {
+	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil || response.SavedSearches != nil {
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
 			return

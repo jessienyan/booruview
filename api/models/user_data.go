@@ -160,6 +160,7 @@ type UserDataJSON struct {
 	FavoriteTags  api.TagList       `json:"favorite_tags" validate:"dive"`
 	Blacklist     api.TagList       `json:"blacklist" validate:"dive"`
 	SearchHistory SearchHistoryList `json:"search_history" validate:"dive"`
+	SavedSearches SearchHistoryList `json:"saved_searches" validate:"dive"`
 }
 
 func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
@@ -175,6 +176,9 @@ func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
 	if ud.SearchHistory == nil {
 		ud.SearchHistory = []SearchHistoryEntry{}
 	}
+	if ud.SavedSearches == nil {
+		ud.SavedSearches = []SearchHistoryEntry{}
+	}
 
 	// Use a different type for marshalling, otherwise this will go into an infinite loop
 	type marshalType UserDataJSON
@@ -186,4 +190,5 @@ func (ud *UserDataJSON) Clean() {
 	ud.FavoriteTags.Clean()
 	ud.Blacklist.Clean()
 	ud.SearchHistory.Clean()
+	ud.SavedSearches.Clean()
 }

@@ -73,6 +73,13 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 			Exclude: api.TagList{{Name: "test4", Type: api.Metadata}},
 		},
 	}}
+	data.SavedSearches = models.SearchHistoryList{{
+		Date: testutil.Time(),
+		Query: models.SearchQuery{
+			Include: api.TagList{{Name: "test5", Type: api.Tag}},
+			Exclude: api.TagList{{Name: "test6", Type: api.Metadata}},
+		},
+	}}
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
@@ -126,6 +133,27 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 			"exclude": [
 			  {
 				"name": "test4",
+				"type": "metadata",
+				"count": 0
+			  }
+			]
+		  }
+		}
+	  ],
+	  "saved_searches": [
+		{
+		  "date": "2026-04-01T01:23:45Z",
+		  "query": {
+			"include": [
+			  {
+				"name": "test5",
+				"type": "tag",
+				"count": 0
+			  }
+			],
+			"exclude": [
+			  {
+				"name": "test6",
 				"type": "metadata",
 				"count": 0
 			  }
