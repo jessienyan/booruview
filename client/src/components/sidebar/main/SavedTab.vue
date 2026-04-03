@@ -36,8 +36,8 @@ function tip() {
 
 <template>
     <p v-if="savedSearches.length === 0">
-        Your saved searches will appear here. You can save a search by clicking
-        the <span class="bi bi-bookmark" @click="tip"></span> button.
+        Your saved searches will appear here. Searches can be saved with the
+        <span class="bi bi-bookmark" @click="tip"></span> button.
     </p>
     <div v-else class="recent-list">
         <div
