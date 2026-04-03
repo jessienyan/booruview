@@ -8,11 +8,14 @@ export type SearchHistory = {
     query: SearchQuery;
 };
 
+export type SavedSearch = SearchHistory;
+
 export type AccountData = {
     favorite_posts: Post[];
     favorite_tags: Tag[];
     blacklist: Tag[];
     search_history: SearchHistory[];
+    saved_searches: SavedSearch[];
 };
 
 export type AddAccountDataPayload = {
@@ -23,6 +26,10 @@ export type AddAccountDataPayload = {
         date: string;
         query: SerializedSearchQuery;
     }[];
+    saved_searches: {
+        date: string;
+        query: SerializedSearchQuery;
+    }[];
 };
 
 export type RemoveAccountDataPayload = {
@@ -30,6 +37,7 @@ export type RemoveAccountDataPayload = {
     favorite_tag_names: string[];
     blacklist_names: string[];
     search_queries: SimpleSerializedSearchQuery[];
+    saved_queries: SimpleSerializedSearchQuery[];
 };
 
 type AccountDataResponse = {
@@ -37,6 +45,13 @@ type AccountDataResponse = {
     favorite_tags: Tag[];
     blacklist: Tag[];
     search_history: {
+        date: string;
+        query: {
+            include: Tag[];
+            exclude: Tag[];
+        };
+    }[];
+    saved_searches: {
         date: string;
         query: {
             include: Tag[];
@@ -59,6 +74,12 @@ function parseAccountDataFromAPI(resp: Partial<AccountDataResponse>): Partial<Ac
 
     if(resp.search_history != null)
         parsed.search_history = resp.search_history.map(h => ({
+            date: new Date(h.date),
+            query: new SearchQuery(h.query),
+        }));
+
+    if(resp.saved_searches != null)
+        parsed.saved_searches = resp.saved_searches.map(h => ({
             date: new Date(h.date),
             query: new SearchQuery(h.query),
         }));
@@ -130,16 +151,17 @@ type Store = {
         columnSizing: ColumnSizing;
         columnWidth: number;
         consented: boolean;
-        favorites: Post[];
         favoriteTags: Tag[];
+        favorites: Post[];
         fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
         fullscreenViewMenuRotate: boolean;
         highResImages: boolean;
-        muteVideo: boolean;
-        queryHistory: SearchHistory[];
-        sidebarTabsHidden: boolean;
         maxPostHeight: number | null;
+        muteVideo: boolean;
         newsLastViewedAt: Date;
+        queryHistory: SearchHistory[];
+        savedSearches: SearchHistory[];
+        sidebarTabsHidden: boolean;
     };
 
     loadSettings(): void;
@@ -186,6 +208,10 @@ type Store = {
     searchHistory(): ComputedRef<SearchHistory[]>;
     addToSearchHistory(history: SearchHistory[]): Promise<void>;
     removeFromSearchHistory(queries: SimpleSerializedSearchQuery[]): Promise<void>;
+
+    savedSearches(): ComputedRef<SavedSearch[]>;
+    addToSavedSearches(searches: SavedSearch[]): Promise<void>;
+    removeFromSavedSearches(queries: SimpleSerializedSearchQuery[]): Promise<void>;
 };
 
 const store = reactive<Store>({
@@ -217,6 +243,7 @@ const store = reactive<Store>({
                     favorite_posts: [],
                     search_history: [],
                     favorite_tags: [],
+                    saved_searches: [],
                 }
             };
             this.saveAccountCredentials();
@@ -308,6 +335,7 @@ const store = reactive<Store>({
                 favorite_tags: [],
                 blacklist: [],
                 search_history: [],
+                saved_searches: [],
                 ...parseAccountDataFromAPI(preloadedData),
             }
             return;
@@ -346,6 +374,7 @@ const store = reactive<Store>({
                 favorite_tags: [],
                 blacklist: [],
                 search_history: [],
+                saved_searches: [],
                 ...parseAccountDataFromAPI(await resp.json() as AccountDataResponse),
             }
         } catch(e) {
@@ -391,16 +420,17 @@ const store = reactive<Store>({
         columnSizing: "dynamic",
         columnWidth: 400,
         consented: false,
-        favorites: [],
         favoriteTags: [],
+        favorites: [],
         fullscreenViewMenuAnchor: "bottomcenter",
         fullscreenViewMenuRotate: false,
         highResImages: true,
-        muteVideo: true,
-        queryHistory: [],
-        sidebarTabsHidden: false,
         maxPostHeight: 600,
+        muteVideo: true,
         newsLastViewedAt: new Date(0),
+        queryHistory: [],
+        savedSearches: [],
+        sidebarTabsHidden: false,
     },
 
     loadSettings() {
@@ -428,7 +458,7 @@ const store = reactive<Store>({
                 continue;
             }
 
-            if (k === "queryHistory") {
+            if (k === "queryHistory" || k === "savedSearches") {
                 type serializedHistory = {
                     date: string;
                     query: SerializedSearchQuery;
@@ -451,7 +481,9 @@ const store = reactive<Store>({
                     return entry;
                 });
 
-                val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+                if(k === "queryHistory") {
+                    val = val.slice(0, QUERY_HISTORY_KEEP_RECENT_LIMIT);
+                }
             } else if (k === "newsLastViewedAt") {
                 val = new Date(val);
             }
@@ -814,6 +846,37 @@ const store = reactive<Store>({
             return this.removeFromAccountData({search_queries: queries});
         }
         this.settings.queryHistory = this.settings.queryHistory.filter(h =>
+            !queries.some(q => h.query.equalsSimple(q))
+        );
+        this.saveSettings();
+    },
+
+    savedSearches(): ComputedRef<SavedSearch[]> {
+        return computed(() => {
+            if (this.account?.data) {
+                return this.account.data.saved_searches;
+            }
+            return this.settings.savedSearches;
+        });
+    },
+
+    async addToSavedSearches(searches: SavedSearch[]) {
+        if(this.account?.data) {
+            const serialized = searches.map(h => ({
+                date: h.date.toISOString(),
+                query: h.query.toJSON()
+            }));
+            return this.addToAccountData({saved_searches: serialized});
+        }
+        this.settings.savedSearches = searches.concat(this.settings.savedSearches);
+        this.saveSettings();
+    },
+
+    async removeFromSavedSearches(queries: SimpleSerializedSearchQuery[]) {
+        if(this.account?.data) {
+            return this.removeFromAccountData({saved_queries: queries});
+        }
+        this.settings.savedSearches = this.settings.savedSearches.filter(h =>
             !queries.some(q => h.query.equalsSimple(q))
         );
         this.saveSettings();

@@ -63,6 +63,7 @@ async function onSubmit(e: Event) {
                 favorite_tags: [...store.settings.favoriteTags],
                 blacklist: [...store.settings.blacklist],
                 search_history: [...store.settings.queryHistory],
+                saved_searches: [...store.settings.savedSearches],
             },
         };
         store.saveAccountCredentials();
@@ -86,6 +87,10 @@ async function onSubmit(e: Event) {
         favorite_posts: store.settings.favorites,
         favorite_tags: store.settings.favoriteTags,
         search_history: store.settings.queryHistory.map((q) => ({
+            date: q.date.toISOString(),
+            query: q.query.toJSON(),
+        })),
+        saved_searches: store.settings.savedSearches.map((q) => ({
             date: q.date.toISOString(),
             query: q.query.toJSON(),
         })),

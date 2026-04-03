@@ -114,8 +114,7 @@ func (lst *SearchHistoryList) Clean() {
 		return b.Date.Compare(a.Date)
 	})
 
-	// Remove entries that have duplicate queries, leaving only the most
-	// recent entry
+	// Remove duplicate and empty queries
 	queries := make(map[string]struct{}, len(*lst))
 	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
 		tags := entry.Query.Tags()
@@ -130,10 +129,6 @@ func (lst *SearchHistoryList) Clean() {
 		queries[tags] = struct{}{}
 		return false
 	})
-
-	if len(*lst) > SearchHistoryLimit {
-		*lst = (*lst)[:SearchHistoryLimit]
-	}
 }
 
 // queries should be the result of calling .Tags() on a tag list
@@ -155,11 +150,19 @@ func (lst *SearchHistoryList) Remove(queries []string) {
 	lst.Clean()
 }
 
+// Truncate removes old entries if the list is too large
+func (lst *SearchHistoryList) Truncate() {
+	if len(*lst) > SearchHistoryLimit {
+		*lst = (*lst)[:SearchHistoryLimit]
+	}
+}
+
 type UserDataJSON struct {
 	FavoritePosts api.PostList      `json:"favorite_posts" validate:"dive"`
 	FavoriteTags  api.TagList       `json:"favorite_tags" validate:"dive"`
 	Blacklist     api.TagList       `json:"blacklist" validate:"dive"`
 	SearchHistory SearchHistoryList `json:"search_history" validate:"dive"`
+	SavedSearches SearchHistoryList `json:"saved_searches" validate:"dive"`
 }
 
 func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
@@ -175,6 +178,9 @@ func (ud UserDataJSON) MarshalJSON() ([]byte, error) {
 	if ud.SearchHistory == nil {
 		ud.SearchHistory = []SearchHistoryEntry{}
 	}
+	if ud.SavedSearches == nil {
+		ud.SavedSearches = []SearchHistoryEntry{}
+	}
 
 	// Use a different type for marshalling, otherwise this will go into an infinite loop
 	type marshalType UserDataJSON
@@ -186,4 +192,5 @@ func (ud *UserDataJSON) Clean() {
 	ud.FavoriteTags.Clean()
 	ud.Blacklist.Clean()
 	ud.SearchHistory.Clean()
+	ud.SavedSearches.Clean()
 }
