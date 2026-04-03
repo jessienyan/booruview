@@ -204,7 +204,6 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 	expected := routes.AccountDataPatchResponse{
 		FavoritePosts: api.PostList{post},
 	}
-
 	require.Equal(t, expected, actual)
 }
 
@@ -243,8 +242,10 @@ func TestAccountDataPatchHandler_AddBlacklist(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, api.TagList{tag}, actual.Blacklist)
+	expected := routes.AccountDataPatchResponse{
+		Blacklist: params.Add.Blacklist,
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
@@ -270,8 +271,10 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, params.Add.SearchHistory, actual.SearchHistory)
+	expected := routes.AccountDataPatchResponse{
+		SearchHistory: params.Add.SearchHistory,
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_AddSavedSearch(t *testing.T) {
@@ -297,8 +300,10 @@ func TestAccountDataPatchHandler_AddSavedSearch(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, params.Add.SavedSearches, actual.SavedSearches)
+	expected := routes.AccountDataPatchResponse{
+		SavedSearches: params.Add.SavedSearches,
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
@@ -307,7 +312,6 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 
 	var data models.UserDataJSON
 	data.FavoritePosts = api.PostList{{Id: 1}, {Id: 2}, {Id: 3}}
-	expected := api.PostList{{Id: 1}, {Id: 3}}
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
@@ -322,7 +326,10 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-	require.Equal(t, expected, actual.FavoritePosts)
+	expected := routes.AccountDataPatchResponse{
+		FavoritePosts: api.PostList{{Id: 1}, {Id: 3}},
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
@@ -333,10 +340,6 @@ func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 	data.FavoriteTags = api.TagList{
 		{Name: "tag1", Count: 1, Type: api.Tag},
 		{Name: "tag2", Count: 2, Type: api.Tag},
-		{Name: "tag3", Count: 3, Type: api.Tag},
-	}
-	expected := api.TagList{
-		{Name: "tag1", Count: 1, Type: api.Tag},
 		{Name: "tag3", Count: 3, Type: api.Tag},
 	}
 	accountDataTestUserData.Set(data)
@@ -353,8 +356,13 @@ func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, expected, actual.FavoriteTags)
+	expected := routes.AccountDataPatchResponse{
+		FavoriteTags: api.TagList{
+			{Name: "tag1", Count: 1, Type: api.Tag},
+			{Name: "tag3", Count: 3, Type: api.Tag},
+		},
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
@@ -365,10 +373,6 @@ func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 	data.Blacklist = api.TagList{
 		{Name: "bad1", Count: 1, Type: api.Tag},
 		{Name: "bad2", Count: 2, Type: api.Tag},
-		{Name: "bad3", Count: 3, Type: api.Tag},
-	}
-	expected := api.TagList{
-		{Name: "bad1", Count: 1, Type: api.Tag},
 		{Name: "bad3", Count: 3, Type: api.Tag},
 	}
 	accountDataTestUserData.Set(data)
@@ -385,8 +389,13 @@ func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, expected, actual.Blacklist)
+	expected := routes.AccountDataPatchResponse{
+		Blacklist: api.TagList{
+			{Name: "bad1", Count: 1, Type: api.Tag},
+			{Name: "bad3", Count: 3, Type: api.Tag},
+		},
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
@@ -410,7 +419,6 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 			},
 		},
 	}
-	expected := models.SearchHistoryList{data.SearchHistory[1]}
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
@@ -431,8 +439,10 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-
-	require.Equal(t, expected, actual.SearchHistory)
+	expected := routes.AccountDataPatchResponse{
+		SearchHistory: models.SearchHistoryList{data.SearchHistory[1]},
+	}
+	require.Equal(t, expected, actual)
 }
 
 func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
@@ -479,7 +489,6 @@ func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
 	expected := routes.AccountDataPatchResponse{
 		SavedSearches: models.SearchHistoryList{data.SavedSearches[1]},
 	}
-
 	require.Equal(t, expected, actual)
 }
 
@@ -497,12 +506,12 @@ func TestAccountDataPatchHandler_ResponseIncludesFieldsIfEmpty(t *testing.T) {
 			BlacklistNames: []string{"test"},
 		},
 	}
-	expected := routes.AccountDataPatchResponse{Blacklist: api.TagList{}}
 
 	resp := patchAccountData(params)
 	require.Equal(t, http.StatusOK, resp.Code)
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
+	expected := routes.AccountDataPatchResponse{Blacklist: api.TagList{}}
 	require.Equal(t, expected, actual)
 }
