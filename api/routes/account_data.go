@@ -159,11 +159,11 @@ type AccountDataPatchParams struct {
 }
 
 type AccountDataPatchResponse struct {
-	FavoritePosts *api.PostList
-	FavoriteTags  *api.TagList
-	Blacklist     *api.TagList
-	SearchHistory *models.SearchHistoryList
-	SavedSearches *models.SearchHistoryList
+	FavoritePosts api.PostList
+	FavoriteTags  api.TagList
+	Blacklist     api.TagList
+	SearchHistory models.SearchHistoryList
+	SavedSearches models.SearchHistoryList
 }
 
 // Overrides the default marshal behavior to only include fields that are non-nil.
@@ -244,36 +244,36 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 
 	if len(form.Add.Blacklist) > 0 {
 		data.Blacklist.Add(form.Add.Blacklist)
-		response.Blacklist = &data.Blacklist
+		response.Blacklist = data.Blacklist
 	}
 	if len(form.Add.FavoritePosts) > 0 {
 		data.FavoritePosts.Add(form.Add.FavoritePosts)
-		response.FavoritePosts = &data.FavoritePosts
+		response.FavoritePosts = data.FavoritePosts
 	}
 	if len(form.Add.FavoriteTags) > 0 {
 		data.FavoriteTags.Add(form.Add.FavoriteTags)
-		response.FavoriteTags = &data.FavoriteTags
+		response.FavoriteTags = data.FavoriteTags
 	}
 	if len(form.Add.SearchHistory) > 0 {
 		data.SearchHistory.Add(form.Add.SearchHistory)
-		response.SearchHistory = &data.SearchHistory
+		response.SearchHistory = data.SearchHistory
 	}
 	if len(form.Add.SavedSearches) > 0 {
 		data.SavedSearches.Add(form.Add.SavedSearches)
-		response.SavedSearches = &data.SavedSearches
+		response.SavedSearches = data.SavedSearches
 	}
 
 	if len(form.Remove.BlacklistNames) > 0 {
 		data.Blacklist.Remove(form.Remove.BlacklistNames)
-		response.Blacklist = &data.Blacklist
+		response.Blacklist = data.Blacklist
 	}
 	if len(form.Remove.FavoritePostIDs) > 0 {
 		data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
-		response.FavoritePosts = &data.FavoritePosts
+		response.FavoritePosts = data.FavoritePosts
 	}
 	if len(form.Remove.FavoriteTagNames) > 0 {
 		data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
-		response.FavoriteTags = &data.FavoriteTags
+		response.FavoriteTags = data.FavoriteTags
 	}
 	if len(form.Remove.SearchQueries) > 0 {
 		queries := make([]string, 0, len(form.Remove.SearchQueries))
@@ -282,7 +282,7 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 			queries = append(queries, q.Tags())
 		}
 		data.SearchHistory.Remove(queries)
-		response.SearchHistory = &data.SearchHistory
+		response.SearchHistory = data.SearchHistory
 	}
 	if len(form.Remove.SavedQueries) > 0 {
 		queries := make([]string, 0, len(form.Remove.SavedQueries))
@@ -291,7 +291,7 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 			queries = append(queries, q.Tags())
 		}
 		data.SavedSearches.Remove(queries)
-		response.SavedSearches = &data.SavedSearches
+		response.SavedSearches = data.SavedSearches
 	}
 
 	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil || response.SavedSearches != nil {
