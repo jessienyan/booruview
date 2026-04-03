@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-04-03",
+		changes: ["added saved searches", "increased account data limit to 6MB (was 4MB)"]
+	},
+	{
 		date: "2026-04-01",
 		changes: ["upgraded grafana and loki to latest version"]
 	},
