@@ -499,3 +499,28 @@ func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
 
 	require.Equal(t, expected, response.SavedSearches)
 }
+
+func TestAccountDataPatchHandler_ResponseIncludesFieldsIfEmpty(t *testing.T) {
+	testutil.Flush()
+	testutil.ResetUserData(accountDataTestUser.ID)
+
+	var data models.UserDataJSON
+	data.Blacklist = api.TagList{{Name: "test", Type: api.Artist, Count: 1}}
+	accountDataTestUserData.Set(data)
+	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
+
+	expected := `{"blacklist": []}`
+
+	removeParams := routes.AccountDataPatchParams{
+		Remove: routes.RemoveAccountData{
+			BlacklistNames: []string{"test"},
+		},
+	}
+	removeBody := testutil.MustMarshalJSON(removeParams)
+	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
+	removeReq.Header.Set("Content-Type", "application/json")
+	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+
+	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.JSONEq(t, expected, removeRec.Body.String())
+}
