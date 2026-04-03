@@ -114,6 +114,7 @@ func AccountDataPutHandler(w http.ResponseWriter, req *http.Request) {
 
 	if changed {
 		data.Clean()
+		data.SearchHistory.Truncate()
 
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
@@ -256,6 +257,7 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	if len(form.Add.SearchHistory) > 0 {
 		data.SearchHistory.Add(form.Add.SearchHistory)
+		data.SearchHistory.Truncate()
 		response.SearchHistory = data.SearchHistory
 	}
 	if len(form.Add.SavedSearches) > 0 {

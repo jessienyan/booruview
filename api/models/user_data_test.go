@@ -58,19 +58,6 @@ func TestSearchHistoryList_Clean_SkipsEmptyQueries(t *testing.T) {
 	require.Equal(t, expected, list)
 }
 
-func TestSearchHistoryList_Clean_RespectsLimit(t *testing.T) {
-	list := make(models.SearchHistoryList, models.SearchHistoryLimit+10)
-	for i := range list {
-		list[i].Date = testutil.Time().Add(time.Duration(i) * time.Hour)
-		list[i].Query = models.SearchQuery{Include: api.TagList{{Name: "tag" + string(rune(i))}}}
-	}
-
-	list.Clean()
-
-	expected := list[:models.SearchHistoryLimit]
-	require.Equal(t, expected, list)
-}
-
 func TestSearchHistoryList_Remove_ByQuery(t *testing.T) {
 	now := testutil.Time()
 	list := models.SearchHistoryList{

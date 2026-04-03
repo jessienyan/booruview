@@ -114,8 +114,7 @@ func (lst *SearchHistoryList) Clean() {
 		return b.Date.Compare(a.Date)
 	})
 
-	// Remove entries that have duplicate queries, leaving only the most
-	// recent entry
+	// Remove duplicate and empty queries
 	queries := make(map[string]struct{}, len(*lst))
 	*lst = slices.DeleteFunc(*lst, func(entry SearchHistoryEntry) bool {
 		tags := entry.Query.Tags()
@@ -130,10 +129,6 @@ func (lst *SearchHistoryList) Clean() {
 		queries[tags] = struct{}{}
 		return false
 	})
-
-	if len(*lst) > SearchHistoryLimit {
-		*lst = (*lst)[:SearchHistoryLimit]
-	}
 }
 
 // queries should be the result of calling .Tags() on a tag list
@@ -153,6 +148,13 @@ func (lst *SearchHistoryList) Remove(queries []string) {
 	})
 
 	lst.Clean()
+}
+
+// Truncate removes old entries if the list is too large
+func (lst *SearchHistoryList) Truncate() {
+	if len(*lst) > SearchHistoryLimit {
+		*lst = (*lst)[:SearchHistoryLimit]
+	}
 }
 
 type UserDataJSON struct {
