@@ -195,7 +195,7 @@ onMounted(() => {
 }
 
 .tag-metadata {
-    background-color: #9a6600;
+    background-color: #7a5602;
 }
 
 .tag-unknown {
