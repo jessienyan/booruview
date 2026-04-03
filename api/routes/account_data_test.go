@@ -34,10 +34,10 @@ func init() {
 
 func callHandler(handlerFunc func(http.ResponseWriter, *http.Request), req *http.Request, token string) *httptest.ResponseRecorder {
 	req.Header.Set("Authorization", "Bearer "+token)
-	rec := httptest.NewRecorder()
+	resp := httptest.NewRecorder()
 	wrappedHandler := routes.AuthMiddleware(http.HandlerFunc(handlerFunc))
-	wrappedHandler.ServeHTTP(rec, req)
-	return rec
+	wrappedHandler.ServeHTTP(resp, req)
+	return resp
 }
 
 func TestAccountDataGetHandler_Empty(t *testing.T) {
@@ -45,12 +45,12 @@ func TestAccountDataGetHandler_Empty(t *testing.T) {
 	testutil.ResetUserData(accountDataTestUser.ID)
 
 	req := httptest.NewRequest("GET", "/api/account/data", nil)
-	rec := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Empty(t, response.FavoritePosts)
 	require.Empty(t, response.FavoriteTags)
@@ -165,10 +165,10 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 	}`
 
 	req := httptest.NewRequest("GET", "/api/account/data", nil)
-	rec := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
-	require.JSONEq(t, expected, rec.Body.String())
+	require.Equal(t, http.StatusOK, resp.Code)
+	require.JSONEq(t, expected, resp.Body.String())
 }
 
 func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
@@ -185,12 +185,12 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, api.PostList{post}, response.FavoritePosts)
 }
@@ -209,12 +209,12 @@ func TestAccountDataPatchHandler_AddFavoriteTags(t *testing.T) {
 
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, api.TagList{tag}, response.FavoriteTags)
 }
@@ -233,12 +233,12 @@ func TestAccountDataPatchHandler_AddBlacklist(t *testing.T) {
 
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, api.TagList{tag}, response.Blacklist)
 }
@@ -264,12 +264,12 @@ func TestAccountDataPatchHandler_AddSearchHistory(t *testing.T) {
 
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, params.Add.SearchHistory, response.SearchHistory)
 }
@@ -295,12 +295,12 @@ func TestAccountDataPatchHandler_AddSavedSearch(t *testing.T) {
 
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	rec := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, params.Add.SavedSearches, response.SavedSearches)
 }
@@ -315,20 +315,20 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			FavoritePostIDs: []int{2},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 	require.Equal(t, expected, response.FavoritePosts)
 }
 
@@ -349,20 +349,20 @@ func TestAccountDataPatchHandler_RemoveFavoriteTags(t *testing.T) {
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			FavoriteTagNames: []string{"tag2"},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, expected, response.FavoriteTags)
 }
@@ -384,20 +384,20 @@ func TestAccountDataPatchHandler_RemoveBlacklist(t *testing.T) {
 	accountDataTestUserData.Set(data)
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			BlacklistNames: []string{"bad2"},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, expected, response.Blacklist)
 }
@@ -428,7 +428,7 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	// Now remove one search history entry
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			SearchQueries: []models.SearchQueryNames{
 				{
@@ -438,15 +438,15 @@ func TestAccountDataPatchHandler_RemoveSearchHistory(t *testing.T) {
 			},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, expected, response.SearchHistory)
 }
@@ -477,7 +477,7 @@ func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
 	testutil.UpdateUserData(accountDataTestUser.ID, accountDataTestUserData)
 
 	// Now remove one search history entry
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			SavedQueries: []models.SearchQueryNames{
 				{
@@ -487,15 +487,15 @@ func TestAccountDataPatchHandler_RemoveSavedSearch(t *testing.T) {
 			},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
+	require.Equal(t, http.StatusOK, resp.Code)
 
 	var response routes.AccountDataResponse
-	testutil.MustUnmarshalJSON(removeRec.Body.Bytes(), &response)
+	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &response)
 
 	require.Equal(t, expected, response.SavedSearches)
 }
@@ -511,16 +511,16 @@ func TestAccountDataPatchHandler_ResponseIncludesFieldsIfEmpty(t *testing.T) {
 
 	expected := `{"blacklist": []}`
 
-	removeParams := routes.AccountDataPatchParams{
+	params := routes.AccountDataPatchParams{
 		Remove: routes.RemoveAccountData{
 			BlacklistNames: []string{"test"},
 		},
 	}
-	removeBody := testutil.MustMarshalJSON(removeParams)
-	removeReq := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(removeBody))
-	removeReq.Header.Set("Content-Type", "application/json")
-	removeRec := callHandler(routes.AccountDataPatchHandler, removeReq, accountDataAuthToken)
+	body := testutil.MustMarshalJSON(params)
+	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
 
-	require.Equal(t, http.StatusOK, removeRec.Code)
-	require.JSONEq(t, expected, removeRec.Body.String())
+	require.Equal(t, http.StatusOK, resp.Code)
+	require.JSONEq(t, expected, resp.Body.String())
 }
