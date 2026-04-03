@@ -84,12 +84,20 @@
         import GETGHOSTED
     }
 
-    # Hauwei OpenHarmony browser spams these
+    # Hauwei browser
     @openHarmony {
         header  User-Agent      *OpenHarmony*
         path    /favicon.png    /favicon-64.png
     }
     handle @openHarmony {
+        import GETGHOSTED
+    }
+
+    @stopFuckingSpammingFavicons {
+        header  X-Requested-With    idm.internet.download.manager
+        path    /favicon.png        /favicon-64.png
+    }
+    handle @stopFuckingSpammingFavicons {
         import GETGHOSTED
     }
 
