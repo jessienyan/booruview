@@ -874,7 +874,7 @@ const store = reactive<Store>({
 
     async removeFromSavedSearches(queries: SimpleSerializedSearchQuery[]) {
         if(this.account?.data) {
-            return this.removeFromAccountData({search_queries: queries});
+            return this.removeFromAccountData({saved_queries: queries});
         }
         this.settings.savedSearches = this.settings.savedSearches.filter(h =>
             !queries.some(q => h.query.equalsSimple(q))
