@@ -4,12 +4,14 @@ import news from "@/news";
 import store from "@/store";
 import NewsTab from "./NewsTab.vue";
 import RecentTab from "./RecentTab.vue";
+import SavedTab from "./SavedTab.vue";
 import SearchTab from "./SearchTab.vue";
 
-type Tab = "search" | "recent" | "news";
+type Tab = "search" | "recent" | "saved" | "news";
 const tabComponents: Record<Tab, Component> = {
     search: SearchTab,
     recent: RecentTab,
+    saved: SavedTab,
     news: NewsTab,
 };
 const currentTab = ref<Tab>("search");
@@ -45,6 +47,13 @@ const numUnreadNews = computed(() => {
                 @click="switchTab('recent')"
             >
                 recent
+            </button>
+            <button
+                class="tab-btn"
+                :class="{ active: currentTab === 'saved' }"
+                @click="switchTab('saved')"
+            >
+                saved
             </button>
 
             <div class="spacer" />

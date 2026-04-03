@@ -36,7 +36,7 @@ function unsaveSearch() {
         <button v-if="!isSaved" title="save search" @click="saveSearch()">
             <span class="bi bi-bookmark"></span>
         </button>
-        <button v-if="isSaved" title="unsave search" @click="unsaveSearch()">
+        <button v-else title="unsave search" @click="unsaveSearch()">
             <span class="bi bi-bookmark-fill"></span>
         </button>
     </div>

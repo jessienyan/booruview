@@ -6,7 +6,7 @@ import type { SearchQuery } from "@/search";
 import store from "@/store";
 
 const relativeTime = useRelativeTime();
-const history = store.searchHistory();
+const savedSearches = store.savedSearches();
 
 function styledTags(query: SearchQuery) {
     return computed(() => {
@@ -24,18 +24,25 @@ function styledTags(query: SearchQuery) {
 }
 
 function onDelete(index: number) {
-    store.removeFromSearchHistory([history.value[index].query.toJSONSimple()]);
+    store.removeFromSavedSearches([
+        savedSearches.value[index].query.toJSONSimple(),
+    ]);
+}
+
+function tip() {
+    window.alert("the one in the search tab :)");
 }
 </script>
 
 <template>
-    <p v-if="history.length === 0">
-        Your recent search history will appear here.
+    <p v-if="savedSearches.length === 0">
+        Your saved searches will appear here. You can save a search by clicking
+        the <span class="bi bi-bookmark" @click="tip"></span> button.
     </p>
     <div v-else class="recent-list">
         <div
-            class="history-entry"
-            v-for="(entry, i) of history"
+            class="saved-search-entry"
+            v-for="(entry, i) of savedSearches"
             :key="entry.date.getTime()"
         >
             <div class="tag-list">
@@ -44,10 +51,10 @@ function onDelete(index: number) {
             <div class="entry-footer">
                 <button
                     class="btn-delete"
-                    title="remove from history"
+                    title="remove from saved searches"
                     @click="onDelete(i)"
                 >
-                    <i class="bi bi-trash3"></i>
+                    <i class="bi bi-bookmark-dash"></i>
                 </button>
                 <span class="time" :title="entry.date.toLocaleString()">{{
                     relativeTime(entry.date)
@@ -71,7 +78,7 @@ function onDelete(index: number) {
 @import "@/assets/buttons";
 @import "@/assets/colors";
 
-.history-entry {
+.saved-search-entry {
     margin-bottom: 0.8rem;
 }
 
