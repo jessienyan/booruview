@@ -159,11 +159,11 @@ type AccountDataPatchParams struct {
 }
 
 type AccountDataPatchResponse struct {
-	FavoritePosts api.PostList
-	FavoriteTags  api.TagList
-	Blacklist     api.TagList
-	SearchHistory models.SearchHistoryList
-	SavedSearches models.SearchHistoryList
+	FavoritePosts api.PostList             `json:"favorite_posts"`
+	FavoriteTags  api.TagList              `json:"favorite_tags"`
+	Blacklist     api.TagList              `json:"blacklist"`
+	SearchHistory models.SearchHistoryList `json:"search_history"`
+	SavedSearches models.SearchHistoryList `json:"saved_searches"`
 }
 
 // Overrides the default marshal behavior to only include fields that are non-nil.
