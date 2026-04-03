@@ -45,6 +45,8 @@ function tip() {
             v-for="(entry, i) of savedSearches"
             :key="entry.date.getTime()"
         >
+            <span class="bi bi-bookmark-fill corner-icon"></span>
+
             <div class="tag-list">
                 <TagList :tags="styledTags(entry.query).value" />
             </div>
@@ -54,7 +56,7 @@ function tip() {
                     title="remove from saved searches"
                     @click="onDelete(i)"
                 >
-                    <i class="bi bi-bookmark-dash"></i>
+                    <i class="bi bi-trash3"></i>
                 </button>
                 <span class="time" :title="entry.date.toLocaleString()">{{
                     relativeTime(entry.date)
@@ -79,7 +81,17 @@ function tip() {
 @import "@/assets/colors";
 
 .saved-search-entry {
+    position: relative;
     margin-bottom: 0.8rem;
+    overflow: hidden;
+}
+
+.corner-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 1.3em;
+    color: $color-primary-light;
 }
 
 .entry-footer {
