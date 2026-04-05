@@ -161,7 +161,6 @@ type Store = {
         newsLastViewedAt: Date;
         queryHistory: SearchHistory[];
         savedSearches: SearchHistory[];
-        sidebarTabsHidden: boolean;
     };
 
     loadSettings(): void;
@@ -430,7 +429,6 @@ const store = reactive<Store>({
         newsLastViewedAt: new Date(0),
         queryHistory: [],
         savedSearches: [],
-        sidebarTabsHidden: false,
     },
 
     loadSettings() {

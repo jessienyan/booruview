@@ -14,31 +14,21 @@ const tabComponents: Record<Tab, Component> = {
     account: AccountTab,
 };
 const currentTab = ref<Tab>("about");
+const show = ref(false);
 
 function switchTab(tab: Tab) {
     currentTab.value = tab;
-    store.settings.sidebarTabsHidden = false;
-    store.saveSettings();
-}
-
-function toggleClose() {
-    store.settings.sidebarTabsHidden = !store.settings.sidebarTabsHidden;
-    store.saveSettings();
+    show.value = true;
 }
 </script>
 
 <template>
-    <div
-        class="tab-container"
-        :class="{ closed: store.settings.sidebarTabsHidden }"
-    >
+    <div class="tab-container" :class="{ closed: !show }">
         <header class="tabs">
             <button
                 class="tab-btn"
                 :class="{
-                    active:
-                        currentTab === 'about' &&
-                        !store.settings.sidebarTabsHidden,
+                    active: currentTab === 'about' && show,
                 }"
                 @click="switchTab('about')"
             >
@@ -47,9 +37,7 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{
-                    active:
-                        currentTab === 'help' &&
-                        !store.settings.sidebarTabsHidden,
+                    active: currentTab === 'help' && show,
                 }"
                 @click="switchTab('help')"
             >
@@ -58,9 +46,7 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{
-                    active:
-                        currentTab === 'settings' &&
-                        !store.settings.sidebarTabsHidden,
+                    active: currentTab === 'settings' && show,
                 }"
                 @click="switchTab('settings')"
             >
@@ -70,28 +56,19 @@ function toggleClose() {
             <button
                 class="tab-btn"
                 :class="{
-                    active:
-                        currentTab === 'account' &&
-                        !store.settings.sidebarTabsHidden,
+                    active: currentTab === 'account' && show,
                 }"
                 @click="switchTab('account')"
             >
                 account
             </button>
 
-            <button
-                v-if="!store.settings.sidebarTabsHidden"
-                class="tab-btn close-btn"
-                @click="toggleClose"
-            >
+            <button v-if="show" class="tab-btn close-btn" @click="show = false">
                 <i class="bi bi-chevron-down"></i>
             </button>
         </header>
 
-        <div
-            class="tab-content-container"
-            v-if="!store.settings.sidebarTabsHidden"
-        >
+        <div class="tab-content-container" v-if="show">
             <div class="tab-content">
                 <KeepAlive>
                     <component :is="tabComponents[currentTab]" />
