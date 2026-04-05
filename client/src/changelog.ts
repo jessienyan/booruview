@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-04-05",
+		changes: ["changed sidebar footer tabs to always be closed by default instead of remembering the last state"]
+	},
+	{
 		date: "2026-04-03",
 		changes: [
 			"added saved searches",
