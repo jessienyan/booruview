@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import DraggablePostContainer from "@/components/DraggablePostContainer.vue";
 import NoResults from "@/components/NoResults.vue";
+import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
 import store from "@/store";
 
@@ -14,9 +14,10 @@ onMounted(() => mainContainer.value.focus());
     <NoResults v-if="favPosts.length === 0">
         you don't have any favorites yet
     </NoResults>
-    <DraggablePostContainer
+    <PostContainer
         v-else
         :posts="favPosts"
         :scroll-container="mainContainer"
+        :keyed="true"
     />
 </template>
