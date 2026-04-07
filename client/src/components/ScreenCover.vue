@@ -1,14 +1,9 @@
 <script setup lang="ts">
-defineEmits(["click"]);
 const { blackout } = defineProps<{ blackout?: boolean }>();
 </script>
 
 <template>
-    <div
-        class="screen-cover"
-        :class="{ blackout }"
-        @click="$emit('click')"
-    ></div>
+    <div class="screen-cover" :class="{ blackout }"></div>
 </template>
 
 <style lang="scss" scoped>
