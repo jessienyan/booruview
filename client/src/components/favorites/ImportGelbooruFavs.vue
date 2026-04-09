@@ -6,8 +6,11 @@ defineEmits(["close"]);
 const input = ref("");
 
 function onInput(e: Event) {
-    const value = (e.target as HTMLInputElement).value;
+    const $el = e.target as HTMLInputElement;
+    const value = $el.value;
     input.value = value.replace(/[^\d]+/, "");
+    // Update the DOM in case input.value didn't change
+    $el.value = input.value;
 }
 </script>
 
