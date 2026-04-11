@@ -95,6 +95,8 @@
 
     @stopFuckingSpammingFavicons {
         header  X-Requested-With    idm.internet.download.manager
+        header  X-Requested-With    *android*
+        header  X-Requested-With    *webview*
         path    /favicon.png        /favicon-64.png
     }
     handle @stopFuckingSpammingFavicons {
