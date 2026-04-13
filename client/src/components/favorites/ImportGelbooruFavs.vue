@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { delay } from "@/fetch";
 import store from "@/store";
 import ScreenCover from "../ScreenCover.vue";
@@ -7,6 +7,16 @@ import ScreenCover from "../ScreenCover.vue";
 defineEmits(["close"]);
 const input = ref("");
 const importing = ref(false);
+const importPageMax = ref(0);
+const importPage = ref(0);
+
+const btnText = computed(() => {
+    if (!importing.value) {
+        return "Import";
+    }
+
+    return `Importing (${importPage.value} of ${importPageMax.value})`;
+});
 
 function onInput(e: Event) {
     const $el = e.target as HTMLInputElement;
@@ -17,22 +27,23 @@ function onInput(e: Event) {
 }
 
 async function doImport() {
-    let page = 1;
+    importPage.value = 1;
     let totalResults = 0;
     const prevFavCount = store.favoritePosts().value.length;
 
     while (true) {
         const resp = await store.searchPosts(
             { include: [`fav:${input.value}`], exclude: [] },
-            page,
+            importPage.value,
         );
         totalResults = resp.total_count;
+        importPageMax.value = Math.ceil(totalResults / resp.count_per_page);
 
         if (!resp.results.length) {
             break;
         }
 
-        store.addFavoritePosts(resp.results);
+        await store.addFavoritePosts(resp.results);
 
         // Last page
         if (resp.results.length < resp.count_per_page) {
@@ -41,7 +52,7 @@ async function doImport() {
 
         // Avoid hitting rate limit
         await delay(1000);
-        page++;
+        importPage.value++;
     }
 
     const added = store.favoritePosts().value.length - prevFavCount;
@@ -113,7 +124,7 @@ async function onSubmit() {
                     class="btn-primary btn-rounded"
                     :disabled="importing"
                 >
-                    Import
+                    {{ btnText }}
                 </button>
             </form>
         </div>
