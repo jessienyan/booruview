@@ -564,8 +564,9 @@ const store = reactive<Store>({
 
         try {
             val = await resp.json();
-        } catch(_) {
-            throw "Something went wrong";
+        } catch(e) {
+            console.error("Failed to parse API response", e);
+            throw e;
         }
 
         if (resp.status >= 400) {
@@ -600,23 +601,24 @@ const store = reactive<Store>({
                 posts = await this.searchPosts(queryTags, page);
             } catch(e) {
                 this.toast = {
-                    msg: e as string,
+                    msg: typeof e === "string" ? e : "Something went wrong",
                     type: "error",
-                }
-                return;
-            } finally {
+                };
                 this.fetchingPosts = false;
-                this.hasSearched = true;
+                return;
             }
+
+            this.hasSearched = true;
+            this.fetchingPosts = false;
 
             if (!sameQuery) {
                 this.posts.clear();
             }
 
-            this.posts.set(page!, posts.results);
+            this.posts.set(page, posts.results);
             this.resultsPerPage = posts.count_per_page;
             this.totalPostCount = posts.total_count;
-            this.currentPage = page!;
+            this.currentPage = page;
 
             if (this.settings.closeSidebarOnSearch) {
                 this.sidebarClosed = true;
