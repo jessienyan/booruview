@@ -187,7 +187,7 @@ type Store = {
     nextPage(): Promise<void>;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void>;
-    searchPosts(opts: { query: SearchQuery, page?: number; force?: boolean }): Promise<void>;
+    searchAndUpdateResults(opts: { query: SearchQuery, page?: number; force?: boolean }): Promise<void>;
     addQueryToHistory(): void;
     clearPosts(): void;
     getTag(name: string): Tag | undefined;
@@ -545,7 +545,7 @@ const store = reactive<Store>({
         return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
     },
 
-    async searchPosts({ query, page, force }: { query: SearchQuery, page?: number; force?: boolean; }): Promise<void> {
+    async searchAndUpdateResults({ query, page, force }: { query: SearchQuery, page?: number; force?: boolean; }): Promise<void> {
         type PostListResponse = {
             count_per_page: number;
             total_count: number;
