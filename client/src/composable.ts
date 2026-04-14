@@ -209,3 +209,21 @@ export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<stri
 		return newURL.toString();
 	});
 }
+
+// Attaches a keydown listener to the body that calls `fn` if the target element contains `el`
+export function useKeydownListener(key: string, el: MaybeRefOrGetter, fn: () => void) {
+	const handler = (e: KeyboardEvent) => {
+		if(e.key !== key || !e.target) {
+			return;
+		}
+
+		const $target = e.target as HTMLElement;
+		if($target.contains(toValue(el))) {
+			e.preventDefault();
+			e.stopPropagation();
+			fn();
+		}
+	}
+	onMounted(() => document.body.addEventListener("keydown", handler));
+	onUnmounted(() => document.body.removeEventListener("keydown", handler));
+}

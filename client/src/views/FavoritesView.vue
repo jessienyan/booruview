@@ -5,7 +5,7 @@ import Footer from "@/components/Footer.vue";
 import FavoritesHeader from "@/components/favorites/FavoritesHeader.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { useMainContainer } from "@/composable";
+import { useKeydownListener, useMainContainer } from "@/composable";
 import { POSTS_PER_PAGE } from "@/config";
 import PageSwipeArrow from "@/PageSwipeArrow.vue";
 import store from "@/store";
@@ -36,6 +36,13 @@ const navigateToPage = (page: number) => {
 };
 
 onMounted(() => mainContainer.value.focus());
+
+useKeydownListener("ArrowLeft", mainContainer, () =>
+    navigateToPage(currentPage.value - 1),
+);
+useKeydownListener("ArrowRight", mainContainer, () =>
+    navigateToPage(currentPage.value + 1),
+);
 </script>
 
 <template>

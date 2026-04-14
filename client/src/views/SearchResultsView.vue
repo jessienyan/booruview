@@ -4,12 +4,14 @@ import Footer from "@/components/Footer.vue";
 import LoadingResults from "@/components/LoadingResults.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { useMainContainer } from "@/composable";
+import { useKeydownListener, useMainContainer } from "@/composable";
 import PageSwipeArrow from "@/PageSwipeArrow.vue";
 import store from "@/store";
 
 const mainContainer = useMainContainer();
 onMounted(() => mainContainer.value.focus());
+useKeydownListener("ArrowLeft", mainContainer, () => store.prevPage());
+useKeydownListener("ArrowRight", mainContainer, () => store.nextPage());
 </script>
 
 <template>
