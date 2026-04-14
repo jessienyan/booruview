@@ -20,7 +20,7 @@ export const router = createRouter({
 			component: SearchResultsView,
 		},
 		{
-			path: "/favs/:page(\\d+)",
+			path: "/favs/:page(\\d+)?",
 			name: "favorites",
 			component: FavoritesView,
 		},
@@ -60,9 +60,11 @@ router.beforeEach(async to => {
 		let page = parseInt(to.params.page as string || "1", 10);
 		page = Math.max(1, Math.min(page, maxPage));
 
-		return {
-			name: "favorites",
-			params: { page },
-		};
+		if (page.toString() !== to.params.page) {
+			return {
+				name: "favorites",
+				params: { page },
+			};
+		}
 	}
 });
