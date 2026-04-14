@@ -110,44 +110,50 @@ onUnmounted(() => {
         <ScreenCover @click="onClose" />
 
         <div class="modal">
-            <p>
-                To import your favorite posts from Gelbooru, you'll need your
-                account ID.
-            </p>
-            <ol>
-                <li>Login to your Gelbooru account</li>
-                <li>
-                    Go to the
-                    <a
-                        href="https://gelbooru.com/index.php?page=account&s=home"
-                        target="_blank"
-                        >account page</a
-                    >
-                </li>
-                <li>Click on <strong>My Profile</strong></li>
-                <li>Copy the number in the URL, for example:</li>
-            </ol>
-            <pre>https://gelbooru.com/...&amp;id=<strong>123456789</strong></pre>
-            <form @submit.prevent="onSubmit">
+            <button class="btn-close" @click="onClose">
+                <span class="bi bi-x-lg"></span>
+            </button>
+            <div class="modal-body">
                 <p>
-                    Importing might take a few minutes if you have a lot of
-                    favorites. Keep this screen open until the import is done.
+                    To import your favorite posts from Gelbooru, you'll need
+                    your account ID.
                 </p>
-                <input
-                    type="text"
-                    class="text-input rounded input-block"
-                    :value="input"
-                    @input="onInput"
-                    placeholder="account id here"
-                />
-                <button
-                    type="submit"
-                    class="btn-primary btn-rounded btn-block"
-                    :disabled="importing || !input.length"
-                >
-                    {{ btnText }}
-                </button>
-            </form>
+                <ol>
+                    <li>Login to your Gelbooru account</li>
+                    <li>
+                        Go to the
+                        <a
+                            href="https://gelbooru.com/index.php?page=account&s=home"
+                            target="_blank"
+                            >account page</a
+                        >
+                    </li>
+                    <li>Click on <strong>My Profile</strong></li>
+                    <li>Copy the number in the URL, for example:</li>
+                </ol>
+                <pre>https://gelbooru.com/...&amp;id=<strong>123456789</strong></pre>
+                <form @submit.prevent="onSubmit">
+                    <p>
+                        Importing might take a few minutes if you have a lot of
+                        favorites. Keep this screen open until the import is
+                        done.
+                    </p>
+                    <input
+                        type="text"
+                        class="text-input rounded input-block"
+                        :value="input"
+                        @input="onInput"
+                        placeholder="account id here"
+                    />
+                    <button
+                        type="submit"
+                        class="btn-primary btn-rounded btn-block"
+                        :disabled="importing || !input.length"
+                    >
+                        {{ btnText }}
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </template>
@@ -173,10 +179,23 @@ onUnmounted(() => {
     position: relative;
     z-index: 1000;
     color: #ccc;
-    padding: 0.01em 0.8em;
     margin: 1rem;
     max-width: 400px;
     background-color: $color-primary;
+}
+
+.modal-body {
+    padding: 0.01em 0.8em;
+}
+
+.btn-close {
+    border: none;
+    background: none;
+    color: white;
+    padding: 6px;
+    margin: 6px;
+    float: right;
+    cursor: pointer;
 }
 
 .text-input {
