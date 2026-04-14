@@ -15,7 +15,7 @@ const updates: Update[] = [
         title: "favorites update",
         component: (
             <>
-                <p>Today's update has a couple changes for favorites.</p>
+                <p>Today's update has a few changes for favorites.</p>
                 <p>
                     1. You can now{" "}
                     <strong>import favorites from Gelbooru</strong> (check the{" "}
