@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 import { delay } from "@/fetch";
 import store from "@/store";
 import ScreenCover from "../ScreenCover.vue";
 
-defineEmits(["close"]);
+const emit = defineEmits(["close"]);
 const input = ref("");
 const importing = ref(false);
 const importPageMax = ref(0);
@@ -31,7 +31,7 @@ async function doImport() {
     let totalResults = 0;
     const prevFavCount = store.favoritePosts().value.length;
 
-    while (true) {
+    while (importing.value) {
         const resp = await store.searchPosts(
             { include: [`fav:${input.value}`], exclude: [] },
             importPage.value,
@@ -88,11 +88,20 @@ async function onSubmit() {
         importing.value = false;
     }
 }
+
+function onClose() {
+    importing.value = false;
+    emit("close");
+}
+
+onUnmounted(() => {
+    importing.value = false;
+});
 </script>
 
 <template>
     <div class="modal-container">
-        <ScreenCover @click="$emit('close')" />
+        <ScreenCover @click="onClose" />
 
         <div class="modal">
             <p>
