@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { POSTS_PER_PAGE } from "./config";
 import { tagsToSearchQuery } from "./search";
 import store from "./store";
 import FavoritesView from "./views/FavoritesView.vue";
@@ -19,7 +20,7 @@ export const router = createRouter({
 			component: SearchResultsView,
 		},
 		{
-			path: "/favs/:page(\\d+)?",
+			path: "/favs/:page(\\d+)",
 			name: "favorites",
 			component: FavoritesView,
 		},
@@ -54,17 +55,14 @@ router.beforeEach(async to => {
 	}
 
 	if (to.name === "favorites") {
-		const postsPerPage = 100;
 		const favPosts = store.favoritePosts();
-		const maxPage = Math.ceil(favPosts.value.length / postsPerPage);
-		const page = parseInt(to.params.page as string || "1", 10);
-		const clampedPage = Math.max(1, Math.min(page, maxPage));
+		const maxPage = Math.ceil(favPosts.value.length / POSTS_PER_PAGE);
+		let page = parseInt(to.params.page as string || "1", 10);
+		page = Math.max(1, Math.min(page, maxPage));
 
-		if (page !== clampedPage) {
-			return {
-				name: "favorites",
-				params: { page: clampedPage === 1 ? undefined : clampedPage.toString() },
-			};
-		}
+		return {
+			name: "favorites",
+			params: { page },
+		};
 	}
 });

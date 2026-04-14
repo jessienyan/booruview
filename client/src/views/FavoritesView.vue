@@ -5,9 +5,8 @@ import Footer from "@/components/Footer.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
+import { POSTS_PER_PAGE } from "@/config";
 import store from "@/store";
-
-const postsPerPage = 100;
 
 const route = useRoute();
 const favPosts = store.favoritePosts();
@@ -15,11 +14,13 @@ const mainContainer = useMainContainer();
 const currentPage = computed(() =>
     parseInt((route.params.page as string) || "1", 10),
 );
-const maxPage = computed(() => Math.ceil(favPosts.value.length / postsPerPage));
+const maxPage = computed(() =>
+    Math.ceil(favPosts.value.length / POSTS_PER_PAGE),
+);
 const currentPosts = computed(() =>
     favPosts.value.slice(
-        (currentPage.value - 1) * postsPerPage,
-        currentPage.value * postsPerPage,
+        (currentPage.value - 1) * POSTS_PER_PAGE,
+        currentPage.value * POSTS_PER_PAGE,
     ),
 );
 
