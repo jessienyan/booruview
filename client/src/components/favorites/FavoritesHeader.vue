@@ -17,11 +17,7 @@ function onToggle() {
             import gelbooru favs
         </button>
     </div>
-    <button
-        class="header-toggle-btn"
-        :class="{ closed: !store.settings.favHeaderOpen }"
-        @click="onToggle"
-    >
+    <button class="header-toggle-btn" @click="onToggle">
         <i v-if="store.settings.favHeaderOpen" class="bi bi-chevron-up"></i>
         <i v-else class="bi bi-chevron-down"></i>
     </button>
@@ -56,9 +52,5 @@ function onToggle() {
     display: block;
     margin: auto;
     width: fit-content;
-
-    &.closed {
-        opacity: 0.6;
-    }
 }
 </style>
