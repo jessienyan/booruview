@@ -1,4 +1,5 @@
 import type { Component } from "vue";
+import { RouterLink } from "vue-router";
 import { SURVEY_LINK } from "./config";
 
 type Update = {
@@ -9,6 +10,31 @@ type Update = {
 
 // NOTE: add new updates to the top of the list so it's sorted by most recent
 const updates: Update[] = [
+    {
+        date: new Date("2026-04-14T19:36:00+00:00"),
+        title: "favorites update",
+        component: (
+            <>
+                <p>Today's update has a couple changes for favorites.</p>
+                <p>
+                    1. You can now{" "}
+                    <strong>import favorites from Gelbooru</strong> (check the{" "}
+                    <RouterLink to={{ name: "favorites" }}>
+                        favs page
+                    </RouterLink>
+                    ).
+                </p>
+                <p>
+                    2. Favorites now use pages the same as search results. This
+                    should fix any lag issues if you have a lot of favs.
+                </p>
+                <p>
+                    3. Favoriting a post while logged in now uses significantly
+                    less bandwidth.
+                </p>
+            </>
+        ),
+    },
     {
         date: new Date("2026-03-28T20:30:16+00:00"),
         title: "improvements for slow connections",
