@@ -14,7 +14,13 @@ onMounted(() => mainContainer.value.focus());
 
 <template>
     <LoadingResults v-if="store.fetchingPosts" />
-    <PageSwipeArrow :scroll-container="mainContainer" />
+    <PageSwipeArrow
+        :scroll-container="mainContainer"
+        :current-page="store.currentPage"
+        :max-page="store.maxPage()"
+        @prev="store.prevPage()"
+        @next="store.nextPage()"
+    />
     <NoResults v-if="store.totalPostCount === 0 && store.hasSearched">
         no results :(
     </NoResults>

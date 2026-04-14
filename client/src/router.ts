@@ -64,6 +64,14 @@ router.beforeEach(async (to, from) => {
 	if (to.name === "favorites") {
 		const favPosts = store.favoritePosts();
 		const maxPage = Math.ceil(favPosts.value.length / POSTS_PER_PAGE);
+
+		if (maxPage === 0) {
+			if (to.params.page) {
+				return { name: "favorites" };
+			}
+			return;
+		}
+
 		let page = parseInt(to.params.page as string || "1", 10);
 		page = Math.max(1, Math.min(page, maxPage));
 

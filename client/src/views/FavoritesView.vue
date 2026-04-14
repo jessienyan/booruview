@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Footer from "@/components/Footer.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
 import { POSTS_PER_PAGE } from "@/config";
+import PageSwipeArrow from "@/PageSwipeArrow.vue";
 import store from "@/store";
 
+const router = useRouter();
 const route = useRoute();
 const favPosts = store.favoritePosts();
 const mainContainer = useMainContainer();
@@ -24,6 +26,14 @@ const favsForPage = computed(() =>
     ),
 );
 
+const navigateToPage = (page: number) => {
+    const clampedPage = Math.max(1, Math.min(page, maxPage.value));
+    router.push({
+        name: "favorites",
+        params: { page: clampedPage.toString() },
+    });
+};
+
 onMounted(() => mainContainer.value.focus());
 </script>
 
@@ -32,6 +42,13 @@ onMounted(() => mainContainer.value.focus());
         you don't have any favorites yet
     </NoResults>
     <template v-else>
+        <PageSwipeArrow
+            :scroll-container="mainContainer"
+            :current-page="currentPage"
+            :max-page="maxPage"
+            @prev="navigateToPage(currentPage - 1)"
+            @next="navigateToPage(currentPage + 1)"
+        />
         <PostContainer
             :posts="favsForPage"
             :scroll-container="mainContainer"
@@ -53,8 +70,6 @@ onMounted(() => mainContainer.value.focus());
                     page: (currentPage + 1).toString(),
                 },
             }"
-            :prev-disabled="currentPage === 1"
-            :next-disabled="currentPage >= maxPage"
         />
     </template>
 </template>

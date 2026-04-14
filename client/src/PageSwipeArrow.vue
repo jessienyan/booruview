@@ -3,7 +3,14 @@ import VanillaSwipe, { type EventData } from "vanilla-swipe";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import store from "./store";
 
-const props = defineProps<{ scrollContainer: HTMLElement }>();
+const props = defineProps<{
+    scrollContainer: HTMLElement;
+    currentPage: number;
+    maxPage: number;
+}>();
+
+const emit = defineEmits(["prev", "next"]);
+
 const swipeDirection = ref<"LEFT" | "RIGHT" | null>(null);
 const minDistanceForSwipe = 50; // pixels
 const maxAngleForSwipe = 30; // degrees
@@ -36,7 +43,7 @@ onMounted(() => {
 
             switch (data.directionX) {
                 case "LEFT":
-                    if (store.currentPage === 1) {
+                    if (props.currentPage <= 1) {
                         return;
                     }
 
@@ -44,7 +51,7 @@ onMounted(() => {
                     break;
 
                 case "RIGHT":
-                    if (store.currentPage === store.maxPage()) {
+                    if (props.currentPage === props.maxPage) {
                         return;
                     }
 
@@ -68,14 +75,12 @@ onMounted(() => {
         onSwiped() {
             switch (swipeDirection.value) {
                 case "LEFT":
-                    store.prevPage().finally(() => {
-                        swipeDirection.value = null;
-                    });
+                    emit("prev");
+                    swipeDirection.value = null;
                     break;
                 case "RIGHT":
-                    store.nextPage().finally(() => {
-                        swipeDirection.value = null;
-                    });
+                    emit("next");
+                    swipeDirection.value = null;
                     break;
             }
         },
