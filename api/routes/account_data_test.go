@@ -201,9 +201,10 @@ func TestAccountDataPatchHandler_AddFavoritePosts(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-	expected := routes.AccountDataPatchResponse{
-		FavoritePosts: api.PostList{post},
-	}
+
+	// Favorited posts are not included in the response
+	expected := routes.AccountDataPatchResponse{}
+
 	require.Equal(t, expected, actual)
 }
 
@@ -326,9 +327,9 @@ func TestAccountDataPatchHandler_RemoveFavoritePosts(t *testing.T) {
 
 	var actual routes.AccountDataPatchResponse
 	testutil.MustUnmarshalJSON(resp.Body.Bytes(), &actual)
-	expected := routes.AccountDataPatchResponse{
-		FavoritePosts: api.PostList{{Id: 1}, {Id: 3}},
-	}
+
+	// Favorited posts are not included in the response
+	expected := routes.AccountDataPatchResponse{}
 	require.Equal(t, expected, actual)
 }
 
