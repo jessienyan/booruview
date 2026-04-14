@@ -3,27 +3,57 @@ import { ref, Teleport } from "vue";
 import ImportGelbooruFavs from "./ImportGelbooruFavs.vue";
 
 const showFavsModal = ref(false);
+const showHeader = ref(true);
 </script>
 
 <template>
-    <div class="header-container">
+    <div class="header-container" v-if="showHeader">
         <button class="btn-primary btn-rounded" @click="showFavsModal = true">
             import gelbooru favs
         </button>
-
-        <Teleport to="body">
-            <ImportGelbooruFavs
-                v-if="showFavsModal"
-                @close="showFavsModal = false"
-            />
-        </Teleport>
     </div>
+    <button
+        class="header-toggle-btn"
+        :class="{ closed: !showHeader }"
+        @click="showHeader = !showHeader"
+    >
+        <i v-if="showHeader" class="bi bi-chevron-up"></i>
+        <i v-else class="bi bi-chevron-down"></i>
+    </button>
+
+    <Teleport to="body">
+        <ImportGelbooruFavs
+            v-if="showFavsModal"
+            @close="showFavsModal = false"
+        />
+    </Teleport>
 </template>
 
 <style lang="scss" scoped>
 @import "@/assets/buttons";
+@import "@/assets/colors";
 
 .header-container {
+    position: relative;
+    background-color: $color-primary-darker;
     padding: 0.8em;
+    box-shadow: 0 0 10px $color-bg;
+}
+
+.header-toggle-btn {
+    border: 1px solid #444;
+    border-top: none;
+    padding: 0.4rem 1.6rem;
+    border-radius: 0 0 4px 4px;
+    background-color: #1e1e1e;
+    color: #888;
+    cursor: pointer;
+    display: block;
+    margin: auto;
+    width: fit-content;
+
+    &.closed {
+        opacity: 0.4;
+    }
 }
 </style>
