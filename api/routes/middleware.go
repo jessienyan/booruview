@@ -32,6 +32,13 @@ func RecoverMiddleware(next http.Handler) http.Handler {
 				} else {
 					err = errors.Errorf("%v", recoverErr)
 				}
+
+				// This happens when the connection closes while we're writing a response.
+				// Usually it means the user refreshed the page or closed their browser
+				if strings.Contains(err.Error(), "write: broken pipe") {
+					return
+				}
+
 				respondWithInternalError(w, errors.Wrap(err, "recovered from panic"))
 			}
 		}()
@@ -49,7 +56,7 @@ type userContextValue struct {
 	Data models.UserData
 }
 
-func getUser(req *http.Request) *userContextValue {
+func GetUser(req *http.Request) *userContextValue {
 	user := req.Context().Value(userKey)
 	if user == nil {
 		return nil
@@ -68,6 +75,7 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 			respondWithUnauthorized(w)
 			return nil, false
 		}
+		err = errors.Wrap(err, "failed to lookup user")
 		respondWithInternalError(w, err)
 		return nil, false
 	}
@@ -90,6 +98,7 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 			UserID: user.ID,
 		})
 		if err != nil {
+			err = errors.Wrap(err, "failed to create user data")
 			respondWithInternalError(w, err)
 			return nil, false
 		}
@@ -108,22 +117,43 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 }
 
 // Adds a user to the request context if a valid auth token was sent.
-// If the token is invalid or missing, returns 401.
+// Looks for the token in the Authorization header, then as a cookie.
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		token := strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+		var token string
+
+		token = strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
+
 		if token == "" {
-			respondWithUnauthorized(w)
-			return
+			cookie, _ := req.Cookie(api.AuthCookieName)
+			if cookie != nil {
+				token = cookie.Value
+			}
 		}
 
-		if parsedToken, err := api.ParseAuthToken(token); err == nil {
-			var ok bool
-			if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
-				// loadUserIntoContext sent a response already, nothing to do here
+		if token != "" {
+			if parsedToken, err := api.ParseAuthToken(token); err == nil {
+				// Make sure we don't clobber `req`
+				var ok bool
+				if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
+					// loadUserIntoContext sent a response already, nothing to do here
+					return
+				}
+			} else {
+				respondWithUnauthorized(w)
 				return
 			}
-		} else {
+		}
+
+		next.ServeHTTP(w, req)
+	})
+}
+
+// Aborts the request with a 401 if the user wasn't authenticated
+func RequireAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		u := GetUser(req)
+		if u == nil {
 			respondWithUnauthorized(w)
 			return
 		}

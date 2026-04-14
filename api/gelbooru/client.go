@@ -26,9 +26,9 @@ var (
 )
 
 type GelbooruClient interface {
-	SearchTags(query string) ([]api.TagResponse, error)
+	SearchTags(query string) (api.TagList, error)
 	ListPosts(tags string, page int) (*PostList, error)
-	ListTags(tags string) ([]api.TagResponse, error)
+	ListTags(tags string) (api.TagList, error)
 }
 
 type Client struct {
@@ -104,7 +104,7 @@ func ParseTagNumericType(raw int) api.TagType {
 	return api.Unknown
 }
 
-func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
+func (c Client) doApiTagSearch(query string) (api.TagList, error) {
 	var resp []TagSearchResponse
 	params := url.Values{}
 	params.Add("page", "autocomplete2")
@@ -115,7 +115,7 @@ func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 		return nil, err
 	}
 
-	tags := make([]api.TagResponse, 0, len(resp))
+	tags := make(api.TagList, 0, len(resp))
 	for _, t := range resp {
 		data := api.TagResponse{
 			Name: t.Value,
@@ -138,14 +138,14 @@ func (c Client) doApiTagSearch(query string) ([]api.TagResponse, error) {
 	return tags, nil
 }
 
-func (c Client) SearchTags(query string) ([]api.TagResponse, error) {
+func (c Client) SearchTags(query string) (api.TagList, error) {
 	isFilter, suggestions := SuggestedSearchFilters(query)
 
 	if !isFilter {
 		return c.doApiTagSearch(query)
 	}
 
-	tags := make([]api.TagResponse, 0, len(suggestions))
+	tags := make(api.TagList, 0, len(suggestions))
 	tagType := api.Unknown
 
 	// Fake rating:* as metadata tag
@@ -198,7 +198,7 @@ type FullPostResponse struct {
 
 type PostList struct {
 	TotalCount int
-	Posts      []api.PostResponse
+	Posts      api.PostList
 }
 
 const (
@@ -225,7 +225,7 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		return nil, err
 	}
 
-	posts := make([]api.PostResponse, 0, len(resp.Post))
+	posts := make(api.PostList, 0, len(resp.Post))
 	for _, p := range resp.Post {
 		data := api.PostResponse{
 			Id:    p.Id,
@@ -303,7 +303,7 @@ type FullTagInfoResponse struct {
 
 // ListTags returns a list of info found on the given tags (e.g. count, type).
 // tags should be one or more tags separated by a space.
-func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
+func (c Client) ListTags(tags string) (api.TagList, error) {
 	var resp FullTagInfoResponse
 	params := url.Values{}
 	params.Add("page", "dapi")
@@ -317,7 +317,7 @@ func (c Client) ListTags(tags string) ([]api.TagResponse, error) {
 		return nil, err
 	}
 
-	tagInfo := make([]api.TagResponse, resp.Attributes.Count)
+	tagInfo := make(api.TagList, resp.Attributes.Count)
 	for i, t := range resp.Tag {
 		if t.Name == "" {
 			continue

@@ -28,9 +28,16 @@ func NewRouter(client gelbooru.GelbooruClient) *mux.Router {
 	r.HandleFunc("/login", LoginHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 
+	maybeAuthRouter := r.NewRoute().Subrouter()
+	maybeAuthRouter.Use(AuthMiddleware)
+	maybeAuthRouter.HandleFunc("/index.html", IndexHandler)
+
 	authRouter := r.NewRoute().Subrouter()
-	authRouter.Use(AuthMiddleware)
-	authRouter.HandleFunc("/account", AccountHandler).Methods("GET", "PATCH", "DELETE")
+	authRouter.Use(AuthMiddleware, RequireAuthMiddleware)
+	authRouter.HandleFunc("/account", AccountDeleteHandler).Methods("DELETE")
+	authRouter.HandleFunc("/account/data", AccountDataGetHandler).Methods("GET")
+	authRouter.HandleFunc("/account/data", AccountDataPatchHandler).Methods("PATCH")
+	authRouter.HandleFunc("/account/data", AccountDataPutHandler).Methods("PUT")
 	authRouter.HandleFunc("/account/password", ChangePasswordHandler).Methods("POST")
 
 	return r

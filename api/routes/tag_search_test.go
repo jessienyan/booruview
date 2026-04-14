@@ -43,7 +43,7 @@ func TestTagSearchHandler_CacheHit(t *testing.T) {
 func TestTagSearchHandler_NoResults(t *testing.T) {
 	testutil.Flush()
 
-	expected := []api.TagResponse{}
+	expected := api.TagList{}
 	client := &testutil.MockGelbooruClient{}
 	client.On("SearchTags", "test").Return(expected, nil)
 
@@ -61,7 +61,7 @@ func TestTagSearchHandler_NoResults(t *testing.T) {
 func TestTagSearchHandler_SomeResults(t *testing.T) {
 	testutil.Flush()
 
-	results := []api.TagResponse{{Name: "test", Count: 0, Type: api.Tag}}
+	results := api.TagList{{Name: "test", Count: 0, Type: api.Tag}}
 	client := &testutil.MockGelbooruClient{}
 	client.On("SearchTags", "test").Return(results, nil)
 
@@ -85,7 +85,7 @@ func TestTagSearchHandler_GelbooruDown(t *testing.T) {
 	testutil.Flush()
 
 	client := &testutil.MockGelbooruClient{}
-	client.On("SearchTags", "test").Return([]api.TagResponse{}, gelbooru.GelbooruError{})
+	client.On("SearchTags", "test").Return(api.TagList{}, gelbooru.GelbooruError{})
 
 	req := httptest.NewRequest("GET", "/tagsearch?q=test", nil)
 	rec := httptest.NewRecorder()

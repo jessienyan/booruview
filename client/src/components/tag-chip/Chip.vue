@@ -122,6 +122,7 @@ onMounted(() => {
     cursor: pointer;
     color: #fff;
     text-shadow: 0 0 2px black;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 
     .warning {
         color: #f44;
@@ -194,7 +195,7 @@ onMounted(() => {
 }
 
 .tag-metadata {
-    background-color: #9a6600;
+    background-color: #7a5602;
 }
 
 .tag-unknown {

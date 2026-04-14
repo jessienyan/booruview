@@ -8,7 +8,6 @@ import Login from "./account/Login.vue";
 import Register from "./account/Register.vue";
 
 const showRegisterForm = ref(false);
-const showChangePasswordForm = ref(false);
 
 function logout() {
     store.account = null;
@@ -16,8 +15,7 @@ function logout() {
 }
 
 function downloadData() {
-    // Shouldn't happen
-    if (!store.account) {
+    if (!store.account?.data) {
         return;
     }
 
@@ -52,8 +50,7 @@ function downloadData() {
 
 const isUploading = ref(false);
 async function uploadData() {
-    // Shouldn't happen
-    if (!store.account) {
+    if (!store.account?.data) {
         return;
     }
 
@@ -90,10 +87,10 @@ async function uploadData() {
     );
 
     try {
-        await store.saveAccountData({
-            favorite_posts: true,
-            favorite_tags: true,
-            blacklist: true,
+        await store.addToAccountData({
+            favorite_posts: store.account.data.favorite_posts,
+            favorite_tags: store.account.data.favorite_tags,
+            blacklist: store.account.data.blacklist,
         });
         store.toast = {
             msg: "Upload OK!",

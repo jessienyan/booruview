@@ -1,3 +1,8 @@
+{{/*
+    !! NOTE !!
+    This file is served through the API so we can inject data into it.
+*/}}
+
 <!doctype html>
 <html lang="en-US">
     <head>
@@ -30,6 +35,8 @@
         <style>
             @import "./src/assets/_document.scss";
         </style>
+        <script id="account-data" type="application/json">{{.AccountData}}</script>
+        <script id="cdn-hosts" type="application/json">{{.CDNHosts}}</script>
         <link rel="stylesheet" href="./src/assets/main.scss" />
     </head>
     <body>
@@ -38,6 +45,8 @@
                 Enable javascript to use booruview
             </div></noscript
         >
+
+
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>

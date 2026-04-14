@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import ClearTagsButton from "@/components/search/ClearTagsButton.vue";
+import SearchFooterButtons from "@/components/search/SearchFooterButtons.vue";
 import SearchForm from "@/components/search/SearchForm.vue";
 import TagList from "@/components/TagList.vue";
 import store from "@/store";
@@ -84,7 +84,8 @@ const styledTags = computed(() => {
                 :tags="styledTags"
                 :actions="{ edit: true }"
             />
-            <ClearTagsButton />
+
+            <SearchFooterButtons />
         </div>
     </div>
 </template>

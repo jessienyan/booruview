@@ -9,7 +9,7 @@
         "preview": "vite preview",
         "build-only": "vite build",
         "type-check": "vue-tsc --build",
-        "format": "biome check --write --unsafe src/ && prettier --write '**/*.vue'"
+        "format": "biome check --write --unsafe src/ && prettier --write '**/*.{tsx,vue}'"
     },
     "dependencies": {
         "@csstools/normalize.css": "^12.1.1",

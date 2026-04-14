@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./api/
+      context: api
       args:
         - COMMIT_HASH=$VITE_COMMIT_SHA
     #command: dlv debug --headless --listen=:12345 --continue --accept-multiclient cmd/server/main.go
@@ -11,12 +11,19 @@ services:
       - "8000:8000"
       - "12345:12345"
     environment:
-      - "VALKEY_ADDR=valkey:6379"
-      - "DATABASE_PATH=/app/database/sqlite.db"
+      - VALKEY_ADDR=valkey:6379
+      - DATABASE_PATH=/app/database/sqlite.db
+      - DEV=1
     env_file:
       - ".env"
     volumes:
       - ./api:/app
+      # This is for index.html. Binding the file directly doesn't work though because
+      # it won't be updated in the container if it changes, so we have to bind the dir instead
+      - ./client/dist:/dist
+    depends_on:
+      - client
+      - valkey
 
   caddy:
     build:
@@ -33,6 +40,9 @@ services:
       - ./client/dist:/srv:ro   # Live client updates
       - ./logs/:/var/log/caddy/
       - caddy-data:/data
+    depends_on:
+      - api
+      - client
 
   client:
     build:

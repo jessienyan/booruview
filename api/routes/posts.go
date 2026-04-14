@@ -14,9 +14,9 @@ import (
 )
 
 type PostsResponse struct {
-	CountPerPage int                `json:"count_per_page"`
-	TotalCount   int                `json:"total_count"`
-	Results      []api.PostResponse `json:"results"`
+	CountPerPage int          `json:"count_per_page"`
+	TotalCount   int          `json:"total_count"`
+	Results      api.PostList `json:"results"`
 }
 
 type PostsHandler struct {
@@ -27,6 +27,7 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// NOTE: post rate limiting happens after checking the cache. The cost increases
 	// if there's a cache miss
 	if err := req.ParseForm(); err != nil {
+		err = errors.Wrap(err, "failed to parse form")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -48,13 +49,14 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	resp := PostsResponse{
-		Results: []api.PostResponse{},
+		Results: api.PostList{},
 	}
 	tags := api.CleanTagList(req.Form["q"])
 	query := strings.Join(tags, " ")
 
 	cached, err := GetCachedPosts(query, page)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached posts")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -81,6 +83,7 @@ func (h PostsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		err = errors.Wrap(err, "failed to list posts")
 		respondWithInternalError(w, err)
 		return
 	}

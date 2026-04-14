@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import { COMMIT_SHA } from "./config";
 import { router } from "./router";
-import store from "./store";
+import store, { APP_VERSION_TTL_MS } from "./store";
 import { createRouterScroller } from "./vue-router-better-scroller";
 
 // Periodically check the API and notify the user if the version updated
@@ -13,9 +13,8 @@ setInterval(async () => {
 	}
 
 	try {
-		const resp = await fetch("/api/version");
-		const { version }: { version: string } = await resp.json();
-		if (version !== currentVersion) {
+		const version = await store.appVersion();
+		if(version !== currentVersion) {
 			store.toast = {
 				msg: "booruview updated, refresh the page",
 				type: "info",
@@ -23,7 +22,7 @@ setInterval(async () => {
 			currentVersion = version;
 		}
 	} catch (_e) {}
-}, 60 * 1000);
+}, APP_VERSION_TTL_MS);
 
 store.loadSettings();
 store.updateCDNHosts();

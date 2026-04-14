@@ -5,6 +5,11 @@ export type SerializedSearchQuery = {
 	exclude: Tag[];
 };
 
+export type SimpleSerializedSearchQuery = {
+	include: string[];
+	exclude: string[];
+}
+
 export class SearchQuery {
 	_include: Map<string, Tag>;
 	_exclude: Map<string, Tag>;
@@ -84,6 +89,26 @@ export class SearchQuery {
 		return true;
 	}
 
+	equalsSimple(o: SimpleSerializedSearchQuery): boolean {
+		if (this._include.size !== o.include.length || this._exclude.size !== o.exclude.length) {
+			return false;
+		}
+
+		for (const k of o.include) {
+			if (!this._include.has(k)) {
+				return false;
+			}
+		}
+
+		for (const k of o.exclude) {
+			if (!this._exclude.has(k)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	copy(): SearchQuery {
 		const clone = new SearchQuery();
 		clone._include = new Map(this._include);
@@ -96,6 +121,13 @@ export class SearchQuery {
 			include: this.includedList(),
 			exclude: this.excludedList(),
 		};
+	}
+
+	toJSONSimple(): SimpleSerializedSearchQuery {
+		return {
+			include: this.includedList().map(t => t.name),
+			exclude: this.excludedList().map(t => t.name),
+		}
 	}
 }
 

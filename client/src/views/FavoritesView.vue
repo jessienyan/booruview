@@ -17,7 +17,7 @@ const currentPage = computed(() =>
 const maxPage = computed(() =>
     Math.ceil(favPosts.value.length / POSTS_PER_PAGE),
 );
-const currentPosts = computed(() =>
+const favsForPage = computed(() =>
     favPosts.value.slice(
         (currentPage.value - 1) * POSTS_PER_PAGE,
         currentPage.value * POSTS_PER_PAGE,
@@ -33,7 +33,7 @@ onMounted(() => mainContainer.value.focus());
     </NoResults>
     <template v-else>
         <PostContainer
-            :posts="currentPosts"
+            :posts="favsForPage"
             :scroll-container="mainContainer"
             :keyed="false"
         />

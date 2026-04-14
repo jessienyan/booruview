@@ -405,6 +405,14 @@ function importData() {
         <h2>import/export</h2>
 
         <p>
+            <span class="bi bi-info-circle"></span>
+            <strong
+                >If you want to sync your devices automatically, check the
+                account tab.</strong
+            >
+        </p>
+
+        <p>
             Copy your data to another device (settings/blacklist/favorites).
             Your blacklist and favorites will be merged together.
         </p>

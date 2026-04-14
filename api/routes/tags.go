@@ -20,7 +20,7 @@ const (
 )
 
 type TagsResponse struct {
-	Results []api.TagResponse `json:"results"`
+	Results api.TagList `json:"results"`
 }
 
 type TagsHandler struct {
@@ -33,6 +33,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := req.ParseForm(); err != nil {
+		err = errors.Wrap(err, "failed to parse form")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -48,7 +49,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// write empty response
 	if len(query) == 0 {
-		resp := TagsResponse{Results: []api.TagResponse{}}
+		resp := TagsResponse{Results: api.TagList{}}
 		respondJson(w, http.StatusOK, resp)
 		return
 	}
@@ -60,6 +61,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	cached, cachedMap, err := GetCachedTags(query)
 	if err != nil {
+		err = errors.Wrap(err, "failed to get cached tags")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -71,7 +73,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	var tags []api.TagResponse
+	var tags api.TagList
 	if len(missing) > 0 {
 		tags, err = h.Client.ListTags(strings.Join(missing, " "))
 		if err != nil {
@@ -80,6 +82,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				return
 			}
 
+			err = errors.Wrap(err, "failed to read request body")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -93,7 +96,7 @@ func (h TagsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func WriteCachedTags(tags []api.TagResponse) {
+func WriteCachedTags(tags api.TagList) {
 	vk := api.Valkey()
 	cmds := make(valkey.Commands, 0, len(tags))
 
@@ -111,7 +114,7 @@ func WriteCachedTags(tags []api.TagResponse) {
 	vk.DoMulti(context.Background(), cmds...)
 }
 
-func GetCachedTags(query []string) ([]api.TagResponse, map[string]api.TagResponse, error) {
+func GetCachedTags(query []string) (api.TagList, map[string]api.TagResponse, error) {
 	keys := make([]string, len(query))
 	for i, query := range query {
 		keys[i] = gelbooru.TagCacheKey(query)
@@ -138,7 +141,7 @@ func GetCachedTags(query []string) ([]api.TagResponse, map[string]api.TagRespons
 		return nil, nil, err
 	}
 
-	resp := make([]api.TagResponse, 0, len(entries))
+	resp := make(api.TagList, 0, len(entries))
 	respMap := make(map[string]api.TagResponse, len(entries))
 	for i, entry := range entries {
 		if entry == "" {

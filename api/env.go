@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	DevMode      = os.Getenv("DEV") == "1"
 	AppVersion   = "unset" // embedded using flags at build time, check Dockerfile
 	ValkeyAddr   = os.Getenv("VALKEY_ADDR")
 	SecretKey    = []byte(os.Getenv("SECRET_KEY"))

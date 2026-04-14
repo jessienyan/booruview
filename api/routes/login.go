@@ -11,6 +11,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -37,6 +38,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
+		err = errors.Wrap(err, "failed to read request body")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -65,6 +67,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		if err == sql.ErrNoRows {
 			doesntExist = true
 		} else {
+			err = errors.Wrap(err, "failed to get user")
 			respondWithInternalError(w, err)
 			return
 		}
@@ -83,17 +86,27 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		ID:        u.ID,
 	})
 	if err != nil {
-		err = fmt.Errorf("failed to update user login time: %w", err)
+		err = errors.Wrap(err, "failed to update user")
 		respondWithInternalError(w, err)
 		return
 	}
 
 	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
 	if err != nil {
+		err = errors.Wrap(err, "failed to create auth token")
 		respondWithInternalError(w, err)
 		return
 	}
 
+	w.Header().Add(
+		"Set-Cookie",
+		fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
+			api.AuthCookieName,
+			token,
+			int(api.AuthTokenTTL.Seconds()),
+		),
+	)
 	log.Info().Str("user", u.String()).Msg("user logged in")
 	respondJson(w, 200, LoginResponse{AuthToken: token, Username: u.Username})
 }
