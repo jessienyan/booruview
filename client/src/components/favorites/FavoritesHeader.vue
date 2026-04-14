@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { ref, Teleport } from "vue";
+import store from "@/store";
 import ImportGelbooruFavs from "./ImportGelbooruFavs.vue";
 
 const showFavsModal = ref(false);
-const showHeader = ref(true);
+
+function onToggle() {
+    store.settings.favHeaderOpen = !store.settings.favHeaderOpen;
+    store.saveSettings();
+}
 </script>
 
 <template>
-    <div class="header-container" v-if="showHeader">
+    <div class="header-container" v-if="store.settings.favHeaderOpen">
         <button class="btn-primary btn-rounded" @click="showFavsModal = true">
             import gelbooru favs
         </button>
     </div>
     <button
         class="header-toggle-btn"
-        :class="{ closed: !showHeader }"
-        @click="showHeader = !showHeader"
+        :class="{ closed: !store.settings.favHeaderOpen }"
+        @click="onToggle"
     >
-        <i v-if="showHeader" class="bi bi-chevron-up"></i>
+        <i v-if="store.settings.favHeaderOpen" class="bi bi-chevron-up"></i>
         <i v-else class="bi bi-chevron-down"></i>
     </button>
 
@@ -53,7 +58,7 @@ const showHeader = ref(true);
     width: fit-content;
 
     &.closed {
-        opacity: 0.4;
+        opacity: 0.6;
     }
 }
 </style>

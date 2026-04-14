@@ -157,6 +157,7 @@ type Store = {
         columnSizing: ColumnSizing;
         columnWidth: number;
         consented: boolean;
+        favHeaderOpen: boolean;
         favoriteTags: Tag[];
         favorites: Post[];
         fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
@@ -426,6 +427,7 @@ const store = reactive<Store>({
         columnSizing: "dynamic",
         columnWidth: 400,
         consented: false,
+        favHeaderOpen: true,
         favoriteTags: [],
         favorites: [],
         fullscreenViewMenuAnchor: "bottomcenter",
