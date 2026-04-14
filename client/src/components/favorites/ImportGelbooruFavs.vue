@@ -39,7 +39,7 @@ async function doImport() {
         totalResults = resp.total_count;
         importPageMax.value = Math.ceil(totalResults / resp.count_per_page);
 
-        if (!resp.results.length) {
+        if (!resp.results.length || !importing.value) {
             break;
         }
 
@@ -55,6 +55,7 @@ async function doImport() {
         importPage.value++;
     }
 
+    const stopped = !importing.value;
     const added = store.favoritePosts().value.length - prevFavCount;
     let msg = "";
 
@@ -65,14 +66,19 @@ async function doImport() {
     } else if (added === 1) {
         msg = "Done! Imported 1 favorite";
     } else {
-        msg = `Done! Imported ${added} favorites`;
+        msg = `Imported ${added} favorites`;
+
+        if (stopped) {
+            msg = `Canceled import. ${msg}`;
+        } else {
+            msg = `Done! ${msg}`;
+        }
     }
 
     store.toast = {
         msg,
         type: "info",
     };
-    // bonus: show progress modal
 }
 
 async function onSubmit() {
