@@ -21,7 +21,7 @@ const btnText = computed(() => {
 function onInput(e: Event) {
     const $el = e.target as HTMLInputElement;
     const value = $el.value;
-    input.value = value.replace(/[^\d]+/, "");
+    input.value = value.replace(/[^\d]/g, "");
     // Update the DOM in case input.value didn't change
     $el.value = input.value;
 }
