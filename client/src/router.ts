@@ -52,4 +52,19 @@ router.beforeEach(async to => {
 			store.justClickedSearchButton = false;
 		}
 	}
+
+	if (to.name === "favorites") {
+		const postsPerPage = 100;
+		const favPosts = store.favoritePosts();
+		const maxPage = Math.ceil(favPosts.value.length / postsPerPage);
+		const page = parseInt(to.params.page as string || "1", 10);
+		const clampedPage = Math.max(1, Math.min(page, maxPage));
+
+		if (page !== clampedPage) {
+			return {
+				name: "favorites",
+				params: { page: clampedPage === 1 ? undefined : clampedPage.toString() },
+			};
+		}
+	}
 });

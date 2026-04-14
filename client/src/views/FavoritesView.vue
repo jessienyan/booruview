@@ -15,6 +15,7 @@ const mainContainer = useMainContainer();
 const currentPage = computed(() =>
     parseInt((route.params.page as string) || "1", 10),
 );
+const maxPage = computed(() => Math.ceil(favPosts.value.length / postsPerPage));
 const currentPosts = computed(() =>
     favPosts.value.slice(
         (currentPage.value - 1) * postsPerPage,
@@ -37,7 +38,7 @@ onMounted(() => mainContainer.value.focus());
         />
         <Footer
             :current-page="currentPage"
-            :max-page="Math.ceil(favPosts.length / postsPerPage)"
+            :max-page="maxPage"
             :total-count="favPosts.length"
             :prev-to="{
                 name: 'favorites',
@@ -51,6 +52,8 @@ onMounted(() => mainContainer.value.focus());
                     page: (currentPage + 1).toString(),
                 },
             }"
+            :prev-disabled="currentPage === 1"
+            :next-disabled="currentPage >= maxPage"
         />
     </template>
 </template>

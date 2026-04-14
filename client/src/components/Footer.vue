@@ -9,6 +9,7 @@ const {
     nextTo,
     prevDisabled,
     nextDisabled,
+    spinner,
 } = defineProps<{
     currentPage: number;
     maxPage: number;
@@ -17,6 +18,7 @@ const {
     nextTo: RouteLocationRaw;
     prevDisabled?: boolean;
     nextDisabled?: boolean;
+    spinner?: "prev" | "next" | "none";
 }>();
 
 const fmt = new Intl.NumberFormat();
@@ -31,7 +33,12 @@ const fmt = new Intl.NumberFormat();
                     :disabled="prevDisabled"
                     v-if="currentPage > 1"
                 >
-                    <i class="bi bi-arrow-left"></i> prev
+                    <div v-if="spinner === 'prev'" class="spinner">
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        <i class="bi bi-arrow-left"></i> prev
+                    </template>
                 </button>
             </RouterLink>
             <RouterLink v-if="currentPage < maxPage" :to="nextTo">
@@ -39,7 +46,12 @@ const fmt = new Intl.NumberFormat();
                     class="btn-primary btn-rounded"
                     :disabled="nextDisabled"
                 >
-                    next <i class="bi bi-arrow-right"></i>
+                    <div v-if="spinner === 'next'" class="spinner">
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        next <i class="bi bi-arrow-right"></i>
+                    </template>
                 </button>
             </RouterLink>
         </div>
