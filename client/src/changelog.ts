@@ -7,7 +7,9 @@ export const changeLog: ChangeLogEntry[] = [
 	{
 		date: "2026-04-13",
 		changes: [
-			"added gelbooru favorite importing"
+			"added gelbooru favorite importing",
+			"added pagination to favorites page",
+			"removed favorited posts from patch response which significantly reduces bandwidth",
 		]
 	},
 	{
