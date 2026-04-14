@@ -1,64 +1,63 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { RouterLink } from "vue-router";
-import store from "@/store";
+import { type RouteLocationRaw, RouterLink } from "vue-router";
+
+const {
+    currentPage,
+    maxPage,
+    totalCount,
+    prevTo,
+    nextTo,
+    prevDisabled,
+    nextDisabled,
+    spinner,
+} = defineProps<{
+    currentPage: number;
+    maxPage: number;
+    totalCount: number;
+    prevTo: RouteLocationRaw;
+    nextTo: RouteLocationRaw;
+    prevDisabled?: boolean;
+    nextDisabled?: boolean;
+    spinner?: "prev" | "next" | "none";
+}>();
 
 const fmt = new Intl.NumberFormat();
-const currentPageText = computed(() => fmt.format(store.currentPage));
-const maxPageText = computed(() => fmt.format(store.maxPage()));
-const totalPostCountText = computed(() => fmt.format(store.totalPostCount));
 </script>
 
 <template>
     <footer class="page-nav">
-        <p
-            v-if="store.maxPage() > 200 && store.currentPage >= 200"
-            class="end-notice"
-        >
-            Unfortunately, results past page 200 aren't viewable<br />because
-            they are blocked by Gelbooru. :(
-        </p>
-
         <div class="nav-btns">
-            <RouterLink
-                v-if="store.currentPage > 1"
-                :to="{
-                    name: 'search',
-                    params: {
-                        page: store.currentPage - 1,
-                        query: $route.params.query,
-                    },
-                }"
-            >
+            <RouterLink v-if="currentPage > 1" :to="prevTo">
                 <button
                     class="btn-primary btn-rounded"
-                    :disabled="store.fetchingPosts"
-                    v-if="store.currentPage > 1"
+                    :disabled="prevDisabled"
+                    v-if="currentPage > 1"
                 >
-                    <i class="bi bi-arrow-left"></i> prev
+                    <div v-if="spinner === 'prev'" class="spinner">
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        <i class="bi bi-arrow-left"></i> prev
+                    </template>
                 </button>
             </RouterLink>
-            <RouterLink
-                v-if="store.currentPage < store.maxPage()"
-                :to="{
-                    name: 'search',
-                    params: {
-                        page: store.currentPage + 1,
-                        query: $route.params.query,
-                    },
-                }"
-            >
+            <RouterLink v-if="currentPage < maxPage" :to="nextTo">
                 <button
                     class="btn-primary btn-rounded"
-                    :disabled="store.fetchingPosts || store.currentPage >= 200"
+                    :disabled="nextDisabled"
                 >
-                    next <i class="bi bi-arrow-right"></i>
+                    <div v-if="spinner === 'next'" class="spinner">
+                        <span class="spinner-inner"></span>
+                    </div>
+                    <template v-else>
+                        next <i class="bi bi-arrow-right"></i>
+                    </template>
                 </button>
             </RouterLink>
         </div>
         <p>
-            page {{ currentPageText }} of {{ maxPageText }} ({{
-                totalPostCountText
+            page {{ currentPage }} of {{ maxPage }} ({{
+                fmt.format(totalCount)
             }}
             results)
         </p>

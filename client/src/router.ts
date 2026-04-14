@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { POSTS_PER_PAGE } from "./config";
 import { tagsToSearchQuery } from "./search";
 import store from "./store";
 import FavoritesView from "./views/FavoritesView.vue";
@@ -12,31 +13,17 @@ export const router = createRouter({
 			path: "/",
 			name: "landing",
 			component: LandingView,
-			beforeEnter(to) {
-				if (!to.hash) {
-					return;
-				}
-
-				const queryParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-
-				// Redirect old URL scheme: /#page=N&q=tag,tag
-				if (queryParams.has("page") && queryParams.has("q")) {
-					return {
-						name: "search",
-						params: {
-							page: queryParams.get("page"),
-							query: queryParams.get("q"),
-						},
-					};
-				}
-			},
 		},
 		{
 			path: "/search/:page(\\d+)/:query?",
 			name: "search",
 			component: SearchResultsView,
 		},
-		{ path: "/favs", name: "favorites", component: FavoritesView },
+		{
+			path: "/favs/:page(\\d+)?",
+			name: "favorites",
+			component: FavoritesView,
+		},
 	],
 });
 
@@ -71,6 +58,29 @@ router.beforeEach(async (to, from) => {
 			store.lastSearchRoute = to;
 		} finally {
 			store.justClickedSearchButton = false;
+		}
+	}
+
+	if (to.name === "favorites") {
+		const favPosts = store.favoritePosts();
+		const maxPage = Math.ceil(favPosts.value.length / POSTS_PER_PAGE);
+
+		if (maxPage === 0) {
+			if (to.params.page) {
+				return { name: "favorites" };
+			}
+			return;
+		}
+
+		let page = parseInt(to.params.page as string || "1", 10);
+		page = Math.max(1, Math.min(page, maxPage));
+		store.lastFavPage = page;
+
+		if (page.toString() !== to.params.page) {
+			return {
+				name: "favorites",
+				params: { page },
+			};
 		}
 	}
 });

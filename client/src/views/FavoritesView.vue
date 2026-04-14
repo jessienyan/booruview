@@ -1,27 +1,85 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Footer from "@/components/Footer.vue";
 import FavoritesHeader from "@/components/favorites/FavoritesHeader.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
-import { useMainContainer } from "@/composable";
+import { useKeydownListener, useMainContainer } from "@/composable";
+import { POSTS_PER_PAGE } from "@/config";
+import PageSwipeArrow from "@/PageSwipeArrow.vue";
 import store from "@/store";
 
+const router = useRouter();
+const route = useRoute();
 const favPosts = store.favoritePosts();
 const mainContainer = useMainContainer();
+const currentPage = computed(() =>
+    parseInt((route.params.page as string) || "1", 10),
+);
+const maxPage = computed(() =>
+    Math.ceil(favPosts.value.length / POSTS_PER_PAGE),
+);
+const favsForPage = computed(() =>
+    favPosts.value.slice(
+        (currentPage.value - 1) * POSTS_PER_PAGE,
+        currentPage.value * POSTS_PER_PAGE,
+    ),
+);
+
+const navigateToPage = (page: number) => {
+    const clampedPage = Math.max(1, Math.min(page, maxPage.value));
+    router.push({
+        name: "favorites",
+        params: { page: clampedPage.toString() },
+    });
+};
+
 onMounted(() => mainContainer.value.focus());
+
+useKeydownListener("ArrowLeft", mainContainer, () =>
+    navigateToPage(currentPage.value - 1),
+);
+useKeydownListener("ArrowRight", mainContainer, () =>
+    navigateToPage(currentPage.value + 1),
+);
 </script>
 
 <template>
     <FavoritesHeader />
+    <div class="spacer"></div>
     <NoResults v-if="favPosts.length === 0">
         you don't have any favorites yet
     </NoResults>
     <template v-else>
-        <div class="spacer"></div>
-        <PostContainer
-            :posts="favPosts"
+        <PageSwipeArrow
             :scroll-container="mainContainer"
-            :keyed="true"
+            :current-page="currentPage"
+            :max-page="maxPage"
+            @prev="navigateToPage(currentPage - 1)"
+            @next="navigateToPage(currentPage + 1)"
+        />
+        <PostContainer
+            :posts="favsForPage"
+            :scroll-container="mainContainer"
+            :keyed="false"
+        />
+        <Footer
+            :current-page="currentPage"
+            :max-page="maxPage"
+            :total-count="favPosts.length"
+            :prev-to="{
+                name: 'favorites',
+                params: {
+                    page: (currentPage - 1).toString(),
+                },
+            }"
+            :next-to="{
+                name: 'favorites',
+                params: {
+                    page: (currentPage + 1).toString(),
+                },
+            }"
         />
     </template>
 </template>

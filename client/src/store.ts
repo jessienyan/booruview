@@ -176,8 +176,8 @@ type Store = {
 
     query: SearchQuery;
     lastQuery: SearchQuery;
-
     lastSearchRoute: RouteLocation | null;
+    lastFavPage: number;
 
     /** mapping of page number to posts */
     posts: Map<number, Post[]>;
@@ -538,6 +538,7 @@ const store = reactive<Store>({
     query: new SearchQuery(),
     lastQuery: new SearchQuery(),
     lastSearchRoute: null,
+    lastFavPage: 1,
     posts: new Map<number, Post[]>(),
     cachedTags: new Map<string, Tag>(),
     cachedTagSearch: new Map<string, Tag[]>(),

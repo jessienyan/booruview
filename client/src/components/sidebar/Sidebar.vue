@@ -41,7 +41,9 @@ import SidebarMain from "./main/SidebarMain.vue";
                     </svg>
                 </button>
             </RouterLink>
-            <RouterLink :to="{ name: 'favorites' }">
+            <RouterLink
+                :to="{ name: 'favorites', params: { page: store.lastFavPage } }"
+            >
                 <button
                     class="btn-sidebar btn-nav"
                     title="view favorites"
@@ -111,9 +113,13 @@ $sidebar-btn-width: 60px;
 .buttons {
     display: flex;
     flex-direction: row;
-    width: 100%;
     font-size: 0;
-    padding-right: 10px;
+    align-items: center;
+
+    .sidebar-open & {
+        width: 100%;
+        padding-right: 10px;
+    }
 
     .router-link-active {
         .btn-sidebar {

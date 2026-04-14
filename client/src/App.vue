@@ -75,8 +75,6 @@ const hasConsented = computed(() => {
                     'hide-overflow':
                         store.fetchingPosts || store.userIsSwipingToChangePage,
                 }"
-                @keydown.left="$route.name === 'search' && store.prevPage()"
-                @keydown.right="$route.name === 'search' && store.nextPage()"
             >
                 <RouterView />
             </main>
