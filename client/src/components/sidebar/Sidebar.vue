@@ -41,7 +41,9 @@ import SidebarMain from "./main/SidebarMain.vue";
                     </svg>
                 </button>
             </RouterLink>
-            <RouterLink :to="{ name: 'favorites' }">
+            <RouterLink
+                :to="{ name: 'favorites', params: { page: store.lastFavPage } }"
+            >
                 <button
                     class="btn-sidebar btn-nav"
                     title="view favorites"

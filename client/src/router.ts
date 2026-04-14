@@ -74,6 +74,7 @@ router.beforeEach(async (to, from) => {
 
 		let page = parseInt(to.params.page as string || "1", 10);
 		page = Math.max(1, Math.min(page, maxPage));
+		store.lastFavPage = page;
 
 		if (page.toString() !== to.params.page) {
 			return {
