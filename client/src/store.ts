@@ -279,6 +279,11 @@ const store = reactive<Store>({
             return;
         }
 
+        // PATCH does not return favorited posts to reduce bandwidth
+        if(data.favorite_posts) {
+            this.account.data.favorite_posts = data.favorite_posts.concat(this.account.data.favorite_posts);
+        }
+
         const { authToken } = this.account;
         const payload = { add: data };
 
@@ -304,6 +309,12 @@ const store = reactive<Store>({
     async removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void> {
         if(!this.account?.data) {
             return;
+        }
+
+        // PATCH does not return favorited posts to reduce bandwidth
+        if(data.favorite_post_ids) {
+            const ids = new Set(data.favorite_post_ids);
+            this.account.data.favorite_posts = this.account.data.favorite_posts.filter(p => !ids.has(p.id));
         }
 
         const { authToken } = this.account;

@@ -160,7 +160,6 @@ type AccountDataPatchParams struct {
 }
 
 type AccountDataPatchResponse struct {
-	FavoritePosts api.PostList             `json:"favorite_posts"`
 	FavoriteTags  api.TagList              `json:"favorite_tags"`
 	Blacklist     api.TagList              `json:"blacklist"`
 	SearchHistory models.SearchHistoryList `json:"search_history"`
@@ -174,9 +173,6 @@ type AccountDataPatchResponse struct {
 func (resp AccountDataPatchResponse) MarshalJSON() ([]byte, error) {
 	respMap := make(map[string]any)
 
-	if resp.FavoritePosts != nil {
-		respMap["favorite_posts"] = resp.FavoritePosts
-	}
 	if resp.FavoriteTags != nil {
 		respMap["favorite_tags"] = resp.FavoriteTags
 	}
@@ -249,7 +245,6 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	if len(form.Add.FavoritePosts) > 0 {
 		data.FavoritePosts.Add(form.Add.FavoritePosts)
-		response.FavoritePosts = data.FavoritePosts
 	}
 	if len(form.Add.FavoriteTags) > 0 {
 		data.FavoriteTags.Add(form.Add.FavoriteTags)
@@ -271,7 +266,6 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	if len(form.Remove.FavoritePostIDs) > 0 {
 		data.FavoritePosts.Remove(form.Remove.FavoritePostIDs)
-		response.FavoritePosts = data.FavoritePosts
 	}
 	if len(form.Remove.FavoriteTagNames) > 0 {
 		data.FavoriteTags.Remove(form.Remove.FavoriteTagNames)
@@ -296,7 +290,7 @@ func AccountDataPatchHandler(w http.ResponseWriter, req *http.Request) {
 		response.SavedSearches = data.SavedSearches
 	}
 
-	if response.FavoritePosts != nil || response.FavoriteTags != nil || response.Blacklist != nil || response.SearchHistory != nil || response.SavedSearches != nil {
+	if data.FavoritePosts != nil || data.FavoriteTags != nil || data.Blacklist != nil || data.SearchHistory != nil || data.SavedSearches != nil {
 		if err := user.Data.Set(data); err != nil {
 			respondWithInternalError(w, err)
 			return
