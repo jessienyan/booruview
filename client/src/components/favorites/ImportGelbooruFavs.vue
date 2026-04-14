@@ -123,6 +123,10 @@ onUnmounted(() => {
             </ol>
             <pre>https://gelbooru.com/...&amp;id=<strong>123456789</strong></pre>
             <form @submit.prevent="onSubmit">
+                <p>
+                    Importing might take a few minutes if you have a lot of
+                    favorites. Keep this screen open until the import is done.
+                </p>
                 <input
                     type="text"
                     class="text-input rounded input-block"
