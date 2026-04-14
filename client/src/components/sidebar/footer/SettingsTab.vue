@@ -405,10 +405,9 @@ function importData() {
         <h2>import/export</h2>
 
         <p>
-            <span class="bi bi-info-circle"></span>
-            <strong
-                >If you want to sync your devices automatically, check the
-                account tab.</strong
+            <strong>
+                <span class="bi bi-info-circle"></span> If you want to sync your
+                devices automatically, check the account tab.</strong
             >
         </p>
 

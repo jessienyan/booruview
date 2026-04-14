@@ -54,7 +54,7 @@ router.beforeEach(async (to, from) => {
 				store.query = query;
 			}
 
-			await store.searchPosts({ query, page, force: store.justClickedSearchButton });
+			await store.searchAndUpdateResults({ query, page, force: store.justClickedSearchButton });
 			store.lastSearchRoute = to;
 		} finally {
 			store.justClickedSearchButton = false;

@@ -40,6 +40,12 @@ export type RemoveAccountDataPayload = {
     saved_queries: SimpleSerializedSearchQuery[];
 };
 
+export type PostListResponse = {
+    count_per_page: number;
+    total_count: number;
+    results: Post[];
+};
+
 type AccountDataResponse = {
     favorite_posts: Post[];
     favorite_tags: Tag[];
@@ -151,6 +157,7 @@ type Store = {
         columnSizing: ColumnSizing;
         columnWidth: number;
         consented: boolean;
+        favHeaderOpen: boolean;
         favoriteTags: Tag[];
         favorites: Post[];
         fullscreenViewMenuAnchor: FullscreenViewMenuAnchorPoint;
@@ -187,7 +194,8 @@ type Store = {
     nextPage(): Promise<void>;
     postsForCurrentPage(): Post[] | undefined;
     prevPage(): Promise<void>;
-    searchPosts(opts: { query: SearchQuery, page?: number; force?: boolean }): Promise<void>;
+    searchPosts(tags: SimpleSerializedSearchQuery, page: number): Promise<PostListResponse>;
+    searchAndUpdateResults(opts: { query: SearchQuery, page?: number; force?: boolean }): Promise<void>;
     addQueryToHistory(): void;
     clearPosts(): void;
     getTag(name: string): Tag | undefined;
@@ -419,6 +427,7 @@ const store = reactive<Store>({
         columnSizing: "dynamic",
         columnWidth: 400,
         consented: false,
+        favHeaderOpen: true,
         favoriteTags: [],
         favorites: [],
         fullscreenViewMenuAnchor: "bottomcenter",
@@ -545,94 +554,88 @@ const store = reactive<Store>({
         return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
     },
 
-    async searchPosts({ query, page, force }: { query: SearchQuery, page?: number; force?: boolean; }): Promise<void> {
-        type PostListResponse = {
-            count_per_page: number;
-            total_count: number;
-            results: Post[];
-        };
+    async searchPosts(tags: SimpleSerializedSearchQuery, page: number): Promise<PostListResponse> {
+        const queryParams = new URLSearchParams();
 
+        queryParams.append("page", page.toString());
+        tags.include.forEach(t => {queryParams.append("q", t)});
+        tags.exclude.forEach(t => {queryParams.append("q", `-${t}`)});
+
+        const resp = await fetch(`/api/posts?${queryParams.toString()}`);
+        let val: any;
+
+        try {
+            val = await resp.json();
+        } catch(e) {
+            console.error("Failed to parse API response", e);
+            throw e;
+        }
+
+        if (resp.status >= 400) {
+            if ("error" in val) {
+                throw val.error;
+            }
+            throw "Something went wrong";
+        }
+
+        return val;
+    },
+
+    async searchAndUpdateResults({ query, page, force }: { query: SearchQuery, page?: number; force?: boolean; }): Promise<void> {
         this.fetchingPosts = true;
-            page = page ?? this.currentPage;
-            const sameQuery = query.equals(this.lastQuery);
+        page = page ?? this.currentPage;
+        const sameQuery = query.equals(this.lastQuery);
 
-            // Don't refetch posts we already have
-            if (!force && sameQuery && this.posts.has(page)) {
+        // Don't refetch posts we already have
+        if (!force && sameQuery && this.posts.has(page)) {
+            this.fetchingPosts = false;
+            this.currentPage = page;
+            return;
+        }
+
+        const queryTags = query.toJSONSimple();
+        queryTags.exclude = queryTags.exclude.concat(this.blacklist().value.map(t => t.name));
+
+        const doSearch = async () => {
+            let posts: PostListResponse;
+
+            try {
+                posts = await this.searchPosts(queryTags, page);
+            } catch(e) {
+                this.toast = {
+                    msg: typeof e === "string" ? e : "Something went wrong",
+                    type: "error",
+                };
                 this.fetchingPosts = false;
-                this.currentPage = page;
                 return;
             }
 
-            const searchTags = query.asList().concat(this.blacklist().value.map(t => `-${t.name}`));
+            this.hasSearched = true;
+            this.fetchingPosts = false;
 
-            const queryParams = new URLSearchParams();
-            queryParams.append("page", page.toString());
-
-            for (const t of searchTags) {
-                queryParams.append("q", t);
+            if (!sameQuery) {
+                this.posts.clear();
             }
 
-            const doSearch = async () => {
-                try {
-                    const resp = await fetch(`/api/posts?${queryParams.toString()}`);
-                    if (resp.status >= 400) {
-                        try {
-                            const val = await resp.json();
-                            let msg = "Something went wrong";
+            this.posts.set(page, posts.results);
+            this.resultsPerPage = posts.count_per_page;
+            this.totalPostCount = posts.total_count;
+            this.currentPage = page;
 
-                            if ("error" in val) {
-                                msg = val.error;
-                            }
-
-                            this.toast = {
-                                msg,
-                                type: "error",
-                            };
-                        } catch {
-                            this.toast = {
-                                msg: "Something went wrong",
-                                type: "error",
-                            };
-                        }
-                        this.hasSearched = true;
-                        throw new Error("search failed");
-                    }
-
-                    const json = await resp.json() as PostListResponse;
-                    if (!sameQuery) {
-                        this.posts.clear();
-                    }
-
-                    this.posts.set(page!, json.results);
-                    this.resultsPerPage = json.count_per_page;
-                    this.totalPostCount = json.total_count;
-                    this.currentPage = page!;
-
-                    if (this.settings.closeSidebarOnSearch) {
-                        this.sidebarClosed = true;
-                    }
-
-                    this.addQueryToHistory();
-                    this.lastQuery = this.query.copy();
-                } catch(err) {
-                    console.error(err);
-                    this.toast = {
-                        msg: "Something went wrong",
-                        type: "error",
-                    };
-                    throw err;
-                } finally {
-                    this.fetchingPosts = false;
-                    this.hasSearched = true;
-                }
+            if (this.settings.closeSidebarOnSearch) {
+                this.sidebarClosed = true;
             }
 
-            if(!this.fetchingAccountData) {
-                await doSearch();
-            } else {
-                // Wait to search until we're done fetching account data since we need the blacklist
-                watch(() => this.fetchingAccountData, doSearch, { once: true });
-            }
+            this.addQueryToHistory();
+            this.lastQuery = this.query.copy();
+        }
+
+        if(!this.fetchingAccountData) {
+            await doSearch();
+        } else {
+            // Wait to search until we're done fetching account data since we need the blacklist
+            watch(() => this.fetchingAccountData, doSearch, { once: true });
+        }
     },
 
     maxPage(): number {

@@ -2,6 +2,7 @@
 import { computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Footer from "@/components/Footer.vue";
+import FavoritesHeader from "@/components/favorites/FavoritesHeader.vue";
 import NoResults from "@/components/NoResults.vue";
 import PostContainer from "@/components/PostContainer.vue";
 import { useMainContainer } from "@/composable";
@@ -38,6 +39,8 @@ onMounted(() => mainContainer.value.focus());
 </script>
 
 <template>
+    <FavoritesHeader />
+    <div class="spacer"></div>
     <NoResults v-if="favPosts.length === 0">
         you don't have any favorites yet
     </NoResults>
@@ -73,3 +76,9 @@ onMounted(() => mainContainer.value.focus());
         />
     </template>
 </template>
+
+<style lang="css" scoped>
+.spacer {
+    height: 1rem;
+}
+</style>
