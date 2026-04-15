@@ -679,15 +679,18 @@ const store = reactive<Store>({
             return;
         }
 
-        const missing = tags.filter(t => !this.cachedTags.has(t));
+        // Filter out meta queries that don't have a tag
+        const searchFilters = /^(fav|height|id|pool|score|sort|source|updated|user|width):/;
+        tags = tags.filter(t => !searchFilters.test(t))
+        tags = tags.filter(t => !this.cachedTags.has(t));
 
-        if (missing.length === 0) {
+        if (tags.length === 0) {
             return;
         }
 
         const queryParams = new URLSearchParams();
 
-        for (const t of missing) {
+        for (const t of tags) {
             queryParams.append("t", t);
         }
 
