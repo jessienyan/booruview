@@ -4,6 +4,8 @@
 
 You can help support the project with a small [donation](#donate).
 
+Join our discord: https://discord.gg/AmQRy7peCg
+
 ## Tech stack
 - Frontend SPA built with Vue + Typescript. It's pretty minimal and lightweight
 - Simple backend API built with Go. Acts as a "smart" proxy for the Gelbooru API

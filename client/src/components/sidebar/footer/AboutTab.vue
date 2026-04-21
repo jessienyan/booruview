@@ -27,6 +27,11 @@ import ChangeLog from "./ChangeLog.vue";
             >
         </li>
         <li>
+            <a href="https://discord.gg/AmQRy7peCg" target="_blank"
+                ><i class="bi bi-discord"></i>Discord (feedback+art)</a
+            >
+        </li>
+        <li>
             <a :href="SURVEY_LINK" target="_blank"
                 ><i class="bi bi-send-fill"></i>Give anonymous feedback</a
             >
