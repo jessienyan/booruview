@@ -1,6 +1,6 @@
 import type { Component } from "vue";
 import { RouterLink } from "vue-router";
-import { SURVEY_LINK } from "./config";
+import { DISCORD_LINK, SURVEY_LINK } from "./config";
 
 type Update = {
     date: Date;
@@ -10,6 +10,32 @@ type Update = {
 
 // NOTE: add new updates to the top of the list so it's sorted by most recent
 const updates: Update[] = [
+    {
+        date: new Date("2026-04-21T19:08:00+00:00"),
+        title: "discord server",
+        component: (
+            <>
+                <p>
+                    Booruview now has a discord server:{" "}
+                    <a href={DISCORD_LINK} target="_blank">
+                        {DISCORD_LINK}
+                    </a>
+                </p>
+                <ul>
+                    <li>Share and discuss feedback (public or private)</li>
+                    <li>Share your favorite art/artists</li>
+                    <li>Tell other people that they have bad taste</li>
+                </ul>
+                <p>
+                    The{" "}
+                    <a href={SURVEY_LINK} target="_blank">
+                        anonymous survey
+                    </a>{" "}
+                    is still available if you prefer that.
+                </p>
+            </>
+        ),
+    },
     {
         date: new Date("2026-04-14T19:36:00+00:00"),
         title: "favorites update",

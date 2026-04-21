@@ -2,7 +2,12 @@
 import CodebergLogo from "@/assets/codeberg.svg";
 import { changeLog } from "@/changelog";
 import Collapsable from "@/components/Collapsable.vue";
-import { COMMIT_SHA, LAST_COMMIT_DATE, SURVEY_LINK } from "@/config";
+import {
+    COMMIT_SHA,
+    DISCORD_LINK,
+    LAST_COMMIT_DATE,
+    SURVEY_LINK,
+} from "@/config";
 import ChangeLog from "./ChangeLog.vue";
 </script>
 
@@ -27,7 +32,7 @@ import ChangeLog from "./ChangeLog.vue";
             >
         </li>
         <li>
-            <a href="https://discord.gg/AmQRy7peCg" target="_blank"
+            <a :href="DISCORD_LINK" target="_blank"
                 ><i class="bi bi-discord"></i>Discord (feedback+art)</a
             >
         </li>
