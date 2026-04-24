@@ -93,7 +93,7 @@ onUnmounted(() => {
 
     <!-- Using a key on the image prevents it from stretching when changing between posts -->
     <img
-        v-else
+        v-else-if="store.settings.enablePanZoom"
         ref="imgRef"
         referrerpolicy="same-origin"
         :src="imageURL"
@@ -101,11 +101,26 @@ onUnmounted(() => {
         :height="content.height"
         :key="`img-${post.id}`"
     />
+    <img
+        v-else
+        class="img-fit"
+        ref="imgRef"
+        referrerpolicy="same-origin"
+        :src="imageURL"
+    />
 </template>
 
 <style scoped>
 video {
     max-width: 100%;
     max-height: 100%;
+}
+
+.img-fit {
+    max-width: 100%;
+    max-height: 100%;
+    transform: translateY(-50%);
+    position: relative;
+    top: 50%;
 }
 </style>

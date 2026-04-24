@@ -101,6 +101,11 @@ function onChangeCheckForUpdates(e: Event) {
     store.saveSettings();
 }
 
+function onChangeEnablePanZoom(e: Event) {
+    store.settings.enablePanZoom = (e.target as HTMLInputElement).checked;
+    store.saveSettings();
+}
+
 const exportCode = ref("");
 const exportCodeRef = useTemplateRef("export-code");
 const canGenerate = ref(true);
@@ -386,6 +391,17 @@ function importData() {
                     @change="onChangeFullscreenViewMenuRotate"
                 />
                 vertical controls/menu</label
+            >
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.enablePanZoom"
+                    @change="onChangeEnablePanZoom"
+                />
+                allow pan and zoom in fullscreen view</label
             >
         </div>
 
