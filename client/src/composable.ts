@@ -256,10 +256,9 @@ export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
 
 		pz.value = createPanZoom(elVal, {
 			autocenter: true,
-			bounds: true,
-			boundsPadding: 0.1,
 			maxZoom: 4,
 			minZoom: 0.05,
+			smoothScroll: false,
 			onTouch() {
 				// Don't block the touch event so the user can right click
 				return false;

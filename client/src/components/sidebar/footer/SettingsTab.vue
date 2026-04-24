@@ -401,7 +401,7 @@ function importData() {
                     :checked="store.settings.enablePanZoom"
                     @change="onChangeEnablePanZoom"
                 />
-                allow pan and zoom in fullscreen view</label
+                enable pan + zoom</label
             >
         </div>
 
