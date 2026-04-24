@@ -1,16 +1,20 @@
+import createPanZoom, { type PanZoom } from "panzoom";
 import {
 	type ComputedRef,
 	computed,
 	inject,
 	type MaybeRefOrGetter,
+    onActivated,
+    onDeactivated,
 	onMounted,
 	onUnmounted,
+    type Ref,
 	readonly,
 	ref,
 	type ShallowRef,
 	toValue,
+    watch,
 } from "vue";
-
 import store from "./store";
 import type { RefOrGetter } from "./types";
 
@@ -226,4 +230,51 @@ export function useKeydownListener(key: string, el: MaybeRefOrGetter, fn: () => 
 	}
 	onMounted(() => document.body.addEventListener("keydown", handler));
 	onUnmounted(() => document.body.removeEventListener("keydown", handler));
+}
+
+export type UsePanZoomOptions = {
+	enable: boolean;
+	el: MaybeRefOrGetter<HTMLElement|null>;
+	key: Ref;
+}
+
+export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
+	const pz = ref<PanZoom|null>(null);
+
+	function teardown() {
+		pz.value?.dispose();
+		pz.value = null;
+	}
+
+	function setup() {
+		teardown();
+
+		const elVal = toValue(el);
+		if(!enable || !elVal) {
+			return;
+		}
+
+		pz.value = createPanZoom(elVal, {
+			autocenter: true,
+			bounds: true,
+			boundsPadding: 0.1,
+			maxZoom: 4,
+			minZoom: 0.05,
+			onTouch() {
+				// Don't block the touch event so the user can right click
+				return false;
+			},
+		});
+	}
+
+	watch(
+		() => [enable, el, key],
+		() => setup(),
+		{ deep: true, flush: "post" }
+	);
+
+	onMounted(() => setup());
+	onUnmounted(() => teardown());
+	onDeactivated(() => pz.value?.pause());
+	onActivated(() => pz.value?.resume());
 }

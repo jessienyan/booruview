@@ -157,6 +157,7 @@ type Store = {
         columnSizing: ColumnSizing;
         columnWidth: number;
         consented: boolean;
+        enablePanZoom: boolean;
         favHeaderOpen: boolean;
         favoriteTags: Tag[];
         favorites: Post[];
@@ -438,6 +439,7 @@ const store = reactive<Store>({
         columnSizing: "dynamic",
         columnWidth: 400,
         consented: false,
+        enablePanZoom: true,
         favHeaderOpen: true,
         favoriteTags: [],
         favorites: [],

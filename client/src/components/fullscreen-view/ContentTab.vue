@@ -13,11 +13,11 @@ import {
     useGelbooruImageURL,
     useGelbooruVideoURL,
     useIsVideo,
+    usePanZoom,
 } from "@/composable";
 import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");
-let pz: PanZoom | undefined;
 const { post } = defineProps<{ post: Post }>();
 const htmlRoot = document.body.parentElement as HTMLElement;
 const overscrollCssClass = "prevent-overscroll";
@@ -52,44 +52,21 @@ const content = computed(() => {
 const imageURL = useGelbooruImageURL(() => content.value.url);
 const videoURL = useGelbooruVideoURL(() => content.value.url);
 
-function setupPanZoom() {
-    pz?.dispose();
-
-    // Don't use panzoom for videos
-    if (isVideo.value) {
-        return;
-    }
-
-    pz = createPanZoom(imgRef.value!, {
-        autocenter: true,
-        bounds: true,
-        boundsPadding: 0.1,
-        maxZoom: 4,
-        minZoom: 0.05,
-        onTouch() {
-            // Don't block the touch event so the user can right click
-            return false;
-        },
-    });
-}
-
-watch(() => post.id, setupPanZoom, { flush: "post" });
+usePanZoom({
+    enable: store.settings.enablePanZoom && !isVideo.value,
+    el: imgRef,
+    key: computed(() => post.id),
+});
 
 onMounted(() => {
-    setupPanZoom();
-
     // Since the touch event isn't being blocked we need to prevent the user from
     // overscrolling the page (refresh by pulling down)
     htmlRoot.classList.add(overscrollCssClass);
 });
 
 onUnmounted(() => {
-    pz?.dispose();
     htmlRoot.classList.remove(overscrollCssClass);
 });
-
-onDeactivated(() => pz?.pause());
-onActivated(() => pz?.resume());
 </script>
 
 <template>
