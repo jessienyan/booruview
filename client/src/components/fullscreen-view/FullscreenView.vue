@@ -285,7 +285,12 @@ onUnmounted(() => {
                 @mouseup.self="tabHandler.mouseUp"
             >
                 <KeepAlive>
-                    <ContentTab v-if="currentTab == 'content'" :post="post" />
+                    <ContentTab
+                        v-if="currentTab == 'content'"
+                        :post="post"
+                        @prev="showPrevPost"
+                        @next="showNextPost"
+                    />
                     <InfoTab v-else-if="currentTab == 'info'" :post="post" />
                 </KeepAlive>
             </div>

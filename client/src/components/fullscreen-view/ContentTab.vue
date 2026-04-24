@@ -22,6 +22,7 @@ const { post } = defineProps<{ post: Post }>();
 const htmlRoot = document.body.parentElement as HTMLElement;
 const overscrollCssClass = "prevent-overscroll";
 const isVideo = useIsVideo(() => post);
+const emit = defineEmits(["prev", "next"]);
 
 const content = computed(() => {
     const hasHighRes = post.image_url.length > 0;
@@ -91,23 +92,25 @@ onUnmounted(() => {
         />
     </video>
 
-    <!-- Using a key on the image prevents it from stretching when changing between posts -->
-    <img
-        v-else-if="store.settings.enablePanZoom"
-        ref="imgRef"
-        referrerpolicy="same-origin"
-        :src="imageURL"
-        :width="content.width"
-        :height="content.height"
-        :key="`img-${post.id}`"
-    />
-    <img
-        v-else
-        class="img-fit"
-        ref="imgRef"
-        referrerpolicy="same-origin"
-        :src="imageURL"
-    />
+    <template v-else>
+        <div class="hidden-prev-btn" @click="$emit('prev')"></div>
+        <div class="hidden-next-btn" @click="$emit('next')"></div>
+        <img
+            v-if="store.settings.enablePanZoom"
+            ref="imgRef"
+            referrerpolicy="same-origin"
+            :src="imageURL"
+            :width="content.width"
+            :height="content.height"
+        />
+        <img
+            v-else
+            class="img-fit"
+            ref="imgRef"
+            referrerpolicy="same-origin"
+            :src="imageURL"
+        />
+    </template>
 </template>
 
 <style scoped>
@@ -122,5 +125,29 @@ video {
     transform: translateY(-50%);
     position: relative;
     top: 50%;
+}
+
+.hidden-prev-btn {
+    z-index: 1;
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+    left: 0;
+
+    /* prev button takes up 33% of the screen */
+    right: 67%;
+}
+
+.hidden-next-btn {
+    z-index: 1;
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+
+    /* next button takes up 67% of the screen. this allows users to click either
+       the right side of the viewport or the center
+    */
+    left: 33%;
+    right: 0;
 }
 </style>
