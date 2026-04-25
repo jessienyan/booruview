@@ -8,7 +8,6 @@ import {
     onDeactivated,
 	onMounted,
 	onUnmounted,
-    type Ref,
 	readonly,
 	ref,
 	type ShallowRef,
@@ -233,9 +232,9 @@ export function useKeydownListener(key: string, el: MaybeRefOrGetter, fn: () => 
 }
 
 export type UsePanZoomOptions = {
-	enable: boolean;
+	enable: MaybeRefOrGetter<boolean>;
 	el: MaybeRefOrGetter<HTMLElement|null>;
-	key: Ref;
+	key: MaybeRefOrGetter;
 }
 
 export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
@@ -250,7 +249,7 @@ export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
 		teardown();
 
 		const elVal = toValue(el);
-		if(!enable || !elVal) {
+		if(!toValue(enable) || !elVal) {
 			return;
 		}
 
@@ -266,11 +265,7 @@ export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
 		});
 	}
 
-	watch(
-		() => [enable, el, key],
-		() => setup(),
-		{ deep: true, flush: "post" }
-	);
+	watch([enable, el, key], setup);
 
 	onMounted(() => setup());
 	onUnmounted(() => teardown());

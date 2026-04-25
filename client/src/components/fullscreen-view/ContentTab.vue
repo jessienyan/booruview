@@ -46,9 +46,9 @@ const imageURL = useGelbooruImageURL(() => content.value.url);
 const videoURL = useGelbooruVideoURL(() => content.value.url);
 
 usePanZoom({
-    enable: store.settings.enablePanZoom && !isVideo.value,
+    enable: () => store.settings.enablePanZoom && !isVideo.value,
     el: imgRef,
-    key: computed(() => post.id),
+    key: () => post.id,
 });
 
 const goPrev = useStationaryClick(() => emit("prev"));
