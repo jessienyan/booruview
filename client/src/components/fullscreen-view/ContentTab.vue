@@ -14,6 +14,7 @@ import {
     useGelbooruVideoURL,
     useIsVideo,
     usePanZoom,
+    useStationaryClick,
 } from "@/composable";
 import store from "@/store";
 
@@ -59,6 +60,9 @@ usePanZoom({
     key: computed(() => post.id),
 });
 
+const goPrev = useStationaryClick(() => emit("prev"));
+const goNext = useStationaryClick(() => emit("next"));
+
 onMounted(() => {
     // Since the touch event isn't being blocked we need to prevent the user from
     // overscrolling the page (refresh by pulling down)
@@ -93,8 +97,16 @@ onUnmounted(() => {
     </video>
 
     <template v-else>
-        <div class="hidden-prev-btn" @click="$emit('prev')"></div>
-        <div class="hidden-next-btn" @click="$emit('next')"></div>
+        <div
+            class="hidden-prev-btn"
+            @mousedown="goPrev.mouseDown"
+            @mouseup="goPrev.mouseUp"
+        ></div>
+        <div
+            class="hidden-next-btn"
+            @mousedown="goNext.mouseDown"
+            @mouseup="goNext.mouseUp"
+        ></div>
         <img
             v-if="store.settings.enablePanZoom"
             ref="imgRef"
@@ -102,6 +114,7 @@ onUnmounted(() => {
             :src="imageURL"
             :width="content.width"
             :height="content.height"
+            :key="post.id"
         />
         <img
             v-else
