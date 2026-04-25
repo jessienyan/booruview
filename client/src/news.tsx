@@ -11,6 +11,27 @@ type Update = {
 // NOTE: add new updates to the top of the list so it's sorted by most recent
 const updates: Update[] = [
     {
+        date: new Date("2026-04-25T19:04:00+00:00"),
+        title: "tap to nav",
+        component: (
+            <>
+                <p>Small update today, mostly for mobile users.</p>
+                <ul>
+                    <li>
+                        You can change posts by clicking the left/right side of
+                        the image instead of having to use the menu buttons.
+                        This is on by default and can be disabled in the
+                        settings
+                    </li>
+                    <li>
+                        Panning and zooming can now be disabled in the settings
+                    </li>
+                    <li>Images now fill the entire screen</li>
+                </ul>
+            </>
+        ),
+    },
+    {
         date: new Date("2026-04-21T19:08:00+00:00"),
         title: "discord server",
         component: (
