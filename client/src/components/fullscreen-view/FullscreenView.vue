@@ -283,6 +283,7 @@ onUnmounted(() => {
                 :class="tabClasses"
                 @mousedown.self="tabHandler.mouseDown"
                 @mouseup.self="tabHandler.mouseUp"
+                @dblclick.stop="(e) => e.stopImmediatePropagation()"
             >
                 <KeepAlive>
                     <ContentTab
