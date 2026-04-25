@@ -21,12 +21,16 @@ func IndexHandler(w http.ResponseWriter, req *http.Request) {
 	if readTemplateFile {
 		f, err := os.ReadFile(indexTemplatePath)
 		if err != nil {
-			log.Fatal().Err(err).Msg("failed to read index.html")
+			log.Err(err).Msg("failed to read index.html")
+			respondWithInternalError(w, err)
+			return
 		}
 
 		indexTemplate, err = template.New("index").Parse(string(f))
 		if err != nil {
-			log.Fatal().Err(err).Msg("failed to parse template")
+			log.Err(err).Msg("failed to parse template")
+			respondWithInternalError(w, err)
+			return
 		}
 	}
 
