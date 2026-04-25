@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import createPanZoom, { type PanZoom } from "panzoom";
-import {
-    computed,
-    onActivated,
-    onDeactivated,
-    onMounted,
-    onUnmounted,
-    useTemplateRef,
-    watch,
-} from "vue";
+import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
 import {
     useGelbooruImageURL,
     useGelbooruVideoURL,
@@ -97,16 +88,19 @@ onUnmounted(() => {
     </video>
 
     <template v-else>
-        <div
-            class="hidden-prev-btn"
-            @mousedown="goPrev.mouseDown"
-            @mouseup="goPrev.mouseUp"
-        ></div>
-        <div
-            class="hidden-next-btn"
-            @mousedown="goNext.mouseDown"
-            @mouseup="goNext.mouseUp"
-        ></div>
+        <template v-if="store.settings.enableClickImageToChange">
+            <div
+                class="hidden-prev-btn"
+                @mousedown="goPrev.mouseDown"
+                @mouseup="goPrev.mouseUp"
+            ></div>
+            <div
+                class="hidden-next-btn"
+                @mousedown="goNext.mouseDown"
+                @mouseup="goNext.mouseUp"
+            ></div>
+        </template>
+
         <img
             v-if="store.settings.enablePanZoom"
             ref="imgRef"
@@ -143,8 +137,8 @@ video {
 .hidden-prev-btn {
     z-index: 1;
     position: absolute;
-    top: 20%;
-    bottom: 20%;
+    top: 0;
+    bottom: 0;
     left: 0;
 
     /* prev button takes up 33% of the screen */
@@ -154,8 +148,8 @@ video {
 .hidden-next-btn {
     z-index: 1;
     position: absolute;
-    top: 20%;
-    bottom: 20%;
+    top: 0;
+    bottom: 0;
 
     /* next button takes up 67% of the screen. this allows users to click either
        the right side of the viewport or the center

@@ -106,6 +106,13 @@ function onChangeEnablePanZoom(e: Event) {
     store.saveSettings();
 }
 
+function onChangeClickImageToChange(e: Event) {
+    store.settings.enableClickImageToChange = (
+        e.target as HTMLInputElement
+    ).checked;
+    store.saveSettings();
+}
+
 const exportCode = ref("");
 const exportCodeRef = useTemplateRef("export-code");
 const canGenerate = ref(true);
@@ -402,6 +409,17 @@ function importData() {
                     @change="onChangeEnablePanZoom"
                 />
                 enable pan + zoom</label
+            >
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="store.settings.enableClickImageToChange"
+                    @change="onChangeClickImageToChange"
+                />
+                clicking left/right of image changes posts</label
             >
         </div>
 
