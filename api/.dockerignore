@@ -2,3 +2,5 @@
 
 # databases should be mounted
 **/*.db
+**/*-shm
+**/*-wal
