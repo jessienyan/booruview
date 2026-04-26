@@ -21,9 +21,10 @@ WORKDIR /app
 
 # Embed the generated index.html
 COPY client/dist/index.html /dist/index.html
-COPY --from=build /app/database ./database
 COPY --from=build /dist/goose /dist/server ./
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+RUN mkdir /app/database
 
 RUN echo -e '#!/bin/sh\ncd /app && ./goose up && exec ./server' > start.sh && chmod +x start.sh
 

@@ -1,6 +1,11 @@
 .git
 .vscode
-.env
+**/.env
 **/node_modules
 **/logs
 **/__debug_bin*
+
+# databases should be mounted
+**/*.db
+**/*-shm
+**/*-wal
