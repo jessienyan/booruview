@@ -10,6 +10,7 @@ export const changeLog: ChangeLogEntry[] = [
 			"added click to change posts",
 			"added toggle for panzoom",
 			"remove padding around images when using panzoom",
+			"enable WAL for db",
 		]
 	},
 	{
