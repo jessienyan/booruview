@@ -7,4 +7,6 @@ node_modules
 grafana.sh
 deploy.sh
 **/*.db
+**/*.db-shm
+**/*.db-wal
 **/dist
