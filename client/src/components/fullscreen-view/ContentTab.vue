@@ -1,27 +1,20 @@
 <script setup lang="ts">
-import createPanZoom, { type PanZoom } from "panzoom";
-import {
-    computed,
-    onActivated,
-    onDeactivated,
-    onMounted,
-    onUnmounted,
-    useTemplateRef,
-    watch,
-} from "vue";
+import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
 import {
     useGelbooruImageURL,
     useGelbooruVideoURL,
     useIsVideo,
+    usePanZoom,
+    useStationaryClick,
 } from "@/composable";
 import store from "@/store";
 
 const imgRef = useTemplateRef("imgRef");
-let pz: PanZoom | undefined;
 const { post } = defineProps<{ post: Post }>();
 const htmlRoot = document.body.parentElement as HTMLElement;
 const overscrollCssClass = "prevent-overscroll";
 const isVideo = useIsVideo(() => post);
+const emit = defineEmits(["prev", "next"]);
 
 const content = computed(() => {
     const hasHighRes = post.image_url.length > 0;
@@ -52,44 +45,24 @@ const content = computed(() => {
 const imageURL = useGelbooruImageURL(() => content.value.url);
 const videoURL = useGelbooruVideoURL(() => content.value.url);
 
-function setupPanZoom() {
-    pz?.dispose();
+usePanZoom({
+    enable: () => store.settings.enablePanZoom && !isVideo.value,
+    el: imgRef,
+    key: () => post.id,
+});
 
-    // Don't use panzoom for videos
-    if (isVideo.value) {
-        return;
-    }
-
-    pz = createPanZoom(imgRef.value!, {
-        autocenter: true,
-        bounds: true,
-        boundsPadding: 0.1,
-        maxZoom: 4,
-        minZoom: 0.05,
-        onTouch() {
-            // Don't block the touch event so the user can right click
-            return false;
-        },
-    });
-}
-
-watch(() => post.id, setupPanZoom, { flush: "post" });
+const goPrev = useStationaryClick(() => emit("prev"));
+const goNext = useStationaryClick(() => emit("next"));
 
 onMounted(() => {
-    setupPanZoom();
-
     // Since the touch event isn't being blocked we need to prevent the user from
     // overscrolling the page (refresh by pulling down)
     htmlRoot.classList.add(overscrollCssClass);
 });
 
 onUnmounted(() => {
-    pz?.dispose();
     htmlRoot.classList.remove(overscrollCssClass);
 });
-
-onDeactivated(() => pz?.pause());
-onActivated(() => pz?.resume());
 </script>
 
 <template>
@@ -114,21 +87,74 @@ onActivated(() => pz?.resume());
         />
     </video>
 
-    <!-- Using a key on the image prevents it from stretching when changing between posts -->
-    <img
-        v-else
-        ref="imgRef"
-        referrerpolicy="same-origin"
-        :src="imageURL"
-        :width="content.width"
-        :height="content.height"
-        :key="`img-${post.id}`"
-    />
+    <template v-else>
+        <template v-if="store.settings.enableClickImageToChange">
+            <div
+                class="hidden-prev-btn"
+                @mousedown="goPrev.mouseDown"
+                @mouseup="goPrev.mouseUp"
+            ></div>
+            <div
+                class="hidden-next-btn"
+                @mousedown="goNext.mouseDown"
+                @mouseup="goNext.mouseUp"
+            ></div>
+        </template>
+
+        <img
+            v-if="store.settings.enablePanZoom"
+            ref="imgRef"
+            referrerpolicy="same-origin"
+            :src="imageURL"
+            :width="content.width"
+            :height="content.height"
+            :key="post.id"
+        />
+        <img
+            v-else
+            class="img-fit"
+            ref="imgRef"
+            referrerpolicy="same-origin"
+            :src="imageURL"
+        />
+    </template>
 </template>
 
 <style scoped>
 video {
     max-width: 100%;
     max-height: 100%;
+}
+
+.img-fit {
+    max-width: 100%;
+    max-height: 100%;
+    transform: translateY(-50%);
+    position: relative;
+    top: 50%;
+}
+
+.hidden-prev-btn {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    /* prev button takes up 33% of the screen */
+    right: 67%;
+}
+
+.hidden-next-btn {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    /* next button takes up 67% of the screen. this allows users to click either
+       the right side of the viewport or the center
+    */
+    left: 33%;
+    right: 0;
 }
 </style>

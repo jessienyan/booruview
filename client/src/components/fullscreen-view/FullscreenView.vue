@@ -283,9 +283,15 @@ onUnmounted(() => {
                 :class="tabClasses"
                 @mousedown.self="tabHandler.mouseDown"
                 @mouseup.self="tabHandler.mouseUp"
+                @dblclick.stop="(e) => e.stopImmediatePropagation()"
             >
                 <KeepAlive>
-                    <ContentTab v-if="currentTab == 'content'" :post="post" />
+                    <ContentTab
+                        v-if="currentTab == 'content'"
+                        :post="post"
+                        @prev="showPrevPost"
+                        @next="showNextPost"
+                    />
                     <InfoTab v-else-if="currentTab == 'info'" :post="post" />
                 </KeepAlive>
             </div>

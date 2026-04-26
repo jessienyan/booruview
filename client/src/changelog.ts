@@ -5,6 +5,14 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-04-25",
+		changes: [
+			"added click to change posts",
+			"added toggle for panzoom",
+			"remove padding around images when using panzoom",
+		]
+	},
+	{
 		date: "2026-04-15",
 		changes: ["fixed frontend trying to lookup meta tags like sort: and score:"]
 	},
