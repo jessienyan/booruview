@@ -16,7 +16,7 @@ export CLIENT_IMG=$IMG_PREFIX/client
 export VALKEY_IMG=$IMG_PREFIX/valkey
 
 COMMIT=$(git rev-parse --short HEAD)
-DATE=$(git show -s --format=%cs HEAD)
+DATE=$(date +%Y-%m-%d)
 
 echo ">>> building API image"
 docker build --quiet -t $API_IMG --build-arg COMMIT_HASH=$COMMIT -f api/Dockerfile.prod .
