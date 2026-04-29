@@ -142,6 +142,7 @@ onMounted(() => {
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
                 :key="post.key"
+                :forceLoad="false"
             />
         </div>
     </div>

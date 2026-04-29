@@ -3,13 +3,17 @@ import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
 import { useGelbooruImageURL, useIsVideo } from "@/composable";
 import store from "@/store";
 
-const { cropped, maxHeight, renderHeight, post, scrollContainer } =
+const { cropped, maxHeight, renderHeight, post, scrollContainer, forceLoad } =
     defineProps<{
         cropped: boolean;
         maxHeight: number;
         renderHeight: number;
         post: Post;
         scrollContainer: HTMLElement;
+
+        // When true, the post's content will be loaded regardless if it's on screen.
+        // Can be used for preloading posts
+        forceLoad?: boolean;
     }>();
 
 const isVideo = useIsVideo(() => post);
@@ -53,6 +57,17 @@ const scrollObserver = new IntersectionObserver(onIntersectionChange, {
     root: scrollContainer,
     rootMargin: `${preloadImageViewportDistance} 0px ${preloadImageViewportDistance} 0px`,
 });
+
+watch(
+    () => forceLoad,
+    () => {
+        if (forceLoad) {
+            showImage.value = true;
+            scrollObserver.disconnect();
+        }
+    },
+    { immediate: true },
+);
 
 function onIntersectionChange(entries: IntersectionObserverEntry[]) {
     const e = entries[0];
