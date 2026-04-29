@@ -16,18 +16,10 @@ type ColumnDimensions = {
     width: number;
 };
 
-const { scrollContainer, posts, keyed, postDragId } = defineProps<{
+const { scrollContainer, posts, keyed } = defineProps<{
     scrollContainer: HTMLElement;
     posts: Post[];
     keyed: boolean;
-    postDragId?: number;
-}>();
-
-const emit = defineEmits<{
-    "post-dragstart": [event: DragEvent, postIndex: number];
-    "post-dragenter": [event: DragEvent, postIndex: number];
-    "post-dragleave": [event: DragEvent, postIndex: number];
-    "post-dragend": [event: DragEvent, postIndex: number];
 }>();
 
 const container = useTemplateRef("container");
@@ -150,17 +142,6 @@ onMounted(() => {
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
                 :key="post.key"
-                :beingDragged="postDragId === post.post.id"
-                @dragstart="
-                    (e: DragEvent) => emit('post-dragstart', e, post.index)
-                "
-                @dragenter="
-                    (e: DragEvent) => emit('post-dragenter', e, post.index)
-                "
-                @dragleave="
-                    (e: DragEvent) => emit('post-dragleave', e, post.index)
-                "
-                @dragend="(e: DragEvent) => emit('post-dragend', e, post.index)"
             />
         </div>
     </div>
