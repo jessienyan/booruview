@@ -5,6 +5,12 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-04-28",
+		changes: [
+			"added preloading while in fullscreen view. the viewer now preloads the next post so it should load instantly"
+		]
+	},
+	{
 		date: "2026-04-25",
 		changes: [
 			"added click to change posts",
