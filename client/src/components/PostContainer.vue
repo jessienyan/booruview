@@ -126,6 +126,18 @@ const orderedPosts = computed<CroppedPost[][]>(() => {
     return ordered;
 });
 
+// Returning true causes a post to load even if it's not in view.
+// When viewing a post in fullscreen, preload the next post
+function forceLoad(i: number) {
+    return computed(() => {
+        if (!store.fullscreenPost || i === 0) {
+            return false;
+        }
+
+        return store.fullscreenPost.id === posts[i - 1].id;
+    });
+}
+
 onMounted(() => {
     new ResizeObserver(onResize).observe(container.value!);
 });
@@ -142,7 +154,7 @@ onMounted(() => {
                 :cropped="post.cropped"
                 :scrollContainer="scrollContainer"
                 :key="post.key"
-                :forceLoad="false"
+                :forceLoad="forceLoad(post.index).value"
             />
         </div>
     </div>
