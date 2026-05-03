@@ -52,6 +52,7 @@ services:
         max-file: 3
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./database:/booruview-db:ro
 
   loki:
     image: grafana/loki
