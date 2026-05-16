@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-05-15",
+		changes: ["added explicit dark theme meta tag. this fixes an issue with some browsers using light mode elements for things like scroll bars"]
+	},
+	{
 		date: "2026-04-28",
 		changes: [
 			"added preloading while in fullscreen view. the viewer now preloads the next post so it should load instantly"
