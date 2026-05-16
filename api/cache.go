@@ -25,7 +25,7 @@ func TagFromCacheValue(tagName string, val string) (tag TagResponse, err error) 
 
 	tag = TagResponse{
 		Name:  tagName,
-		Type:  ParseTagType(parts[0]),
+		Type:  TagTypeFromString(parts[0]),
 		Count: count,
 	}
 

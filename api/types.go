@@ -17,7 +17,7 @@ const (
 	Unknown    TagType = "unknown"
 )
 
-func ParseTagType(val string) TagType {
+func TagTypeFromString(val string) TagType {
 	switch val {
 	case string(Tag):
 		return Tag
