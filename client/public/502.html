@@ -16,15 +16,49 @@
         <meta property="og:image" content="/favicon-64.png" />
         <link rel="icon" href="/favicon-64.png" sizes="64x64" />
         <link rel="icon" href="/favicon.png" sizes="16x16" />
+		<style type="text/css">
+		* {
+			box-sizing: border-box;
+		}
+		html, body {
+			width: 100%;
+			height: 100%;
+		}
+		body {
+			display: flex;
+			flex-direction: column;
+			margin: 0;
+			padding: 0.8em;
+			padding-bottom: 0;
+		}
+		h1 {
+			margin-top: 0.5em;
+		}
+		.img-container {
+			width: 500px;
+			max-height: 500px;
+			min-height: 0;
+			flex: 1;
+		}
+		img {
+			display: block;
+			height: 100%;
+			margin: auto;
+		}
+		</style>
 	</head>
 	<body>
-		<h1>offline for maintenance</h1>
-		<p>booruview will be right back</p>
+		<div>
+			<h1>down for maintenance</h1>
+			<p>booruview will be right back</p>
+		</div>
 		<!--
 			image credit: seseren
 			https://www.weibo.com/6818055101/PmEVGaQyS
 			https://gelbooru.com/index.php?page=post&s=view&id=11801477
 		-->
-		<img src="/502.gif" />
+		<div class="img-container">
+			<img src="/502.gif" />
+		</div>
 	</body>
 </html>

@@ -114,7 +114,8 @@
     ##################################################################
 
     handle_errors 502 {
-        try_files /502.html
+        file_server
+        rewrite /502.html
     }
 
     handle_errors {
