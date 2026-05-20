@@ -113,6 +113,11 @@
     # </favicon spam>
     ##################################################################
 
+    handle_errors 502 {
+        file_server
+        rewrite /502.html
+    }
+
     handle_errors {
         respond "{err.status_code} {err.status_text}"
     }
