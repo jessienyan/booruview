@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-05-19",
+		changes: ["added 502 maintenance page"]
+	},
+	{
 		date: "2026-05-15",
 		changes: ["added explicit dark theme meta tag. this fixes an issue with some browsers using light mode elements for things like scroll bars"]
 	},
