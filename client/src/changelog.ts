@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-05-23",
+		changes: ["return 503 for any http transport error when calling gelbooru"]
+	},
+	{
 		date: "2026-05-19",
 		changes: ["added 502 maintenance page"]
 	},
