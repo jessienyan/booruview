@@ -34,6 +34,7 @@ func InitLogging() {
 	}
 
 	zerolog.DurationFieldUnit = time.Second
+	zerolog.TimeFieldFormat = time.StampMicro
 	log.Logger = log.
 		Output(zerolog.ConsoleWriter{Out: redactedWriter{out: os.Stderr}, TimeFormat: time.StampMicro}).
 		Level(minLevel).

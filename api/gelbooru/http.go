@@ -1,14 +1,12 @@
 package gelbooru
 
 import (
-	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
-	"syscall"
 	"time"
 
 	stderrors "errors"
@@ -21,20 +19,6 @@ import (
 var (
 	defaultHTTPClient = &http.Client{Timeout: 4 * time.Second}
 )
-
-// Checks if the error is timeout related, and if so, replaces it with a GelbooruError
-func transformTimeoutError(err error) error {
-	resetByPeer := errors.Is(err, syscall.ECONNRESET)
-	isTimeout := os.IsTimeout(err)
-	isCtxDeadline := errors.Is(err, context.DeadlineExceeded)
-
-	// Timeouts or closed connections generally mean Gelbooru isn't available
-	if resetByPeer || isTimeout || isCtxDeadline {
-		err = stderrors.Join(GelbooruError{Code: 503}, err)
-	}
-
-	return err
-}
 
 func doRequest(httpClient *http.Client, req *http.Request) (*http.Response, error) {
 	earlier := time.Now()
@@ -70,7 +54,7 @@ func httpGet(httpClient *http.Client, theUrl string, params url.Values) (*http.R
 
 	resp, err := doRequest(httpClient, req)
 	if err != nil {
-		return nil, transformTimeoutError(err)
+		return nil, fmt.Errorf("http request failed: %w", stderrors.Join(GelbooruError{Code: 503}, err))
 	}
 
 	if resp.StatusCode != 200 {
