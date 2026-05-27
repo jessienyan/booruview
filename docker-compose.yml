@@ -47,7 +47,7 @@ services:
   client:
     build:
       context: ./client/
-    command: yarn build --watch --sourcemap
+    command: yarn build --watch --sourcemap --minify false
     environment:
       - NODE_ENV=development
       - VITE_DEV=1
