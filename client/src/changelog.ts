@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-05-27",
+		changes: ["use a shallow reactive store for posts/tags"]
+	},
+	{
 		date: "2026-05-23",
 		changes: ["return 503 for any http transport error when calling gelbooru"]
 	},
