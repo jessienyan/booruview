@@ -2,7 +2,10 @@
 import { type CSSProperties, computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useIsVideo, useMainContainer, useStationaryClick } from "@/composable";
-import store, { type FullscreenViewMenuAnchorPoint } from "@/store";
+import store, {
+    type FullscreenViewMenuAnchorPoint,
+    searchCache,
+} from "@/store";
 import ScreenCover from "../ScreenCover.vue";
 import ContentTab from "./ContentTab.vue";
 import InfoTab from "./InfoTab.vue";
@@ -109,7 +112,7 @@ const currentPostIndex = computed(() => {
     let index = -1;
 
     if (route.name === "search") {
-        index = store.posts
+        index = searchCache.posts
             .get(store.currentPage)!
             .findIndex((p) => p.id === post.id);
     } else if (route.name === "favorites") {
@@ -201,11 +204,12 @@ function showNextPost() {
     }
 
     if (store.currentPage === nav.page) {
-        store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+        store.fullscreenPost =
+            searchCache.posts.get(nav.page)![nav.index] || null;
     } else {
         store.nextPage().then(() => {
             store.fullscreenPost =
-                store.posts.get(nav.page)![nav.index] || null;
+                searchCache.posts.get(nav.page)![nav.index] || null;
         });
     }
 }
@@ -221,11 +225,12 @@ function showPrevPost() {
     }
 
     if (store.currentPage === nav.page) {
-        store.fullscreenPost = store.posts.get(nav.page)![nav.index] || null;
+        store.fullscreenPost =
+            searchCache.posts.get(nav.page)![nav.index] || null;
     } else {
         store.prevPage().then(() => {
             store.fullscreenPost =
-                store.posts.get(nav.page)![nav.index] || null;
+                searchCache.posts.get(nav.page)![nav.index] || null;
         });
     }
 }

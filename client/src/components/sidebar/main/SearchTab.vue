@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import SearchFooterButtons from "@/components/search/SearchFooterButtons.vue";
 import SearchForm from "@/components/search/SearchForm.vue";
 import TagList from "@/components/TagList.vue";
-import store from "@/store";
+import store, { searchCache } from "@/store";
 
 const router = useRouter();
 
@@ -39,7 +39,7 @@ function onTagSelect(tag: Tag, negated: boolean) {
     // Slight hack: try looking up unknown tags and replace it with the real version
     if (tag.type === "unknown") {
         store.loadTags([tag.name]).then(() => {
-            const real = store.cachedTags.get(tag.name);
+            const real = searchCache.cachedTags.get(tag.name);
 
             if (real === undefined) {
                 return;

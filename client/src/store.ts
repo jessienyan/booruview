@@ -1,4 +1,4 @@
-import { type ComputedRef, computed, reactive, watch } from "vue";
+import { type ComputedRef, computed, reactive, shallowReactive, watch } from "vue";
 import type { RouteLocation } from "vue-router";
 import { router } from "./router";
 import { SearchQuery, type SerializedSearchQuery, type SimpleSerializedSearchQuery } from "./search";
@@ -93,6 +93,13 @@ function parseAccountDataFromAPI(resp: Partial<AccountDataResponse>): Partial<Ac
     return parsed;
 }
 
+// Shallow reactive store.
+export const searchCache = shallowReactive({
+    posts: new Map<number, Post[]>(),
+    cachedTags: new Map<string, Tag>(),
+    cachedTagSearch: new Map<string, Tag[]>(),
+});
+
 export type FullscreenViewMenuAnchorPoint =
     | "topleft"
     | "topcenter"
@@ -180,11 +187,6 @@ type Store = {
     lastQuery: SearchQuery;
     lastSearchRoute: RouteLocation | null;
     lastFavPage: number;
-
-    /** mapping of page number to posts */
-    posts: Map<number, Post[]>;
-    cachedTags: Map<string, Tag>;
-    cachedTagSearch: Map<string, Tag[]>;
 
     onEditTag: EventTarget;
     onPostsCleared: EventTarget;
@@ -554,9 +556,6 @@ const store = reactive<Store>({
     lastQuery: new SearchQuery(),
     lastSearchRoute: null,
     lastFavPage: 1,
-    posts: new Map<number, Post[]>(),
-    cachedTags: new Map<string, Tag>(),
-    cachedTagSearch: new Map<string, Tag[]>(),
 
     onEditTag: new EventTarget(),
     onPostsCleared: new EventTarget(),
@@ -567,7 +566,7 @@ const store = reactive<Store>({
 
     async tagsForPost(post: Post): Promise<Tag[]> {
         await store.loadTags(post.tags);
-        return post.tags.map(t => this.cachedTags.get(t)).filter(t => t != null);
+        return post.tags.map(t => searchCache.cachedTags.get(t)).filter(t => t != null);
     },
 
     async searchPosts(tags: SimpleSerializedSearchQuery, page: number): Promise<PostListResponse> {
@@ -603,7 +602,7 @@ const store = reactive<Store>({
         const sameQuery = query.equals(this.lastQuery);
 
         // Don't refetch posts we already have
-        if (!force && sameQuery && this.posts.has(page)) {
+        if (!force && sameQuery && searchCache.posts.has(page)) {
             this.fetchingPosts = false;
             this.currentPage = page;
             return;
@@ -630,10 +629,10 @@ const store = reactive<Store>({
             this.fetchingPosts = false;
 
             if (!sameQuery) {
-                this.posts.clear();
+                searchCache.posts.clear();
             }
 
-            this.posts.set(page, posts.results);
+            searchCache.posts.set(page, posts.results);
             this.resultsPerPage = posts.count_per_page;
             this.totalPostCount = posts.total_count;
             this.currentPage = page;
@@ -686,7 +685,7 @@ const store = reactive<Store>({
         // Filter out meta queries that don't have a tag
         const searchFilters = /^(fav|height|id|pool|score|sort|source|updated|user|width):/;
         tags = tags.filter(t => !searchFilters.test(t))
-        tags = tags.filter(t => !this.cachedTags.has(t));
+        tags = tags.filter(t => !searchCache.cachedTags.has(t));
 
         if (tags.length === 0) {
             return;
@@ -702,7 +701,7 @@ const store = reactive<Store>({
             const resp = await fetch(`/api/tags?${queryParams.toString()}`);
             const json = await resp.json() as TagResponse;
             json.results.forEach(t => {
-                this.cachedTags.set(t.name, t);
+                searchCache.cachedTags.set(t.name, t);
             });
         } catch(err) {
             console.error(err);
@@ -711,7 +710,7 @@ const store = reactive<Store>({
     },
 
     postsForCurrentPage(): Post[] | undefined {
-        return this.posts.get(this.currentPage);
+        return searchCache.posts.get(this.currentPage);
     },
 
     async nextPage(): Promise<void> {
@@ -754,7 +753,7 @@ const store = reactive<Store>({
     },
 
     clearPosts() {
-        this.posts.clear();
+        searchCache.posts.clear();
         this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
     },
 
@@ -762,7 +761,7 @@ const store = reactive<Store>({
         if (name.startsWith("-")) {
             name = name.slice(1);
         }
-        return this.cachedTags.get(name);
+        return searchCache.cachedTags.get(name);
     },
 
     favoritePosts(): ComputedRef<Post[]> {

@@ -8,7 +8,7 @@ import {
     watch,
 } from "vue";
 import { useDismiss } from "@/composable";
-import store from "@/store";
+import store, { searchCache } from "@/store";
 import QuickTagsButton from "./QuickTagsButton.vue";
 import SearchSuggestions from "./Suggestions.vue";
 
@@ -66,7 +66,7 @@ function doTagSearch(query: string) {
         return;
     }
 
-    const cached = store.cachedTagSearch.get(query);
+    const cached = searchCache.cachedTagSearch.get(query);
     if (cached != null) {
         setSuggestions(cached);
         return;
@@ -81,7 +81,7 @@ function doTagSearch(query: string) {
             }
 
             resp.json().then((json: SearchResponse) => {
-                store.cachedTagSearch.set(query, json.results);
+                searchCache.cachedTagSearch.set(query, json.results);
                 setSuggestions(json.results);
             });
         })
