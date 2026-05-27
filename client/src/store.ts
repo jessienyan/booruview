@@ -629,10 +629,10 @@ const store = reactive<Store>({
             this.fetchingPosts = false;
 
             if (!sameQuery) {
-                searchCache.posts.clear();
+                searchCache.posts = new Map();
             }
 
-            searchCache.posts.set(page, posts.results);
+            searchCache.posts = new Map(searchCache.posts).set(page, posts.results);
             this.resultsPerPage = posts.count_per_page;
             this.totalPostCount = posts.total_count;
             this.currentPage = page;
@@ -703,6 +703,7 @@ const store = reactive<Store>({
             json.results.forEach(t => {
                 searchCache.cachedTags.set(t.name, t);
             });
+            searchCache.cachedTags = new Map(searchCache.cachedTags);
         } catch(err) {
             console.error(err);
             throw err;
@@ -753,7 +754,7 @@ const store = reactive<Store>({
     },
 
     clearPosts() {
-        searchCache.posts.clear();
+        searchCache.posts = new Map();
         this.onPostsCleared.dispatchEvent(new CustomEvent("postsCleared"));
     },
 

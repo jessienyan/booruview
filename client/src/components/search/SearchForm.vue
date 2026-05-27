@@ -81,7 +81,9 @@ function doTagSearch(query: string) {
             }
 
             resp.json().then((json: SearchResponse) => {
-                searchCache.cachedTagSearch.set(query, json.results);
+                searchCache.cachedTagSearch = new Map(
+                    searchCache.cachedTagSearch,
+                ).set(query, json.results);
                 setSuggestions(json.results);
             });
         })
