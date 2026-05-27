@@ -138,7 +138,7 @@ const numUnreadNews = computed(() => {
 .tab-content-container {
     flex: 1;
     min-height: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .tab-content {

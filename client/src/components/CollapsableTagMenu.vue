@@ -73,7 +73,7 @@ const sortedTags = computed<TagChip[]>(() =>
     padding: 8px;
     max-width: 300px;
     max-height: 350px;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     &:deep(.chip) {
         margin: 0;

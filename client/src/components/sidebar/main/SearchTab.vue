@@ -101,7 +101,7 @@ const styledTags = computed(() => {
 
 .taglist-container {
     margin-top: 1rem;
-    overflow-y: scroll;
+    overflow-y: auto;
     flex: 1;
 }
 

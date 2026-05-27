@@ -133,7 +133,7 @@ const hasConsented = computed(() => {
 main {
     flex: 1;
     min-height: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
     overscroll-behavior-x: contain;
     position: relative;
 

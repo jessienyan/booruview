@@ -202,7 +202,7 @@ const sortedFavTags = computed<TagChip[]>(() => {
 .content-container {
     padding: 0.8rem;
     background-color: #1c1c1c;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-width: 300px;
     max-height: 350px;
 

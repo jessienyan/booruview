@@ -90,7 +90,7 @@ const styledTags = computed(() =>
 
 .tag-list {
     max-width: 800px;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-height: 100%;
 
     @include hide-scrollbar;
