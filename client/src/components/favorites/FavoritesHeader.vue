@@ -42,12 +42,12 @@ function onToggle() {
 }
 
 .header-toggle-btn {
-    border: 1px solid #444;
+    border: 1px solid #666;
     border-top: none;
-    padding: 0.4rem 1.6rem;
-    border-radius: 0 0 4px 4px;
+    padding: 0.6rem 1.6rem;
+    border-radius: 0 0 6px 6px;
     background-color: #1e1e1e;
-    color: #888;
+    color: #aaa;
     cursor: pointer;
     display: block;
     margin: auto;
