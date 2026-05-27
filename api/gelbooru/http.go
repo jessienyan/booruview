@@ -80,7 +80,7 @@ func httpGetJson[T any](httpClient *http.Client, apiUrl string, params url.Value
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return transformTimeoutError(err)
+		return err
 	}
 
 	if len(body) == 0 {
