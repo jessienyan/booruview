@@ -83,7 +83,12 @@ import SidebarMain from "./main/SidebarMain.vue";
 
     @media (max-width: $mobile-width) {
         .sidebar-open & {
-            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
         }
 
         .sidebar-closed & {

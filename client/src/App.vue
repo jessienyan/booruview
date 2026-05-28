@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, readonly, ref, useTemplateRef, watch } from "vue";
+import { computed, provide, readonly, useTemplateRef, watch } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import store from "@/store";
@@ -10,20 +10,6 @@ import Toast from "./components/Toast.vue";
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
 
-const scrollTop = ref(0);
-
-watch(
-    () => store.sidebarClosed,
-    (closed) => {
-        if (closed) {
-            return;
-        }
-
-        scrollTop.value = mainContainer.value?.scrollTop ?? 0;
-    },
-    { flush: "pre" },
-);
-
 watch(
     () => store.sidebarClosed,
     (closed) => {
@@ -33,13 +19,6 @@ watch(
 
         // Grab focus so pgup/pgdn works without having to click the scroll container
         mainContainer.value?.focus();
-
-        // Restore scroll pos on mobile. Regrettably have to use setTimeout instead of nextTick
-        if (window.innerWidth <= 600 && mainContainer.value) {
-            setTimeout(() => {
-                mainContainer.value!.scrollTop = scrollTop.value;
-            }, 0);
-        }
     },
     { flush: "post" },
 );
@@ -153,12 +132,6 @@ main {
     overflow-y: auto;
     overscroll-behavior-x: contain;
     position: relative;
-
-    @media (max-width: $mobile-width) {
-        .sidebar-open & {
-            display: none;
-        }
-    }
 
     &:focus {
         outline: none;
