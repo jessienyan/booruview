@@ -6,7 +6,10 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
 	{
 		date: "2026-05-27",
-		changes: ["use a shallow reactive store for posts/tags"]
+		changes: [
+			"use a shallow reactive store for posts/tags",
+			"fix scroll resetting on mobile when opening the sidebar"
+		]
 	},
 	{
 		date: "2026-05-23",
