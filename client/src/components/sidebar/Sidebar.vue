@@ -115,10 +115,10 @@ $sidebar-btn-width: 60px;
     flex-direction: row;
     font-size: 0;
     align-items: center;
+    padding-right: 10px;
 
     .sidebar-open & {
         width: 100%;
-        padding-right: 10px;
     }
 
     .router-link-active {
@@ -162,6 +162,7 @@ $sidebar-btn-width: 60px;
             flex-direction: column;
             height: 100%;
             width: $sidebar-btn-width;
+            padding-right: 0;
         }
 
         .btn-small {
