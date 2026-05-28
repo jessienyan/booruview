@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-    computed,
-    nextTick,
-    provide,
-    readonly,
-    useTemplateRef,
-    watch,
-} from "vue";
+import { computed, provide, readonly, ref, useTemplateRef, watch } from "vue";
 import { RouterView } from "vue-router";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
 import store from "@/store";
@@ -17,14 +10,38 @@ import Toast from "./components/Toast.vue";
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
 
-// Focus scroll container when sidebar is closed
+const scrollTop = ref(0);
+
 watch(
     () => store.sidebarClosed,
-    () => {
-        if (store.sidebarClosed) {
-            nextTick(() => mainContainer.value?.focus());
+    (closed) => {
+        if (closed) {
+            return;
+        }
+
+        scrollTop.value = mainContainer.value?.scrollTop ?? 0;
+    },
+    { flush: "pre" },
+);
+
+watch(
+    () => store.sidebarClosed,
+    (closed) => {
+        if (!closed) {
+            return;
+        }
+
+        // Grab focus so pgup/pgdn works without having to click the scroll container
+        mainContainer.value?.focus();
+
+        // Restore scroll pos on mobile. Regrettably have to use setTimeout instead of nextTick
+        if (window.innerWidth <= 600 && mainContainer.value) {
+            setTimeout(() => {
+                mainContainer.value!.scrollTop = scrollTop.value;
+            }, 0);
         }
     },
+    { flush: "post" },
 );
 
 const hasConsented = computed(() => {
