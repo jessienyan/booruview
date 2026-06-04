@@ -11,6 +11,61 @@ type Update = {
 // NOTE: add new updates to the top of the list so it's sorted by most recent
 const updates: Update[] = [
     {
+        date: new Date("2026-06-03T21:19:05-04:00"),
+        title: "upcoming changes",
+        component: (
+            <>
+                <p>
+                    I've spent the last six months downloading a local copy of
+                    Gelbooru (tags, posts, and images/videos). This will mean:
+                </p>
+                <ul>
+                    <li>Better privacy</li>
+                    <li>Faster searches</li>
+                    <li>
+                        *Much* smaller file sizes (~95% reduction for hi-res
+                        images)
+                    </li>
+                </ul>
+                <p>
+                    For the sake of openness, I plan to follow{" "}
+                    <a
+                        href="https://e621.net/db_export/"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        e621.net's
+                    </a>{" "}
+                    lead and publish daily CSV dumps of all the data.
+                </p>
+                <p>
+                    Speaking of e621, in the coming months I'm hoping to add
+                    searching for{" "}
+                    <a href="https://e621.net" target="_blank" rel="noopener">
+                        e621.net
+                    </a>{" "}
+                    and{" "}
+                    <a href="https://rule34.xxx" target="_blank" rel="noopener">
+                        rule34.xxx
+                    </a>
+                    . I would love to hear your feedback on how that should
+                    look.
+                </p>
+                <p>
+                    In other news: Booruview just hit 500 signups! The site's
+                    been averaging 1300 users/day and 8000 users/week. Thank
+                    you!
+                </p>
+                <p>
+                    <a href={DISCORD_LINK} target="_blank">
+                        Join our discord!
+                    </a>{" "}
+                    Your feedback is the best way to support the site.
+                </p>
+            </>
+        ),
+    },
+    {
         date: new Date("2026-04-25T19:04:00+00:00"),
         title: "tap to nav",
         component: (
