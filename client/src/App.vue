@@ -6,6 +6,7 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
+import { proxyIssueBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -37,6 +38,19 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
+        <div
+            class="banner banner-warning"
+            v-if="hasConsented && proxyIssueBanner.show.value"
+        >
+            Our image proxy got blocked by Gelbooru, I'll try and have it fixed
+            ASAP.
+            <a
+                href="#"
+                class="banner-close"
+                @click.prevent="proxyIssueBanner.onHide()"
+                >close</a
+            >
+        </div>
         <div
             class="app"
             :class="{
@@ -90,7 +104,7 @@ const hasConsented = computed(() => {
 }
 
 .banner {
-    padding: 1em;
+    padding: 0.6em 1em;
     font-size: 1.1em;
     line-height: 1.5em;
 }
