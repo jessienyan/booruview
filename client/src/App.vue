@@ -6,7 +6,7 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
-import { proxyIssueBanner } from "./indicators";
+import { switchedToThumbsBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -40,14 +40,14 @@ const hasConsented = computed(() => {
     <div class="app-outer">
         <div
             class="banner banner-warning"
-            v-if="hasConsented && proxyIssueBanner.show.value"
+            v-if="hasConsented && switchedToThumbsBanner.show.value"
         >
-            Our image proxy got blocked by Gelbooru, I'll try and have it fixed
-            ASAP.
+            I had to downgrade image previews to be potato quality so we don't
+            get blocked by Gelbooru. Sorry, I know it sucks :(
             <a
                 href="#"
                 class="banner-close"
-                @click.prevent="proxyIssueBanner.onHide()"
+                @click.prevent="switchedToThumbsBanner.onHide()"
                 >close</a
             >
         </div>

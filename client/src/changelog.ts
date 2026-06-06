@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-06-06",
+		changes: ["change image previews to default to thumbnails (goodnight, sweet prince)"]
+	},
+	{
 		date: "2026-05-27",
 		changes: [
 			"use a shallow reactive store for posts/tags",
