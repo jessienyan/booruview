@@ -23,7 +23,9 @@ const favorited = computed(
 );
 
 const content = computed<{ url: string; width: number; height: number }>(() => {
-    if (isVideo.value) {
+    // NOTE: As of 2026-06-06, Gelbooru has added a very strict rate limit for the lowres (sample) images.
+    // Need to prioritize thumbnails for now
+    if (post.thumbnail_url.length) {
         return {
             url: post.thumbnail_url,
             width: post.thumbnail_width,
@@ -31,7 +33,7 @@ const content = computed<{ url: string; width: number; height: number }>(() => {
         };
     }
 
-    if (post.lowres_url.length > 0) {
+    if (post.lowres_url.length) {
         return {
             url: post.lowres_url,
             width: post.lowres_width,
