@@ -12,4 +12,6 @@ cd ${0%/*}
 COMPONENT_FILES=components/
 
 cp $COMPONENT_FILES/Caddyfile .
-[[ $USE_MEDIA_PROXY = 1 ]] && cat < $COMPONENT_FILES/Caddyfile.proxy >> Caddyfile
+if [[ $USE_MEDIA_PROXY = 1 ]]; then
+	cat < $COMPONENT_FILES/Caddyfile.proxy >> Caddyfile
+fi
