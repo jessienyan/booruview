@@ -17,7 +17,10 @@ func NewRouter(client gelbooru.GelbooruClient) *mux.Router {
 	r.Handle("/tagsearch", TagSearchHandler{Client: client})
 	r.HandleFunc("/settings/import", SettingImportHandler).Methods("POST")
 	r.HandleFunc("/settings/export", SettingExportHandler).Methods("POST")
-	r.Handle("/posts", PostsHandler{Client: client})
+	// r.Handle("/posts", PostsHandler{Client: client})
+	r.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
+		respondWithBadRequest(w, "Post searching is temporarily disabled.")
+	})
 	r.HandleFunc("/hosts", CDNHostHandler)
 	r.HandleFunc("/version", func(w http.ResponseWriter, req *http.Request) {
 		type versionResponse struct {
