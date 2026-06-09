@@ -107,6 +107,11 @@ const hasConsented = computed(() => {
 .banner-warning {
     background-color: #ccd666;
     color: #111;
+
+    a {
+        color: #111;
+        font-weight: bold;
+    }
 }
 
 .banner-announcement {
