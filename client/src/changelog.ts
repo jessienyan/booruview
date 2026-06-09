@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-06-09",
+		changes: ["temporarily disabled searching"]
+	},
+	{
 		date: "2026-06-06",
 		changes: ["change image previews to default to thumbnails (goodnight, sweet prince)"]
 	},
