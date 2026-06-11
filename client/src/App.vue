@@ -6,7 +6,7 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
-import { DISCORD_LINK } from "./config";
+import { switchedToThumbsBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -38,12 +38,17 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
-        <div class="banner banner-warning" v-if="hasConsented">
-            Searching is temporarily disabled. Gelbooru added strict limits due
-            to bot abuse. You can still access your favorites, account, and
-            blacklist. Note that favorites might not load.
-            <a :href="DISCORD_LINK" target="_blank"
-                >Join discord for updates.</a
+        <div
+            class="banner banner-warning"
+            v-if="hasConsented && switchedToThumbsBanner.show.value"
+        >
+            I had to downgrade image previews to be potato quality so we don't
+            get blocked by Gelbooru. Sorry, I know it sucks :(
+            <a
+                href="#"
+                class="banner-close"
+                @click.prevent="switchedToThumbsBanner.onHide()"
+                >close</a
             >
         </div>
         <div
