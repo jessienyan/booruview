@@ -6,6 +6,7 @@ import store from "@/store";
 import ContentWarning from "./components/ContentWarning.vue";
 import FullscreenView from "./components/fullscreen-view/FullscreenView.vue";
 import Toast from "./components/Toast.vue";
+import { switchedToThumbsBanner } from "./indicators";
 
 const mainContainer = useTemplateRef("main");
 provide("mainContainer", readonly(mainContainer));
@@ -37,7 +38,6 @@ const hasConsented = computed(() => {
 
 <template>
     <div class="app-outer">
-        <!--
         <div
             class="banner banner-warning"
             v-if="hasConsented && switchedToThumbsBanner.show.value"
@@ -51,7 +51,6 @@ const hasConsented = computed(() => {
                 >close</a
             >
         </div>
-        -->
         <div
             class="app"
             :class="{
