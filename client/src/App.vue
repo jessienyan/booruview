@@ -42,8 +42,10 @@ const hasConsented = computed(() => {
             class="banner banner-warning"
             v-if="hasConsented && switchedToThumbsBanner.show.value"
         >
-            I had to downgrade image previews to be potato quality so we don't
-            get blocked by Gelbooru. Sorry, I know it sucks :(
+            Gelbooru is defending against bot abuse by using stricter limits.
+            Image preview quality had to be temporarily lowered. Try reloading
+            the page if images aren't loading. Images might not be available if
+            the site is busy. Sorry :(
             <a
                 href="#"
                 class="banner-close"
