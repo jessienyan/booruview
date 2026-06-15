@@ -6,7 +6,7 @@ export type ChangeLogEntry = {
 export const changeLog: ChangeLogEntry[] = [
 	{
 		date: "2026-06-15",
-		changes: ["use higher quality previews (reverts 2026-06-06)"]
+		changes: ["use higher quality previews (reverts 2026-06-06)", "update image cdn from img2 to img4 (api returns wrong url)"]
 	},
 	{
 		date: "2026-06-11",

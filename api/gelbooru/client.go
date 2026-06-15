@@ -264,6 +264,8 @@ func (c Client) ListPosts(tags string, page int) (*PostList, error) {
 		// Video URL host is video-cdn3.gelbooru.com but that seems to be broken. Viewing the post
 		// on Gelbooru uses video-cdn4.gelbooru.com instead
 		data.ImageUrl = strings.Replace(data.ImageUrl, "video-cdn3.gelbooru.com", "video-cdn4.gelbooru.com", 1)
+		// Likewise for images
+		data.ImageUrl = strings.Replace(data.ImageUrl, "img2.gelbooru.com", "img4.gelbooru.com", 1)
 
 		// Rewrite media URLs to use a proxy
 		if api.UseMediaProxy {
