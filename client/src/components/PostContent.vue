@@ -23,21 +23,18 @@ const favorited = computed(
 );
 
 const content = computed<{ url: string; width: number; height: number }>(() => {
-    // NOTE: As of 2026-06-06, Gelbooru has added a very strict rate limit for the lowres (sample) images.
-    // Need to prioritize thumbnails for now
-    if (post.thumbnail_url.length) {
-        return {
-            url: post.thumbnail_url,
-            width: post.thumbnail_width,
-            height: post.thumbnail_height,
-        };
-    }
-
+    // Try showing a lower quality version since this is just a preview
     if (post.lowres_url.length) {
         return {
             url: post.lowres_url,
             width: post.lowres_width,
             height: post.lowres_height,
+        };
+    } else if (post.thumbnail_url.length) {
+        return {
+            url: post.thumbnail_url,
+            width: post.thumbnail_width,
+            height: post.thumbnail_height,
         };
     }
 
