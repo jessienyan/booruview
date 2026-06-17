@@ -31,7 +31,7 @@ repos:
 
       - id: sqlc-generate
         name: Generate go models from sql
-        entry: sh -ce "cd api && go tool sqlc generate"
+        entry: sh -ce "cd api && go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate"
         language: system
         pass_filenames: false
         files: \.sql$
