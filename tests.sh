@@ -26,5 +26,5 @@ mkdir -p .gotestcache
 echo ">>> building..."
 suppress dcc build
 suppress dcc up -d --renew-anon-volumes valkey
-dcc run --rm --quiet api ash -c 'rm -f $DATABASE_PATH && goose up && go test ./...'
+dcc run --rm --quiet api
 suppress dcc down
