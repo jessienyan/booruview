@@ -82,8 +82,13 @@ func TestLoginHandler_Success(t *testing.T) {
 	var response routes.LoginResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
 
-	require.NotEmpty(t, response.AuthToken)
 	require.Equal(t, loginTestUser.Username, response.Username)
+
+	// Verify session cookie is set
+	cookies := rec.Result().Cookies()
+	require.Len(t, cookies, 1)
+	require.Equal(t, api.AuthCookieName, cookies[0].Name)
+	require.NotEmpty(t, cookies[0].Value)
 }
 
 func TestLoginHandler_UpdatesLastLogin(t *testing.T) {

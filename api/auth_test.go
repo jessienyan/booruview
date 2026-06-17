@@ -2,7 +2,6 @@ package api
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,40 +36,8 @@ func TestGenerateSalt(t *testing.T) {
 	require.NotEqual(t, GenerateSalt(), GenerateSalt())
 }
 
-func TestNewAuthToken_Valid(t *testing.T) {
-	userID := 123
-	issuedAt := time.Now().Truncate(time.Second)
-	Now = func() time.Time {
-		return issuedAt
-	}
-	token, err := NewAuthToken(userID, 1*time.Minute)
-	Now = time.Now
-
-	require.NoError(t, err)
-
-	parsed, err := ParseAuthToken(token)
-	require.NoError(t, err)
-	require.Equal(
-		t,
-		ParsedAuthToken{UserID: int64(userID), CreatedAt: issuedAt},
-		parsed,
-	)
-}
-
-func TestParseAuthToken_Expired(t *testing.T) {
-	issuedAt := time.Now().Add(-1 * time.Hour)
-	Now = func() time.Time {
-		return issuedAt
-	}
-	token, _ := NewAuthToken(0, 1*time.Minute)
-	Now = time.Now
-
-	_, err := ParseAuthToken(token)
-	require.ErrorIs(t, err, AuthTokenExpired)
-}
-
-func TestParseAuthToken_Tampered(t *testing.T) {
-	token, _ := NewAuthToken(0, 1*time.Minute)
-	_, err := ParseAuthToken(token + "X")
-	require.ErrorIs(t, err, AuthTokenInvalid)
+func TestGenerateSessionKey(t *testing.T) {
+	key := GenerateSessionKey()
+	require.Len(t, key, sessionKeyLength*2) // hex encoded
+	require.NotEqual(t, GenerateSessionKey(), GenerateSessionKey())
 }

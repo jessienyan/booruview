@@ -25,13 +25,20 @@ func init() {
 	authMiddlewareUser, _ = testutil.CreateUser(authMiddlewareUsername, authMiddlewarePassword)
 }
 
+func sessionCookie(key string) *http.Cookie {
+	return &http.Cookie{
+		Name:  api.AuthCookieName,
+		Value: key,
+	}
+}
+
 func TestAuthMiddleware_Ok(t *testing.T) {
 	testutil.Flush()
 
-	token, _ := api.NewAuthToken(int(authMiddlewareUser.ID), 1*time.Minute)
+	sessionKey := testutil.CreateSession(authMiddlewareUser.ID)
 
 	req := httptest.NewRequest("GET", "/faked", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.AddCookie(sessionCookie(sessionKey))
 	rec := httptest.NewRecorder()
 
 	called := false
@@ -62,11 +69,11 @@ func TestAuthMiddleware_MissingHeader(t *testing.T) {
 	require.True(t, called)
 }
 
-func TestAuthMiddleware_InvalidToken(t *testing.T) {
+func TestAuthMiddleware_InvalidSession(t *testing.T) {
 	testutil.Flush()
 
 	req := httptest.NewRequest("GET", "/faked", nil)
-	req.Header.Set("Authorization", "Bearer invalidtoken")
+	req.AddCookie(sessionCookie("invalidsession"))
 	rec := httptest.NewRecorder()
 
 	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -77,13 +84,20 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 	require.Equal(t, http.StatusUnauthorized, rec.Code)
 }
 
-func TestAuthMiddleware_ExpiredToken(t *testing.T) {
+func TestAuthMiddleware_ExpiredSession(t *testing.T) {
 	testutil.Flush()
 
-	token, _ := api.NewAuthToken(int(authMiddlewareUser.ID), 0)
+	// Create a session that's already expired
+	db := models.New(api.UserDB())
+	key := api.GenerateSessionKey()
+	db.CreateSession(t.Context(), models.CreateSessionParams{
+		Key:       key,
+		UserID:    authMiddlewareUser.ID,
+		ExpiresAt: api.Now().Add(-time.Hour),
+	})
 
 	req := httptest.NewRequest("GET", "/faked", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.AddCookie(sessionCookie(key))
 	rec := httptest.NewRecorder()
 
 	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -97,10 +111,17 @@ func TestAuthMiddleware_ExpiredToken(t *testing.T) {
 func TestAuthMiddleware_UserDeleted(t *testing.T) {
 	testutil.Flush()
 
-	token, _ := api.NewAuthToken(123456789, 1*time.Minute)
+	// Create a session for a non-existent user
+	db := models.New(api.UserDB())
+	key := api.GenerateSessionKey()
+	db.CreateSession(t.Context(), models.CreateSessionParams{
+		Key:       key,
+		UserID:    123456789,
+		ExpiresAt: api.Now().Add(time.Minute),
+	})
 
 	req := httptest.NewRequest("GET", "/faked", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.AddCookie(sessionCookie(key))
 	rec := httptest.NewRecorder()
 
 	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -114,10 +135,10 @@ func TestAuthMiddleware_UserDeleted(t *testing.T) {
 func TestRequireAuthMiddleware_Ok(t *testing.T) {
 	testutil.Flush()
 
-	token, _ := api.NewAuthToken(int(authMiddlewareUser.ID), 1*time.Minute)
+	sessionKey := testutil.CreateSession(authMiddlewareUser.ID)
 
 	req := httptest.NewRequest("GET", "/faked", nil)
-	req.Header.Set("Authorization", "Bearer "+token)
+	req.AddCookie(sessionCookie(sessionKey))
 	rec := httptest.NewRecorder()
 
 	called := false

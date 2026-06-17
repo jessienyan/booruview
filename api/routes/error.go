@@ -83,5 +83,5 @@ func respondWithInternalError(w http.ResponseWriter, err error) {
 }
 
 func respondWithUnauthorized(w http.ResponseWriter) {
-	respondWithError(w, http.StatusUnauthorized, "Auth token is missing or invalid.", "Want header 'Authorization: Bearer <token>'")
+	respondWithError(w, http.StatusUnauthorized, "Session is missing or invalid.", "Login required")
 }

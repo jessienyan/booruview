@@ -12,6 +12,33 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type validatedSession struct {
+	UserID int64
+}
+
+func validateSession(ctx context.Context, key string) (validatedSession, error) {
+	if key == "" {
+		return validatedSession{}, api.SessionInvalid
+	}
+
+	db := models.New(api.UserDB())
+	db.DeleteExpiredSessions(ctx)
+
+	session, err := db.GetSessionByKey(ctx, key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return validatedSession{}, api.SessionInvalid
+		}
+		return validatedSession{}, api.SessionInvalid
+	}
+
+	if session.ExpiresAt.Before(api.Now()) {
+		return validatedSession{}, api.SessionExpired
+	}
+
+	return validatedSession{UserID: session.UserID}, nil
+}
+
 func clientIP(req *http.Request) string {
 	val := req.Header.Get("X-Forwarded-For")
 	if val == "" {
@@ -66,12 +93,12 @@ func GetUser(req *http.Request) *userContextValue {
 
 // If ok, fetches a user and adds them to the request context if they exist.
 // Otherwise, an error response is written.
-func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken api.ParsedAuthToken) (newReq *http.Request, ok bool) {
+func loadUserIntoContext(w http.ResponseWriter, req *http.Request, session validatedSession) (newReq *http.Request, ok bool) {
 	db := models.New(api.UserDB())
-	user, err := db.GetUserByID(req.Context(), parsedToken.UserID)
+	user, err := db.GetUserByID(req.Context(), session.UserID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Info().Int64("userid", parsedToken.UserID).Msg("user tried to login but account doesn't exist, probably deleted")
+			log.Info().Int64("userid", session.UserID).Msg("user tried to login but account doesn't exist, probably deleted")
 			respondWithUnauthorized(w)
 			return nil, false
 		}
@@ -80,14 +107,7 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 		return nil, false
 	}
 
-	// Reject the token if the user changed their password since the token was created.
-	if user.PasswordChangedAt.Valid && user.PasswordChangedAt.Time.After(parsedToken.CreatedAt) {
-		log.Info().Int64("userid", parsedToken.UserID).Time("issued", parsedToken.CreatedAt).Time("password_changed_at", user.PasswordChangedAt.Time).Msg("rejected token created before last password change")
-		respondWithUnauthorized(w)
-		return nil, false
-	}
-
-	data, err := db.GetUserData(req.Context(), parsedToken.UserID)
+	data, err := db.GetUserData(req.Context(), session.UserID)
 	if err == sql.ErrNoRows {
 		var userData models.UserData
 		userData.Set(models.UserDataJSON{})
@@ -116,33 +136,25 @@ func loadUserIntoContext(w http.ResponseWriter, req *http.Request, parsedToken a
 	return req, true
 }
 
-// Adds a user to the request context if a valid auth token was sent.
-// Looks for the token in the Authorization header, then as a cookie.
+// Adds a user to the request context if a valid session cookie was sent.
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var token string
-
-		token = strings.TrimPrefix(req.Header.Get("Authorization"), "Bearer ")
-
-		if token == "" {
-			cookie, _ := req.Cookie(api.AuthCookieName)
-			if cookie != nil {
-				token = cookie.Value
-			}
+		cookie, err := req.Cookie(api.AuthCookieName)
+		if err != nil || cookie == nil {
+			next.ServeHTTP(w, req)
+			return
 		}
 
-		if token != "" {
-			if parsedToken, err := api.ParseAuthToken(token); err == nil {
-				// Make sure we don't clobber `req`
-				var ok bool
-				if req, ok = loadUserIntoContext(w, req, parsedToken); !ok {
-					// loadUserIntoContext sent a response already, nothing to do here
-					return
-				}
-			} else {
-				respondWithUnauthorized(w)
+		if session, err := validateSession(req.Context(), cookie.Value); err == nil {
+			// Make sure we don't clobber `req`
+			var ok bool
+			if req, ok = loadUserIntoContext(w, req, session); !ok {
+				// loadUserIntoContext sent a response already, nothing to do here
 				return
 			}
+		} else {
+			respondWithUnauthorized(w)
+			return
 		}
 
 		next.ServeHTTP(w, req)

@@ -5,8 +5,10 @@ CREATE TABLE user_sessions (
 	created_at	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	expires_at	DATETIME NOT NULL,
 	user_id		INTEGER NOT NULL,
-	FOREIGN KEY (user_id) REFERENCES users (id)
+	FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
 -- +goose StatementEnd
 
 -- +goose Down

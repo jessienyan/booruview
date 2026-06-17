@@ -122,6 +122,17 @@ func CreateUser(username, password string) (models.Users, models.UserData) {
 	return user, data
 }
 
+func CreateSession(userID int64) string {
+	db := models.New(api.UserDB())
+	key := api.GenerateSessionKey()
+	db.CreateSession(context.Background(), models.CreateSessionParams{
+		Key:       key,
+		UserID:    userID,
+		ExpiresAt: api.Now().Add(api.SessionTTL),
+	})
+	return key
+}
+
 func Time() time.Time {
 	testTime, _ := time.Parse(time.RFC3339, "2026-04-01T01:23:45Z")
 	return testTime

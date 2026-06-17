@@ -16,7 +16,7 @@ import (
 var (
 	accountDataTestUser     models.Users
 	accountDataTestUserData models.UserData
-	accountDataAuthToken    string
+	accountDataSessionKey   string
 	accountDataTestUsername = "accountdatatest"
 	accountDataTestPassword = "pass123"
 )
@@ -25,15 +25,14 @@ func init() {
 	testutil.Setup()
 	api.InitUserDatabase()
 	accountDataTestUser, accountDataTestUserData = testutil.CreateUser(accountDataTestUsername, accountDataTestPassword)
-	var err error
-	accountDataAuthToken, err = api.NewAuthToken(int(accountDataTestUser.ID), api.AuthTokenTTL)
-	if err != nil {
-		panic(err)
-	}
+	accountDataSessionKey = testutil.CreateSession(accountDataTestUser.ID)
 }
 
-func callHandler(handlerFunc func(http.ResponseWriter, *http.Request), req *http.Request, token string) *httptest.ResponseRecorder {
-	req.Header.Set("Authorization", "Bearer "+token)
+func callHandler(handlerFunc func(http.ResponseWriter, *http.Request), req *http.Request, sessionKey string) *httptest.ResponseRecorder {
+	req.AddCookie(&http.Cookie{
+		Name:  api.AuthCookieName,
+		Value: sessionKey,
+	})
 	resp := httptest.NewRecorder()
 	wrappedHandler := routes.AuthMiddleware(http.HandlerFunc(handlerFunc))
 	wrappedHandler.ServeHTTP(resp, req)
@@ -44,7 +43,7 @@ func patchAccountData(data any) *httptest.ResponseRecorder {
 	body := testutil.MustMarshalJSON(data)
 	req := httptest.NewRequest("PATCH", "/api/account/data", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataPatchHandler, req, accountDataSessionKey)
 	return resp
 }
 
@@ -53,7 +52,7 @@ func TestAccountDataGetHandler_Empty(t *testing.T) {
 	testutil.ResetUserData(accountDataTestUser.ID)
 
 	req := httptest.NewRequest("GET", "/api/account/data", nil)
-	resp := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataGetHandler, req, accountDataSessionKey)
 
 	require.Equal(t, http.StatusOK, resp.Code)
 
@@ -179,7 +178,7 @@ func TestAccountDataGetHandler_Success(t *testing.T) {
 	}`
 
 	req := httptest.NewRequest("GET", "/api/account/data", nil)
-	resp := callHandler(routes.AccountDataGetHandler, req, accountDataAuthToken)
+	resp := callHandler(routes.AccountDataGetHandler, req, accountDataSessionKey)
 
 	require.Equal(t, http.StatusOK, resp.Code)
 	require.JSONEq(t, expected, resp.Body.String())

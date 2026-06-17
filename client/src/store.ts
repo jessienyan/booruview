@@ -118,14 +118,14 @@ export type ColumnSizing = "fixed" | "dynamic";
 
 type Store = {
     account: {
-        authToken: string;
         username: string;
         data?: AccountData;
     } | null;
     fetchingAccountData: boolean;
 
     login(username: string, password: string): Promise<void>;
-    saveAccountCredentials(): void;
+    logout(): Promise<void>;
+    saveAccountInfo(): void;
     addToAccountData(data: Partial<AddAccountDataPayload>): Promise<void>;
     removeFromAccountData(data: Partial<RemoveAccountDataPayload>): Promise<void>;
     fetchAccountData(): Promise<void>;
@@ -247,7 +247,6 @@ const store = reactive<Store>({
 
 
             this.account = {
-                authToken: data.auth_token,
                 username: data.username,
                 data: {
                     blacklist: [],
@@ -257,7 +256,7 @@ const store = reactive<Store>({
                     saved_searches: [],
                 }
             };
-            this.saveAccountCredentials();
+            this.saveAccountInfo();
             await this.fetchAccountData();
         } catch(err) {
             console.error(err);
@@ -269,11 +268,21 @@ const store = reactive<Store>({
         }
     },
 
-    saveAccountCredentials() {
+    async logout() {
+        try {
+            await fetch("/api/logout", { method: "POST" });
+        } catch(err) {
+            console.error(err);
+        }
+        this.account = null;
+        this.saveAccountInfo();
+    },
+
+    saveAccountInfo() {
         let payload = null;
         if(this.account) {
-            const { authToken, username } = this.account;
-            payload = { authToken, username }
+            const { username } = this.account;
+            payload = { username }
         }
         localStorage.setItem("account", JSON.stringify(payload));
     },
@@ -288,14 +297,12 @@ const store = reactive<Store>({
             this.account.data.favorite_posts = data.favorite_posts.concat(this.account.data.favorite_posts);
         }
 
-        const { authToken } = this.account;
         const payload = { add: data };
 
         const resp = await fetch("/api/account/data", {
             body: JSON.stringify(payload),
             method: "PATCH",
             headers: {
-                Authorization: `Bearer ${authToken}`,
                 "Content-Type": "application/json"
             }
         });
@@ -321,14 +328,12 @@ const store = reactive<Store>({
             this.account.data.favorite_posts = this.account.data.favorite_posts.filter(p => !ids.has(p.id));
         }
 
-        const { authToken } = this.account;
         const payload = { remove: data };
 
         const resp = await fetch("/api/account/data", {
             body: JSON.stringify(payload),
             method: "PATCH",
             headers: {
-                Authorization: `Bearer ${authToken}`,
                 "Content-Type": "application/json"
             }
         });
@@ -363,22 +368,17 @@ const store = reactive<Store>({
             return;
         }
 
-        const { authToken } = this.account;
-
         try {
             this.fetchingAccountData = true;
 
             const resp = await fetch("/api/account/data", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${authToken}`
-                }
+                method: "GET"
             });
 
-            // Token may have expired or account was deleted.
+            // Session may have expired or account was deleted.
             if(resp.status === 401) {
                 this.account = null;
-                this.saveAccountCredentials();
+                this.saveAccountInfo();
                 this.toast = {
                     msg: "Please login again",
                     type: "error"

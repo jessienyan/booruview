@@ -40,3 +40,20 @@ RETURNING *;
 UPDATE user_data
 SET data = ?, updated_at = CURRENT_TIMESTAMP
 WHERE user_id = ?;
+
+-- name: CreateSession :one
+INSERT INTO user_sessions (key, user_id, expires_at)
+VALUES (?, ?, ?)
+RETURNING *;
+
+-- name: GetSessionByKey :one
+SELECT * FROM user_sessions WHERE key = ?;
+
+-- name: DeleteSessionByKey :exec
+DELETE FROM user_sessions WHERE key = ?;
+
+-- name: DeleteUserSessions :exec
+DELETE FROM user_sessions WHERE user_id = ?;
+
+-- name: DeleteExpiredSessions :exec
+DELETE FROM user_sessions WHERE expires_at < CURRENT_TIMESTAMP;

@@ -10,6 +10,7 @@ import (
 
 	api "codeberg.org/jessienyan/booruview"
 	"codeberg.org/jessienyan/booruview/models"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -29,7 +30,7 @@ type CreateUserParams struct {
 }
 
 type RegisterResponse struct {
-	AuthToken string `json:"auth_token"`
+	Username string `json:"username"`
 }
 
 // Creates a new user account
@@ -105,11 +106,26 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 
 	log.Info().Str("user", u.String()).Msg("user registered")
 
-	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
-	if err != nil {
-		respondWithInternalError(w, err)
+	sessionKey := api.GenerateSessionKey()
+	if _, err := db.CreateSession(req.Context(), models.CreateSessionParams{
+		Key:       sessionKey,
+		UserID:    u.ID,
+		ExpiresAt: api.Now().Add(api.SessionTTL),
+	}); err != nil {
+		respondWithInternalError(w, errors.Wrap(err, "failed to create session"))
 		return
 	}
 
-	respondJson(w, 200, RegisterResponse{token})
+	// TODO: cookie jar
+	w.Header().Add(
+		"Set-Cookie",
+		fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
+			api.AuthCookieName,
+			sessionKey,
+			int(api.SessionTTL.Seconds()),
+		),
+	)
+
+	respondJson(w, 200, RegisterResponse{Username: u.Username})
 }

@@ -8,7 +8,32 @@ package models
 import (
 	"context"
 	"database/sql"
+	"time"
 )
+
+const createSession = `-- name: CreateSession :one
+INSERT INTO user_sessions (key, user_id, expires_at)
+VALUES (?, ?, ?)
+RETURNING "key", created_at, expires_at, user_id
+`
+
+type CreateSessionParams struct {
+	Key       string    `db:"key"`
+	UserID    int64     `db:"user_id"`
+	ExpiresAt time.Time `db:"expires_at"`
+}
+
+func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (UserSessions, error) {
+	row := q.db.QueryRowContext(ctx, createSession, arg.Key, arg.UserID, arg.ExpiresAt)
+	var i UserSessions
+	err := row.Scan(
+		&i.Key,
+		&i.CreatedAt,
+		&i.ExpiresAt,
+		&i.UserID,
+	)
+	return i, err
+}
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users
@@ -57,6 +82,24 @@ func (q *Queries) CreateUserData(ctx context.Context, arg CreateUserDataParams) 
 	return i, err
 }
 
+const deleteExpiredSessions = `-- name: DeleteExpiredSessions :exec
+DELETE FROM user_sessions WHERE expires_at < CURRENT_TIMESTAMP
+`
+
+func (q *Queries) DeleteExpiredSessions(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteExpiredSessions)
+	return err
+}
+
+const deleteSessionByKey = `-- name: DeleteSessionByKey :exec
+DELETE FROM user_sessions WHERE key = ?
+`
+
+func (q *Queries) DeleteSessionByKey(ctx context.Context, key string) error {
+	_, err := q.db.ExecContext(ctx, deleteSessionByKey, key)
+	return err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users WHERE id = ?
 `
@@ -73,6 +116,31 @@ DELETE FROM user_data WHERE user_id = ?
 func (q *Queries) DeleteUserData(ctx context.Context, userID int64) error {
 	_, err := q.db.ExecContext(ctx, deleteUserData, userID)
 	return err
+}
+
+const deleteUserSessions = `-- name: DeleteUserSessions :exec
+DELETE FROM user_sessions WHERE user_id = ?
+`
+
+func (q *Queries) DeleteUserSessions(ctx context.Context, userID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUserSessions, userID)
+	return err
+}
+
+const getSessionByKey = `-- name: GetSessionByKey :one
+SELECT "key", created_at, expires_at, user_id FROM user_sessions WHERE key = ?
+`
+
+func (q *Queries) GetSessionByKey(ctx context.Context, key string) (UserSessions, error) {
+	row := q.db.QueryRowContext(ctx, getSessionByKey, key)
+	var i UserSessions
+	err := row.Scan(
+		&i.Key,
+		&i.CreatedAt,
+		&i.ExpiresAt,
+		&i.UserID,
+	)
+	return i, err
 }
 
 const getUser = `-- name: GetUser :one

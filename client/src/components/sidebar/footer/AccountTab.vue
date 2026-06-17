@@ -9,9 +9,8 @@ import Register from "./account/Register.vue";
 
 const showRegisterForm = ref(false);
 
-function logout() {
-    store.account = null;
-    store.saveAccountCredentials();
+async function logout() {
+    await store.logout();
 }
 
 function downloadData() {

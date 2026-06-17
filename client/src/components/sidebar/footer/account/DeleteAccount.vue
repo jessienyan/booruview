@@ -26,14 +26,13 @@ async function doDelete() {
             method: "DELETE",
             body: JSON.stringify({ permanently_delete_account: true }),
             headers: {
-                Authorization: `Bearer ${store.account!.authToken}`,
                 "Content-Type": "application/json",
             },
         });
 
         if (resp.ok) {
             store.account = null;
-            store.saveAccountCredentials();
+            store.saveAccountInfo();
             store.toast = {
                 msg: "Account deleted successfully",
                 type: "info",

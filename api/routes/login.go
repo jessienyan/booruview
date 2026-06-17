@@ -21,11 +21,10 @@ type LoginParams struct {
 }
 
 type LoginResponse struct {
-	AuthToken string `json:"auth_token"`
-	Username  string `json:"username"`
+	Username string `json:"username"`
 }
 
-// Login to an account and receive an auth token
+// Login to an account and receive a session cookie
 func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, loginCost) {
 		return
@@ -91,9 +90,13 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	token, err := api.NewAuthToken(int(u.ID), api.AuthTokenTTL)
-	if err != nil {
-		err = errors.Wrap(err, "failed to create auth token")
+	sessionKey := api.GenerateSessionKey()
+	if _, err := db.CreateSession(req.Context(), models.CreateSessionParams{
+		Key:       sessionKey,
+		UserID:    u.ID,
+		ExpiresAt: api.Now().Add(api.SessionTTL),
+	}); err != nil {
+		err = errors.Wrap(err, "failed to create session")
 		respondWithInternalError(w, err)
 		return
 	}
@@ -103,10 +106,10 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		fmt.Sprintf(
 			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
 			api.AuthCookieName,
-			token,
-			int(api.AuthTokenTTL.Seconds()),
+			sessionKey,
+			int(api.SessionTTL.Seconds()),
 		),
 	)
 	log.Info().Str("user", u.String()).Msg("user logged in")
-	respondJson(w, 200, LoginResponse{AuthToken: token, Username: u.Username})
+	respondJson(w, 200, LoginResponse{Username: u.Username})
 }

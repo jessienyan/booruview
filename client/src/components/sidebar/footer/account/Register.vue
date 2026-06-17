@@ -57,7 +57,6 @@ async function onSubmit(e: Event) {
 
         store.account = {
             username: username.value!,
-            authToken: data.auth_token,
             data: {
                 favorite_posts: [...store.settings.favorites],
                 favorite_tags: [...store.settings.favoriteTags],
@@ -66,7 +65,7 @@ async function onSubmit(e: Event) {
                 saved_searches: [...store.settings.savedSearches],
             },
         };
-        store.saveAccountCredentials();
+        store.saveAccountInfo();
     } catch (e) {
         console.error(e);
         toastError("Something went wrong :(");

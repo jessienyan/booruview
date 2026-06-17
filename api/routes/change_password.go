@@ -17,10 +17,6 @@ type ChangePasswordParams struct {
 	NewPassword     string `json:"new_password"`
 }
 
-type ChangePasswordResponse struct {
-	AuthToken string `json:"auth_token"`
-}
-
 func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 	if isRateLimited(w, req, resetPasswordCost) {
 		return
@@ -74,13 +70,34 @@ func ChangePasswordHandler(w http.ResponseWriter, req *http.Request) {
 
 	log.Info().Str("user", user.User.String()).Msg("user changed password")
 
-	// Generate a new token for the user so they aren't immediately logged out
-	token, err := api.NewAuthToken(int(user.User.ID), api.AuthTokenTTL)
-	if err != nil {
-		err = fmt.Errorf("failed to create new auth token: %w", err)
+	// Invalidate all existing sessions and create a new one
+	if err := db.DeleteUserSessions(req.Context(), user.User.ID); err != nil {
+		err = fmt.Errorf("failed to delete user sessions: %w", err)
 		respondWithInternalError(w, err)
 		return
 	}
 
-	respondJson(w, 200, ChangePasswordResponse{AuthToken: token})
+	sessionKey := api.GenerateSessionKey()
+	_, err = db.CreateSession(req.Context(), models.CreateSessionParams{
+		Key:       sessionKey,
+		UserID:    user.User.ID,
+		ExpiresAt: api.Now().Add(api.SessionTTL),
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to create session: %w", err)
+		respondWithInternalError(w, err)
+		return
+	}
+
+	w.Header().Add(
+		"Set-Cookie",
+		fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
+			api.AuthCookieName,
+			sessionKey,
+			int(api.SessionTTL.Seconds()),
+		),
+	)
+
+	respondJson(w, http.StatusOK, map[string]string{})
 }

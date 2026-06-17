@@ -39,22 +39,21 @@ async function submit() {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
-                Authorization: `Bearer ${store.account!.authToken}`,
                 "Content-Type": "application/json",
             },
         });
 
-        const data = await resp.json();
-        if (data.error) {
-            store.toast = {
-                msg: data.error,
-                type: "error",
-            };
+        if (!resp.ok) {
+            const data = await resp.json();
+            if (data.error) {
+                store.toast = {
+                    msg: data.error,
+                    type: "error",
+                };
+            }
             return;
         }
 
-        store.account!.authToken = data.auth_token;
-        store.saveAccountCredentials();
         store.toast = {
             msg: "Password changed",
             type: "info",

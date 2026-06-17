@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	api "codeberg.org/jessienyan/booruview"
-	"codeberg.org/jessienyan/booruview/models"
 	"codeberg.org/jessienyan/booruview/routes"
 	"codeberg.org/jessienyan/booruview/testutil"
 	"github.com/stretchr/testify/require"
@@ -36,14 +35,13 @@ func TestRegisterHandler_Success(t *testing.T) {
 
 	var response routes.RegisterResponse
 	testutil.MustUnmarshalJSON(rec.Body.Bytes(), &response)
+	require.Equal(t, params.Username, response.Username)
 
-	parsedToken, err := api.ParseAuthToken(response.AuthToken)
-	require.NoError(t, err)
-
-	db := models.New(api.UserDB())
-	user, err := db.GetUser(t.Context(), params.Username)
-	require.NoError(t, err)
-	require.Equal(t, parsedToken.UserID, user.ID)
+	// Verify session cookie is set
+	cookies := rec.Result().Cookies()
+	require.Len(t, cookies, 1)
+	require.Equal(t, api.AuthCookieName, cookies[0].Name)
+	require.NotEmpty(t, cookies[0].Value)
 }
 
 func TestRegisterHandler_SpecialCharacters(t *testing.T) {
