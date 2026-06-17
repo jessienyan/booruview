@@ -29,14 +29,14 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: use cookie jar
-	w.Header().Add(
-		"Set-Cookie",
-		fmt.Sprintf(
-			"%s=; Max-Age=0; Path=/; SameSite=strict; HttpOnly",
-			api.AuthCookieName,
-		),
-	)
+	http.SetCookie(w, &http.Cookie{
+		Name:     api.AuthCookieName,
+		Value:    "",
+		MaxAge:   0,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		HttpOnly: true,
+	})
 
 	log.Info().Str("user", user.User.String()).Msg("user logged out")
 	w.WriteHeader(http.StatusNoContent)

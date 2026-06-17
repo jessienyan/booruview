@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -101,15 +100,14 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Add(
-		"Set-Cookie",
-		fmt.Sprintf(
-			"%s=%s; Max-Age=%d; Path=/; SameSite=strict; HttpOnly",
-			api.AuthCookieName,
-			sessionKey,
-			int(api.SessionTTL.Seconds()),
-		),
-	)
+	http.SetCookie(w, &http.Cookie{
+		Name:     api.AuthCookieName,
+		Value:    sessionKey,
+		MaxAge:   int(api.SessionTTL.Seconds()),
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		HttpOnly: true,
+	})
 	log.Info().Str("user", u.String()).Msg("user logged in")
 	respondJson(w, 200, LoginResponse{Username: u.Username})
 }
