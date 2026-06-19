@@ -34,5 +34,11 @@
 		transport http {
 			tls
 		}
+
+		# Triggers file downloads
+		@proxyOk status 200
+		handle_response @proxyOk {
+			header_down		Content-Disposition		attachment; filename="{path}"
+		}
 	}
 }
