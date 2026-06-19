@@ -5,6 +5,10 @@ export type ChangeLogEntry = {
 
 export const changeLog: ChangeLogEntry[] = [
 	{
+		date: "2026-06-18",
+		changes: ["switched auth from JWT to session cookie", "download link now prompts the user to save the file with the correct filename"]
+	},
+	{
 		date: "2026-06-15",
 		changes: ["use higher quality previews (reverts 2026-06-06)", "update image cdn from img2 to img4 (api returns wrong url)"]
 	},
