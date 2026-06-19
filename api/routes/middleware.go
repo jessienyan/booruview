@@ -18,7 +18,7 @@ type validatedSession struct {
 
 func validateSession(ctx context.Context, key string) (validatedSession, error) {
 	if key == "" {
-		return validatedSession{}, api.SessionInvalid
+		return validatedSession{}, nil
 	}
 
 	db := models.New(api.UserDB())
