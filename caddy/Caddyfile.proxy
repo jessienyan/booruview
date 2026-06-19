@@ -7,11 +7,11 @@
     }
 
 	map {query.to}															{proxy_upstream}	{proxy_path} {
-		~^https:\/\/(img[0-9]\.gelbooru\.com)(\/(?:images|samples)\/.+)$	"${1}"					"${2}"
-		~^https:\/\/(video-cdn[0-9]\.gelbooru\.com)(\/images\/.+)$			"${1}"					"${2}"
-		~^https:\/\/(gelbooru\.com)(\/thumbnails\/.+)$						"${1}"					"${2}"
+		~^https:\/\/(img[0-9]\.gelbooru\.com)(\/(?:images|samples)\/.+)$	"${1}"				"${2}"
+		~^https:\/\/(video-cdn[0-9]\.gelbooru\.com)(\/images\/.+)$			"${1}"				"${2}"
+		~^https:\/\/((?:img[0-9]\.)?gelbooru\.com)(\/thumbnails\/.+)$		"${1}"				"${2}"
 
-		default																""						""
+		default																""					""
 	}
 
 	@invalid_url `{proxy_upstream} == ""`
@@ -24,6 +24,12 @@
 
 		header_up Referer	https://gelbooru.com
 		header_up Host		{proxy_upstream}
+
+		# Strip sensitive headers
+		header_up -Via
+		header_up -Cdn-Loop
+		header_up -Cf-*
+		header_up -X-*
 
 		transport http {
 			tls
