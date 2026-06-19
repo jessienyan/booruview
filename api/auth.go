@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"net/http"
 	"time"
 
 	"golang.org/x/crypto/argon2"
@@ -49,4 +50,26 @@ func GenerateSessionKey() string {
 	buf := make([]byte, sessionKeyLength)
 	rand.Read(buf)
 	return hex.EncodeToString(buf)
+}
+
+func SetAuthCookie(w http.ResponseWriter, key string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     AuthCookieName,
+		Value:    key,
+		MaxAge:   int(SessionTTL.Seconds()),
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		HttpOnly: true,
+	})
+}
+
+func RemoveAuthCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     AuthCookieName,
+		Value:    "",
+		MaxAge:   -1,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		HttpOnly: true,
+	})
 }

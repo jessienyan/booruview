@@ -116,14 +116,6 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     api.AuthCookieName,
-		Value:    sessionKey,
-		MaxAge:   int(api.SessionTTL.Seconds()),
-		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
-		HttpOnly: true,
-	})
-
+	api.SetAuthCookie(w, sessionKey)
 	respondJson(w, 200, RegisterResponse{Username: u.Username})
 }

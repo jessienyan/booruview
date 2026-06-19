@@ -153,8 +153,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 		} else {
-			respondWithUnauthorized(w)
-			return
+			if err == api.SessionExpired {
+				api.RemoveAuthCookie(w)
+			} else {
+				log.Warn().Err(err).Msg("session cookie denied")
+			}
 		}
 
 		next.ServeHTTP(w, req)

@@ -100,14 +100,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     api.AuthCookieName,
-		Value:    sessionKey,
-		MaxAge:   int(api.SessionTTL.Seconds()),
-		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
-		HttpOnly: true,
-	})
+	api.SetAuthCookie(w, sessionKey)
 	log.Info().Str("user", u.String()).Msg("user logged in")
 	respondJson(w, 200, LoginResponse{Username: u.Username})
 }

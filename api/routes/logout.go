@@ -29,15 +29,7 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     api.AuthCookieName,
-		Value:    "",
-		MaxAge:   -1,
-		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
-		HttpOnly: true,
-	})
-
+	api.RemoveAuthCookie(w)
 	log.Info().Str("user", user.User.String()).Msg("user logged out")
 	w.WriteHeader(http.StatusNoContent)
 }
