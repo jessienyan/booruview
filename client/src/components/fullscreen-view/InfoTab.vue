@@ -6,6 +6,10 @@ import TagList from "../TagList.vue";
 const tags = ref<Tag[]>([]);
 const { post } = defineProps<{ post: Post }>();
 
+const downloadUrl = computed(() => {
+    return `${post.image_url || post.lowres_url}&download`;
+});
+
 watchEffect(() => {
     if (post === null) {
         return;
@@ -69,10 +73,7 @@ const styledTags = computed(() =>
     <div class="tag-list" :style="containerStyle">
         <TagList :jiggle="false" :tags="styledTags" />
         <p>
-            <a :href="post.image_url || post.lowres_url" target="_blank"
-                >download<i class="bi bi-download"></i
-            ></a>
-            -
+            <a :href="downloadUrl">download<i class="bi bi-download"></i></a> -
             <a
                 :href="`https://gelbooru.com/index.php?page=post&s=view&id=${post.id}`"
                 target="_blank"
