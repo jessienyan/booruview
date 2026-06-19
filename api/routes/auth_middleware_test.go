@@ -76,12 +76,15 @@ func TestAuthMiddleware_InvalidSession(t *testing.T) {
 	req.AddCookie(sessionCookie("invalidsession"))
 	rec := httptest.NewRecorder()
 
+	called := false
 	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.Fail(t, "should not be called")
+		// invalid sessions are silently ignored when auth is optional
+		called = true
 	}))
 	handler.ServeHTTP(rec, req)
 
-	require.Equal(t, http.StatusUnauthorized, rec.Code)
+	require.True(t, called)
+	require.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestAuthMiddleware_ExpiredSession(t *testing.T) {
@@ -100,12 +103,16 @@ func TestAuthMiddleware_ExpiredSession(t *testing.T) {
 	req.AddCookie(sessionCookie(key))
 	rec := httptest.NewRecorder()
 
+	called := false
 	handler := routes.AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		require.Fail(t, "should not be called")
+		// invalid sessions are silently ignored when auth is optional
+		called = true
 	}))
 	handler.ServeHTTP(rec, req)
 
-	require.Equal(t, http.StatusUnauthorized, rec.Code)
+	require.Empty(t, rec.Result().Cookies()) // should clear cookie
+	require.True(t, called)
+	require.Equal(t, http.StatusOK, rec.Code)
 }
 
 func TestAuthMiddleware_UserDeleted(t *testing.T) {
