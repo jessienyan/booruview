@@ -32,7 +32,7 @@ func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     api.AuthCookieName,
 		Value:    "",
-		MaxAge:   0,
+		MaxAge:   -1,
 		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
 		HttpOnly: true,
