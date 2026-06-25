@@ -259,6 +259,10 @@ function onBrowserBack() {
     wasClosedFromBackButton.value = true;
 }
 
+const downloadUrl = computed(() => {
+    return `${post.image_url || post.lowres_url}&download`;
+});
+
 onMounted(() => {
     document.addEventListener("keydown", onKeyDown, { capture: true });
 
@@ -339,6 +343,9 @@ onUnmounted(() => {
                         :class="[`bi-${isFavorited ? 'heart-fill' : 'heart'}`]"
                     ></i>
                 </button>
+                <a class="menu-btn" title="download" :href="downloadUrl">
+                    <i class="bi bi-download"></i>
+                </a>
                 <button
                     class="menu-btn"
                     title="previous image"
@@ -421,7 +428,7 @@ onUnmounted(() => {
     opacity: 0.5;
     transition: opacity 150ms;
     cursor: pointer;
-    padding: 0.6rem 0.8rem;
+    padding: 0.6rem 0.6rem;
 
     &:not(:disabled) {
         &:hover,
