@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { type CSSProperties, computed, ref, watchEffect } from "vue";
+import { useDownloadURL } from "@/composable";
 import store from "@/store";
 import TagList from "../TagList.vue";
 
 const tags = ref<Tag[]>([]);
 const { post } = defineProps<{ post: Post }>();
 
-const downloadUrl = computed(() => {
-    return `${post.image_url || post.lowres_url}&download`;
-});
+const downloadUrl = useDownloadURL(post);
 
 watchEffect(() => {
     if (post === null) {

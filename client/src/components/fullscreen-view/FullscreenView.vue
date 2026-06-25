@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { type CSSProperties, computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { useIsVideo, useMainContainer, useStationaryClick } from "@/composable";
+import {
+    useDownloadURL,
+    useIsVideo,
+    useMainContainer,
+    useStationaryClick,
+} from "@/composable";
 import store, {
     type FullscreenViewMenuAnchorPoint,
     searchCache,
@@ -259,9 +264,7 @@ function onBrowserBack() {
     wasClosedFromBackButton.value = true;
 }
 
-const downloadUrl = computed(() => {
-    return `${post.image_url || post.lowres_url}&download`;
-});
+const downloadUrl = useDownloadURL(post);
 
 onMounted(() => {
     document.addEventListener("keydown", onKeyDown, { capture: true });
@@ -346,6 +349,7 @@ onUnmounted(() => {
                 <a class="menu-btn" title="download" :href="downloadUrl">
                     <i class="bi bi-download"></i>
                 </a>
+                <div class="separator"></div>
                 <button
                     class="menu-btn"
                     title="previous image"
@@ -471,5 +475,14 @@ onUnmounted(() => {
     color: #bb9fce;
     text-shadow: 0 0 0.4rem #bb9fce;
     padding-right: 0.8rem;
+}
+
+.separator {
+    width: 1px;
+    height: 36px;
+    margin: 0 0.4em;
+    background-color: white;
+    opacity: 0.3;
+    align-self: center;
 }
 </style>

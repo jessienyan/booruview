@@ -15,7 +15,6 @@ import {
     watch,
 } from "vue";
 import store from "./store";
-import type { RefOrGetter } from "./types";
 
 export function useDismiss(el: MaybeRefOrGetter<MaybeRefOrGetter<HTMLElement | null>[]>, onDismiss: () => void) {
 	function handler(e: MouseEvent) {
@@ -156,7 +155,7 @@ export function useViewportSize() {
 }
 
 // Rewrites an image URL to use the current CDN host
-export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<string> {
+export function useGelbooruImageURL(url_: MaybeRefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
 		let url = toValue(url_);
 
@@ -187,7 +186,7 @@ export function useGelbooruImageURL(url_: RefOrGetter<string>): ComputedRef<stri
 }
 
 // Rewrites a video URL to use the current CDN host
-export function useGelbooruVideoURL(url_: RefOrGetter<string>): ComputedRef<string> {
+export function useGelbooruVideoURL(url_: MaybeRefOrGetter<string>): ComputedRef<string> {
 	return computed<string>(() => {
 		let url = toValue(url_);
 
@@ -275,4 +274,20 @@ export function usePanZoom({enable, el, key}: UsePanZoomOptions) {
 	onUnmounted(() => teardown());
 	onDeactivated(() => pz.value?.pause());
 	onActivated(() => pz.value?.resume());
+}
+
+export function useDownloadURL(post: MaybeRefOrGetter<Post>) {
+	return computed(() => {
+		const isVideo = useIsVideo(post);
+		const postVal = toValue(post);
+		let url = "";
+
+		if(isVideo.value) {
+			url = useGelbooruVideoURL(postVal.image_url).value;
+		} else {
+			url = useGelbooruImageURL(postVal.image_url || postVal.lowres_url).value;
+		}
+
+		return `${url}&download`;
+	});
 }
